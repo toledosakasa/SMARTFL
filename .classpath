@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.5.2.v_981_R35x.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.5.2.R35x_v20100126.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

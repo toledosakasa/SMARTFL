@@ -1,8 +1,11 @@
-### BTrace Log: 19-12-11 обнГ11:35
+### BTrace Log: 12/19/19 3:01 PM
 
-foo.<clinit>:1
 foo.main:11
 foo.main:12
 foo.main:13
 foo.main:14
+foo.f:5
+foo.f:6
+foo.f:7
+foo.f:8
 foo.main:15

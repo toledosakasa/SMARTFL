@@ -9,8 +9,8 @@ public class foo {
 	}  
 	public static void main(String []args) {
        int b = 3;
-       int c = b + 1 ;
+       int c = b + 1;
        int a = 12;
-       assert(f(1) == 3);
+       f(2);
     }
 } 

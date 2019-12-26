@@ -16,8 +16,7 @@ public class LineInfo {
 	public Line getLineByPos(int pos)
 	{
 		int l = cu.getLineNumber(pos);
-		if(!linemap.containsKey(l))addLine(l);
-		return linemap.get(l);
+		return getLine(l);
 	}
 	
 	public Line getLine(int l)
@@ -37,6 +36,7 @@ public class LineInfo {
 	}
 	public void print()
 	{
+		System.out.println("lineinfo: ");
 		for(Integer k : linemap.keySet())
 		{
 			System.out.println(k + ":");

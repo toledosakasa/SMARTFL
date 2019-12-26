@@ -17,10 +17,12 @@ import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimplePropertyDescriptor;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
@@ -31,9 +33,11 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 public class LineMappingVisitor extends ASTVisitor {
 	private final LineInfo lineinfo;
 	private Stack<Integer> predqueue;
+	private List<String> methodargs;
 	private Map<String, Map<Integer, Integer>> vtable;// varname, <domainstart,domainend>
 	private Map<String, Map<Integer, Integer>> vmap;// varname, <usepos,defpos(domainstart)>
-	private String predvarname = "__PREDVAR__#";
+	private static String predvarname = "__PREDVAR__#";
+	private static String constantname = "__CONSTANT__#";
 
 	public LineMappingVisitor(LineInfo l) {
 		lineinfo = l;
@@ -43,11 +47,10 @@ public class LineMappingVisitor extends ASTVisitor {
 		// print(lineinfo.cu);
 	}
 
-	private String getNormVarname(String varname, int usepos)
-	{
+	private String getNormVarname(String varname, int usepos) {
 		return varname + "#" + String.valueOf(getVarDom(varname, usepos));
 	}
-	
+
 	private int getVarDom(String varname, int usepos) {
 		if (!vtable.containsKey(varname)) {// should not happen. temporal solution for x.f
 			return usepos;
@@ -83,14 +86,14 @@ public class LineMappingVisitor extends ASTVisitor {
 				Object value = rs.getStructuralProperty(simple);
 				// System.out.println(simple.getId() + " (" + value.toString() + ")");
 				if (simple.getId().equals("identifier")) {
-					String s = getNormVarname(value.toString(),pos);
+					String s = getNormVarname(value.toString(), pos);
 					uses.add(s);
 				}
 				if (simple.getId().equals("operator")) {
 					ops.add(value.toString());
 				}
 				if (simple.getId().equals("token")) {
-					uses.add("constant");
+					uses.add(getConstName());
 				}
 			} else if (descriptor instanceof ChildPropertyDescriptor) {
 				ChildPropertyDescriptor child = (ChildPropertyDescriptor) descriptor;
@@ -128,8 +131,19 @@ public class LineMappingVisitor extends ASTVisitor {
 		return node;
 	}
 
+	public static String getPredName(int pos) {
+		return predvarname + String.valueOf(pos);
+	}
+
+	public static String getConstName() {
+		return constantname;
+	}
+
 	public void varDeclare(VariableDeclaration node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		
+		
+		//System.out.print("At pos " + pos + " : ");
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		String defname = node.getName().getIdentifier();
@@ -162,7 +176,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		if (node.getInitializer() != null) {
 			ASTNode childNode = node.getInitializer();
 			getUsesAndOps(childNode, uses, ops);
-			lineinfo.getLine(pos).setDef(getNormVarname(defname,pos));
+			lineinfo.getLine(pos).setDef(getNormVarname(defname, pos));
 			lineinfo.getLine(pos).addOps(ops);
 			lineinfo.getLine(pos).addUses(uses);
 			lineinfo.getLine(pos).addPreds(predqueue);
@@ -171,38 +185,63 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(VariableDeclarationFragment node) {
+		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
 		varDeclare(node);
 		return true;
 	}
 
 	public boolean visit(SingleVariableDeclaration node) {
+		
 		varDeclare(node);
 		return true;
 	}
 
+	public void initLine(Line l) {
+		if (methodargs != null && !methodargs.isEmpty()) {
+			l.initMethod(methodargs);
+			methodargs = null;
+		}
+	}
+
 	public boolean visit(Assignment node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+		return true;
+	}
+
+	public void endVisit(Assignment node) {
+		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
 		String defname = getSimpleDef(node.getLeftHandSide());
+
+		if (l.isMethodInvocation()) {
+			l.setRetDef(getNormVarname(defname, pos));
+			return;
+		}
 		// System.out.println(defname+String.valueOf(pos)+getVarDom(defname, pos));
-		lineinfo.getLine(pos).setDef(getNormVarname(defname,pos));
+		l.setDef(getNormVarname(defname, pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		getUsesAndOps(node.getRightHandSide(), uses, ops);
-		lineinfo.getLine(pos).addUses(uses);
-		lineinfo.getLine(pos).addOps(ops);
-		lineinfo.getLine(pos).addPreds(predqueue);
+		l.addUses(uses);
+		l.addOps(ops);
+		l.addPreds(predqueue);
 		// print(node.getRightHandSide());
-		return true;
 	}
 
 	public boolean visit(IfStatement node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
-		lineinfo.getLine(pos).setDef(predvarname + String.valueOf(pos));
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+		l.setDef(getPredName(pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		getUsesAndOps(node.getExpression(), uses, ops);
-		lineinfo.getLine(pos).addUses(uses);
-		lineinfo.getLine(pos).addOps(ops);
+		l.addUses(uses);
+		l.addOps(ops);
 		predqueue.push(pos);
 		return true;// TODO merge else branch defs.
 	}
@@ -214,12 +253,14 @@ public class LineMappingVisitor extends ASTVisitor {
 
 	public boolean visit(WhileStatement node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
-		lineinfo.getLine(pos).setDef(predvarname + String.valueOf(pos));
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+		l.setDef(getPredName(pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		getUsesAndOps(node.getExpression(), uses, ops);
-		lineinfo.getLine(pos).addUses(uses);
-		lineinfo.getLine(pos).addOps(ops);
+		l.addUses(uses);
+		l.addOps(ops);
 		predqueue.push(pos);
 		return true;// TODO merge else branch defs.
 	}
@@ -231,12 +272,14 @@ public class LineMappingVisitor extends ASTVisitor {
 
 	public boolean visit(DoStatement node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
-		lineinfo.getLine(pos).setDef(predvarname + String.valueOf(pos));
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+		l.setDef(getPredName(pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		getUsesAndOps(node.getExpression(), uses, ops);
-		lineinfo.getLine(pos).addUses(uses);
-		lineinfo.getLine(pos).addOps(ops);
+		l.addUses(uses);
+		l.addOps(ops);
 		predqueue.push(pos);
 		return true;// TODO merge else branch defs.
 	}
@@ -248,12 +291,14 @@ public class LineMappingVisitor extends ASTVisitor {
 
 	public boolean visit(ForStatement node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
-		lineinfo.getLine(pos).setDef(predvarname + String.valueOf(pos));
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+		l.setDef(getPredName(pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		getUsesAndOps(node.getExpression(), uses, ops);
-		lineinfo.getLine(pos).addUses(uses);
-		lineinfo.getLine(pos).addOps(ops);
+		l.addUses(uses);
+		l.addOps(ops);
 		predqueue.push(pos);
 		return true;// TODO merge else branch defs.
 	}
@@ -265,15 +310,57 @@ public class LineMappingVisitor extends ASTVisitor {
 	// TODO EnhancedForStatement
 
 	public boolean visit(MethodInvocation node) {
-		System.out.println(node.arguments());
-		System.out.println(node.getName());
+		// System.out.println(node.arguments());
+		// System.out.println(node.getName());
+		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+
+		l.initMethodInvocation();
+		List<Expression> args = node.arguments();
+		for (Expression arg : args) {
+			Set<String> uses = new TreeSet<String>();
+			List<String> ops = new ArrayList<String>();
+			getUsesAndOps(arg, uses, ops);
+			l.arguses.add(uses);
+			l.argops.add(ops);
+		}
 		return true;
 	}
-	
+
 	public boolean visit(MethodDeclaration node) {
+
+		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+
+		List<SingleVariableDeclaration> pars = node.parameters();
+
+		List<String> argdefs = new ArrayList<String>();
+		for (SingleVariableDeclaration tmp : pars) {
+			String s = tmp.getName().getIdentifier();
+			argdefs.add(getNormVarname(s, pos));
+		}
+		if (!argdefs.isEmpty()) {
+			methodargs = argdefs;
+		}
 		return true;
 	}
 	
+	public boolean visit(ReturnStatement node) {
+		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
+		initLine(l);
+
+		Set<String> uses = new TreeSet<String>();
+		List<String> ops = new ArrayList<String>();
+		getUsesAndOps(node.getExpression(), uses, ops);
+		l.initRet(uses,ops);
+		l.addPreds(predqueue);
+		
+		return true;
+	}
+
 	private void print(ASTNode node) {
 		List properties = node.structuralPropertiesForType();
 

@@ -1,7 +1,5 @@
 package ppfl;
 
-
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -44,10 +42,10 @@ public class GraphConstructor {
 		}
 		// Set the appropriate variables based on supplied options
 		String filepatht = "E:\\My_files\\eclipse-workspace\\ppfl\\simpletests\\foo.java";
-		String tracepatht = "E:\\My_files\\eclipse-workspace\\ppfl\\traces\tmp.txt";
-		
+		String tracepatht = "E:\\My_files\\eclipse-workspace\\ppfl\\traces\\tmp.txt";
+
 		if (commandLine.hasOption('S')) {
-			filepatht= commandLine.getOptionValue('S');
+			filepatht = commandLine.getOptionValue('S');
 		}
 		if (commandLine.hasOption('T')) {
 			tracepatht = commandLine.getOptionValue('T');
@@ -55,13 +53,13 @@ public class GraphConstructor {
 		if (commandLine.hasOption('v')) {
 			verboset = true;
 		}
-		
+
 		final String TraceFile = tracepatht;
 		final boolean verbose = verboset;
-		final String FilePath= filepatht;
+		final String FilePath = filepatht;
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
 		final AST ast = AST.newAST(AST.JLS3);
-		
+
 		System.out.println(FilePath);
 		String source = readFileToString(FilePath);
 		parser.setSource(source.toCharArray());
@@ -72,9 +70,17 @@ public class GraphConstructor {
 		ASTVisitor visitor = new LineMappingVisitor(lineinfo);
 		cu.accept(visitor);
 		lineinfo.print();
-		//TODO construct Pgraph by lineinfo and trace.
+		// TODO construct Pgraph by lineinfo and trace.
+		
+		Graph pgraph = new Graph(lineinfo,tracepatht);
+		pgraph.observe("foo.main#14", true);
+		pgraph.observe("a#3#3",false);
+		pgraph.printgraph();
+		
+		pgraph.inference();
+		
+		pgraph.printprobs();
 	}
-
 
 	private static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
