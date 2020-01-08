@@ -41,8 +41,9 @@ public class GraphConstructor {
 			e1.printStackTrace();
 		}
 		// Set the appropriate variables based on supplied options
-		String filepatht = "E:\\My_files\\eclipse-workspace\\ppfl\\simpletests\\foo.java";
-		String tracepatht = "E:\\My_files\\eclipse-workspace\\ppfl\\traces\\tmp.txt";
+		String ppflroot = ".";
+		String filepatht = ppflroot + "\\simpletests\\foo.java";
+		String tracepatht =  ppflroot +"\\traces\\tmp.txt";
 
 		if (commandLine.hasOption('S')) {
 			filepatht = commandLine.getOptionValue('S');
@@ -72,7 +73,7 @@ public class GraphConstructor {
 		lineinfo.print();
 		// TODO construct Pgraph by lineinfo and trace.
 		
-		Graph pgraph = new Graph(lineinfo,tracepatht);
+		Graph pgraph = new Graph(lineinfo,tracepatht,"Simpletest");
 		pgraph.observe("foo.main#14", true);
 		pgraph.observe("a#3#3",false);
 		pgraph.printgraph();

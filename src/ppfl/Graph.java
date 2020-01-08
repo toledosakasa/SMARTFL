@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Vector;
 
 public class Graph {
 
@@ -19,6 +20,7 @@ public class Graph {
 	private List<Node> nodes;
 	private List<StmtNode> stmts;
 	private Map<String, Node> nodemap;
+	private Map<String, Node> stmtmap;
 	private Map<String, Integer> varcountmap;
 
 	private StmtNode callernode;
@@ -26,20 +28,30 @@ public class Graph {
 	private List<Set<String>> passedargs;
 	private String returnDef;
 
-	private int nsamples = 10000;
+	private String testname;
+
+	private int nsamples = 1 << 10;
 	Random random;
 
 	public Graph() {
 
 	}
 
-	public Graph(LineInfo lineinfo, String tracefilename) {
+	public Graph(LineInfo lineinfo, String tracefilename, String testname) {
+		this.testname = testname;
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
 		stmts = new ArrayList<StmtNode>();
 		nodemap = new TreeMap<String, Node>();
+		stmtmap = new TreeMap<String, Node>();
 		varcountmap = new TreeMap<String, Integer>();
 		random = new Random();
+		parsetrace(lineinfo, tracefilename, testname);
+	}
+
+	public void parsetrace(LineInfo lineinfo, String tracefilename, String testname) {
+		this.testname = testname;
+		varcountmap = new TreeMap<String, Integer>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
 			String t;
@@ -54,13 +66,12 @@ public class Graph {
 				StmtNode stmt = null;
 				String stmtname = domain + "#" + String.valueOf(line);
 				// System.out.println("At line " + stmtname);
-				if (!nodemap.containsKey(stmtname)) {
+				if (!hasNode(stmtname)) {
 					stmt = new StmtNode(stmtname);
-					nodemap.put(stmtname, stmt);
-					stmts.add(stmt);
-					nodes.add(stmt);
+					addNode(stmtname, stmt);
+
 				} else {
-					stmt = (StmtNode) nodemap.get(stmtname);
+					stmt = (StmtNode) getNode(stmtname);
 					assert (stmt.isStmt());
 				}
 
@@ -94,7 +105,7 @@ public class Graph {
 				}
 
 				if (curline.def != null) {
-					//curline.print();
+					// curline.print();
 					FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, stmt);
 				}
 
@@ -108,25 +119,24 @@ public class Graph {
 	}
 
 	private FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, StmtNode stmt) {
-		
 
 		List<Node> prednodes = new ArrayList<Node>();
 		if (preds != null)
 			for (Integer i : preds) {
 				String s = LineMappingVisitor.getPredName(i);
-				assert (nodemap.containsKey(s));
 				String predname = getVarName(s, varcountmap);
-				prednodes.add(nodemap.get(predname));
+				assert (hasNode(predname));
+				prednodes.add(getNode(predname));
 			}
 		List<Node> usenodes = new ArrayList<Node>();
 		if (uses != null)
 			for (String s : uses) {
-				if (!s.equals(LineMappingVisitor.getConstName())) {//TODO deal with constants.
+				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
 					// System.out.print(s + " ");
 					assert (varcountmap.containsKey(s));
 					String usename = getVarName(s, varcountmap);
 					// System.out.println("Setting uses: " + usename);
-					usenodes.add(nodemap.get(usename));
+					usenodes.add(getNode(usename));
 				}
 			}
 		if (!varcountmap.containsKey(def)) {
@@ -135,11 +145,10 @@ public class Graph {
 			varcountmap.put(def, varcountmap.get(def) + 1);
 		}
 		String defname = getVarName(def, varcountmap);
-		Node defnode = new Node(defname);
+		Node defnode = new Node(defname, testname);
 		// System.out.println("Adding def: " + defname);
-		nodemap.put(defname, defnode);
-		nodes.add(defnode);
-		
+		addNode(defname, defnode);
+
 		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes);
 		factornodes.add(ret);
 		return ret;
@@ -150,12 +159,45 @@ public class Graph {
 		return name + "#" + String.valueOf(count);
 	}
 
+	private String getNodeName(String name) {
+		return this.testname + "#" + name;
+	}
+
+	private boolean hasNode(String name) {
+		return nodemap.containsKey(getNodeName(name)) || stmtmap.containsKey(name);
+	}
+
+	private void addNode(String name, Node node) {
+		if (node instanceof StmtNode) {
+			stmtmap.put(name, node);
+			stmts.add((StmtNode) node);
+		} else {
+			nodemap.put(getNodeName(name), node);
+			nodes.add(node);
+		}
+	}
+
+	private Node getNode(String name) {
+		if (nodemap.containsKey(getNodeName(name)))
+			return nodemap.get(getNodeName(name));
+		else if (stmtmap.containsKey(name))
+			return stmtmap.get(name);
+		else
+			return null;
+	}
+
 	public void inference() {
 		for (Node n : nodes) {
 			n.init();
 		}
+		for (Node n : stmts) {
+			n.init();
+		}
 		for (int i = 0; i < nsamples; i++) {
 			for (Node n : nodes) {
+				n.setTemp(random.nextBoolean());
+			}
+			for (Node n : stmts) {
 				n.setTemp(random.nextBoolean());
 			}
 			double product = 1.0;
@@ -165,12 +207,29 @@ public class Graph {
 			for (Node n : nodes) {
 				n.addimp(product);
 			}
+			for (Node n : stmts) {
+				n.addimp(product);
+			}
 		}
 
+		nodes.sort(new Comparator<Node>() {
+			@Override
+			public int compare(Node arg0, Node arg1) {
+				if (Double.isNaN(arg0.getprob()))
+					return 1;
+				if (Double.isNaN(arg1.getprob()))
+					return -1;
+				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
+			}
+		});
 		stmts.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				return (arg0.getprob() - arg1.getprob()) > 0 ? 1 : -1;
+				if (Double.isNaN(arg0.getprob()))
+					return 1;
+				if (Double.isNaN(arg1.getprob()))
+					return -1;
+				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
 			}
 		});
 		return;
@@ -190,13 +249,11 @@ public class Graph {
 
 	public void printgraph() {
 		System.out.println("\nNodes: ");
-		for (Node n : nodes) {
-			if (n.isStmt)
-				n.print();
+		for (Node n : stmts) {
+			n.print();
 		}
 		for (Node n : nodes) {
-			if (!n.isStmt)
-				n.print();
+			n.print();
 		}
 		System.out.println("Factors:");
 		for (FactorNode n : factornodes) {
@@ -206,19 +263,24 @@ public class Graph {
 
 	public void printprobs() {
 		System.out.println("\nProbabilities: ");
-		System.out.println("Vars:");
+		System.out.println("Vars:" + nodes.size());
 		for (Node n : nodes) {
-			if (!n.isStmt)
-				n.printprob();
+			n.printprob();
 		}
-		System.out.println("Stmts:");
+		System.out.println("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
 			n.printprob();
 		}
 	}
 
 	public void observe(String s, boolean v) {
+		String name = getNodeName(s);
 		for (Node n : nodes) {
+			if (n.getName().equals(name)) {
+				n.observe(v);
+			}
+		}
+		for (Node n : stmts) {
 			if (n.getName().equals(s)) {
 				n.observe(v);
 			}

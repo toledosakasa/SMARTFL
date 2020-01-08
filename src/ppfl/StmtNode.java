@@ -9,7 +9,23 @@ public class StmtNode extends Node {
 	}
 
 	public boolean equals(StmtNode oth) {
-		return this.getName().equals(oth.getName());
+		return this.name.equals(oth.name);
 	}
 
+	public void print() {
+		System.out.print(this.name);
+		System.out.print("(Statement)");
+		if (this.obs) {
+			System.out.print(" observed = " + this.obsvalue);
+		}
+		System.out.println("");
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void printprob() {
+		System.out.println(this.name + " prob = " + String.valueOf(getprob()));
+	}
 }

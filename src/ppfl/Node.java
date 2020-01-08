@@ -1,15 +1,16 @@
 package ppfl;
 
 public class Node {
-	private boolean obs;// obs = 1 means observed as a given value, which excludes this node from
-						// inference procedure.
-	private boolean obsvalue;
+	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from
+							// inference procedure.
+	protected boolean obsvalue;
 	private boolean tempvalue;// for inference(sampling)
 	protected boolean isStmt;
 	private double p;// inferred chance to be correct
-	private String name;
+	protected String name;
 	private double impT;
 	private double impF;// importance for True and False in importance sampling.
+	private String testname;
 
 	public Node(String name) {
 		this.obs = false;
@@ -19,8 +20,17 @@ public class Node {
 		tempvalue = true;// TODO init by statistics
 	}
 
+	public Node(String name, String testname) {
+		this.testname = testname;
+		this.obs = false;
+		this.p = 0.5;
+		this.name = name;
+		isStmt = false;
+		tempvalue = true;// TODO init by statistics
+	}
+
 	public String getName() {
-		return this.name;
+		return this.testname + "#" + this.name;
 	}
 
 	public void observe(boolean obsvalue) {
@@ -62,10 +72,9 @@ public class Node {
 
 	public void print() {
 		System.out.print(this.getName());
-		if (this.isStmt)
-			System.out.print("(Statement)");
-		if(this.obs) {
-			System.out.print(" observed = "+ this.obsvalue);
+		System.out.print("(Statement)");
+		if (this.obs) {
+			System.out.print(" observed = " + this.obsvalue);
 		}
 		System.out.println("");
 	}

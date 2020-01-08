@@ -8,9 +8,9 @@ public class FactorNode {
 	private Node stmt;
 	private List<Node> uses;
 	// TODO consider operators
-	private double HIGH = 0.95;
+	private double HIGH = 0.99;
 	private double MEDIUM = 0.5;
-	private double LOW = 0.05;
+	private double LOW = 0.01;
 
 	public FactorNode(Node def, Node stmt, List<Node> preds, List<Node> uses) {
 		this.preds = preds;
@@ -57,7 +57,6 @@ public class FactorNode {
 			// def = true stmt = false use = false
 			return LOW;// TODO should be medium when using certain ops.
 		}
-
 		return MEDIUM;
 	}
 

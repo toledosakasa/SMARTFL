@@ -1,0 +1,8 @@
+### BTrace Log: 12/19/19 3:01 PM
+
+foo.main:14
+foo.f:5
+foo.f:6
+foo.f:7
+foo.f:8
+foo.main:15

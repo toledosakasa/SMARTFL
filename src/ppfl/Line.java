@@ -105,6 +105,7 @@ public class Line {
 	}
 
 	public void initRet(Set<String> retuses, List<String> retops) {
+		this.isret = true;
 		this.retuses = retuses;
 		this.retops = retops;
 	}
