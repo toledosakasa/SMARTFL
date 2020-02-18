@@ -42,8 +42,9 @@ class GraphTest {
 		pgraph.observe("a#3#3", false);
 		pgraph.printgraph();
 		pgraph.inference();
-		pgraph.printprobs();
-
+        pgraph.printprobs();
+        pgraph.bp_inference();
+		pgraph.bp_printprobs();
 		assertFalse(fail);
 	}
 	
@@ -97,7 +98,9 @@ class GraphTest {
 		pgraph.observe("a#3#3", false);
 		pgraph.printgraph();
 		pgraph.inference();
-		pgraph.printprobs();
+        pgraph.printprobs();
+        pgraph.bp_inference();
+		pgraph.bp_printprobs();
 		
 		assertFalse(fail);
 	}

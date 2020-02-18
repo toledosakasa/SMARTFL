@@ -22,7 +22,7 @@ public class Graph {
 	private Map<String, Node> nodemap;
 	private Map<String, Node> stmtmap;
 	private Map<String, Integer> varcountmap;
-
+	
 	private StmtNode callernode;
 	private Line caller;
 	private List<Set<String>> passedargs;
@@ -30,7 +30,8 @@ public class Graph {
 
 	private String testname;
 
-	private int nsamples = 1 << 10;
+    private int nsamples = 1 << 20;
+    private int bp_times = 100;
 	Random random;
 
 	public Graph() {
@@ -149,7 +150,24 @@ public class Graph {
 		// System.out.println("Adding def: " + defname);
 		addNode(defname, defnode);
 
-		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes);
+        Edge dedge = new Edge();
+        defnode.add_edge(dedge);
+        Edge sedge = new Edge();
+        stmt.add_edge(sedge);
+        List<Edge> puedges = new ArrayList<Edge>();
+        for(Node n : prednodes)
+        {
+            Edge nedge = new Edge();
+            puedges.add(nedge);
+            n.add_edge(nedge);
+        }
+        for(Node n : usenodes)
+        {
+            Edge nedge = new Edge();
+            puedges.add(nedge);
+            n.add_edge(nedge);
+        }
+		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, dedge, sedge, puedges);
 		factornodes.add(ret);
 		return ret;
 	}
@@ -233,7 +251,48 @@ public class Graph {
 			}
 		});
 		return;
-	}
+    }
+    
+    public void bp_inference()
+    {
+        for(int i=0;i<bp_times;i++)
+        {
+            for(FactorNode n: factornodes)
+            {
+                n.send_message();
+            }
+            for(Node n: nodes)
+            {
+                n.send_message();
+            }
+            for(Node n: stmts)
+            {
+                n.send_message();
+            }
+        }
+        nodes.sort(new Comparator<Node>() {
+			@Override
+			public int compare(Node arg0, Node arg1) {
+				if (Double.isNaN(arg0.bp_getprob()))
+					return 1;
+				if (Double.isNaN(arg1.bp_getprob()))
+					return -1;
+				return (arg0.bp_getprob() - arg1.bp_getprob()) < 0 ? -1 : 1;
+			}
+        });
+        stmts.sort(new Comparator<Node>() {
+			@Override
+			public int compare(Node arg0, Node arg1) {
+				if (Double.isNaN(arg0.bp_getprob()))
+					return 1;
+				if (Double.isNaN(arg1.bp_getprob()))
+					return -1;
+				return (arg0.bp_getprob() - arg1.bp_getprob()) < 0 ? -1 : 1;
+			}
+        });
+        return;
+        
+    }
 
 	public StmtNode getTopStmt() {// should be called after inference()
 		return stmts.get(0);
@@ -270,6 +329,18 @@ public class Graph {
 		System.out.println("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
 			n.printprob();
+		}
+    }
+    
+    public void bp_printprobs() {
+		System.out.println("\nProbabilities: ");
+		System.out.println("Vars:" + nodes.size());
+		for (Node n : nodes) {
+			n.bp_printprob();
+		}
+		System.out.println("Stmts:" + stmts.size());
+		for (StmtNode n : stmts) {
+			n.bp_printprob();
 		}
 	}
 
