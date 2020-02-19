@@ -16,6 +16,7 @@ public class Node {
     private String testname;
     
     private List<Edge> edges;
+    private double eplison = 1e-3;
 
 	public Node(String name) {
 		this.obs = false;
@@ -82,7 +83,7 @@ public class Node {
         edges.add(edge) ;
     }
 
-    public void send_message()
+    public boolean send_message()
     {
         if(obs)
         {
@@ -90,8 +91,11 @@ public class Node {
             for (Edge n : edges) {
                 n.set_ntof(val);
             }
+            double delta = val - this.p;
+            if(delta < 0)
+            	delta = -delta;
             this.p = val;
-            return;
+            return delta>eplison;
         }
 
         double v0 = 1,v1 = 1;
@@ -99,7 +103,9 @@ public class Node {
             v1 = v1 * n.get_fton();
             v0 = v0 * (1 - n.get_fton());
         }
-        
+        double delta = v1/(v0+v1) - this.p;
+        if(delta < 0)
+        	delta = -delta;
         this.p = v1 / (v0+v1);
 
         for (Edge n : edges) {
@@ -109,6 +115,7 @@ public class Node {
             tv1 = tv1 / (tv0 + tv1);
             n.set_ntof(tv1);
         }
+        return delta>eplison;
     }
 
 	public double bp_getprob() {

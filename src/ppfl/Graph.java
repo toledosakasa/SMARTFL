@@ -257,17 +257,25 @@ public class Graph {
     {
         for(int i=0;i<bp_times;i++)
         {
+        	boolean isend = true;
             for(FactorNode n: factornodes)
             {
                 n.send_message();
             }
             for(Node n: nodes)
             {
-                n.send_message();
+               if(n.send_message())
+            	   isend = false;
             }
             for(Node n: stmts)
             {
-                n.send_message();
+                if(n.send_message())
+             	   isend = false;
+            }
+            if(isend)
+            {
+            	//System.out.println("\n\n"+i+"\n\n");
+            	break;
             }
         }
         nodes.sort(new Comparator<Node>() {
