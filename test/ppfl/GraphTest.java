@@ -18,35 +18,41 @@ class GraphTest {
 	@Test
 	void domaintest() {
 		boolean fail = false;
-		String ppflroot = ".";
-		String filepatht = ppflroot + "\\simpletests\\domaintest.java";
-		String tracepatht = ppflroot + "\\test_traces\\domaintest_trace.txt";
+		try {
 
-		final String TraceFile = tracepatht;
-		final String FilePath = filepatht;
-		ASTParser parser = ASTParser.newParser(AST.JLS3);
-		final AST ast = AST.newAST(AST.JLS3);
+			String ppflroot = ".";
+			String filepatht = ppflroot + "\\simpletests\\domaintest.java";
+			String tracepatht = ppflroot + "\\test_traces\\domaintest_trace.txt";
 
-		String source = readFileToString(FilePath);
-		parser.setSource(source.toCharArray());
-		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+			final String TraceFile = tracepatht;
+			final String FilePath = filepatht;
+			ASTParser parser = ASTParser.newParser(AST.JLS3);
+			final AST ast = AST.newAST(AST.JLS3);
 
-		final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-		LineInfo lineinfo = new LineInfo(cu);
-		ASTVisitor visitor = new LineMappingVisitor(lineinfo);
-		cu.accept(visitor);
-		lineinfo.print();
+			String source = readFileToString(FilePath);
+			parser.setSource(source.toCharArray());
+			parser.setKind(ASTParser.K_COMPILATION_UNIT);
 
-		Graph pgraph = new Graph(lineinfo, tracepatht, "Simpletest");
-		pgraph.observe("foo.main#14", true);
-		pgraph.observe("a#3#3", false);
-		pgraph.printgraph();
-		pgraph.inference();
-		pgraph.printprobs();
+			final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+			LineInfo lineinfo = new LineInfo(cu);
+			ASTVisitor visitor = new LineMappingVisitor(lineinfo);
+			cu.accept(visitor);
+			lineinfo.print();
 
+			Graph pgraph = new Graph(lineinfo, tracepatht, "Simpletest");
+			pgraph.observe("foo.main#14", true);
+			pgraph.observe("a#3#3", false);
+			pgraph.printgraph();
+			pgraph.inference();
+			pgraph.printprobs();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			fail = true;
+			e.printStackTrace();
+		}
 		assertFalse(fail);
 	}
-	
+
 	@Test
 	void mergetest() {
 		boolean fail = false;
@@ -70,7 +76,7 @@ class GraphTest {
 		ASTVisitor visitorp = new LineMappingVisitor(lineinfop);
 		cu.accept(visitorp);
 		lineinfop.print();
-		
+
 		final String TraceFilef = failtrace;
 		final String FilePathf = failpath;
 		final AST astf = AST.newAST(AST.JLS3);
@@ -88,9 +94,9 @@ class GraphTest {
 		Graph pgraph = new Graph(lineinfop, passtrace, "Passtest");
 		pgraph.observe("foo.main#11", true);
 		pgraph.observe("a#3#2", true);
-		//pgraph.printgraph();
-		//pgraph.inference();
-		//pgraph.printprobs();
+		// pgraph.printgraph();
+		// pgraph.inference();
+		// pgraph.printprobs();
 
 		pgraph.parsetrace(lineinfof, failtrace, "Failtest");
 		pgraph.observe("foo.main#11", true);
@@ -98,7 +104,7 @@ class GraphTest {
 		pgraph.printgraph();
 		pgraph.inference();
 		pgraph.printprobs();
-		
+
 		assertFalse(fail);
 	}
 

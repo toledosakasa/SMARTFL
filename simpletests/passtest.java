@@ -8,6 +8,6 @@ public class foo {
 		return a;
 	}  
 	public static void main(String []args) {
-       f(2);
+       f(1);
     }
 } 

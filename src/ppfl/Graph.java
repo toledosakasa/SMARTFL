@@ -30,7 +30,7 @@ public class Graph {
 
 	private String testname;
 
-	private int nsamples = 1 << 10;
+	private int nsamples = 1 << 20;
 	Random random;
 
 	public Graph() {
