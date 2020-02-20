@@ -22,7 +22,7 @@ public class Graph {
 	private Map<String, Node> nodemap;
 	private Map<String, Node> stmtmap;
 	private Map<String, Integer> varcountmap;
-	
+
 	private StmtNode callernode;
 	private Line caller;
 	private List<Set<String>> passedargs;
@@ -30,8 +30,8 @@ public class Graph {
 
 	private String testname;
 
-    private int nsamples = 1 << 20;
-    private int bp_times = 100;
+	private int nsamples = 1 << 20;
+	private int bp_times = 100;
 	Random random;
 
 	public Graph() {
@@ -150,23 +150,21 @@ public class Graph {
 		// System.out.println("Adding def: " + defname);
 		addNode(defname, defnode);
 
-        Edge dedge = new Edge();
-        defnode.add_edge(dedge);
-        Edge sedge = new Edge();
-        stmt.add_edge(sedge);
-        List<Edge> puedges = new ArrayList<Edge>();
-        for(Node n : prednodes)
-        {
-            Edge nedge = new Edge();
-            puedges.add(nedge);
-            n.add_edge(nedge);
-        }
-        for(Node n : usenodes)
-        {
-            Edge nedge = new Edge();
-            puedges.add(nedge);
-            n.add_edge(nedge);
-        }
+		Edge dedge = new Edge();
+		defnode.add_edge(dedge);
+		Edge sedge = new Edge();
+		stmt.add_edge(sedge);
+		List<Edge> puedges = new ArrayList<Edge>();
+		for (Node n : prednodes) {
+			Edge nedge = new Edge();
+			puedges.add(nedge);
+			n.add_edge(nedge);
+		}
+		for (Node n : usenodes) {
+			Edge nedge = new Edge();
+			puedges.add(nedge);
+			n.add_edge(nedge);
+		}
 		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, dedge, sedge, puedges);
 		factornodes.add(ret);
 		return ret;
@@ -251,34 +249,28 @@ public class Graph {
 			}
 		});
 		return;
-    }
-    
-    public void bp_inference()
-    {
-        for(int i=0;i<bp_times;i++)
-        {
-        	boolean isend = true;
-            for(FactorNode n: factornodes)
-            {
-                n.send_message();
-            }
-            for(Node n: nodes)
-            {
-               if(n.send_message())
-            	   isend = false;
-            }
-            for(Node n: stmts)
-            {
-                if(n.send_message())
-             	   isend = false;
-            }
-            if(isend)
-            {
-            	//System.out.println("\n\n"+i+"\n\n");
-            	break;
-            }
-        }
-        nodes.sort(new Comparator<Node>() {
+	}
+
+	public void bp_inference() {
+		for (int i = 0; i < bp_times; i++) {
+			boolean isend = true;
+			for (FactorNode n : factornodes) {
+				n.send_message();
+			}
+			for (Node n : nodes) {
+				if (n.send_message())
+					isend = false;
+			}
+			for (Node n : stmts) {
+				if (n.send_message())
+					isend = false;
+			}
+			if (isend) {
+				// System.out.println("\n\n"+i+"\n\n");
+				break;
+			}
+		}
+		nodes.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
 				if (Double.isNaN(arg0.bp_getprob()))
@@ -287,8 +279,8 @@ public class Graph {
 					return -1;
 				return (arg0.bp_getprob() - arg1.bp_getprob()) < 0 ? -1 : 1;
 			}
-        });
-        stmts.sort(new Comparator<Node>() {
+		});
+		stmts.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
 				if (Double.isNaN(arg0.bp_getprob()))
@@ -297,10 +289,10 @@ public class Graph {
 					return -1;
 				return (arg0.bp_getprob() - arg1.bp_getprob()) < 0 ? -1 : 1;
 			}
-        });
-        return;
-        
-    }
+		});
+		return;
+
+	}
 
 	public StmtNode getTopStmt() {// should be called after inference()
 		return stmts.get(0);
@@ -338,9 +330,9 @@ public class Graph {
 		for (StmtNode n : stmts) {
 			n.printprob();
 		}
-    }
-    
-    public void bp_printprobs() {
+	}
+
+	public void bp_printprobs() {
 		System.out.println("\nProbabilities: ");
 		System.out.println("Vars:" + nodes.size());
 		for (Node n : nodes) {
