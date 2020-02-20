@@ -54,6 +54,37 @@ class GraphTest {
 	}
 
 	@Test
+	void bptest(){
+		String ppflroot = ".";
+		String filepatht = ppflroot + "\\simpletests\\domaintest.java";
+		String tracepatht = ppflroot + "\\test_traces\\domaintest_trace.txt";
+
+		final String TraceFile = tracepatht;
+		final String FilePath = filepatht;
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		final AST ast = AST.newAST(AST.JLS3);
+
+		String source = readFileToString(FilePath);
+		parser.setSource(source.toCharArray());
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+		final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		LineInfo lineinfo = new LineInfo(cu);
+		ASTVisitor visitor = new LineMappingVisitor(lineinfo);
+		cu.accept(visitor);
+		lineinfo.print();
+
+		Graph pgraph = new Graph(lineinfo, tracepatht, "Simpletest");
+		pgraph.observe("foo.main#14", true);
+		pgraph.observe("a#3#3", false);
+		pgraph.printgraph();
+		pgraph.inference();
+        pgraph.printprobs();
+        pgraph.bp_inference();
+		pgraph.bp_printprobs();
+	}
+
+	@Test
 	void mergetest() {
 		boolean fail = false;
 		String ppflroot = ".";
@@ -103,8 +134,10 @@ class GraphTest {
 		pgraph.observe("a#3#3", false);
 		pgraph.printgraph();
 		pgraph.inference();
-		pgraph.printprobs();
-
+		
+        pgraph.printprobs();
+        pgraph.bp_inference();
+		pgraph.bp_printprobs();
 		assertFalse(fail);
 	}
 

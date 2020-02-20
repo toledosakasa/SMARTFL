@@ -43,7 +43,7 @@ public class GraphConstructor {
 		// Set the appropriate variables based on supplied options
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\simpletests\\foo.java";
-		String tracepatht =  ppflroot +"\\traces\\tmp.txt";
+		String tracepatht =  ppflroot +"\\test_traces\\tmp.txt";
 
 		if (commandLine.hasOption('S')) {
 			filepatht = commandLine.getOptionValue('S');

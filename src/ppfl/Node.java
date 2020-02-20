@@ -1,5 +1,8 @@
 package ppfl;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Node {
 	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from
 							// inference procedure.
@@ -10,14 +13,18 @@ public class Node {
 	protected String name;
 	private double impT;
 	private double impF;// importance for True and False in importance sampling.
-	private String testname;
+    private String testname;
+    
+    private List<Edge> edges;
+    private double eplison = 1e-3;
 
 	public Node(String name) {
 		this.obs = false;
 		this.p = 0.5;
 		this.name = name;
 		isStmt = false;
-		tempvalue = true;// TODO init by statistics
+        tempvalue = true;// TODO init by statistics
+        edges = new ArrayList<Edge>();
 	}
 
 	public Node(String name, String testname) {
@@ -26,7 +33,8 @@ public class Node {
 		this.p = 0.5;
 		this.name = name;
 		isStmt = false;
-		tempvalue = true;// TODO init by statistics
+        tempvalue = true;// TODO init by statistics
+        edges = new ArrayList<Edge>();
 	}
 
 	public String getName() {
@@ -68,7 +76,52 @@ public class Node {
 
 	public boolean isStmt() {
 		return this.isStmt;
+    }
+    
+    public void add_edge(Edge edge)
+    {
+        edges.add(edge) ;
+    }
+
+    public boolean send_message()
+    {
+        if(obs)
+        {
+            double val = obsvalue? 1.0 : 0.0;
+            for (Edge n : edges) {
+                n.set_ntof(val);
+            }
+            double delta = val - this.p;
+            if(delta < 0)
+            	delta = -delta;
+            this.p = val;
+            return delta>eplison;
+        }
+
+        double v0 = 1,v1 = 1;
+        for (Edge n : edges) {
+            v1 = v1 * n.get_fton();
+            v0 = v0 * (1 - n.get_fton());
+        }
+        double delta = v1/(v0+v1) - this.p;
+        if(delta < 0)
+        	delta = -delta;
+        this.p = v1 / (v0+v1);
+
+        for (Edge n : edges) {
+            double tv1 = v1 / n.get_fton();
+            double tv0 = v0 / (1-n.get_fton());
+            //normalization
+            tv1 = tv1 / (tv0 + tv1);
+            n.set_ntof(tv1);
+        }
+        return delta>eplison;
+    }
+
+	public double bp_getprob() {
+		return p;
 	}
+    
 
 	public void print() {
 		System.out.print(this.getName());
@@ -81,5 +134,9 @@ public class Node {
 
 	public void printprob() {
 		System.out.println(this.getName() + " prob = " + String.valueOf(getprob()));
+    }
+    
+    public void bp_printprob() {
+		System.out.println(this.getName() + " prob = " + String.valueOf(bp_getprob()));
 	}
 }
