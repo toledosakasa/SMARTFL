@@ -202,6 +202,63 @@ public class Graph {
 			return null;
 	}
 
+	private void solve(List<Node> allnodes, int cur, int tot) {
+		if (cur == tot) {
+			double product = 1.0;
+			for (FactorNode n : factornodes) {
+				product = product * n.getProb();// TODO consider log-add
+			}
+			for (Node n : nodes) {
+				n.addimp(product);
+			}
+			for (Node n : stmts) {
+				n.addimp(product);
+			}
+			return;
+		}
+		allnodes.get(cur).setTemp(true);
+		solve(allnodes, cur + 1, tot);
+		allnodes.get(cur).setTemp(false);
+		solve(allnodes, cur + 1, tot);
+	}
+
+	public void BF_inference() {
+		for (Node n : nodes) {
+			n.init();
+		}
+		for (Node n : stmts) {
+			n.init();
+		}
+
+		List<Node> allnodes = new ArrayList<Node>();
+		allnodes.addAll(nodes);
+		allnodes.addAll(stmts);
+		int nnodes = allnodes.size();
+		solve(allnodes, 0, nnodes);
+
+		nodes.sort(new Comparator<Node>() {
+			@Override
+			public int compare(Node arg0, Node arg1) {
+				if (Double.isNaN(arg0.getprob()))
+					return 1;
+				if (Double.isNaN(arg1.getprob()))
+					return -1;
+				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
+			}
+		});
+		stmts.sort(new Comparator<Node>() {
+			@Override
+			public int compare(Node arg0, Node arg1) {
+				if (Double.isNaN(arg0.getprob()))
+					return 1;
+				if (Double.isNaN(arg1.getprob()))
+					return -1;
+				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
+			}
+		});
+		return;
+	}
+
 	public void inference() {
 		for (Node n : nodes) {
 			n.init();
