@@ -57,8 +57,8 @@ public class FactorNode {
 
         for (Edge n : puedges) {
             double except_put = put/n.get_ntof();
-            double nv1 = HIGH * (sv * dv * except_put + sv * (1-dv) * (1-except_put)) + (1-sv) * (1-dv)
-                        + LOW * (sv * dv * (1-except_put) + sv * (1-dv)*except_put) + (1-sv) * dv;
+            double nv1 = HIGH * (sv * dv * except_put + sv * (1-dv) * (1-except_put) + (1-sv) * (1-dv))
+                        + LOW * (sv * dv * (1-except_put) + sv * (1-dv)*except_put + (1-sv) * dv);
             double nv0 = HIGH * (sv * (1-dv) + (1-sv) * (1-dv)) + LOW * (sv * dv + (1-sv) * dv);
             n.set_fton(nv1 / (nv1 + nv0));
         }
