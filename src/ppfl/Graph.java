@@ -222,7 +222,7 @@ public class Graph {
 		solve(allnodes, cur + 1, tot);
 	}
 
-	public void BF_inference() {
+	public void bf_inference() {
 		for (Node n : nodes) {
 			n.init();
 		}
@@ -399,6 +399,44 @@ public class Graph {
 		for (StmtNode n : stmts) {
 			n.bp_printprob();
 		}
+	}
+
+	private double getdiff(double a, double b) {
+		double max = Math.max(Math.abs(a), Math.abs(b));
+		return max == 0.0 ? 0 : Math.abs(a - b) / max;
+	}
+
+	public double check_bp_with_bf(boolean verbose) {
+		double maxdiff = 0;
+		this.bf_inference();
+		this.bp_inference();
+		if (verbose) {
+			System.out.println("\nProbabilities: ");
+			System.out.println("Vars:" + nodes.size());
+		}
+		for (Node n : nodes) {
+			if (verbose) {
+				n.printprob();
+				n.bp_printprob();
+			}
+			if (!n.obs) {
+				double diff = getdiff(n.bp_getprob(), n.getprob());
+				maxdiff = Math.max(diff, maxdiff);
+			}
+		}
+		if (verbose)
+			System.out.println("Stmts:" + stmts.size());
+		for (StmtNode n : stmts) {
+			if (verbose) {
+				n.printprob();
+				n.bp_printprob();
+			}
+			if (!n.obs) {
+				double diff = getdiff(n.bp_getprob(), n.getprob());
+				maxdiff = Math.max(diff, maxdiff);
+			}
+		}
+		return maxdiff;
 	}
 
 	public void observe(String s, boolean v) {

@@ -62,7 +62,7 @@ class GraphTest {
 		boolean fail = false;
 		Graph pgraph = dominit();
 		try {
-			pgraph.BF_inference();
+			pgraph.bf_inference();
 			pgraph.printprobs();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -75,10 +75,7 @@ class GraphTest {
 	@Test
 	void bptest() {
 		Graph pgraph = dominit();
-		pgraph.BF_inference();
-		pgraph.printprobs();
-		pgraph.bp_inference();
-		pgraph.bp_printprobs();
+		System.out.println("Max relative difference:" + pgraph.check_bp_with_bf(true));
 	}
 
 	@Test

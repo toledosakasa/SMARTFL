@@ -133,6 +133,6 @@ public class Node {
 	}
 
 	public void bp_printprob() {
-		System.out.println(this.getName() + " prob = " + String.valueOf(bp_getprob()));
+		System.out.println(this.getName() + " prob_bp = " + String.valueOf(bp_getprob()));
 	}
 }
