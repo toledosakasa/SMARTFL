@@ -2,7 +2,7 @@ import os
 btrace_home=os.path.abspath("./lib/btrace")
 testdir = os.path.abspath("./simpletests")
 srcname = "foo"
-tracedir = os.path.abspath("./traces")
+tracedir = os.path.abspath("./test_traces")
 tmp_tracefile = tracedir+"/tmp.txt"
 
 # os.system("export BTRACE_HOME=%s" % (btrace_home))
