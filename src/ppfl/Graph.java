@@ -222,7 +222,8 @@ public class Graph {
 		solve(allnodes, cur + 1, tot);
 	}
 
-	public void bf_inference() {
+	public long bf_inference() {
+		long startTime = System.currentTimeMillis();
 		for (Node n : nodes) {
 			n.init();
 		}
@@ -256,7 +257,8 @@ public class Graph {
 				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
 			}
 		});
-		return;
+		long endTime = System.currentTimeMillis();
+		return (endTime - startTime);
 	}
 
 	public void inference() {
@@ -308,7 +310,8 @@ public class Graph {
 		return;
 	}
 
-	public void bp_inference() {
+	public long bp_inference() {
+		long startTime = System.currentTimeMillis();
 		for (int i = 0; i < bp_times; i++) {
 			boolean isend = true;
 			for (FactorNode n : factornodes) {
@@ -347,7 +350,9 @@ public class Graph {
 				return (arg0.bp_getprob() - arg1.bp_getprob()) < 0 ? -1 : 1;
 			}
 		});
-		return;
+		long endTime = System.currentTimeMillis();
+
+		return (endTime - startTime);
 
 	}
 
@@ -408,8 +413,11 @@ public class Graph {
 
 	public double check_bp_with_bf(boolean verbose) {
 		double maxdiff = 0;
-		this.bf_inference();
-		this.bp_inference();
+		String diffname = null;
+		double maxdiffstmt = 0;
+		String diffnamestmt = null;
+		long bftime = this.bf_inference();
+		long bptime = this.bp_inference();
 		if (verbose) {
 			System.out.println("\nProbabilities: ");
 			System.out.println("Vars:" + nodes.size());
@@ -421,7 +429,11 @@ public class Graph {
 			}
 			if (!n.obs) {
 				double diff = getdiff(n.bp_getprob(), n.getprob());
-				maxdiff = Math.max(diff, maxdiff);
+				if (diff > maxdiff) {
+					maxdiff = diff;
+					diffname = n.getName();
+				}
+
 			}
 		}
 		if (verbose)
@@ -433,10 +445,21 @@ public class Graph {
 			}
 			if (!n.obs) {
 				double diff = getdiff(n.bp_getprob(), n.getprob());
-				maxdiff = Math.max(diff, maxdiff);
+				if (diff > maxdiffstmt) {
+					maxdiffstmt = diff;
+					diffnamestmt = n.getName();
+				}
 			}
 		}
+		if (verbose) {
+			System.out.println("Var max relative difference:" + maxdiff + " at " + diffname);
+			System.out.println("Stmt max relative difference:" + maxdiffstmt + " at " + diffnamestmt);
+			System.out.println("Brute force time : " + bftime / 1000.0 + "s");
+			System.out.println("Belief propagation time : " + bptime / 1000.0 + "s");
+		}
+
 		return maxdiff;
+
 	}
 
 	public void observe(String s, boolean v) {

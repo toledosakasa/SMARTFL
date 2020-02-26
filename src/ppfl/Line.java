@@ -11,16 +11,16 @@ public class Line {
 	Set<Integer> preds;
 	Set<String> uses;
 	List<String> ops;
-	
+
 	boolean ismethodinvocation;
 	String retdef;
 	List<Set<String>> arguses;
 	List<List<String>> argops;
-	
+
 	boolean isret;
 	Set<String> retuses;
 	List<String> retops;
-	
+
 	boolean ismethod;
 	List<String> argdefs;
 

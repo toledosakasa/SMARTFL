@@ -25,7 +25,4 @@ public class StmtNode extends Node {
 		return this.name;
 	}
 
-	public void printprob() {
-		System.out.println(this.name + " prob = " + String.valueOf(getprob()));
-	}
 }

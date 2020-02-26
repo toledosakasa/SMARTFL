@@ -43,7 +43,7 @@ public class GraphConstructor {
 		// Set the appropriate variables based on supplied options
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\simpletests\\foo.java";
-		String tracepatht =  ppflroot +"\\test_traces\\tmp.txt";
+		String tracepatht = ppflroot + "\\test_traces\\tmp.txt";
 
 		if (commandLine.hasOption('S')) {
 			filepatht = commandLine.getOptionValue('S');
@@ -72,14 +72,14 @@ public class GraphConstructor {
 		cu.accept(visitor);
 		lineinfo.print();
 		// TODO construct Pgraph by lineinfo and trace.
-		
-		Graph pgraph = new Graph(lineinfo,tracepatht,"Simpletest");
+
+		Graph pgraph = new Graph(lineinfo, tracepatht, "Simpletest");
 		pgraph.observe("foo.main#14", true);
-		pgraph.observe("a#3#3",false);
+		pgraph.observe("a#3#3", false);
 		pgraph.printgraph();
-		
+
 		pgraph.inference();
-		
+
 		pgraph.printprobs();
 	}
 

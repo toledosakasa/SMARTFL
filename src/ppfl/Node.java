@@ -129,7 +129,11 @@ public class Node {
 	}
 
 	public void printprob() {
-		System.out.println(this.getName() + " prob = " + String.valueOf(getprob()));
+		if (this.obs) {
+			System.out.println(
+					this.getName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
+		} else
+			System.out.println(this.getName() + " prob = " + String.valueOf(getprob()));
 	}
 
 	public void bp_printprob() {

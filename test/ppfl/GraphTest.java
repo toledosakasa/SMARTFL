@@ -75,11 +75,10 @@ class GraphTest {
 	@Test
 	void bptest() {
 		Graph pgraph = dominit();
-		System.out.println("Max relative difference:" + pgraph.check_bp_with_bf(true));
+		pgraph.check_bp_with_bf(true);
 	}
 
-	@Test
-	void mergetest() {
+	Graph mergeinit() {
 		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\simpletests\\passtest.java";
@@ -126,13 +125,13 @@ class GraphTest {
 		pgraph.parsetrace(lineinfof, failtrace, "Failtest");
 		pgraph.observe("foo.main#11", true);
 		pgraph.observe("a#3#3", false);
-		pgraph.printgraph();
-		pgraph.inference();
+		return pgraph;
+	}
 
-		pgraph.printprobs();
-		pgraph.bp_inference();
-		pgraph.bp_printprobs();
-		assertFalse(fail);
+	@Test
+	void mergetest() {
+		Graph pgraph = mergeinit();
+		pgraph.check_bp_with_bf(true);
 	}
 
 	private static String readFileToString(String filePath) {

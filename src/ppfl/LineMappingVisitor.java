@@ -141,9 +141,8 @@ public class LineMappingVisitor extends ASTVisitor {
 
 	public void varDeclare(VariableDeclaration node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
-		
-		
-		//System.out.print("At pos " + pos + " : ");
+
+		// System.out.print("At pos " + pos + " : ");
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		String defname = node.getName().getIdentifier();
@@ -152,7 +151,8 @@ public class LineMappingVisitor extends ASTVisitor {
 		int domstart = lineinfo.getLineNumber(parent.getStartPosition());
 		int domend = lineinfo.getLineNumber(parent.getStartPosition() + parent.getLength());
 
-		//System.out.println("VDef:" + defname + "," + String.valueOf(domstart) + "-" + String.valueOf(domend));
+		// System.out.println("VDef:" + defname + "," + String.valueOf(domstart) + "-" +
+		// String.valueOf(domend));
 
 		if (!vtable.containsKey(defname))
 			vtable.put(defname, new TreeMap<Integer, Integer>());
@@ -193,7 +193,7 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(SingleVariableDeclaration node) {
-		
+
 		varDeclare(node);
 		return true;
 	}
@@ -346,7 +346,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		}
 		return true;
 	}
-	
+
 	public boolean visit(ReturnStatement node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
 		Line l = lineinfo.getLine(pos);
@@ -355,9 +355,9 @@ public class LineMappingVisitor extends ASTVisitor {
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
 		getUsesAndOps(node.getExpression(), uses, ops);
-		l.initRet(uses,ops);
+		l.initRet(uses, ops);
 		l.addPreds(predqueue);
-		
+
 		return true;
 	}
 
