@@ -1,13 +1,20 @@
 import os
 btrace_home=os.path.abspath("./lib/btrace")
 testdir = os.path.abspath("./simpletests")
-srcname = "foo"
 tracedir = os.path.abspath("./test_traces")
-tmp_tracefile = tracedir+"/tmp.txt"
+if (len(sys.argv) >= 3):
+	srcname = sys.argv[1]
+	tracefile = tracedir + sys.argv[2]
+else if(len(sys.argv) >=2):
+	srcname = sys.argv[1]
+	tracefile = tracedir + srcname
+else:
+	srcname = "foo"
+	tracefile = tracedir+"/tmp.txt"
 
 # os.system("export BTRACE_HOME=%s" % (btrace_home))
 
-jvmargs="-javaagent:%s/build/btrace-agent.jar=noserver,debug=true,scriptOutputFile=%s,script=%s/scripts/AllLines.class" % (btrace_home, tmp_tracefile, btrace_home)
+jvmargs="-javaagent:%s/build/btrace-agent.jar=noserver,debug=true,scriptOutputFile=%s,script=%s/scripts/AllLines.class" % (btrace_home, tracefile, btrace_home)
 
 f=open("%s/scripts/AllLines_pattern.java"%(btrace_home))
 s=f.read()
