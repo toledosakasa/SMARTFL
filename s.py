@@ -1,11 +1,12 @@
 import os
+import sys
 btrace_home=os.path.abspath("./lib/btrace")
 testdir = os.path.abspath("./simpletests")
 tracedir = os.path.abspath("./test_traces")
 if (len(sys.argv) >= 3):
 	srcname = sys.argv[1]
 	tracefile = tracedir + sys.argv[2]
-else if(len(sys.argv) >=2):
+elif(len(sys.argv) >= 2):
 	srcname = sys.argv[1]
 	tracefile = tracedir + srcname
 else:
@@ -24,7 +25,6 @@ f=open("%s/scripts/AllLines.java"%(btrace_home),'w')
 f.write(s)
 f.close()
 os.system("cd %s/scripts && ../bin/btracec AllLines.java"%(btrace_home))
-
 
 os.system("cd %s && javac "%(testdir) + srcname + ".java")
 

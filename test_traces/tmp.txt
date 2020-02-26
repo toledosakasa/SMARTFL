@@ -1,4 +1,4 @@
-### BTrace Log: 12/19/19 3:01 PM
+### BTrace Log: 20-2-27 ионГ1:15
 
 foo.main:14
 foo.f:5
