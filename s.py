@@ -1,3 +1,8 @@
+# todo:
+# new workflow: 
+# 	btracec compiled script for each test class under test/trace
+#	add cmdline args to eclipse test(config portable? otherwise script to run(makefile?))
+
 import os
 import sys
 btrace_home=os.path.abspath("./lib/btrace")
