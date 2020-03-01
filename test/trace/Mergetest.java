@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-class Mergetest {
+class MergeTest {
 
 	public static int f(int a) {
 		if (a > 1)

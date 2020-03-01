@@ -88,10 +88,10 @@ class GraphTest {
 //		String passtrace = ppflroot + "\\test_traces\\passtest_trace.txt";
 //		String failpath = ppflroot + "\\simpletests\\failtest.java";
 //		String failtrace = ppflroot + "\\test_traces\\failtest_trace.txt";
-		String passpath = ppflroot + "\\test\\trace\\Mergetest.java";
+		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
 		String failpath = passpath;
-		String passtrace = ppflroot + "\\test\\trace\\logs\\Mergetest.pass.log";
-		String failtrace = ppflroot + "\\test\\trace\\logs\\Mergetest.fail.log";
+		String passtrace = ppflroot + "\\test\\trace\\logs\\MergeTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\MergeTest.fail.log";
 
 		final String TraceFilep = passtrace;
 		final String FilePathp = passpath;
@@ -123,10 +123,10 @@ class GraphTest {
 		lineinfof.print();
 
 		Graph pgraph = new Graph(lineinfop, passtrace, "pass");
-		pgraph.observe("trace.Mergetest.pass#18", true);
+		pgraph.observe("trace.MergeTest.pass#18", true);
 		pgraph.observe("a#9#2", true);
 		pgraph.parsetrace(lineinfof, failtrace, "fail");
-		pgraph.observe("trace.Mergetest.fail#23", true);
+		pgraph.observe("trace.MergeTest.fail#23", true);
 		pgraph.observe("a#9#3", false);
 
 //		Graph pgraph = new Graph(lineinfop, passtrace, "Passtest");

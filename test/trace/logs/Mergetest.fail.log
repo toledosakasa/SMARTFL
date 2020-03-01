@@ -1,8 +1,8 @@
-### BTrace Log: 20-3-2 ÉÏÎç12:34
+### BTrace Log: 20-3-2 ÉÏÎç1:03
 
-trace.Mergetest.<init>:7
-trace.Mergetest.fail:23
-trace.Mergetest.f:10
-trace.Mergetest.f:11
-trace.Mergetest.f:12
-trace.Mergetest.f:13
+trace.MergeTest.<init>:7
+trace.MergeTest.fail:23
+trace.MergeTest.f:10
+trace.MergeTest.f:11
+trace.MergeTest.f:12
+trace.MergeTest.f:13
