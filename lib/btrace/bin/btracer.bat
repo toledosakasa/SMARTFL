@@ -17,7 +17,7 @@ if "%1"=="" (
 if "%JAVA_HOME%" == "" goto noJavaHome
 
 if "%1" == "--version" (
-  %JAVA_HOME%\bin\java -jar %BTRACE_HOME%/build/btrace-client.jar com.sun.btrace.Main --version
+  "%JAVA_HOME%\bin\java" -jar %BTRACE_HOME%/build/btrace-client.jar com.sun.btrace.Main --version
   goto end
 )
 
@@ -85,7 +85,7 @@ set inloop=1
     goto loop
   )
 
-%JAVA_HOME%\bin\java -Xshare:off "-javaagent:%BTRACE_HOME%/build/btrace-agent.jar=%OPTIONS,script=%~1" %2 %3 %4 %5 %6 %7 %8 %9
+"%JAVA_HOME%\bin\java" -Xshare:off "-javaagent:%BTRACE_HOME%/build/btrace-agent.jar=%OPTIONS,script=%~1" %2 %3 %4 %5 %6 %7 %8 %9
 goto end
 
 :noJavaHome

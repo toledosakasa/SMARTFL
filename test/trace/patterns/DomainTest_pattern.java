@@ -2,9 +2,9 @@ import com.sun.btrace.annotations.*;
 import static com.sun.btrace.BTraceUtils.*;
 
 @BTrace
-public class AllLines {
+public class DomainTest_pattern {
     @OnMethod(
-        clazz="foo",
+        clazz="trace.DomainTest",
         method="/.*/",
         location=@Location(value=Kind.LINE, line=-1)
     )
