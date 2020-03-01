@@ -17,8 +17,9 @@ class GraphTest {
 
 	Graph dominit() {
 		String ppflroot = ".";
-		String filepatht = ppflroot + "\\simpletests\\domaintest.java";
-		String tracepatht = ppflroot + "\\test_traces\\domaintest_trace.txt";
+		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
+		String filepatht = ppflroot + "\\test\\trace\\DomainTest.java";
+		String tracepatht = ppflroot + "\\test\\trace\\logs\\DomainTest.test.log";
 
 		final String TraceFile = tracepatht;
 		final String FilePath = filepatht;
@@ -35,9 +36,11 @@ class GraphTest {
 		cu.accept(visitor);
 		lineinfo.print();
 
-		Graph pgraph = new Graph(lineinfo, tracepatht, "Simpletest");
-		pgraph.observe("foo.main#14", true);
-		pgraph.observe("a#3#3", false);
+		Graph pgraph = new Graph(lineinfo, tracepatht, "DomainTest");
+		// pgraph.observe("foo.main#14", true);
+		// pgraph.observe("a#3#3", false);
+		pgraph.observe("trace.DomainTest.test#18", true);
+		pgraph.observe("a#9#3", false);
 		pgraph.printgraph();
 		return pgraph;
 	}
@@ -81,10 +84,14 @@ class GraphTest {
 	Graph mergeinit() {
 		boolean fail = false;
 		String ppflroot = ".";
-		String passpath = ppflroot + "\\simpletests\\passtest.java";
-		String passtrace = ppflroot + "\\test_traces\\passtest_trace.txt";
-		String failpath = ppflroot + "\\simpletests\\failtest.java";
-		String failtrace = ppflroot + "\\test_traces\\failtest_trace.txt";
+//		String passpath = ppflroot + "\\simpletests\\passtest.java";
+//		String passtrace = ppflroot + "\\test_traces\\passtest_trace.txt";
+//		String failpath = ppflroot + "\\simpletests\\failtest.java";
+//		String failtrace = ppflroot + "\\test_traces\\failtest_trace.txt";
+		String passpath = ppflroot + "\\test\\trace\\Mergetest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\Mergetest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\Mergetest.fail.log";
 
 		final String TraceFilep = passtrace;
 		final String FilePathp = passpath;
@@ -115,16 +122,20 @@ class GraphTest {
 		cu.accept(visitorf);
 		lineinfof.print();
 
-		Graph pgraph = new Graph(lineinfop, passtrace, "Passtest");
-		pgraph.observe("foo.main#11", true);
-		pgraph.observe("a#3#2", true);
-		// pgraph.printgraph();
-		// pgraph.inference();
-		// pgraph.printprobs();
+		Graph pgraph = new Graph(lineinfop, passtrace, "pass");
+		pgraph.observe("trace.Mergetest.pass#18", true);
+		pgraph.observe("a#9#2", true);
+		pgraph.parsetrace(lineinfof, failtrace, "fail");
+		pgraph.observe("trace.Mergetest.fail#23", true);
+		pgraph.observe("a#9#3", false);
 
-		pgraph.parsetrace(lineinfof, failtrace, "Failtest");
-		pgraph.observe("foo.main#11", true);
-		pgraph.observe("a#3#3", false);
+//		Graph pgraph = new Graph(lineinfop, passtrace, "Passtest");
+//		pgraph.observe("foo.main#11", true);
+//		pgraph.observe("a#3#2", true);
+//
+//		pgraph.parsetrace(lineinfof, failtrace, "Failtest");
+//		pgraph.observe("foo.main#11", true);
+//		pgraph.observe("a#3#3", false);
 		return pgraph;
 	}
 
