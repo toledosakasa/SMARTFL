@@ -18,6 +18,8 @@ public class Node {
 	private List<Edge> edges;
 	private double eplison = 1e-3;
 
+	StmtNode stmt;
+	
 	public Node(String name) {
 		this.obs = false;
 		this.p = 0.5;
@@ -25,9 +27,10 @@ public class Node {
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
 		edges = new ArrayList<Edge>();
+		stmt = null;
 	}
 
-	public Node(String name, String testname) {
+	public Node(String name, String testname, StmtNode _stmt) {
 		this.testname = testname;
 		this.obs = false;
 		this.p = 0.5;
@@ -35,10 +38,15 @@ public class Node {
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
 		edges = new ArrayList<Edge>();
+		stmt = _stmt;
 	}
 
 	public String getName() {
 		return this.testname + "#" + this.name;
+	}
+	
+	public String getPrintName() {
+		return this.testname + "#" + this.name + "@" + this.stmt.getName();
 	}
 
 	public void observe(boolean obsvalue) {
@@ -131,12 +139,12 @@ public class Node {
 	public void printprob() {
 		if (this.obs) {
 			System.out.println(
-					this.getName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
+					this.getPrintName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
 		} else
-			System.out.println(this.getName() + " prob = " + String.valueOf(getprob()));
+			System.out.println(this.getPrintName() + " prob = " + String.valueOf(getprob()));
 	}
 
 	public void bp_printprob() {
-		System.out.println(this.getName() + " prob_bp = " + String.valueOf(bp_getprob()));
+		System.out.println(this.getPrintName() + " prob_bp = " + String.valueOf(bp_getprob()));
 	}
 }

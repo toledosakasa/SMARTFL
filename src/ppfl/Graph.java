@@ -60,6 +60,7 @@ public class Graph {
 			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
 			String t;
 			String last_defined_var = null;
+			StmtNode last_defined_stmt = null;
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
@@ -107,6 +108,7 @@ public class Graph {
 							Set<String> arguses = passedargs.get(i);
 							FactorNode factor = buildFactor(d, curline.preds, arguses, callernode);
 							last_defined_var = d;
+							last_defined_stmt = callernode;
 						}
 					}
 				}
@@ -116,6 +118,7 @@ public class Graph {
 						FactorNode factor = buildFactor(returnDef, curline.preds, curline.uses, callernode);
 						// record last defined value(used in auto-oracle)
 						last_defined_var = returnDef;
+						last_defined_stmt = callernode;
 					}
 				}
 
@@ -131,13 +134,15 @@ public class Graph {
 					FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, stmt);
 					// record last defined value(used in auto-oracle)
 					last_defined_var = curline.def;
+					last_defined_stmt = stmt;
 				}
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
 			if (auto_oracle) {
-				this.observe(getVarName(last_defined_var, varcountmap), testpass);
-				System.out.println("Observe " + getVarName(last_defined_var, varcountmap) + " as " + testpass);
+				String observename = getVarName(last_defined_var, varcountmap);
+				this.observe(observename, testpass);
+				System.out.println("Observe " + observename + " as " + testpass);
 			}
 
 			reader.close();
@@ -175,7 +180,7 @@ public class Graph {
 			varcountmap.put(def, varcountmap.get(def) + 1);
 		}
 		String defname = getVarName(def, varcountmap);
-		Node defnode = new Node(defname, testname);
+		Node defnode = new Node(defname, testname, stmt);
 		// System.out.println("Adding def: " + defname);
 		addNode(defname, defnode);
 
@@ -490,8 +495,8 @@ public class Graph {
 		return maxdiff;
 
 	}
-	
-	//deprecated.
+
+	// deprecated.
 	public void observe(String s, boolean v) {
 		String name = getNodeName(s);
 		for (Node n : nodes) {
