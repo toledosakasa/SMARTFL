@@ -15,6 +15,74 @@ import org.junit.jupiter.api.Test;
 
 class GraphTest {
 
+    Graph gengraph(String name) {
+		String ppflroot = ".";
+		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
+		String filepatht = ppflroot + "\\test\\trace\\"+name+".java";
+		String tracepatht = ppflroot + "\\test\\trace\\logs\\"+name+".test.log";
+
+		final String TraceFile = tracepatht;
+		final String FilePath = filepatht;
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		final AST ast = AST.newAST(AST.JLS3);
+
+		String source = readFileToString(FilePath);
+		parser.setSource(source.toCharArray());
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+		final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		LineInfo lineinfo = new LineInfo(cu);
+		ASTVisitor visitor = new LineMappingVisitor(lineinfo);
+		cu.accept(visitor);
+		lineinfo.print();
+
+		//3rd parameter : test name(must be the same as in junit test, otherwise auto-oracle will fail)
+		//4th parameter : test execution state (pass = true, fail = false)
+		//5th parameter : using auto-oracle
+		Graph pgraph = new Graph(lineinfo, tracepatht, "test", false, false);
+		// pgraph.observe("foo.main#14", true);
+		// pgraph.observe("a#3#3", false);
+		// pgraph.observe("trace.DomainTest.test#18", true);
+		// pgraph.observe("a#9#3", false);
+		pgraph.printgraph();
+		return pgraph;
+    }
+    
+    @Test
+	void gcdtest() {
+		boolean fail = false;
+        Graph pgraph = gengraph("gcdtest");
+        pgraph.observe("a#9#1", true);
+        pgraph.observe("b#9#1", true);
+        pgraph.observe("a#9#3", true);
+        pgraph.observe("a#9#4", false);
+		try {
+			pgraph.bp_inference();
+			pgraph.bp_printprobs();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			fail = true;
+			e.printStackTrace();
+		}
+		assertFalse(fail);
+    }
+    
+    @Test
+	void rectest() {
+		boolean fail = false;
+		//should there be a tmp var of the return value?"
+        Graph pgraph = gengraph("recursivetest");
+        
+	}
+
+    @Test
+	void sumtest() {
+		boolean fail = false;
+		//runtime error, seems to be caused by "for loop"
+        Graph pgraph = gengraph("sumtest");
+	}
+
+
 	Graph dominit() {
 		String ppflroot = ".";
 		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";

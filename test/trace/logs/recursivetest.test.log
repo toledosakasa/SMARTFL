@@ -1,0 +1,17 @@
+### BTrace Log: 20-3-12 ионГ12:53
+
+trace.recursivetest.<init>:7
+trace.recursivetest.test:19
+trace.recursivetest.fact:11
+trace.recursivetest.fact:14
+trace.recursivetest.fact:11
+trace.recursivetest.fact:14
+trace.recursivetest.fact:11
+trace.recursivetest.fact:14
+trace.recursivetest.fact:11
+trace.recursivetest.fact:14
+trace.recursivetest.fact:11
+trace.recursivetest.fact:14
+trace.recursivetest.fact:11
+trace.recursivetest.fact:12
+trace.recursivetest.test:20
