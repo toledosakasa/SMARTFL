@@ -39,7 +39,7 @@ scriptroot = testdir + '/patterns'
 for filename in files:
 	if not(os.path.isdir(filename)):
 		if filename.endswith('.java'):
-			classname = filename.strip('.java')
+			classname = filename[0:-5]
 			pattern_name = classname + "_pattern"
 			writestr = patternstr.replace('__CLASS__NAME__','trace.'+classname)
 			writestr = writestr.replace('AllLines',pattern_name)
