@@ -22,6 +22,10 @@ public class Graph {
 	private Map<String, Node> nodemap;
 	private Map<String, Node> stmtmap;
 	private Map<String, Integer> varcountmap;
+	private Map<String, Integer> stmtcountmap;
+	// if max_loop is set to negative, then no limit is set(unlimited loop
+	// unfolding)
+	int max_loop;
 
 	private StmtNode callernode;
 	private Line caller;
@@ -48,6 +52,8 @@ public class Graph {
 		nodemap = new TreeMap<String, Node>();
 		stmtmap = new TreeMap<String, Node>();
 		varcountmap = new TreeMap<String, Integer>();
+		stmtcountmap = new TreeMap<String, Integer>();
+		max_loop = -1;
 		random = new Random();
 		auto_oracle = _auto_oracle;
 		parsetrace(lineinfo, tracefilename, testname, testpass);
@@ -85,8 +91,17 @@ public class Graph {
 					assert (stmt.isStmt());
 				}
 
-				// auto-assigned observation: test function always true
+				// count how many times this statment has been executed
+				if (stmtcountmap.containsKey(stmtname)) {
+					stmtcountmap.put(stmtname, stmtcountmap.get(stmtname) + 1);
+				} else {
+					stmtcountmap.put(stmtname, 1);
+				}
+				if (max_loop > 0 && stmtcountmap.get(stmtname) > max_loop) {
+					continue;
+				}
 
+				// auto-assigned observation: test function always true
 				if (auto_oracle) {
 					if (trace_method.contentEquals(testname)) {
 						stmt.observe(true);
@@ -95,7 +110,6 @@ public class Graph {
 				}
 
 				// deal with inter-procedure call
-
 				if (curline.ismethod) {
 					// this is the very first statement inside a method.
 
