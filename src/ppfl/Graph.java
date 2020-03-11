@@ -34,11 +34,13 @@ public class Graph {
 	private int bp_times = 100;
 	Random random;
 
+	private boolean auto_oracle;
+
 	public Graph() {
 
 	}
 
-	public Graph(LineInfo lineinfo, String tracefilename, String testname) {
+	public Graph(LineInfo lineinfo, String tracefilename, String testname, boolean testpass, boolean _auto_oracle) {
 		this.testname = testname;
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
@@ -47,21 +49,27 @@ public class Graph {
 		stmtmap = new TreeMap<String, Node>();
 		varcountmap = new TreeMap<String, Integer>();
 		random = new Random();
-		parsetrace(lineinfo, tracefilename, testname);
+		auto_oracle = _auto_oracle;
+		parsetrace(lineinfo, tracefilename, testname, testpass);
 	}
 
-	public void parsetrace(LineInfo lineinfo, String tracefilename, String testname) {
+	public void parsetrace(LineInfo lineinfo, String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
 		varcountmap = new TreeMap<String, Integer>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
 			String t;
+			String last_defined_var = null;
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
 				String[] split = t.split(":");
 				assert (split.length >= 2);
 				String domain = split[0];// TODO utilize this to search lineinfo in different files.
+				int splitp = domain.lastIndexOf('.');
+				String traceclass = domain.substring(0, splitp);
+				String trace_method = domain.substring(splitp + 1);
+
 				int line = Integer.parseInt(split[1]);
 				Line curline = lineinfo.getLine(line);
 				StmtNode stmt = null;
@@ -76,18 +84,29 @@ public class Graph {
 					assert (stmt.isStmt());
 				}
 
+				// auto-assigned observation: test function always true
+
+				if (auto_oracle) {
+					if (trace_method.contentEquals(testname)) {
+						stmt.observe(true);
+						System.out.println("Observe " + stmt.getName() + " as true");
+					}
+				}
+
 				// deal with inter-procedure call
 
 				if (curline.ismethod) {
 					// this is the very first statement inside a method.
 
 					if (passedargs != null && !passedargs.isEmpty()) {
-						// if caller exist. This should apply in most cases(except program main entry)
+						// if caller exist. This should apply in most cases(except program main entry,
+						// parameter passed from command line)
 						assert (curline.argdefs.size() == passedargs.size());
 						for (int i = 0; i < passedargs.size(); i++) {
 							String d = curline.argdefs.get(i);
 							Set<String> arguses = passedargs.get(i);
 							FactorNode factor = buildFactor(d, curline.preds, arguses, callernode);
+							last_defined_var = d;
 						}
 					}
 				}
@@ -95,6 +114,8 @@ public class Graph {
 					// if caller exist.
 					if (returnDef != null) {
 						FactorNode factor = buildFactor(returnDef, curline.preds, curline.uses, callernode);
+						// record last defined value(used in auto-oracle)
+						last_defined_var = returnDef;
 					}
 				}
 
@@ -108,9 +129,17 @@ public class Graph {
 				if (curline.def != null) {
 					// curline.print();
 					FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, stmt);
+					// record last defined value(used in auto-oracle)
+					last_defined_var = curline.def;
 				}
-
 			}
+			// after all lines are parsed, auto-assign oracle for the last defined var
+			// with test state(pass = true,fail = false)
+			if (auto_oracle) {
+				this.observe(getVarName(last_defined_var, varcountmap), testpass);
+				System.out.println("Observe " + getVarName(last_defined_var, varcountmap) + " as " + testpass);
+			}
+
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -461,7 +490,8 @@ public class Graph {
 		return maxdiff;
 
 	}
-
+	
+	//deprecated.
 	public void observe(String s, boolean v) {
 		String name = getNodeName(s);
 		for (Node n : nodes) {

@@ -73,7 +73,7 @@ public class GraphConstructor {
 		lineinfo.print();
 		// TODO construct Pgraph by lineinfo and trace.
 
-		Graph pgraph = new Graph(lineinfo, tracepatht, "Simpletest");
+		Graph pgraph = new Graph(lineinfo, tracepatht, "Simpletest",false,true);
 		pgraph.observe("foo.main#14", true);
 		pgraph.observe("a#3#3", false);
 		pgraph.printgraph();

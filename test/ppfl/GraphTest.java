@@ -36,11 +36,14 @@ class GraphTest {
 		cu.accept(visitor);
 		lineinfo.print();
 
-		Graph pgraph = new Graph(lineinfo, tracepatht, "DomainTest");
+		//3rd parameter : test name(must be the same as in junit test, otherwise auto-oracle will fail)
+		//4th parameter : test execution state (pass = true, fail = false)
+		//5th parameter : using auto-oracle
+		Graph pgraph = new Graph(lineinfo, tracepatht, "test", false, true);
 		// pgraph.observe("foo.main#14", true);
 		// pgraph.observe("a#3#3", false);
-		pgraph.observe("trace.DomainTest.test#18", true);
-		pgraph.observe("a#9#3", false);
+		// pgraph.observe("trace.DomainTest.test#18", true);
+		// pgraph.observe("a#9#3", false);
 		pgraph.printgraph();
 		return pgraph;
 	}
@@ -122,12 +125,12 @@ class GraphTest {
 		cu.accept(visitorf);
 		lineinfof.print();
 
-		Graph pgraph = new Graph(lineinfop, passtrace, "pass");
-		pgraph.observe("trace.MergeTest.pass#18", true);
-		pgraph.observe("a#9#2", true);
-		pgraph.parsetrace(lineinfof, failtrace, "fail");
-		pgraph.observe("trace.MergeTest.fail#23", true);
-		pgraph.observe("a#9#3", false);
+		Graph pgraph = new Graph(lineinfop, passtrace, "pass", true, true);
+		//pgraph.observe("trace.MergeTest.pass#18", true);
+		//pgraph.observe("a#9#2", true);
+		pgraph.parsetrace(lineinfof, failtrace, "fail", false);
+		//pgraph.observe("trace.MergeTest.fail#23", true);
+		//pgraph.observe("a#9#3", false);
 
 //		Graph pgraph = new Graph(lineinfop, passtrace, "Passtest");
 //		pgraph.observe("foo.main#11", true);
