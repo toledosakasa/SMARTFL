@@ -170,6 +170,7 @@ public class Graph {
 				}
 				if (curline.isret) {
 					// if caller exist.
+					//TODO bug. should use stack
 					if (returnDef != null) {
 						FactorNode factor = buildFactor(returnDef, curline.preds, curline.uses, callernode);
 						// record last defined value(used in auto-oracle)
