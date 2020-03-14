@@ -129,7 +129,7 @@ public class Node {
 
 	public void print() {
 		System.out.print(this.getName());
-		System.out.print("(Statement)");
+		//System.out.print("(Statement)");
 		if (this.obs) {
 			System.out.print(" observed = " + this.obsvalue);
 		}

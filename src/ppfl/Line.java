@@ -8,10 +8,15 @@ import java.util.TreeSet;
 
 public class Line {
 	String def;
-	Set<Integer> preds;
 	Set<String> uses;
 	List<String> ops;
-
+	
+	String preddef;
+	Set<String> preduses;
+	Set<String> predops;
+	
+	Set<Integer> preds;
+	
 	boolean ismethodinvocation;
 	String retdef;
 	List<Set<String>> arguses;
@@ -41,6 +46,10 @@ public class Line {
 		def = s;
 	}
 
+	public void setPredDef(String s) {
+		preddef = s;
+	}
+
 	public void setRetDef(String s) {
 		retdef = s;
 	}
@@ -58,6 +67,20 @@ public class Line {
 		}
 		uses.addAll(s);
 	}
+	
+	public void addPredUse(String s) {
+		if (preduses == null) {
+			preduses = new TreeSet<String>();
+		}
+		preduses.add(s);
+	}
+
+	public void addPredUses(Collection<String> s) {
+		if (preduses == null) {
+			preduses = new TreeSet<String>();
+		}
+		preduses.addAll(s);
+	}
 
 	public void addOp(String s) {
 		if (ops == null) {
@@ -73,6 +96,20 @@ public class Line {
 		ops.addAll(s);
 	}
 
+	public void addPredOp(String s) {
+		if (predops == null) {
+			predops = new TreeSet<String>();
+		}
+		predops.add(s);
+	}
+
+	public void addPredOps(Collection<String> s) {
+		if (predops == null) {
+			predops = new TreeSet<String>();
+		}
+		predops.addAll(s);
+	}
+	
 	public void addPred(Integer i) {
 		if (preds == null) {
 			preds = new TreeSet<Integer>();
@@ -124,10 +161,21 @@ public class Line {
 	}
 
 	public void print() {
-		System.out.println("def:" + def);
-		System.out.println("uses:" + uses);
-		System.out.println("ops:" + ops);
-		System.out.println("preds:" + preds);
+		if (def != null)
+			System.out.println("def:" + def);
+		if (uses != null)
+			System.out.println("uses:" + uses);
+		if (ops != null)
+			System.out.println("ops:" + ops);
+		if (preddef != null)
+			System.out.println("preddef:" + preddef);
+		if (preduses != null)
+			System.out.println("preduses:" + preduses);
+		if (predops != null)
+			System.out.println("predops:" + predops);
+		
+		if (preds != null)
+			System.out.println("preds:" + preds);
 		if (this.ismethodinvocation) {
 			System.out.println("retdef:" + retdef);
 			System.out.println("arguses:" + arguses);

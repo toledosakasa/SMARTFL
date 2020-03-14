@@ -62,10 +62,13 @@ public class LineMappingVisitor extends ASTVisitor {
 		int ret = -1;
 		Map<Integer, Integer> m = vtable.get(varname);
 		for (Integer k : m.keySet()) {
+			//System.out.println(k+" "+usepos + " " +m.get(k));
 			if (k <= usepos && usepos <= m.get(k)) {
 				ret = k > ret ? k : ret;
 			}
 		}
+		if(ret == -1)
+			System.out.println(varname + usepos);
 		assert (ret != -1);
 		vmap.get(varname).put(usepos, ret);
 		return ret;
@@ -125,7 +128,7 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public ASTNode getparentBlock(ASTNode node) {
-		while (!(node instanceof Block || node instanceof BodyDeclaration)) {
+		while (!(node instanceof Block || node instanceof BodyDeclaration || node instanceof ForStatement)) {
 			node = node.getParent();
 		}
 		return node;
@@ -151,8 +154,8 @@ public class LineMappingVisitor extends ASTVisitor {
 		int domstart = lineinfo.getLineNumber(parent.getStartPosition());
 		int domend = lineinfo.getLineNumber(parent.getStartPosition() + parent.getLength());
 
-		// System.out.println("VDef:" + defname + "," + String.valueOf(domstart) + "-" +
-		// String.valueOf(domend));
+		System.out.println("VDef:" + defname + "," + String.valueOf(domstart) + "-" +
+		String.valueOf(domend));
 
 		if (!vtable.containsKey(defname))
 			vtable.put(defname, new TreeMap<Integer, Integer>());
@@ -232,36 +235,61 @@ public class LineMappingVisitor extends ASTVisitor {
 		// print(node.getRightHandSide());
 	}
 
-	public boolean visit(IfStatement node) {
+	public void visitBranch(Statement node) {
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
 		Line l = lineinfo.getLine(pos);
 		initLine(l);
-		l.setDef(getPredName(pos));
+//		l.setPredDef(getPredName(pos));
+//		Set<String> uses = new TreeSet<String>();
+//		List<String> ops = new ArrayList<String>();
+//		if (node instanceof IfStatement)
+//			getUsesAndOps(((IfStatement) node).getExpression(), uses, ops);
+//		if (node instanceof WhileStatement)
+//			getUsesAndOps(((WhileStatement) node).getExpression(), uses, ops);
+//		if (node instanceof DoStatement)
+//			getUsesAndOps(((DoStatement) node).getExpression(), uses, ops);
+//		if (node instanceof ForStatement)
+//			getUsesAndOps(((ForStatement) node).getExpression(), uses, ops);
+//
+//		l.addPredUses(uses);
+//		l.addPredOps(ops);
+		predqueue.push(pos);
+	}
+	
+	public void endVisitBranch(Statement node) {
+		predqueue.pop();
+		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
+		//initLine(l);
+		l.setPredDef(getPredName(pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
-		getUsesAndOps(node.getExpression(), uses, ops);
-		l.addUses(uses);
-		l.addOps(ops);
-		predqueue.push(pos);
+		if (node instanceof IfStatement)
+			getUsesAndOps(((IfStatement) node).getExpression(), uses, ops);
+		if (node instanceof WhileStatement)
+			getUsesAndOps(((WhileStatement) node).getExpression(), uses, ops);
+		if (node instanceof DoStatement)
+			getUsesAndOps(((DoStatement) node).getExpression(), uses, ops);
+//		if (node instanceof ForStatement)
+//			getUsesAndOps(((ForStatement) node).getExpression(), uses, ops);
+
+		l.addPredUses(uses);
+		l.addPredOps(ops);
+		
+	}
+
+	public boolean visit(IfStatement node) {
+		visitBranch(node);
 		return true;// TODO merge else branch defs.
 	}
 
 	public void endVisit(IfStatement node) {
-		predqueue.pop();
+		endVisitBranch(node);
 		return;
 	}
 
 	public boolean visit(WhileStatement node) {
-		int pos = lineinfo.getLineNumber(node.getStartPosition());
-		Line l = lineinfo.getLine(pos);
-		initLine(l);
-		l.setDef(getPredName(pos));
-		Set<String> uses = new TreeSet<String>();
-		List<String> ops = new ArrayList<String>();
-		getUsesAndOps(node.getExpression(), uses, ops);
-		l.addUses(uses);
-		l.addOps(ops);
-		predqueue.push(pos);
+		visitBranch(node);
 		return true;// TODO merge else branch defs.
 	}
 
@@ -271,16 +299,7 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(DoStatement node) {
-		int pos = lineinfo.getLineNumber(node.getStartPosition());
-		Line l = lineinfo.getLine(pos);
-		initLine(l);
-		l.setDef(getPredName(pos));
-		Set<String> uses = new TreeSet<String>();
-		List<String> ops = new ArrayList<String>();
-		getUsesAndOps(node.getExpression(), uses, ops);
-		l.addUses(uses);
-		l.addOps(ops);
-		predqueue.push(pos);
+		visitBranch(node);
 		return true;// TODO merge else branch defs.
 	}
 
@@ -290,21 +309,25 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(ForStatement node) {
+		
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
 		Line l = lineinfo.getLine(pos);
 		initLine(l);
-		l.setDef(getPredName(pos));
-		Set<String> uses = new TreeSet<String>();
-		List<String> ops = new ArrayList<String>();
-		getUsesAndOps(node.getExpression(), uses, ops);
-		l.addUses(uses);
-		l.addOps(ops);
 		predqueue.push(pos);
 		return true;// TODO merge else branch defs.
 	}
 
 	public void endVisit(ForStatement node) {
 		predqueue.pop();
+		int pos = lineinfo.getLineNumber(node.getStartPosition());
+		Line l = lineinfo.getLine(pos);
+		l.setPredDef(getPredName(pos));
+		Set<String> uses = new TreeSet<String>();
+		List<String> ops = new ArrayList<String>();
+		getUsesAndOps(node.getExpression(), uses, ops);//TODO
+		l.addPredUses(uses);
+		l.addPredOps(ops);
+		
 		return;
 	}
 	// TODO EnhancedForStatement
