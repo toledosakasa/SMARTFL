@@ -14,6 +14,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+
 public class Graph {
 
 	private List<FactorNode> factornodes;
@@ -37,14 +42,29 @@ public class Graph {
 	private int nsamples = 1 << 20;
 	private int bp_times = 100;
 	Random random;
+	
+	LineInfo lineinfo;
 
+	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
+	// 	input of test function as 1.0(always true)
+	// 	output (return value) of the function being tested as 0.0/1.0 depends on
+	// 		parameter testpass(true = 1.0,false = 0.0)
 	private boolean auto_oracle;
 
 	public Graph() {
-
+		factornodes = new ArrayList<FactorNode>();
+		nodes = new ArrayList<Node>();
+		stmts = new ArrayList<StmtNode>();
+		nodemap = new TreeMap<String, Node>();
+		stmtmap = new TreeMap<String, Node>();
+		varcountmap = new TreeMap<String, Integer>();
+		stmtcountmap = new TreeMap<String, Integer>();
+		max_loop = -1;
+		random = new Random();
+		auto_oracle = true;
 	}
 
-	public Graph(LineInfo lineinfo, String tracefilename, String testname, boolean testpass, boolean _auto_oracle) {
+	public Graph(String tracefilename, String testname, boolean testpass, boolean _auto_oracle) {
 		this.testname = testname;
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
@@ -56,10 +76,32 @@ public class Graph {
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = _auto_oracle;
-		parsetrace(lineinfo, tracefilename, testname, testpass);
+		parsetrace(tracefilename, testname, testpass);
 	}
 
-	public void parsetrace(LineInfo lineinfo, String tracefilename, String testname, boolean testpass) {
+	public void setMaxLoop(int i) {
+		this.max_loop = i;
+	}
+	
+	public void setAutoOracle(boolean b) {
+		this.auto_oracle = b;
+	}
+	
+	public void parsesource(String sourcefilename) {
+		final String FilePath = sourcefilename;
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		String source = readFileToString(FilePath);
+		parser.setSource(source.toCharArray());
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+		final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		this.lineinfo = new LineInfo(cu);
+		ASTVisitor visitor = new LineMappingVisitor(this.lineinfo);
+		cu.accept(visitor);
+		lineinfo.print();
+	}
+	
+	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
 		varcountmap = new TreeMap<String, Integer>();
 		try {
@@ -144,24 +186,22 @@ public class Graph {
 				}
 
 				if (curline.def != null) {
-					//System.out.println("printing curline.def");
-					//curline.print();
+					// System.out.println("printing curline.def");
+					// curline.print();
 					FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, stmt);
 					// record last defined value(used in auto-oracle)
 					last_defined_var = curline.def;
 					last_defined_stmt = stmt;
 				}
-				
+
 				if (curline.preddef != null) {
-					//System.out.println("printing curline.preddef");
-					//curline.print();
+					// System.out.println("printing curline.preddef");
+					// curline.print();
 					FactorNode factor = buildFactor(curline.preddef, curline.preds, curline.preduses, stmt);
 					// record last defined value(used in auto-oracle)
 					last_defined_var = curline.preddef;
 					last_defined_stmt = stmt;
 				}
-
-				
 
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
@@ -183,25 +223,25 @@ public class Graph {
 	private FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, StmtNode stmt) {
 
 		// deal with Declaration and use/pred in the same line
-		//(e.g. for(int i = 0;i < n;i++))
-		//In this case, some use/pred are not in varcountmap. 
+		// (e.g. for(int i = 0;i < n;i++))
+		// In this case, some use/pred are not in varcountmap.
 		Node defnode = null;
 		boolean initDef = false;
 		if (preds != null)
 			for (Integer i : preds) {
 				String s = LineMappingVisitor.getPredName(i);
-				if(!varcountmap.containsKey(s))
+				if (!varcountmap.containsKey(s))
 					initDef = true;
 			}
 		if (uses != null)
 			for (String s : uses) {
 				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
-					if(!varcountmap.containsKey(s))
+					if (!varcountmap.containsKey(s))
 						initDef = true;
 				}
 			}
-		//Add def earlier. for(int i = 1;i < n;i++) def:i#1 use:i#1
-		if(initDef) {
+		// Add def earlier. for(int i = 1;i < n;i++) def:i#1 use:i#1
+		if (initDef) {
 			System.out.println("initdef " + def);
 			if (!varcountmap.containsKey(def)) {
 				varcountmap.put(def, 1);
@@ -213,14 +253,13 @@ public class Graph {
 			// System.out.println("Adding def: " + defname);
 			addNode(defname, defnode);
 		}
-		
-		
+
 		List<Node> prednodes = new ArrayList<Node>();
 		if (preds != null)
 			for (Integer i : preds) {
 				String s = LineMappingVisitor.getPredName(i);
-				if(!varcountmap.containsKey(s)) {
-					//assert(i == )
+				if (!varcountmap.containsKey(s)) {
+					// assert(i == )
 					continue;
 				}
 				String predname = getVarName(s, varcountmap);
@@ -231,7 +270,7 @@ public class Graph {
 			for (String s : uses) {
 				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
 					// System.out.print(s + " ");
-					if(!varcountmap.containsKey(s)) {
+					if (!varcountmap.containsKey(s)) {
 						System.out.println(s);
 					}
 					assert (varcountmap.containsKey(s));
@@ -240,10 +279,10 @@ public class Graph {
 					usenodes.add(getNode(usename));
 				}
 			}
-		
-		//deal with def here. 
-		//when a = a + 1; occurs, use should be a#1, def should be a#2
-		if(!initDef) {
+
+		// deal with def here.
+		// when a = a + 1; occurs, use should be a#1, def should be a#2
+		if (!initDef) {
 			if (!varcountmap.containsKey(def)) {
 				varcountmap.put(def, 1);
 			} else {
@@ -570,16 +609,46 @@ public class Graph {
 	// deprecated.
 	public void observe(String s, boolean v) {
 		String name = getNodeName(s);
+		boolean valid = false;
 		for (Node n : nodes) {
 			if (n.getName().equals(name)) {
+				valid = true;
+				System.out.println("Node observed as " + v);
 				n.observe(v);
 			}
 		}
 		for (Node n : stmts) {
 			if (n.getName().equals(s)) {
+				valid = true;
+				System.out.println("Stmt observed as " + v);
 				n.observe(v);
 			}
 		}
+		if (!valid) {
+			System.out.println("Invalid Observe");
+		}
+	}
+	
+	private static String readFileToString(String filePath) {
+		StringBuilder fileData = new StringBuilder(1000);
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filePath));
+			char[] buf = new char[10];
+			int numRead = 0;
+			while ((numRead = reader.read(buf)) != -1) {
+				String readData = String.valueOf(buf, 0, numRead);
+				fileData.append(readData);
+				buf = new char[1024];
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return fileData.toString();
 	}
 
 }
