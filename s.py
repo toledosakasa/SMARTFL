@@ -1,8 +1,3 @@
-# todo:
-# new workflow: 
-# 	btracec compiled script for each test class under test/trace
-#	add cmdline args to eclipse test(config portable? otherwise script to run(makefile?))
-
 import os
 import sys
 import platform
@@ -14,19 +9,11 @@ if(platform.system() == 'Windows'):
 	btracec = btracec + '.bat'
 	btracer = btracer + '.bat'
 
-simpletestdir = os.path.abspath("./simpletests")
+dirs2make = ["./configs","./test/trace/patterns"]
 testdir = os.path.abspath("./test/trace")
-tracedir = os.path.abspath("./test_traces")
-if (len(sys.argv) >= 3):
-	srcname = sys.argv[1]
-	tracefile = tracedir + sys.argv[2]
-elif(len(sys.argv) >= 2):
-	srcname = sys.argv[1]
-	tracefile = tracedir + srcname
-else:
-	srcname = "foo"
-	tracefile = tracedir+"/tmp.txt"
-
+for dir in dirs2make:
+	if not(os.path.exists(dir)):
+		os.makedirs(dir)
 # os.system("export BTRACE_HOME=%s" % (btrace_home))
 
 f=open("%s/scripts/AllLines_pattern.java"%(btrace_home))
@@ -78,7 +65,9 @@ for filename in files:
 	if(filename.endswith('.java')):
 		os.system("cd %s && %s %s"%(scriptroot,btracec,filename))
 		
-			
+
+#tracedir = os.path.abspath("./test_traces")			
+#simpletestdir = os.path.abspath("./simpletests")
 
 # jvmargs="-javaagent:%s/build/btrace-agent.jar=noserver,debug=true,scriptOutputFile=%s,script=%s/scripts/AllLines.class" % (btrace_home, tracefile, btrace_home)
 
