@@ -128,7 +128,7 @@ public class Node {
 	}
 
 	public void print() {
-		System.out.print(this.getName());
+		System.out.print(this.getPrintName());
 		//System.out.print("(Statement)");
 		if (this.obs) {
 			System.out.print(" observed = " + this.obsvalue);

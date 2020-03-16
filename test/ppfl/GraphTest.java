@@ -22,6 +22,10 @@ class GraphTest {
 
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(false);
+		
+		//set this to false will make a cleaner graph of recursive test.
+		pgraph.setAddReturnArgFactor(true);
+		
 		pgraph.parsesource(filepatht);
 		pgraph.parsetrace(tracepatht, "test", false);
 		pgraph.printgraph();

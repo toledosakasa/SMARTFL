@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -35,21 +36,29 @@ public class Graph {
 	private StmtNode callernode;
 	private Line caller;
 	private List<Set<String>> passedargs;
-	private String returnDef;
+	private Stack<String> returnDef;
 
 	private String testname;
 
 	private int nsamples = 1 << 20;
 	private int bp_times = 100;
 	Random random;
-	
+
 	LineInfo lineinfo;
 
 	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
-	// 	input of test function as 1.0(always true)
-	// 	output (return value) of the function being tested as 0.0/1.0 depends on
-	// 		parameter testpass(true = 1.0,false = 0.0)
+	// input of test function as 1.0(always true)
+	// output (return value) of the function being tested as 0.0/1.0 depends on
+	// parameter testpass(true = 1.0,false = 0.0)
 	private boolean auto_oracle;
+
+	// if this is set to TRUE, a factor of the following will be added for statement
+	// "a = foo (b)":
+	// def : a
+	// use : b
+	// this could avoid call stack breakdown when some functions are not traced(e.g.
+	// libraries)
+	private boolean add_return_arg_factor;
 
 	public Graph() {
 		factornodes = new ArrayList<FactorNode>();
@@ -62,6 +71,8 @@ public class Graph {
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
+		returnDef = new Stack<String>();
+		add_return_arg_factor = true;
 	}
 
 	public Graph(String tracefilename, String testname, boolean testpass, boolean _auto_oracle) {
@@ -82,9 +93,13 @@ public class Graph {
 	public void setMaxLoop(int i) {
 		this.max_loop = i;
 	}
-	
+
 	public void setAutoOracle(boolean b) {
 		this.auto_oracle = b;
+	}
+
+	public void setAddReturnArgFactor(boolean b) {
+		this.add_return_arg_factor = b;
 	}
 	
 	public void parsesource(String sourcefilename) {
@@ -100,7 +115,7 @@ public class Graph {
 		cu.accept(visitor);
 		lineinfo.print();
 	}
-	
+
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
 		varcountmap = new TreeMap<String, Integer>();
@@ -170,11 +185,13 @@ public class Graph {
 				}
 				if (curline.isret) {
 					// if caller exist.
-					//TODO bug. should use stack
-					if (returnDef != null) {
-						FactorNode factor = buildFactor(returnDef, curline.preds, curline.uses, callernode);
+					// System.out.println("parsing ret stmt:");
+					// curline.print();
+					if (!returnDef.isEmpty()) {
+						String retdef = returnDef.pop();
+						FactorNode factor = buildFactor(retdef, curline.preds, curline.retuses, callernode);
 						// record last defined value(used in auto-oracle)
-						last_defined_var = returnDef;
+						last_defined_var = retdef;
 						last_defined_stmt = callernode;
 					}
 				}
@@ -182,14 +199,27 @@ public class Graph {
 				if (curline.ismethodinvocation) {
 					callernode = stmt;
 					caller = curline;
-					returnDef = curline.retdef;
+					if (curline.def != null) {
+						returnDef.push(curline.def);
+					} else
+						returnDef.push(curline.retdef);
 					passedargs = curline.arguses;
 				}
 
 				if (curline.def != null) {
+					if (curline.ismethodinvocation && curline.retdef != null) {
+						// add this factor to deal with libraries.
+						// when no library method is used, this factor could be ignored.
+						if (add_return_arg_factor) {
+							FactorNode factor = buildFactorWithArgUses(curline.def, curline.preds, curline.arguses,
+									stmt);
+						}
+					} else {
+						FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, stmt);
+					}
 					// System.out.println("printing curline.def");
 					// curline.print();
-					FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, stmt);
+
 					// record last defined value(used in auto-oracle)
 					last_defined_var = curline.def;
 					last_defined_stmt = stmt;
@@ -219,6 +249,14 @@ public class Graph {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, StmtNode stmt) {
+		TreeSet<String> t = new TreeSet<String>();
+		for (Set<String> use : uses) {
+			t.addAll(use);
+		}
+		return buildFactor(def, preds, t, stmt);
 	}
 
 	private FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, StmtNode stmt) {
@@ -629,7 +667,7 @@ public class Graph {
 			System.out.println("Invalid Observe");
 		}
 	}
-	
+
 	private static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
 		BufferedReader reader;

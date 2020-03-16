@@ -1,3 +1,4 @@
 /bin/
 *.class
 /test/trace/patterns/
+/configs/*.launch

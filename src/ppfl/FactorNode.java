@@ -107,6 +107,7 @@ public class FactorNode {
 	}
 
 	public void print() {
+		System.out.print("Statement: ");
 		stmt.print();
 		System.out.print("def:");
 		def.print();

@@ -37,6 +37,7 @@ public class LineMappingVisitor extends ASTVisitor {
 	private Map<String, Map<Integer, Integer>> vtable;// varname, <domainstart,domainend>
 	private Map<String, Map<Integer, Integer>> vmap;// varname, <usepos,defpos(domainstart)>
 	private static String predvarname = "__PREDVAR__#";
+	private static String retdefname = "__RETVALUE__#";
 	private static String constantname = "__CONSTANT__#";
 
 	public LineMappingVisitor(LineInfo l) {
@@ -62,12 +63,12 @@ public class LineMappingVisitor extends ASTVisitor {
 		int ret = -1;
 		Map<Integer, Integer> m = vtable.get(varname);
 		for (Integer k : m.keySet()) {
-			//System.out.println(k+" "+usepos + " " +m.get(k));
+			// System.out.println(k+" "+usepos + " " +m.get(k));
 			if (k <= usepos && usepos <= m.get(k)) {
 				ret = k > ret ? k : ret;
 			}
 		}
-		if(ret == -1)
+		if (ret == -1)
 			System.out.println(varname + usepos);
 		assert (ret != -1);
 		vmap.get(varname).put(usepos, ret);
@@ -134,6 +135,10 @@ public class LineMappingVisitor extends ASTVisitor {
 		return node;
 	}
 
+	public static String getRetDefName(int pos) {
+		return retdefname + String.valueOf(pos);
+	}
+
 	public static String getPredName(int pos) {
 		return predvarname + String.valueOf(pos);
 	}
@@ -154,8 +159,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		int domstart = lineinfo.getLineNumber(parent.getStartPosition());
 		int domend = lineinfo.getLineNumber(parent.getStartPosition() + parent.getLength());
 
-		System.out.println("VDef:" + defname + "," + String.valueOf(domstart) + "-" +
-		String.valueOf(domend));
+		System.out.println("VDef:" + defname + "," + String.valueOf(domstart) + "-" + String.valueOf(domend));
 
 		if (!vtable.containsKey(defname))
 			vtable.put(defname, new TreeMap<Integer, Integer>());
@@ -220,10 +224,10 @@ public class LineMappingVisitor extends ASTVisitor {
 		Line l = lineinfo.getLine(pos);
 		String defname = getSimpleDef(node.getLeftHandSide());
 
-		if (l.isMethodInvocation()) {
-			l.setRetDef(getNormVarname(defname, pos));
-			return;
-		}
+//		if (l.isMethodInvocation()) {
+//			l.setRetDef(getNormVarname(defname, pos));
+//			return;
+//		}
 		// System.out.println(defname+String.valueOf(pos)+getVarDom(defname, pos));
 		l.setDef(getNormVarname(defname, pos));
 		Set<String> uses = new TreeSet<String>();
@@ -255,12 +259,12 @@ public class LineMappingVisitor extends ASTVisitor {
 //		l.addPredOps(ops);
 		predqueue.push(pos);
 	}
-	
+
 	public void endVisitBranch(Statement node) {
 		predqueue.pop();
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
 		Line l = lineinfo.getLine(pos);
-		//initLine(l);
+		// initLine(l);
 		l.setPredDef(getPredName(pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
@@ -275,7 +279,7 @@ public class LineMappingVisitor extends ASTVisitor {
 
 		l.addPredUses(uses);
 		l.addPredOps(ops);
-		
+
 	}
 
 	public boolean visit(IfStatement node) {
@@ -309,7 +313,7 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(ForStatement node) {
-		
+
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
 		Line l = lineinfo.getLine(pos);
 		initLine(l);
@@ -324,10 +328,10 @@ public class LineMappingVisitor extends ASTVisitor {
 		l.setPredDef(getPredName(pos));
 		Set<String> uses = new TreeSet<String>();
 		List<String> ops = new ArrayList<String>();
-		getUsesAndOps(node.getExpression(), uses, ops);//TODO
+		getUsesAndOps(node.getExpression(), uses, ops);// TODO
 		l.addPredUses(uses);
 		l.addPredOps(ops);
-		
+
 		return;
 	}
 	// TODO EnhancedForStatement
@@ -340,6 +344,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		initLine(l);
 
 		l.initMethodInvocation();
+		l.setRetDef(getRetDefName(pos));
 		List<Expression> args = node.arguments();
 		for (Expression arg : args) {
 			Set<String> uses = new TreeSet<String>();
