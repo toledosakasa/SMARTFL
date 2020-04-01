@@ -212,6 +212,54 @@ class GraphTest {
 		Graph pgraph = lightloopinit();
 		pgraph.check_bp(true);
 	}
+	
+	Graph breakinit() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\BreakTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\BreakTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\BreakTest.fail.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	void breaktest() {
+		Graph pgraph = breakinit();
+		pgraph.check_bp(true);
+	}
+	
+	Graph badreturninit() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\BadReturnTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\BadReturnTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\BadReturnTest.fail.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	void badreturntest() {
+		Graph pgraph = badreturninit();
+		pgraph.check_bp(true);
+	}
 
 	private static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
