@@ -2,9 +2,9 @@ import com.sun.btrace.annotations.*;
 import static com.sun.btrace.BTraceUtils.*;
 
 @BTrace
-public class MergeTest_pattern {
+public class Mergetest_pattern {
     @OnMethod(
-        clazz="trace.MergeTest",
+        clazz="trace.Mergetest",
         method="/.*/",
         location=@Location(value=Kind.LINE, line=-1)
     )

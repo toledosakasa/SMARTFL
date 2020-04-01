@@ -261,6 +261,49 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 
+	Graph fourinit() {
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\FourTest.java";
+		String failpath = passpath;
+		String passtrace1 = ppflroot + "\\test\\trace\\logs\\FourTest.pass1.log";
+		String passtrace2 = ppflroot + "\\test\\trace\\logs\\FourTest.pass2.log";
+		String failtrace1 = ppflroot + "\\test\\trace\\logs\\FourTest.fail.log";
+		String failtrace2 = ppflroot + "\\test\\trace\\logs\\FourTest.fail2.log";
+		
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace1, "pass", true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace2, "pass", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace1, "fail", false);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace2, "fail", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+	
+	@Test
+	void fourtest() {
+		Graph pgraph = fourinit();
+		pgraph.check_bp(true);
+		/*
+		boolean fail = false;
+		Graph pgraph = fourinit();
+		try {
+			pgraph.inference();
+			pgraph.printprobs();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			fail = true;
+			e.printStackTrace();
+		}
+		assertFalse(fail);
+		*/
+	}
+	
 	private static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
 		BufferedReader reader;
