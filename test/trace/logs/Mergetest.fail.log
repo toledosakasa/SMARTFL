@@ -1,8 +1,0 @@
-### BTrace Log: 20-3-12 ÉÏÎç11:20
-
-trace.MergeTest.<init>:7
-trace.MergeTest.fail:23
-trace.MergeTest.f:10
-trace.MergeTest.f:11
-trace.MergeTest.f:12
-trace.MergeTest.f:13

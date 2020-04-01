@@ -22,10 +22,10 @@ class GraphTest {
 
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(false);
-		
-		//set this to false will make a cleaner graph of recursive test.
+
+		// set this to false will make a cleaner graph of recursive test.
 		pgraph.setAddReturnArgFactor(true);
-		
+
 		pgraph.parsesource(filepatht);
 		pgraph.parsetrace(tracepatht, "test", false);
 		pgraph.printgraph();
@@ -150,6 +150,67 @@ class GraphTest {
 	void mergetest() {
 		Graph pgraph = mergeinit();
 		pgraph.check_bp_with_bf(true);
+	}
+
+	Graph sqrtinit() {
+		String ppflroot = ".";
+		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
+		String filepatht = ppflroot + "\\test\\trace\\SqrtTest.java";
+		String tracepatht = ppflroot + "\\test\\trace\\logs\\SqrtTest.test.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+
+		pgraph.parsesource(filepatht);
+		pgraph.parsetrace(tracepatht, "test", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	void sqrttest() {
+		Graph pgraph = sqrtinit();
+		pgraph.check_bp(true);
+	}
+
+	Graph heavyloopinit() {
+		String ppflroot = ".";
+		String filepatht = ppflroot + "\\test\\trace\\HeavyLoopTest.java";
+		String tracepatht = ppflroot + "\\test\\trace\\logs\\HeavyLoopTest.test.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+
+		pgraph.parsesource(filepatht);
+		pgraph.parsetrace(tracepatht, "test", false);
+		// pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	void heavylooptest() {
+		Graph pgraph = heavyloopinit();
+		pgraph.check_bp(false);
+	}
+
+	Graph lightloopinit() {
+		String ppflroot = ".";
+		String filepatht = ppflroot + "\\test\\trace\\LightLoopTest.java";
+		String tracepatht = ppflroot + "\\test\\trace\\logs\\LightLoopTest.test.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+
+		pgraph.parsesource(filepatht);
+		pgraph.parsetrace(tracepatht, "test", false);
+		// pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	void lightlooptest() {
+		Graph pgraph = lightloopinit();
+		pgraph.check_bp(true);
 	}
 
 	private static String readFileToString(String filePath) {

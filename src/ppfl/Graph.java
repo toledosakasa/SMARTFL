@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Vector;
 
 import org.eclipse.jdt.core.dom.AST;
@@ -64,10 +64,10 @@ public class Graph {
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
 		stmts = new ArrayList<StmtNode>();
-		nodemap = new TreeMap<String, Node>();
-		stmtmap = new TreeMap<String, Node>();
-		varcountmap = new TreeMap<String, Integer>();
-		stmtcountmap = new TreeMap<String, Integer>();
+		nodemap = new HashMap<String, Node>();
+		stmtmap = new HashMap<String, Node>();
+		varcountmap = new HashMap<String, Integer>();
+		stmtcountmap = new HashMap<String, Integer>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
@@ -80,10 +80,10 @@ public class Graph {
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
 		stmts = new ArrayList<StmtNode>();
-		nodemap = new TreeMap<String, Node>();
-		stmtmap = new TreeMap<String, Node>();
-		varcountmap = new TreeMap<String, Integer>();
-		stmtcountmap = new TreeMap<String, Integer>();
+		nodemap = new HashMap<String, Node>();
+		stmtmap = new HashMap<String, Node>();
+		varcountmap = new HashMap<String, Integer>();
+		stmtcountmap = new HashMap<String, Integer>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = _auto_oracle;
@@ -101,7 +101,7 @@ public class Graph {
 	public void setAddReturnArgFactor(boolean b) {
 		this.add_return_arg_factor = b;
 	}
-	
+
 	public void parsesource(String sourcefilename) {
 		final String FilePath = sourcefilename;
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
@@ -118,7 +118,7 @@ public class Graph {
 
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
-		varcountmap = new TreeMap<String, Integer>();
+		varcountmap = new HashMap<String, Integer>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
 			String t;
@@ -252,7 +252,7 @@ public class Graph {
 	}
 
 	private FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, StmtNode stmt) {
-		TreeSet<String> t = new TreeSet<String>();
+		HashSet<String> t = new HashSet<String>();
 		for (Set<String> use : uses) {
 			t.addAll(use);
 		}
@@ -592,6 +592,28 @@ public class Graph {
 	private double getdiff(double a, double b) {
 		double max = Math.max(Math.abs(a), Math.abs(b));
 		return max == 0.0 ? 0 : Math.abs(a - b) / max;
+	}
+
+	public void check_bp(boolean verbose) {
+		long bptime = this.bp_inference();
+
+		System.out.println("\nProbabilities: ");
+		System.out.println("Vars:" + nodes.size());
+		int cnt = 0;
+		for (Node n : nodes) {
+			if (!verbose) {
+				cnt++;
+				if (cnt > 10)
+					break;
+			}
+			n.bp_printprob();
+		}
+		System.out.println("Stmts:" + stmts.size());
+		for (StmtNode n : stmts) {
+			n.bp_printprob();
+		}
+		System.out.println("Belief propagation time : " + bptime / 1000.0 + "s");
+
 	}
 
 	public double check_bp_with_bf(boolean verbose) {
