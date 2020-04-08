@@ -516,21 +516,13 @@ public class Graph {
 		nodes.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				if (Double.isNaN(arg0.bp_getprob()))
-					return 1;
-				if (Double.isNaN(arg1.bp_getprob()))
-					return -1;
-				return (arg0.bp_getprob() - arg1.bp_getprob()) < 0 ? -1 : 1;
+				return Double.compare(arg0.bp_getprob(),arg1.bp_getprob());
 			}
 		});
 		stmts.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				if (Double.isNaN(arg0.bp_getprob()))
-					return 1;
-				if (Double.isNaN(arg1.bp_getprob()))
-					return -1;
-				return (arg0.bp_getprob() - arg1.bp_getprob()) < 0 ? -1 : 1;
+				return Double.compare(arg0.bp_getprob(),arg1.bp_getprob());
 			}
 		});
 		long endTime = System.currentTimeMillis();

@@ -16,7 +16,7 @@ public class Node {
 	private String testname;
 
 	private List<Edge> edges;
-	private double eplison = 1e-3;
+	private double eplison = 1e-8;
 
 	StmtNode stmt;
 	
@@ -116,7 +116,7 @@ public class Node {
 		for (Edge n : edges) {
             double b =(1 - n.get_fton());
             double a = n.get_fton();
-			double tv1 = b/(b+a/ratio);
+			double tv1 = b/(b+a/result);
 			n.set_ntof(tv1);
 		}
 		return delta > eplison;
