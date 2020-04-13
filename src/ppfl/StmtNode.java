@@ -24,7 +24,7 @@ public class StmtNode extends Node {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public String getPrintName() {
 		return this.name;
 	}

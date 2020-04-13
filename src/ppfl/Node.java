@@ -19,7 +19,7 @@ public class Node {
 	private double eplison = 1e-8;
 
 	StmtNode stmt;
-	
+
 	public Node(String name) {
 		this.obs = false;
 		this.p = 0.5;
@@ -44,7 +44,7 @@ public class Node {
 	public String getName() {
 		return this.testname + "#" + this.name;
 	}
-	
+
 	public String getPrintName() {
 		return this.testname + "#" + this.name + "@" + this.stmt.getName();
 	}
@@ -105,19 +105,19 @@ public class Node {
 
 		double ratio = 1;
 		for (Edge n : edges) {
-            ratio = ratio * n.get_fton()/(1 - n.get_fton());
-        }
-        double result = ratio/(ratio+1);
+			ratio = ratio * n.get_fton() / (1 - n.get_fton());
+		}
+		double result = ratio / (ratio + 1);
 		double delta = result - this.p;
 		if (delta < 0)
 			delta = -delta;
 		this.p = result;
 
 		for (Edge n : edges) {
-            double b =(1 - n.get_fton());
-            double a = n.get_fton();
-			//double tv1 = b/(b+a/result);
-			double tv1 = b/(b+a/ratio);
+			double b = (1 - n.get_fton());
+			double a = n.get_fton();
+			// double tv1 = b/(b+a/result);
+			double tv1 = b / (b + a / ratio);
 			n.set_ntof(tv1);
 		}
 		return delta > eplison;
@@ -129,7 +129,7 @@ public class Node {
 
 	public void print() {
 		System.out.print(this.getPrintName());
-		//System.out.print("(Statement)");
+		// System.out.print("(Statement)");
 		if (this.obs) {
 			System.out.print(" observed = " + this.obsvalue);
 		}

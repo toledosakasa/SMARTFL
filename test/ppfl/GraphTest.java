@@ -160,7 +160,6 @@ class GraphTest {
 
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
-
 		pgraph.parsesource(filepatht);
 		pgraph.parsetrace(tracepatht, "test", false);
 		pgraph.printgraph();
