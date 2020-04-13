@@ -36,6 +36,7 @@ public class Graph {
 	private StmtNode callernode;
 	private Line caller;
 	private List<Set<String>> passedargs;
+	private Set<Integer> passedpreds;
 	private Stack<String> returnDef;
 
 	private String testname;
@@ -169,7 +170,6 @@ public class Graph {
 				// deal with inter-procedure call
 				if (curline.ismethod) {
 					// this is the very first statement inside a method.
-
 					if (passedargs != null && !passedargs.isEmpty()) {
 						// if caller exist. This should apply in most cases(except program main entry,
 						// parameter passed from command line)
@@ -177,7 +177,7 @@ public class Graph {
 						for (int i = 0; i < passedargs.size(); i++) {
 							String d = curline.argdefs.get(i);
 							Set<String> arguses = passedargs.get(i);
-							FactorNode factor = buildFactor(d, curline.preds, arguses, callernode);
+							FactorNode factor = buildFactor(d, passedpreds, arguses, callernode);
 							last_defined_var = d;
 							last_defined_stmt = callernode;
 						}
@@ -204,6 +204,7 @@ public class Graph {
 					} else
 						returnDef.push(curline.retdef);
 					passedargs = curline.arguses;
+					passedpreds = curline.preds;
 				}
 
 				if (curline.def != null) {

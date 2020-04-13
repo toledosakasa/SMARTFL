@@ -200,7 +200,6 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(SingleVariableDeclaration node) {
-
 		varDeclare(node);
 		return true;
 	}
