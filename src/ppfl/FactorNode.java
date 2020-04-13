@@ -8,6 +8,7 @@ public class FactorNode {
 	private Node stmt;
 	private List<Node> uses;
 	private List<String> ops;// TODO consider operators
+	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==" };
 	private double HIGH = 0.99;
 	private double MEDIUM = 0.5;
 	private double LOW = 0.01;
@@ -16,7 +17,7 @@ public class FactorNode {
 	private Edge sedge;
 	private List<Edge> puedges;
 
-	public FactorNode(Node def, Node stmt, List<Node> preds, List<Node> uses,List<String> ops, Edge dedge, Edge sedge,
+	public FactorNode(Node def, Node stmt, List<Node> preds, List<Node> uses, List<String> ops, Edge dedge, Edge sedge,
 			List<Edge> puedges) {
 		this.preds = preds;
 		this.stmt = stmt;
@@ -67,6 +68,16 @@ public class FactorNode {
 	}
 
 	public double getProb() {
+		boolean hasUNKoperator = false;
+		if (ops != null)
+			for (String op : ops) {
+				for (String unk : unkops) {
+					if (op.contentEquals(unk))
+						hasUNKoperator = true;
+				}
+			}
+		// if(hasUNKoperator)return MEDIUM;
+		// hasUNKoperator = false;
 		boolean defv = def.getCurrentValue();
 		boolean predv = true;
 		boolean usev = true;
@@ -86,15 +97,22 @@ public class FactorNode {
 				}
 			}
 		boolean pu = predv && usev;
-		if (stmtv) {
+		if (stmtv) {// if the statement is written correctly.
 			if (defv && pu)
 				return HIGH;
-			if (!defv && !pu)
+			if (!defv && !pu) {
+				if (hasUNKoperator)
+					return MEDIUM;
 				return HIGH;
+			}
 			if (!defv && pu)
 				return LOW;
-			if (defv && !pu)
-				return LOW;// TODO should be medium when using certain ops.
+			if (defv && !pu) {
+				if (hasUNKoperator)
+					return MEDIUM;
+				return LOW;
+			}
+
 		} else {
 			if (!defv)
 				return HIGH;
@@ -124,6 +142,10 @@ public class FactorNode {
 			for (Node n : preds) {
 				n.print();
 			}
+		}
+		if (ops != null) {
+			System.out.print("ops:");
+			System.out.println(ops);
 		}
 	}
 }

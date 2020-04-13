@@ -37,6 +37,7 @@ public class Graph {
 	private Line caller;
 	private List<Set<String>> passedargs;
 	private Set<Integer> passedpreds;
+	private List<List<String>> passedops;
 	private Stack<String> returnDef;
 
 	private String testname;
@@ -177,7 +178,8 @@ public class Graph {
 						for (int i = 0; i < passedargs.size(); i++) {
 							String d = curline.argdefs.get(i);
 							Set<String> arguses = passedargs.get(i);
-							FactorNode factor = buildFactor(d, passedpreds, arguses,curline.ops, callernode);
+							List<String> argops = passedops.get(i);
+							FactorNode factor = buildFactor(d, passedpreds, arguses, argops, callernode);
 							last_defined_var = d;
 							last_defined_stmt = callernode;
 						}
@@ -189,7 +191,8 @@ public class Graph {
 					// curline.print();
 					if (!returnDef.isEmpty()) {
 						String retdef = returnDef.pop();
-						FactorNode factor = buildFactor(retdef, curline.preds, curline.retuses,curline.ops, callernode);
+						FactorNode factor = buildFactor(retdef, curline.preds, curline.retuses, curline.retops,
+								callernode);
 						// record last defined value(used in auto-oracle)
 						last_defined_var = retdef;
 						last_defined_stmt = callernode;
@@ -205,6 +208,7 @@ public class Graph {
 						returnDef.push(curline.retdef);
 					passedargs = curline.arguses;
 					passedpreds = curline.preds;
+					passedops = curline.argops;
 				}
 
 				if (curline.def != null) {
@@ -212,11 +216,11 @@ public class Graph {
 						// add this factor to deal with libraries.
 						// when no library method is used, this factor could be ignored.
 						if (add_return_arg_factor) {
-							FactorNode factor = buildFactorWithArgUses(curline.def, curline.preds, curline.arguses,curline.ops,
-									stmt);
+							FactorNode factor = buildFactorWithArgUses(curline.def, curline.preds, curline.arguses,
+									curline.ops, stmt);
 						}
 					} else {
-						FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses,curline.ops, stmt);
+						FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, curline.ops, stmt);
 					}
 					// System.out.println("printing curline.def");
 					// curline.print();
@@ -229,7 +233,8 @@ public class Graph {
 				if (curline.preddef != null) {
 					// System.out.println("printing curline.preddef");
 					// curline.print();
-					FactorNode factor = buildFactor(curline.preddef, curline.preds, curline.preduses,curline.ops, stmt);
+					FactorNode factor = buildFactor(curline.preddef, curline.preds, curline.preduses, curline.predops,
+							stmt);
 					// record last defined value(used in auto-oracle)
 					last_defined_var = curline.preddef;
 					last_defined_stmt = stmt;
@@ -252,12 +257,13 @@ public class Graph {
 		}
 	}
 
-	private FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses,List<String> ops, StmtNode stmt) {
+	private FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, List<String> ops,
+			StmtNode stmt) {
 		HashSet<String> t = new HashSet<String>();
 		for (Set<String> use : uses) {
 			t.addAll(use);
 		}
-		return buildFactor(def, preds, t,ops, stmt);
+		return buildFactor(def, preds, t, ops, stmt);
 	}
 
 	private FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, List<String> ops, StmtNode stmt) {
@@ -349,7 +355,7 @@ public class Graph {
 			puedges.add(nedge);
 			n.add_edge(nedge);
 		}
-		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes,ops, dedge, sedge, puedges);
+		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, ops, dedge, sedge, puedges);
 		factornodes.add(ret);
 		return ret;
 	}
@@ -590,7 +596,6 @@ public class Graph {
 			n.bp_printprob();
 		}
 		System.out.println("Belief propagation time : " + bptime / 1000.0 + "s");
-
 	}
 
 	public double check_bp_with_bf(boolean verbose) {

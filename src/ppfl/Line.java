@@ -15,7 +15,7 @@ public class Line {
 
 	String preddef;
 	Set<String> preduses;
-	Set<String> predops;
+	List<String> predops;
 
 	Set<Integer> preds;
 
@@ -101,14 +101,14 @@ public class Line {
 
 	public void addPredOp(String s) {
 		if (predops == null) {
-			predops = new TreeSet<String>();
+			predops = new ArrayList<String>();
 		}
 		predops.add(s);
 	}
 
 	public void addPredOps(Collection<String> s) {
 		if (predops == null) {
-			predops = new TreeSet<String>();
+			predops = new ArrayList<String>();
 		}
 		predops.addAll(s);
 	}
