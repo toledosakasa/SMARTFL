@@ -77,7 +77,7 @@ public class FactorNode {
 				}
 			}
 		// if(hasUNKoperator)return MEDIUM;
-		// hasUNKoperator = false;
+		//hasUNKoperator = false;
 		boolean defv = def.getCurrentValue();
 		boolean predv = true;
 		boolean usev = true;

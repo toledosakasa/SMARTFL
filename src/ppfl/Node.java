@@ -116,7 +116,8 @@ public class Node {
 		for (Edge n : edges) {
             double b =(1 - n.get_fton());
             double a = n.get_fton();
-			double tv1 = b/(b+a/result);
+			//double tv1 = b/(b+a/result);
+			double tv1 = b/(b+a/ratio);
 			n.set_ntof(tv1);
 		}
 		return delta > eplison;
