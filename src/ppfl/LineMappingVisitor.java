@@ -186,7 +186,7 @@ public class LineMappingVisitor extends ASTVisitor {
 			lineinfo.getLine(pos).setDef(getNormVarname(defname, pos));
 			lineinfo.getLine(pos).addOps(ops);
 			lineinfo.getLine(pos).addUses(uses);
-			lineinfo.getLine(pos).addPreds(predqueue);
+			lineinfo.getLine(pos).addPreds_single(predqueue);
 		}
 
 	}
@@ -235,7 +235,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		getUsesAndOps(node.getRightHandSide(), uses, ops);
 		l.addUses(uses);
 		l.addOps(ops);
-		l.addPreds(predqueue);
+		l.addPreds_single(predqueue);
 		// print(node.getRightHandSide());
 	}
 
@@ -384,7 +384,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		List<String> ops = new ArrayList<String>();
 		getUsesAndOps(node.getExpression(), uses, ops);
 		l.initRet(uses, ops);
-		l.addPreds(predqueue);
+		l.addPreds_single(predqueue);
 
 		return true;
 	}

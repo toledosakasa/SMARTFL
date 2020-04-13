@@ -4,19 +4,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeSet;
 
 public class Line {
 	String def;
 	Set<String> uses;
 	List<String> ops;
-	
+
 	String preddef;
 	Set<String> preduses;
 	Set<String> predops;
-	
+
 	Set<Integer> preds;
-	
+
 	boolean ismethodinvocation;
 	String retdef;
 	List<Set<String>> arguses;
@@ -67,7 +68,7 @@ public class Line {
 		}
 		uses.addAll(s);
 	}
-	
+
 	public void addPredUse(String s) {
 		if (preduses == null) {
 			preduses = new TreeSet<String>();
@@ -109,12 +110,19 @@ public class Line {
 		}
 		predops.addAll(s);
 	}
-	
+
 	public void addPred(Integer i) {
 		if (preds == null) {
 			preds = new TreeSet<Integer>();
 		}
 		preds.add(i);
+	}
+
+	public void addPreds_single(Stack<Integer> qs) {
+		if (preds == null) {
+			preds = new TreeSet<Integer>();
+		}
+		preds.add(qs.peek());
 	}
 
 	public void addPreds(Collection<Integer> qs) {
@@ -173,7 +181,7 @@ public class Line {
 			System.out.println("preduses:" + preduses);
 		if (predops != null)
 			System.out.println("predops:" + predops);
-		
+
 		if (preds != null)
 			System.out.println("preds:" + preds);
 		if (this.ismethodinvocation) {
