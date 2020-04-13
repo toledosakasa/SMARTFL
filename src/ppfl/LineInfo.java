@@ -30,7 +30,7 @@ public class LineInfo {
 	}
 
 	public void addLine(Integer i) {
-		linemap.put(i, new Line());
+		linemap.put(i, new Line(i));
 	}
 
 	public void print() {

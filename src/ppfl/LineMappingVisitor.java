@@ -314,7 +314,6 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(ForStatement node) {
-
 		int pos = lineinfo.getLineNumber(node.getStartPosition());
 		Line l = lineinfo.getLine(pos);
 		initLine(l);

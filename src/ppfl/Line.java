@@ -8,6 +8,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 public class Line {
+	int linenumber;
 	String def;
 	Set<String> uses;
 	List<String> ops;
@@ -37,10 +38,11 @@ public class Line {
 		preds = new TreeSet<Integer>(_preds);
 	}
 
-	public Line() {
+	public Line(int ln) {
 		this.ismethod = false;
 		this.ismethodinvocation = false;
 		this.isret = false;
+		this.linenumber = ln;
 	}
 
 	public void setDef(String s) {
@@ -122,7 +124,11 @@ public class Line {
 		if (preds == null) {
 			preds = new TreeSet<Integer>();
 		}
-		if(!preds.isEmpty())preds.add(qs.peek());
+		if (!qs.isEmpty()) {
+			int t = qs.peek();
+			if (t != this.linenumber)
+				preds.add(t);
+		}
 	}
 
 	public void addPreds(Collection<Integer> qs) {
