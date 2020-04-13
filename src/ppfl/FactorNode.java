@@ -7,7 +7,7 @@ public class FactorNode {
 	private Node def;
 	private Node stmt;
 	private List<Node> uses;
-	// TODO consider operators
+	private List<String> ops;// TODO consider operators
 	private double HIGH = 0.99;
 	private double MEDIUM = 0.5;
 	private double LOW = 0.01;
@@ -16,12 +16,13 @@ public class FactorNode {
 	private Edge sedge;
 	private List<Edge> puedges;
 
-	public FactorNode(Node def, Node stmt, List<Node> preds, List<Node> uses, Edge dedge, Edge sedge,
+	public FactorNode(Node def, Node stmt, List<Node> preds, List<Node> uses,List<String> ops, Edge dedge, Edge sedge,
 			List<Edge> puedges) {
 		this.preds = preds;
 		this.stmt = stmt;
 		this.def = def;
 		this.uses = uses;
+		this.ops = ops;
 		this.dedge = dedge;
 		this.sedge = sedge;
 		this.puedges = puedges;

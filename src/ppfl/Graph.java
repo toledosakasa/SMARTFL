@@ -177,7 +177,7 @@ public class Graph {
 						for (int i = 0; i < passedargs.size(); i++) {
 							String d = curline.argdefs.get(i);
 							Set<String> arguses = passedargs.get(i);
-							FactorNode factor = buildFactor(d, passedpreds, arguses, callernode);
+							FactorNode factor = buildFactor(d, passedpreds, arguses,curline.ops, callernode);
 							last_defined_var = d;
 							last_defined_stmt = callernode;
 						}
@@ -189,7 +189,7 @@ public class Graph {
 					// curline.print();
 					if (!returnDef.isEmpty()) {
 						String retdef = returnDef.pop();
-						FactorNode factor = buildFactor(retdef, curline.preds, curline.retuses, callernode);
+						FactorNode factor = buildFactor(retdef, curline.preds, curline.retuses,curline.ops, callernode);
 						// record last defined value(used in auto-oracle)
 						last_defined_var = retdef;
 						last_defined_stmt = callernode;
@@ -212,11 +212,11 @@ public class Graph {
 						// add this factor to deal with libraries.
 						// when no library method is used, this factor could be ignored.
 						if (add_return_arg_factor) {
-							FactorNode factor = buildFactorWithArgUses(curline.def, curline.preds, curline.arguses,
+							FactorNode factor = buildFactorWithArgUses(curline.def, curline.preds, curline.arguses,curline.ops,
 									stmt);
 						}
 					} else {
-						FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, stmt);
+						FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses,curline.ops, stmt);
 					}
 					// System.out.println("printing curline.def");
 					// curline.print();
@@ -229,7 +229,7 @@ public class Graph {
 				if (curline.preddef != null) {
 					// System.out.println("printing curline.preddef");
 					// curline.print();
-					FactorNode factor = buildFactor(curline.preddef, curline.preds, curline.preduses, stmt);
+					FactorNode factor = buildFactor(curline.preddef, curline.preds, curline.preduses,curline.ops, stmt);
 					// record last defined value(used in auto-oracle)
 					last_defined_var = curline.preddef;
 					last_defined_stmt = stmt;
@@ -252,15 +252,15 @@ public class Graph {
 		}
 	}
 
-	private FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, StmtNode stmt) {
+	private FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses,List<String> ops, StmtNode stmt) {
 		HashSet<String> t = new HashSet<String>();
 		for (Set<String> use : uses) {
 			t.addAll(use);
 		}
-		return buildFactor(def, preds, t, stmt);
+		return buildFactor(def, preds, t,ops, stmt);
 	}
 
-	private FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, StmtNode stmt) {
+	private FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, List<String> ops, StmtNode stmt) {
 
 		// deal with Declaration and use/pred in the same line
 		// (e.g. for(int i = 0;i < n;i++))
@@ -349,7 +349,7 @@ public class Graph {
 			puedges.add(nedge);
 			n.add_edge(nedge);
 		}
-		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, dedge, sedge, puedges);
+		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes,ops, dedge, sedge, puedges);
 		factornodes.add(ret);
 		return ret;
 	}
@@ -424,21 +424,13 @@ public class Graph {
 		nodes.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				if (Double.isNaN(arg0.getprob()))
-					return 1;
-				if (Double.isNaN(arg1.getprob()))
-					return -1;
-				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
+				return Double.compare(arg0.getprob(), arg1.getprob());
 			}
 		});
 		stmts.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				if (Double.isNaN(arg0.getprob()))
-					return 1;
-				if (Double.isNaN(arg1.getprob()))
-					return -1;
-				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
+				return Double.compare(arg0.getprob(), arg1.getprob());
 			}
 		});
 		long endTime = System.currentTimeMillis();
@@ -474,21 +466,13 @@ public class Graph {
 		nodes.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				if (Double.isNaN(arg0.getprob()))
-					return 1;
-				if (Double.isNaN(arg1.getprob()))
-					return -1;
-				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
+				return Double.compare(arg0.getprob(), arg1.getprob());
 			}
 		});
 		stmts.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				if (Double.isNaN(arg0.getprob()))
-					return 1;
-				if (Double.isNaN(arg1.getprob()))
-					return -1;
-				return (arg0.getprob() - arg1.getprob()) < 0 ? -1 : 1;
+				return Double.compare(arg0.getprob(), arg1.getprob());
 			}
 		});
 		return;
@@ -510,20 +494,20 @@ public class Graph {
 					isend = false;
 			}
 			if (isend) {
-				 System.out.println("\n\n"+i+"\n\n");
+				System.out.println("\n\n" + i + "\n\n");
 				break;
 			}
 		}
 		nodes.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.bp_getprob(),arg1.bp_getprob());
+				return Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
 			}
 		});
 		stmts.sort(new Comparator<Node>() {
 			@Override
 			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.bp_getprob(),arg1.bp_getprob());
+				return Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
 			}
 		});
 		long endTime = System.currentTimeMillis();
