@@ -279,6 +279,7 @@ public class LineMappingVisitor extends ASTVisitor {
 
 		l.addPredUses(uses);
 		l.addPredOps(ops);
+		l.addPreds_single(predqueue);
 
 	}
 
@@ -298,7 +299,7 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public void endVisit(WhileStatement node) {
-		predqueue.pop();
+		endVisitBranch(node);
 		return;
 	}
 
@@ -308,7 +309,7 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public void endVisit(DoStatement node) {
-		predqueue.pop();
+		endVisitBranch(node);
 		return;
 	}
 
@@ -331,7 +332,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		getUsesAndOps(node.getExpression(), uses, ops);// TODO
 		l.addPredUses(uses);
 		l.addPredOps(ops);
-
+		l.addPreds_single(predqueue);
 		return;
 	}
 	// TODO EnhancedForStatement

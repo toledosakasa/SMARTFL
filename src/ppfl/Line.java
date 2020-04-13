@@ -122,7 +122,7 @@ public class Line {
 		if (preds == null) {
 			preds = new TreeSet<Integer>();
 		}
-		preds.add(qs.peek());
+		if(!preds.isEmpty())preds.add(qs.peek());
 	}
 
 	public void addPreds(Collection<Integer> qs) {
