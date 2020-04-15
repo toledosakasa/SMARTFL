@@ -7,20 +7,10 @@ public class Edge {
 	// private FactorNode factor;
 	private double ntof = 0.5;
     private double fton = 0.5;
-    private Node node;
 
-	public Edge(Node n) {
-        node = n;
+	public Edge() {
+
 	}
-
-	// public Edge(Node node) {
-	// this.node = node;
-	// this.factor = factor;
-	// }
-
-	// public Node get_node() {
-	// return node;
-	// }
 
 	public void set_ntof(double val) {
 		ntof = val;

@@ -48,16 +48,6 @@ public class FactorNode {
         this.nnodes = allnodes.size();
         gettensor(allnodes, nnodes-1);
 	}
-
-	// double mysum(double lst[], int n) {
-	// int times = (1 << n);
-	// double res = 0;
-	// for (int i = 0; i < times; i++) {
-
-	// }
-	// return 0;
-	// }
-
     private void gettensor(List<Node> allnodes, int cur)
     {
         if (cur < 0) 
@@ -72,19 +62,8 @@ public class FactorNode {
     }
 
 	public void send_message() {
-		// int num = preds.size() + uses.size();
-		// double puv[] = new double[num];
-		// int i = 0;
-		// double put = 1;
-		// for (Edge n : puedges) {
-		// 	put = put * n.get_ntof();
-		// }
-		// double dv = dedge.get_ntof();
-        // double sv = sedge.get_ntof();
-        
+        //used to save all the messages from the nodes
         List<Double> tmpvlist = new ArrayList<Double>();
-
-
         for (int i = 0; i < nnodes; i++)
         {
             tmpvlist.add(alledges.get(i).get_ntof());
@@ -92,11 +71,11 @@ public class FactorNode {
 
         for (int j = 0; j < nnodes; j++)
         {
-            
             double v0 = 0;
             double v1 = 0;
             int step = (1 << j);
             int vnum = (1<<nnodes);
+            //transform a tensor of nnodes-dimension into a one-dimension vector(two values)
             for (int k = 0; k < vnum; k += 2 * step)
             {
                 for (int o = 0; o < step; o++)
@@ -106,7 +85,7 @@ public class FactorNode {
 
                     int index1 = k + o + step;
                     double tmp1 = tensor.get(index1);
-
+                    //get the bit and times the Corresponding message
                     for (int mm = 0; mm < nnodes; mm++)
                     {
                         int bit0 = index0 % 2;
@@ -134,23 +113,6 @@ public class FactorNode {
             }
             alledges.get(j).set_fton(v1/(v1+v0));
         }
-
-		// double sv1 = HIGH * (dv * put + (1 - dv) * (1 - put)) + LOW * ((1 - dv) * put + dv * (1 - put));
-		// double sv0 = HIGH * (1 - dv) + LOW * dv;
-		// sedge.set_fton(sv1 / (sv1 + sv0));
-
-		// double dv1 = HIGH * sv * put + LOW * (sv * (1 - put) + (1 - sv));
-		// double dv0 = HIGH * ((1 - sv) + sv * (1 - put)) + LOW * sv * put;
-		// dedge.set_fton(dv1 / (dv1 + dv0));
-
-		// for (Edge n : puedges) {
-		// 	double except_put = put / n.get_ntof();
-		// 	double nv1 = HIGH * (sv * dv * except_put + sv * (1 - dv) * (1 - except_put) + (1 - sv) * (1 - dv))
-		// 			+ LOW * (sv * dv * (1 - except_put) + sv * (1 - dv) * except_put + (1 - sv) * dv);
-		// 	double nv0 = HIGH * (sv * (1 - dv) + (1 - sv) * (1 - dv)) + LOW * (sv * dv + (1 - sv) * dv);
-		// 	n.set_fton(nv1 / (nv1 + nv0));
-		// }
-
 	}
 
 	public double getProb() {
