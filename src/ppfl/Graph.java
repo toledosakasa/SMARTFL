@@ -340,22 +340,24 @@ public class Graph {
 			addNode(defname, defnode);
 		}
 
-		Edge dedge = new Edge();
+		Edge dedge = new Edge(defnode);
 		defnode.add_edge(dedge);
-		Edge sedge = new Edge();
+		Edge sedge = new Edge(stmt);
 		stmt.add_edge(sedge);
-		List<Edge> puedges = new ArrayList<Edge>();
+		List<Edge> pedges = new ArrayList<Edge>();
 		for (Node n : prednodes) {
-			Edge nedge = new Edge();
-			puedges.add(nedge);
+			Edge nedge = new Edge(n);
+			pedges.add(nedge);
 			n.add_edge(nedge);
-		}
+        }
+        List<Edge> uedges = new ArrayList<Edge>();
 		for (Node n : usenodes) {
-			Edge nedge = new Edge();
-			puedges.add(nedge);
+			Edge nedge = new Edge(n);
+			uedges.add(nedge);
 			n.add_edge(nedge);
 		}
-		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, ops, dedge, sedge, puedges);
+        FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, ops,
+                 dedge, sedge,pedges,uedges);
 		factornodes.add(ret);
 		return ret;
 	}

@@ -16,7 +16,7 @@ public class Node {
 	private String testname;
 
 	private List<Edge> edges;
-	private double eplison = 1e-8;
+	private double epsilon = 1e-8;
 
 	StmtNode stmt;
 
@@ -100,7 +100,7 @@ public class Node {
 			if (delta < 0)
 				delta = -delta;
 			this.p = val;
-			return delta > eplison;
+			return delta > epsilon;
 		}
 
 		double ratio = 1;
@@ -120,7 +120,7 @@ public class Node {
 			double tv1 = b / (b + a / ratio);
 			n.set_ntof(tv1);
 		}
-		return delta > eplison;
+		return delta > epsilon;
 	}
 
 	public double bp_getprob() {

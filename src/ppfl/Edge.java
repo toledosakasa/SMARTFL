@@ -6,10 +6,11 @@ public class Edge {
 	// private Node node;
 	// private FactorNode factor;
 	private double ntof = 0.5;
-	private double fton = 0.5;
+    private double fton = 0.5;
+    private Node node;
 
-	public Edge() {
-
+	public Edge(Node n) {
+        node = n;
 	}
 
 	// public Edge(Node node) {
@@ -34,6 +35,6 @@ public class Edge {
 	}
 
 	public double get_fton() {
-		return this.fton;
+		return fton;
 	}
 }
