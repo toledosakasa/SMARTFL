@@ -272,13 +272,13 @@ class GraphTest {
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
-		pgraph.parsetrace(passtrace1, "pass", true);
+		pgraph.parsetrace(passtrace1, "pass1", true);
 		pgraph.parsesource(passpath);
-		pgraph.parsetrace(passtrace2, "pass", true);
+		pgraph.parsetrace(passtrace2, "pass2", true);
 		pgraph.parsesource(failpath);
-		pgraph.parsetrace(failtrace1, "fail", false);
+		pgraph.parsetrace(failtrace1, "fail1", false);
 		pgraph.parsesource(failpath);
-		pgraph.parsetrace(failtrace2, "fail", false);
+		pgraph.parsetrace(failtrace2, "fail2", false);
 		pgraph.printgraph();
 
 		return pgraph;
