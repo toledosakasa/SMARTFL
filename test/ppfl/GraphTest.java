@@ -276,7 +276,7 @@ class GraphTest {
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace2, "pass2", true);
 		pgraph.parsesource(failpath);
-		pgraph.parsetrace(failtrace1, "fail1", false);
+		pgraph.parsetrace(failtrace1, "fail", false);
 		pgraph.parsesource(failpath);
 		pgraph.parsetrace(failtrace2, "fail2", false);
 		pgraph.printgraph();
@@ -301,6 +301,51 @@ class GraphTest {
 		}
 		assertFalse(fail);
 		*/
+	}
+	
+	Graph modinit() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\ModTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\ModTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\ModTest.fail.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	void modtest() {
+		Graph pgraph = modinit();
+		pgraph.check_bp(true);
+	}
+	
+	Graph simpleflowinit() {
+		String ppflroot = ".";
+		String filepatht = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
+		String tracepatht = ppflroot + "\\test\\trace\\logs\\SimpleFlowTest.fail.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+
+		pgraph.parsesource(filepatht);
+		pgraph.parsetrace(tracepatht, "fail", false);
+		// pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	void simpleflowtest() {
+		Graph pgraph = simpleflowinit();
+		pgraph.check_bp(true);
 	}
 	
 	private static String readFileToString(String filePath) {

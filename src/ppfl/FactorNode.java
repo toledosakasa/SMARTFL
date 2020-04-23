@@ -155,21 +155,40 @@ public class FactorNode {
 					return MEDIUM;
 				return LOW;
 			}
-
 		} else {
-			if (!defv) {
-				if (hasUNKoperator)
-					return MEDIUM;
-				return HIGH;
-			}
-			// else: def = true
-			else if (pu) {
+			if (defv && pu) {
 				if (hasUNKoperator)
 					return MEDIUM;
 				return LOW;
 			}
-			// def = true stmt = false use = false
-			return LOW;// TODO should be medium when using certain ops.
+			if (!defv && !pu) {
+				if (hasUNKoperator)
+					return MEDIUM;
+				return HIGH;
+			}
+			if (!defv && pu) {
+				if (hasUNKoperator)
+					return MEDIUM;
+				return HIGH;
+			}
+			if (defv && !pu) {
+				if (hasUNKoperator)
+					return MEDIUM;
+				return LOW;
+			}
+//			if (!defv) {
+//				if (hasUNKoperator)
+//					return MEDIUM;
+//				return HIGH;
+//			}
+//			// else: def = true
+//			else if (pu) {
+//				if (hasUNKoperator)
+//					return MEDIUM;
+//				return LOW;
+//			}
+//			// def = true stmt = false use = false
+//			return LOW;// TODO should be medium when using certain ops.
 		}
 		return MEDIUM;
 	}
