@@ -303,6 +303,75 @@ class GraphTest {
 		*/
 	}
 	
+	Graph fullinit() {
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\FullTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\FullTest.pass.log";
+		String passtrace1 = ppflroot + "\\test\\trace\\logs\\FullTest.pass1.log";
+		String passtrace2 = ppflroot + "\\test\\trace\\logs\\FullTest.pass2.log";
+		String passtrace3 = ppflroot + "\\test\\trace\\logs\\FullTest.pass3.log";
+		String passtrace4 = ppflroot + "\\test\\trace\\logs\\FullTest.pass4.log";
+		String failtrace1 = ppflroot + "\\test\\trace\\logs\\FullTest.fail1.log";
+		String failtrace2 = ppflroot + "\\test\\trace\\logs\\FullTest.fail2.log";
+		String failtrace3 = ppflroot + "\\test\\trace\\logs\\FullTest.fail3.log";
+		String failtrace4 = ppflroot + "\\test\\trace\\logs\\FullTest.fail4.log";
+		
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace1, "pass1", true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace2, "pass2", true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace3, "pass3", true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace4, "pass4", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace1, "fail1", false);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace2, "fail2", false);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace3, "fail3", false);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace4, "fail4", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+	
+	@Test
+	void fulltest() {
+		Graph pgraph = fullinit();
+		pgraph.check_bp(true);
+	}
+	
+	Graph parainit() {
+		//boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\ParaTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\ParaTest.fail.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	void paratest() {
+		Graph pgraph = parainit();
+		pgraph.check_bp(true);
+	}
+	
 	Graph modinit() {
 		boolean fail = false;
 		String ppflroot = ".";
