@@ -502,7 +502,11 @@ public class Graph {
 					isend = false;
 			}
 			if (isend) {
+<<<<<<< Updated upstream
 				System.out.println("\n\n" + i + "\n\n");
+=======
+				System.out.println("\n\n"+i+"\n\n");
+>>>>>>> Stashed changes
 				break;
 			}
 		}
