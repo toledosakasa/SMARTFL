@@ -328,6 +328,31 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 	
+	Graph branchinit() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\BranchTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\BranchTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\BranchTest.fail.log";
+
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	void branchtest() {
+		Graph pgraph = branchinit();
+		pgraph.check_bp(true);
+	}
+	
 	Graph simpleflowinit() {
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
