@@ -503,6 +503,7 @@ public class Graph {
 			}
 			if (isend) {
 				System.out.println("\n\n" + i + "\n\n");
+				System.out.println("\n\n"+i+"\n\n");
 				break;
 			}
 		}
