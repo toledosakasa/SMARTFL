@@ -6,7 +6,7 @@ public class Edge {
 	// private Node node;
 	// private FactorNode factor;
 	private double ntof = 0.5;
-    private double fton = 0.5;
+	private double fton = 0.5;
 
 	public Edge() {
 

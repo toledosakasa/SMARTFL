@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class BranchTest {
 
 	public static int f(int a) {
-		if(a > 1)
+		if (a > 1)
 			a = a + 1;
 		else
 			a = a - 1;

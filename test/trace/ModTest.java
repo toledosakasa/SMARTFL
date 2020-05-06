@@ -8,7 +8,7 @@ class ModTest {
 
 	public static int f(int a) {
 		a = a + 1;
-		a = a % 2;//should be a % 4
+		a = a % 2;// should be a % 4
 		return a;
 	}
 

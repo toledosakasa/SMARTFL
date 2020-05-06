@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -62,6 +63,7 @@ public class LineMappingVisitor extends ASTVisitor {
 
 		int ret = -1;
 		Map<Integer, Integer> m = vtable.get(varname);
+		// System.out.println(varname + usepos);
 		for (Integer k : m.keySet()) {
 			// System.out.println(k+" "+usepos + " " +m.get(k));
 			if (k <= usepos && usepos <= m.get(k)) {
@@ -129,7 +131,8 @@ public class LineMappingVisitor extends ASTVisitor {
 	}
 
 	public ASTNode getparentBlock(ASTNode node) {
-		while (!(node instanceof Block || node instanceof BodyDeclaration || node instanceof ForStatement)) {
+		while (node instanceof FieldDeclaration
+				|| !(node instanceof Block || node instanceof BodyDeclaration || node instanceof ForStatement)) {
 			node = node.getParent();
 		}
 		return node;

@@ -1,6 +1,7 @@
 package ppfl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -47,6 +48,9 @@ public class Graph {
 	Random random;
 
 	LineInfo lineinfo;
+	Map<String, LineInfo> lineinfomap;
+	// when set to true, lineinfomap will be enabled.
+	boolean parseproject;
 
 	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
 	// input of test function as 1.0(always true)
@@ -75,22 +79,23 @@ public class Graph {
 		auto_oracle = true;
 		returnDef = new Stack<String>();
 		add_return_arg_factor = true;
+		this.lineinfomap = new HashMap<String, LineInfo>();
 	}
 
-	public Graph(String tracefilename, String testname, boolean testpass, boolean _auto_oracle) {
-		this.testname = testname;
-		factornodes = new ArrayList<FactorNode>();
-		nodes = new ArrayList<Node>();
-		stmts = new ArrayList<StmtNode>();
-		nodemap = new HashMap<String, Node>();
-		stmtmap = new HashMap<String, Node>();
-		varcountmap = new HashMap<String, Integer>();
-		stmtcountmap = new HashMap<String, Integer>();
-		max_loop = -1;
-		random = new Random();
-		auto_oracle = _auto_oracle;
-		parsetrace(tracefilename, testname, testpass);
-	}
+//	public Graph(String tracefilename, String testname, boolean testpass, boolean _auto_oracle) {
+//		this.testname = testname;
+//		factornodes = new ArrayList<FactorNode>();
+//		nodes = new ArrayList<Node>();
+//		stmts = new ArrayList<StmtNode>();
+//		nodemap = new HashMap<String, Node>();
+//		stmtmap = new HashMap<String, Node>();
+//		varcountmap = new HashMap<String, Integer>();
+//		stmtcountmap = new HashMap<String, Integer>();
+//		max_loop = -1;
+//		random = new Random();
+//		auto_oracle = _auto_oracle;
+//		parsetrace(tracefilename, testname, testpass);
+//	}
 
 	public void setMaxLoop(int i) {
 		this.max_loop = i;
@@ -98,6 +103,10 @@ public class Graph {
 
 	public void setAutoOracle(boolean b) {
 		this.auto_oracle = b;
+	}
+
+	public void setParseProject(boolean b) {
+		this.parseproject = b;
 	}
 
 	public void setAddReturnArgFactor(boolean b) {
@@ -118,6 +127,44 @@ public class Graph {
 		lineinfo.print();
 	}
 
+	public void parsesourcefile(String sourcefilename, String classname, boolean verbose) {
+		final String FilePath = sourcefilename;
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		String source = readFileToString(FilePath);
+		parser.setSource(source.toCharArray());
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+		final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		LineInfo lf = new LineInfo(cu);
+		ASTVisitor visitor = new LineMappingVisitor(lf);
+		cu.accept(visitor);
+		if (verbose) {
+			lf.print();
+		}
+		this.lineinfomap.put(classname, lf);
+	}
+
+	public void parsesourcefolder(File folder, String prefix, boolean verbose) {
+		if (folder.exists() && folder.isDirectory()) {
+			File[] files = folder.listFiles();
+			for (File file : files) {
+				if (file.isDirectory()) {
+					parsesourcefolder(file, prefix + "." + folder.getName(), verbose);
+				}
+				if (file.isFile() && file.getName().endsWith(".")) {
+					parsesourcefile(file.getAbsolutePath(), prefix + "." + folder.getName(), verbose);
+				}
+			}
+		} else {
+			System.out.println("Not a folder");
+		}
+	}
+
+	public void parseproject(String sourcefolder, String prefix, boolean verbose) {
+		File folder = new File(sourcefolder);
+		parsesourcefolder(folder, prefix, verbose);
+	}
+
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
 		varcountmap = new HashMap<String, Integer>();
@@ -136,6 +183,12 @@ public class Graph {
 				String traceclass = domain.substring(0, splitp);
 				String trace_method = domain.substring(splitp + 1);
 
+				LineInfo lineinfo;
+				if (parseproject) {
+					lineinfo = this.lineinfomap.get(traceclass);
+				} else {
+					lineinfo = this.lineinfo;
+				}
 				int line = Integer.parseInt(split[1]);
 				Line curline = lineinfo.getLine(line);
 				StmtNode stmt = null;
@@ -317,7 +370,9 @@ public class Graph {
 				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
 					// System.out.print(s + " ");
 					if (!varcountmap.containsKey(s)) {
-						System.out.println(s);
+						System.out.println("Undefined use:" + s);
+						// assert(false);
+						continue;
 					}
 					assert (varcountmap.containsKey(s));
 					String usename = getVarName(s, varcountmap);
@@ -349,15 +404,14 @@ public class Graph {
 			Edge nedge = new Edge();
 			pedges.add(nedge);
 			n.add_edge(nedge);
-        }
-        List<Edge> uedges = new ArrayList<Edge>();
+		}
+		List<Edge> uedges = new ArrayList<Edge>();
 		for (Node n : usenodes) {
 			Edge nedge = new Edge();
 			uedges.add(nedge);
 			n.add_edge(nedge);
 		}
-        FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, ops,
-                 dedge, sedge,pedges,uedges);
+		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, ops, dedge, sedge, pedges, uedges);
 		factornodes.add(ret);
 		return ret;
 	}
@@ -503,7 +557,7 @@ public class Graph {
 			}
 			if (isend) {
 				System.out.println("\n\n" + i + "\n\n");
-				System.out.println("\n\n"+i+"\n\n");
+				System.out.println("\n\n" + i + "\n\n");
 				break;
 			}
 		}

@@ -211,7 +211,7 @@ class GraphTest {
 		Graph pgraph = lightloopinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph breakinit() {
 		boolean fail = false;
 		String ppflroot = ".";
@@ -235,7 +235,7 @@ class GraphTest {
 		Graph pgraph = breakinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph badreturninit() {
 		boolean fail = false;
 		String ppflroot = ".";
@@ -268,7 +268,7 @@ class GraphTest {
 		String passtrace2 = ppflroot + "\\test\\trace\\logs\\FourTest.pass2.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\FourTest.fail.log";
 		String failtrace2 = ppflroot + "\\test\\trace\\logs\\FourTest.fail2.log";
-		
+
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
@@ -283,26 +283,18 @@ class GraphTest {
 
 		return pgraph;
 	}
-	
+
 	@Test
 	void fourtest() {
 		Graph pgraph = fourinit();
 		pgraph.check_bp(true);
 		/*
-		boolean fail = false;
-		Graph pgraph = fourinit();
-		try {
-			pgraph.inference();
-			pgraph.printprobs();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			fail = true;
-			e.printStackTrace();
-		}
-		assertFalse(fail);
-		*/
+		 * boolean fail = false; Graph pgraph = fourinit(); try { pgraph.inference();
+		 * pgraph.printprobs(); } catch (Exception e) { // TODO Auto-generated catch
+		 * block fail = true; e.printStackTrace(); } assertFalse(fail);
+		 */
 	}
-	
+
 	Graph fullinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\FullTest.java";
@@ -316,7 +308,7 @@ class GraphTest {
 		String failtrace2 = ppflroot + "\\test\\trace\\logs\\FullTest.fail2.log";
 		String failtrace3 = ppflroot + "\\test\\trace\\logs\\FullTest.fail3.log";
 		String failtrace4 = ppflroot + "\\test\\trace\\logs\\FullTest.fail4.log";
-		
+
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
@@ -341,15 +333,15 @@ class GraphTest {
 
 		return pgraph;
 	}
-	
+
 	@Test
 	void fulltest() {
 		Graph pgraph = fullinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph parainit() {
-		//boolean fail = false;
+		// boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
 		String failpath = passpath;
@@ -371,7 +363,7 @@ class GraphTest {
 		Graph pgraph = parainit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph modinit() {
 		boolean fail = false;
 		String ppflroot = ".";
@@ -396,7 +388,7 @@ class GraphTest {
 		Graph pgraph = modinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph branchinit() {
 		boolean fail = false;
 		String ppflroot = ".";
@@ -421,7 +413,7 @@ class GraphTest {
 		Graph pgraph = branchinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph simpleflowinit() {
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
@@ -441,7 +433,7 @@ class GraphTest {
 		Graph pgraph = simpleflowinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	private static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
 		BufferedReader reader;
