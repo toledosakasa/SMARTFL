@@ -60,6 +60,7 @@ public class LineMappingVisitor extends ASTVisitor {
 		if (vmap.get(varname).containsKey(usepos)) {
 			return vmap.get(varname).get(usepos);
 		}
+		
 
 		int ret = -1;
 		Map<Integer, Integer> m = vtable.get(varname);

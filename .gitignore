@@ -4,3 +4,4 @@
 /test/trace/logs
 /configs/*.launch
 *.log
+/refs/

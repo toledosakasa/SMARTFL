@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 class DomainTest {
 
+	//private static java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger("trace.DomainTest");
+	
 	public static int f(int a) {
 		if (a > 1)
 			a = a + 1;
@@ -15,6 +17,7 @@ class DomainTest {
 
 	@Test
 	void test() {
+		System.out.println("11");
 		f(2);
 	}
 
