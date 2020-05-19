@@ -17,7 +17,6 @@ class DomainTest {
 
 	@Test
 	void test() {
-		System.out.println("11");
 		f(2);
 	}
 
