@@ -17,7 +17,7 @@ class BadReturnTest {
 
 	@Test
 	void pass() {
-		assertEquals(fact(0), 0);
+		assertEquals(fact(0), 1);
 	}
 
 	@Test
