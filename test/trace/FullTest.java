@@ -7,20 +7,20 @@ import org.junit.jupiter.api.Test;
 class FullTest {
 	public static double full(double x, double y) {
 		double tmp = 0;
-		if (x > 0)//should be (x>1) 
-		{
-			x = x-1;
-			y = y-1; 
-			if(y > 0)
-				tmp = x/y;
-			else
-				tmp = y/x;
-		}
-		else if (x < 0)//should be (x<-1)
+		if (x < 0)//should be (x<-1)
 		{
 			x=x+1;
 			y=y+1; 
 			if(y>0)
+				tmp = x/y;
+			else
+				tmp = y/x;
+		}
+		else if (x > 0)//should be (x>1) 
+		{
+			x = x-1;
+			y = y-1; 
+			if(y > 0)
 				tmp = x/y;
 			else
 				tmp = y/x;
