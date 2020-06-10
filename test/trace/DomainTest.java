@@ -10,7 +10,7 @@ class DomainTest {
 	
 	public static int f(int a) {
 		if (a > 1)
-			a = a + 1;
+			a = a + 1123123213;
 		a = a + 2;
 		return a;
 	}

@@ -8,6 +8,7 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
+import javassist.bytecode.ConstPool;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.Mnemonic;
 
@@ -55,7 +56,6 @@ public class TraceTransformer implements ClassFileTransformer {
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
 		byte[] byteCode = classfileBuffer;
-
 		String finalTargetClassName = this.targetClassName.replaceAll("\\.", "/"); // replace . with /
 		if (!className.equals(finalTargetClassName)) {
 			return byteCode;
@@ -107,6 +107,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 					// preprocessing of linenumbers and specific bytecode instructions
 					MethodInfo mi = m.getMethodInfo();
+					ConstPool constp = mi.getConstPool();
 					CodeIterator ci = mi.getCodeAttribute().iterator();
 					List<Integer> li = new ArrayList<Integer>();
 					Map<Integer, StringBuilder> insertmap = new HashMap<Integer, StringBuilder>();
@@ -124,7 +125,7 @@ public class TraceTransformer implements ClassFileTransformer {
 							}
 
 							// deal with specific bytecode instructions
-							String inst = getinst_map(ci, index);
+							String inst = getinst_map(ci, index, constp);
 							if (inst != null)
 								insertmap.get(ln).append(inst);
 						}
@@ -156,19 +157,20 @@ public class TraceTransformer implements ClassFileTransformer {
 		return byteCode;
 
 	}
-	private String getinst_map(CodeIterator ci,int index) {
+
+	private String getinst_map(CodeIterator ci, int index,ConstPool constp) {
 		int op = ci.byteAt(index);
 		String inst = null;
 		String opc = Mnemonic.OPCODE[op];
 		OpcodeInst oi = Interpreter.map[op];
-		if(oi == null) {
+		if (oi == null) {
 			LOGGER.warn("unsupported opcode: " + opc);
 			return "";
 		}
-		inst = oi.getinst(ci, index);
+		inst = oi.getinst(ci, index,constp);
 		return this.getLogStmt(inst);
 	}
-	
+
 	private String getinst(CodeIterator ci, int index) {
 		int op = ci.byteAt(index);
 		String inst = null;
@@ -216,7 +218,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			assert (opc.startsWith("pop"));
 			System.out.println(opc);
 			inst = this.getLogStmt("opcode=pop,popnum=" + (op - 86));
-		} 
+		}
 		// branching
 		else if (op >= 153 && op <= 158) {
 			assert (opc.startsWith("if"));
@@ -250,7 +252,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			assert (opc.startsWith("invokestatic"));
 			System.out.println(opc);
 			inst = this.getLogStmt("opcode=invokestatic");
-		} 
+		}
 		// arith
 		else if (op == 132) {
 			assert (opc.startsWith("iinc"));
