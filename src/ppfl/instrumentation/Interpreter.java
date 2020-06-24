@@ -36,7 +36,7 @@ public class Interpreter {
 	static int[] ret1 = { 172, 173, 174, 175, 176 };// return 1 value. push 1 after pop all
 	static int[] jsr = { 168, 201 };// jsr(push 1) ..finally clausef
 	// invokes
-	static int[] invokes = { 182, 183, 184, 185, 186 };// invokes. 
+	static int[] invokes = { 182, 183, 184, 185, 186 };// invokes.
 	// arith
 	// pop2 push1 arith
 	static int[] pop2push1 = { 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
@@ -58,15 +58,16 @@ public class Interpreter {
 
 	static void printopcodes() {
 		init();
-		for (int i = 0; i < Mnemonic.OPCODE.length; i++)
+		for (int i = 0; i < Mnemonic.OPCODE.length; i++) {
 			if (map[i] == null) {
-				System.out.print("NI ");
-				System.out.println(i + " " + Mnemonic.OPCODE[i]);
+//				System.out.print("NI ");
+//				System.out.println(i + " " + Mnemonic.OPCODE[i]);
 			} else {
+				if(map[i].pushnum != 1)continue;
 				System.out.print(i + " " + Mnemonic.OPCODE[i] + " ");
-				System.out.println(map[i].getinst(null, 0,null));
+				System.out.println(map[i].getinst(null, 0, null));
 			}
-
+		}
 	}
 
 	public static void main(String args[]) {
@@ -153,8 +154,8 @@ public class Interpreter {
 		for (int id : ret0) {
 			map[id] = new OpcodeInst(id, 0, -1);
 		}
-		for (int id : ret1) {
-			map[id] = new OpcodeInst(id, 1, -1);
+		for (int id : ret1) {//return value will be printed after called.
+			map[id] = new OpcodeInst(id, 0, -1);
 		}
 		for (int id : jsr) {
 			map[id] = new OpcodeInst(id, 1, 0);// TODO

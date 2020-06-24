@@ -13,6 +13,14 @@ public class OpcodeInst {
 		VAR, CONST, PARAVAR, PARACONST, STATIC, FIELD, NONE, POOL;
 	}
 
+	public enum datatype {
+		BYTE,SHORT,CHAR,BOOLEAN,
+		INT,LONG,FLOAT,DOUBLE,
+		LDC,
+		STRING,
+		OBJECT
+	}
+
 	// pushs
 	int pushnum;
 	paratype pushtype = paratype.NONE;
@@ -52,17 +60,19 @@ public class OpcodeInst {
 			return null;
 		return String.valueOf(ci.byteAt(cindex + paraindex));
 	}
-	
-	String getpool(CodeIterator ci, int cindex, int paraindex,ConstPool constp) {
+
+	String getpool(CodeIterator ci, int cindex, int paraindex, ConstPool constp) {
 		if (ci == null)
 			return null;
 		return constp.getLdcValue(ci.byteAt(cindex + paraindex)).toString();
 	}
 
 	int get2para(CodeIterator ci, int index) {
-		return ci.byteAt(index+1) << (8) | ci.byteAt(index+2);
+		if (ci == null)
+			return 0;
+		return ci.byteAt(index + 1) << (8) | ci.byteAt(index + 2);
 	}
-	
+
 	String getparas(CodeIterator ci, int index) {
 		if (ci == null)
 			return null;
@@ -74,15 +84,22 @@ public class OpcodeInst {
 		return ret;
 	}
 
-	String getinst(CodeIterator ci, int index,ConstPool constp) {
+	String getmethodinfo(CodeIterator ci, int callindex, ConstPool constp) {
+		if (ci == null)
+			return null;
+		return ",calltype=" + constp.getMethodrefType(callindex) + ",callclass="
+				+ constp.getMethodrefClassName(callindex) + ",callname=" + constp.getMethodrefName(callindex);
+	}
+
+	String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
 		ret.append("opcode=" + this.opcode);
-		if(this.isinvoke) {
-			int callindex = get2para(ci,index);
-			ret.append(",call="+constp.getMethodrefType(callindex));
+		if (this.isinvoke) {
+			int callindex = get2para(ci, index);
+			ret.append(getmethodinfo(ci,callindex,constp));
 			return ret.toString();
 		}
-		
+
 		if (this.popnum != 0)
 			ret.append(",popnum=" + this.popnum);
 		if (this.storetype != paratype.NONE) {
@@ -90,7 +107,7 @@ public class OpcodeInst {
 			if (this.storetype == paratype.VAR) {
 				ret.append(storevalue);
 			} else {
-				ret.append(getparas(ci,index));
+				ret.append(getparas(ci, index));
 			}
 		}
 		if (this.pushnum != 0)
@@ -99,11 +116,10 @@ public class OpcodeInst {
 			ret.append(",pushtype=" + this.pushtype + ",pushvalue=");
 			if (this.pushtype == paratype.CONST || this.pushtype == paratype.VAR) {
 				ret.append(pushvalue);
-			} else if(this.pushtype == paratype.POOL) {
-				ret.append(getpool(ci,index,1,constp));
-			}
-			else {
-				ret.append(getparas(ci,index));
+			} else if (this.pushtype == paratype.POOL) {
+				ret.append(getpool(ci, index, 1, constp));
+			} else {
+				ret.append(getparas(ci, index));
 			}
 		}
 		if (this.pushnum == 0 && this.popnum == 0) {// iinc
@@ -117,6 +133,7 @@ public class OpcodeInst {
 
 		return ret.toString();
 	}
+
 	void setinvoke() {
 		this.isinvoke = true;
 	}

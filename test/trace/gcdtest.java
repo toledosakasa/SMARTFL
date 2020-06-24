@@ -13,7 +13,7 @@ class gcdtest {
 			a = b;
 			b = r;
 		}
-		a = a + 1;
+		b = a + 1;
 
 		return a;
 	}

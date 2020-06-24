@@ -11,8 +11,9 @@ class BadReturnTest {
 			return 1;
 		if (n == 2)
 			return 300000;// wrong
-		int ret = fact(n - 1);
-		return n * ret;
+		// int ret = fact(n - 1);
+		// return n * ret;
+		return n * fact(n - 1);
 	}
 
 	@Test
