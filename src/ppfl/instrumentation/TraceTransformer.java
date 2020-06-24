@@ -47,11 +47,11 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.logFile = s;
 	}
 
-
 	// will be called by bytecode instrumentation
-	public static void printTopStack1(int i) {
+	public static int printTopStack1(int i) {
 		java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger(LOGGERNAME);
-		ppfl_logger.log(java.util.logging.Level.INFO, String.valueOf(i));
+		ppfl_logger.log(java.util.logging.Level.INFO, "Topstack:int, value=" + String.valueOf(i));
+		return i;
 	}
 
 	public static void printTopStack1() {
@@ -123,13 +123,14 @@ public class TraceTransformer implements ClassFileTransformer {
 					CodeAttribute ca = mi.getCodeAttribute();
 					CodeIterator ci = ca.iterator();
 					int lastln = -1;
-					//index used for instrumentation
+					// index used for instrumentation
 					CtClass THISCLASS = cp.get("ppfl.instrumentation.TraceTransformer");
 					int classindex = constp.addClassInfo(THISCLASS);
-					//iterate every instruction
+					// iterate every instruction
 					try {
 						while (ci.hasNext()) {
-							int index = ci.next();
+							// lookahead the next instruction.
+							int index = ci.lookAhead();
 							int ln = mi.getLineNumber(index);
 							String linenumberinfo = cc.getName() + ":" + m.getName() + ":" + ln + ":";
 							if (ln != lastln) {
@@ -137,35 +138,43 @@ public class TraceTransformer implements ClassFileTransformer {
 								System.out.println(ln);
 							}
 
-							// insert bytecode
+							// insert bytecode right before this inst.
 							int op = ci.byteAt(index);
 							String opc = Mnemonic.OPCODE[op];
 							OpcodeInst oi = Interpreter.map[op];
 							System.out.println(opc);
-							//get print information
+							// get print information
 							String inst = getinst_map(ci, index, constp);
 							inst = linenumberinfo + inst;
 							if (inst != null) {
-								//insertmap.get(ln).append(inst);
+								// insertmap.get(ln).append(inst);
 								int instpos = ci.insertGap(8);
 								int instindex = constp.addStringInfo(inst);
 								System.out.println(constp.getStringInfo(instindex));
-								ci.writeByte(19,instpos);//
-								ci.write16bit(instindex, instpos+1);
-								int methodindex = constp.addMethodrefInfo(classindex,"logString","(Ljava/lang/String;)V");
-								ci.writeByte(184,instpos+3);
-								ci.write16bit(methodindex,instpos+4);
-								
+								ci.writeByte(19, instpos);// ldc_w
+								ci.write16bit(instindex, instpos + 1);
+								int methodindex = constp.addMethodrefInfo(classindex, "logString",
+										"(Ljava/lang/String;)V");
+								ci.writeByte(184, instpos + 3);
+								ci.write16bit(methodindex, instpos + 4);
+
 							}
-							//print stack value pushed by this instruction
-							if (oi.pushnum == 1 && oi.opcode == "iload_0") {
+							// move to the next inst. instrumentation below this will be after this inst.
+							ci.next();
+							// print stack value pushed by this instruction.
+							// this should be inserted after the instruction is executed
+							// (after ci.next() is called)
+							if (oi.pushnum == 1 
+									&& (opc.startsWith("i"))// temporary solution for integer insts.should extend opcodeinst class.
+									){
 								System.out.println("dealing with: " + opc);
-								
-								int methodindex = constp.addMethodrefInfo(classindex, "printTopStack1", "(I)V");
-								//ci.insertGap(8);
-								//ci.writeByte(93, index + 1);// dup
-								//ci.writeByte(184, index + 2);// invokestatic
-								//ci.write16bit(methodindex, index + 3);
+
+								int methodindex = constp.addMethodrefInfo(classindex, "printTopStack1", "(I)I");
+								int instpos = ci.insertGap(8);
+								// ci.writeByte(93, instpos + 1);// dup(buggy. I can't explain why. use (I)I
+								// instead.)
+								ci.writeByte(184, instpos + 2);// invokestatic
+								ci.write16bit(methodindex, instpos + 3);
 //								Bytecode bc = new Bytecode(mi.getConstPool());
 //								bc.add(93);//dup
 //								byte[] code = bc.toCodeAttribute().getCode();
@@ -203,6 +212,6 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 		inst = oi.getinst(ci, index, constp);
 		return inst;
-		//return this.getLogStmt(inst);
+		// return this.getLogStmt(inst);
 	}
 }

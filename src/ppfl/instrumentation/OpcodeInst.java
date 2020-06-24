@@ -14,16 +14,13 @@ public class OpcodeInst {
 	}
 
 	public enum datatype {
-		BYTE,SHORT,CHAR,BOOLEAN,
-		INT,LONG,FLOAT,DOUBLE,
-		LDC,
-		STRING,
-		OBJECT
+		BYTE, SHORT, CHAR, BOOLEAN, INT, LONG, FLOAT, DOUBLE, LDC, STRING, OBJECT, NONE
 	}
 
 	// pushs
 	int pushnum;
 	paratype pushtype = paratype.NONE;
+	datatype pushdatatype = datatype.NONE;
 	String pushvalue = null;
 	// pops
 	int popnum;
@@ -49,6 +46,10 @@ public class OpcodeInst {
 	public void setPush(paratype t, String _pushvalue) {
 		this.pushtype = t;
 		this.pushvalue = _pushvalue;
+	}
+	
+	public void setPushDataType(datatype t) {
+		this.pushdatatype = t;
 	}
 
 	public void setPara(int id, paratype t) {
@@ -96,7 +97,7 @@ public class OpcodeInst {
 		ret.append("opcode=" + this.opcode);
 		if (this.isinvoke) {
 			int callindex = get2para(ci, index);
-			ret.append(getmethodinfo(ci,callindex,constp));
+			ret.append(getmethodinfo(ci, callindex, constp));
 			return ret.toString();
 		}
 
@@ -112,16 +113,16 @@ public class OpcodeInst {
 		}
 		if (this.pushnum != 0)
 			ret.append(",pushnum=" + this.pushnum);
-		if (this.pushtype != paratype.NONE) {
-			ret.append(",pushtype=" + this.pushtype + ",pushvalue=");
-			if (this.pushtype == paratype.CONST || this.pushtype == paratype.VAR) {
-				ret.append(pushvalue);
-			} else if (this.pushtype == paratype.POOL) {
-				ret.append(getpool(ci, index, 1, constp));
-			} else {
-				ret.append(getparas(ci, index));
-			}
-		}
+//		if (this.pushtype != paratype.NONE) {
+//			ret.append(",pushtype=" + this.pushtype + ",pushvalue=");
+//			if (this.pushtype == paratype.CONST || this.pushtype == paratype.VAR) {
+//				ret.append(pushvalue);
+//			} else if (this.pushtype == paratype.POOL) {
+//				ret.append(getpool(ci, index, 1, constp));
+//			} else {
+//				ret.append(getparas(ci, index));
+//			}
+//		}
 		if (this.pushnum == 0 && this.popnum == 0) {// iinc
 			if (this.para[0] != null && this.para[0] != paratype.NONE) {
 				ret.append("," + this.para[0] + "=" + getpara(ci, index, 1));
