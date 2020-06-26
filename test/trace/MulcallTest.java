@@ -13,17 +13,20 @@ public class MulcallTest {
 		return a;
 	}
 	
-	public static int f2(int a) {
-		if (a > 4)
-			a = a + 1;
-		a = a + 2;
-		return a;
+	public static int f2(int b) {
+		if (b > 4)
+			b = b + 1;
+		b = b + 2;
+		return b;
 	}
 	
-	public int f(int a) {
-		a = f1(a);
+	public int f(int c) {
+		/*a = f1(a);
 		a = f2(a);
-		return a;
+		return a;*/
+		c = f1(c);
+		c = f2(c);
+		return c;
 	}
 	
 	@Test
