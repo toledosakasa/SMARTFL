@@ -47,23 +47,6 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.logFile = s;
 	}
 
-	// will be called by bytecode instrumentation
-	public static int printTopStack1(int i) {
-		java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger(LOGGERNAME);
-		ppfl_logger.log(java.util.logging.Level.INFO, "Topstack:int, value=" + String.valueOf(i));
-		return i;
-	}
-
-	public static void printTopStack1() {
-		java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger(LOGGERNAME);
-		ppfl_logger.log(java.util.logging.Level.INFO, "Nothing");
-	}
-
-	public static void logString(String s) {
-		java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger(LOGGERNAME);
-		ppfl_logger.log(java.util.logging.Level.INFO, s);
-	}
-
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
@@ -117,77 +100,44 @@ public class TraceTransformer implements ClassFileTransformer {
 					// hello in console
 					LOGGER.info("[Agent] Transforming method {}", m.getName());
 
-					// preprocessing of linenumbers and specific bytecode instructions
+					// get iterator
 					MethodInfo mi = m.getMethodInfo();
-					ConstPool constp = mi.getConstPool();
 					CodeAttribute ca = mi.getCodeAttribute();
 					CodeIterator ci = ca.iterator();
-					int lastln = -1;
-					// index used for instrumentation
-					CtClass THISCLASS = cp.get("ppfl.instrumentation.TraceTransformer");
-					int classindex = constp.addClassInfo(THISCLASS);
+
+					// add constants to constpool.
+					// index will be used during instrumentation.
+					ConstPool constp = mi.getConstPool();
+					CallBackIndex cbi = new CallBackIndex(constp);
+
 					// iterate every instruction
-					try {
-						while (ci.hasNext()) {
-							// lookahead the next instruction.
-							int index = ci.lookAhead();
-							int ln = mi.getLineNumber(index);
-							String linenumberinfo = cc.getName() + ":" + m.getName() + ":" + ln + ":";
-							if (ln != lastln) {
-								lastln = ln;
-								System.out.println(ln);
-							}
+					int lastln = -1;
+					while (ci.hasNext()) {
+						// lookahead the next instruction.
+						int index = ci.lookAhead();
+						int op = ci.byteAt(index);
+						OpcodeInst oi = Interpreter.map[op];
 
-							// insert bytecode right before this inst.
-							int op = ci.byteAt(index);
-							String opc = Mnemonic.OPCODE[op];
-							OpcodeInst oi = Interpreter.map[op];
-							System.out.println(opc);
-							// get print information
-							String inst = getinst_map(ci, index, constp);
-							inst = linenumberinfo + inst;
-							if (inst != null) {
-								// insertmap.get(ln).append(inst);
-								int instpos = ci.insertGap(8);
-								int instindex = constp.addStringInfo(inst);
-								System.out.println(constp.getStringInfo(instindex));
-								ci.writeByte(19, instpos);// ldc_w
-								ci.write16bit(instindex, instpos + 1);
-								int methodindex = constp.addMethodrefInfo(classindex, "logString",
-										"(Ljava/lang/String;)V");
-								ci.writeByte(184, instpos + 3);
-								ci.write16bit(methodindex, instpos + 4);
-
-							}
-							// move to the next inst. instrumentation below this will be after this inst.
-							ci.next();
-							// print stack value pushed by this instruction.
-							// this should be inserted after the instruction is executed
-							// (after ci.next() is called)
-							if (oi.pushnum == 1 
-									&& (opc.startsWith("i"))// temporary solution for integer insts.should extend opcodeinst class.
-									){
-								System.out.println("dealing with: " + opc);
-
-								int methodindex = constp.addMethodrefInfo(classindex, "printTopStack1", "(I)I");
-								int instpos = ci.insertGap(8);
-								// ci.writeByte(93, instpos + 1);// dup(buggy. I can't explain why. use (I)I
-								// instead.)
-								ci.writeByte(184, instpos + 2);// invokestatic
-								ci.write16bit(methodindex, instpos + 3);
-//								Bytecode bc = new Bytecode(mi.getConstPool());
-//								bc.add(93);//dup
-//								byte[] code = bc.toCodeAttribute().getCode();
-
-							}
-							// deal with specific bytecode instructions
-
+						// debugging:opcode
+						String opc = Mnemonic.OPCODE[op];
+						System.out.println(opc);
+						// linenumber information.
+						int ln = mi.getLineNumber(index);
+						String linenumberinfo = cc.getName() + ":" + m.getName() + ":" + ln + ":";
+						if (ln != lastln) {
+							lastln = ln;
+							System.out.println(ln);
 						}
-					} catch (BadBytecode e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 
+						// insert bytecode right before this inst.
+						// print basic information of this instruction
+						oi.insertByteCodeBefore(ci, index, constp, linenumberinfo, cbi);
+						// move to the next inst. everything below this will be inserted after the inst.
+						ci.next();
+						// print advanced information(e.g. value pushed)
+						oi.insertByteCodeAfter(ci, index, constp, cbi);
+					}
+					// not sure if this is necessary.
 					ca.computeMaxStack();
 				}
 				byteCode = cc.toBytecode();
@@ -199,6 +149,25 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 		return byteCode;
 
+	}
+
+	// callbacks.
+	// will be called by bytecode instrumentation
+	public static int printTopStack1(int i) {
+		java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger(LOGGERNAME);
+		ppfl_logger.log(java.util.logging.Level.INFO, "Topstack:int, value=" + String.valueOf(i));
+		return i;
+	}
+
+	public static double printTopStack1(double i) {
+		java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger(LOGGERNAME);
+		ppfl_logger.log(java.util.logging.Level.INFO, "Topstack:double, value=" + String.valueOf(i));
+		return i;
+	}
+
+	public static void logString(String s) {
+		java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger(LOGGERNAME);
+		ppfl_logger.log(java.util.logging.Level.INFO, s);
 	}
 
 	private String getinst_map(CodeIterator ci, int index, ConstPool constp) {

@@ -1,5 +1,6 @@
 package ppfl.instrumentation;
 
+import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
@@ -47,7 +48,7 @@ public class OpcodeInst {
 		this.pushtype = t;
 		this.pushvalue = _pushvalue;
 	}
-	
+
 	public void setPushDataType(datatype t) {
 		this.pushdatatype = t;
 	}
@@ -92,6 +93,8 @@ public class OpcodeInst {
 				+ constp.getMethodrefClassName(callindex) + ",callname=" + constp.getMethodrefName(callindex);
 	}
 
+	// temporary.
+	// extended class should override this method.
 	String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
 		ret.append("opcode=" + this.opcode);
@@ -113,16 +116,6 @@ public class OpcodeInst {
 		}
 		if (this.pushnum != 0)
 			ret.append(",pushnum=" + this.pushnum);
-//		if (this.pushtype != paratype.NONE) {
-//			ret.append(",pushtype=" + this.pushtype + ",pushvalue=");
-//			if (this.pushtype == paratype.CONST || this.pushtype == paratype.VAR) {
-//				ret.append(pushvalue);
-//			} else if (this.pushtype == paratype.POOL) {
-//				ret.append(getpool(ci, index, 1, constp));
-//			} else {
-//				ret.append(getparas(ci, index));
-//			}
-//		}
 		if (this.pushnum == 0 && this.popnum == 0) {// iinc
 			if (this.para[0] != null && this.para[0] != paratype.NONE) {
 				ret.append("," + this.para[0] + "=" + getpara(ci, index, 1));
@@ -135,7 +128,43 @@ public class OpcodeInst {
 		return ret.toString();
 	}
 
+	// no need to overload this.
+	void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo, CallBackIndex cbi)
+			throws BadBytecode {
+		String inst = getinst(ci, index, constp);
+		inst = linenumberinfo + inst;
+		if (inst != null) {
+			// insertmap.get(ln).append(inst);
+			int instpos = ci.insertGap(8);
+			int instindex = constp.addStringInfo(inst);
+			System.out.println(constp.getStringInfo(instindex));
+			ci.writeByte(19, instpos);// ldc_w
+			ci.write16bit(instindex, instpos + 1);
+
+			ci.writeByte(184, instpos + 3);// invokestatic
+			ci.write16bit(cbi.logstringindex, instpos + 4);
+		}
+	}
+
 	void setinvoke() {
 		this.isinvoke = true;
+	}
+
+	// temporary solution for integer insts.
+	// extended class should override this method.
+	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
+			throws BadBytecode {
+		// print stack value pushed by this instruction.
+		// this should be inserted after the instruction is executed
+		// (after ci.next() is called)
+
+		if (this.pushnum == 1 && (this.opcode.startsWith("i"))) {
+			int instpos = ci.insertGap(8);
+			// ci.writeByte(93, instpos + 1);// buggy dup. can't explain(?) 
+			// call (I)I callback instead of (I)V callback.
+			ci.writeByte(184, instpos + 2);// invokestatic
+			ci.write16bit(cbi.tsindex_int, instpos + 3);
+		}
+
 	}
 }

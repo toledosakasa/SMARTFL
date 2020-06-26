@@ -9,6 +9,7 @@ class DomainTest {
 	//private static java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger("trace.DomainTest");
 	
 	public static int f(int a) {
+		int b = a;
 		if (a > 1)
 			a = a + 1;
 		a = a + 2;
