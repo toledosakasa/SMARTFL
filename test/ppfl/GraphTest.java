@@ -337,10 +337,59 @@ class GraphTest {
 		return pgraph;
 	}
 
-	//error
+	//btrace:need to have different signs;
+	//TODOtest: use the same sign for the new mytrace
 	@Test
 	void mulcalltest() {
 		Graph pgraph = mulcallinit();
+		pgraph.check_bp(true);
+	}
+	
+	Graph trycatchinit() {
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\TrycatchTest.java";
+		String failpath = passpath;
+		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\TrycatchTest.pass.log";
+		//String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
+		
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace1, "pass", true);
+		//pgraph.parsesource(failpath);
+		//pgraph.parsetrace(failtrace1, "fail", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	void trycatchtest() {
+		Graph pgraph = trycatchinit();
+		pgraph.check_bp(true);
+	}
+	
+	Graph switchinit() {
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\SwitchTest.java";
+		String failpath = passpath;
+		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.pass.log";
+		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.fail.log";
+		
+		Graph pgraph = new Graph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace1, "pass", true);
+		pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace1, "fail", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	void switchtest() {
+		Graph pgraph = switchinit();
 		pgraph.check_bp(true);
 	}
 	
