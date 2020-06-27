@@ -1,7 +1,9 @@
 package ppfl.instrumentation;
 
 import javassist.bytecode.Mnemonic;
-import ppfl.instrumentation.OpcodeInst.paratype;
+import ppfl.instrumentation.opcode.IconstInst;
+import ppfl.instrumentation.opcode.OpcodeInst;
+import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 /*bytecode reference:
 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5*/
@@ -60,8 +62,8 @@ public class Interpreter {
 		init();
 		for (int i = 0; i < Mnemonic.OPCODE.length; i++) {
 			if (map[i] == null) {
-//				System.out.print("NI ");
-//				System.out.println(i + " " + Mnemonic.OPCODE[i]);
+				System.out.print("Not implemented ");
+				System.out.println(i + " " + Mnemonic.OPCODE[i]);
 			} else {
 				// if(map[i].pushnum != 1)continue;
 				System.out.print(i + " " + Mnemonic.OPCODE[i] + " ");

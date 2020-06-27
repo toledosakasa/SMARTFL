@@ -11,6 +11,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.Mnemonic;
+import ppfl.instrumentation.opcode.OpcodeInst;
 
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;

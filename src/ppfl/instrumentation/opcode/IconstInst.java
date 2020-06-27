@@ -1,9 +1,10 @@
-package ppfl.instrumentation;
+package ppfl.instrumentation.opcode;
 
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
-import ppfl.instrumentation.OpcodeInst.paratype;
+import ppfl.instrumentation.CallBackIndex;
+import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 public class IconstInst extends OpcodeInst {
 
@@ -17,7 +18,7 @@ public class IconstInst extends OpcodeInst {
 	}
 
 	@Override
-	String getinst(CodeIterator ci, int index, ConstPool constp) {
+	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
 		ret.append("opcode=" + this.opcode);
 		ret.append(",pushnum=" + this.pushnum);

@@ -1,9 +1,10 @@
-package ppfl.instrumentation;
+package ppfl.instrumentation.opcode;
 
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
+import ppfl.instrumentation.CallBackIndex;
 
 public class OpcodeInst {
 	private boolean isinvoke;
@@ -31,7 +32,7 @@ public class OpcodeInst {
 	// for weird instructions(e.g. iinc)
 	paratype para[] = new paratype[2];
 
-	OpcodeInst(int _form, int _pushnum, int _popnum) {
+	public OpcodeInst(int _form, int _pushnum, int _popnum) {
 		form = _form;
 		opcode = Mnemonic.OPCODE[_form];
 		pushnum = _pushnum;
@@ -95,7 +96,7 @@ public class OpcodeInst {
 
 	// temporary.
 	// extended class should override this method.
-	String getinst(CodeIterator ci, int index, ConstPool constp) {
+	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
 		ret.append("opcode=" + this.opcode);
 		if (this.isinvoke) {
@@ -129,7 +130,7 @@ public class OpcodeInst {
 	}
 
 	// there's no need to overload this.
-	void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo, CallBackIndex cbi)
+	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo, CallBackIndex cbi)
 			throws BadBytecode {
 
 		String inst = getinst(ci, index, constp);
@@ -147,7 +148,7 @@ public class OpcodeInst {
 		}
 	}
 
-	void setinvoke() {
+	public void setinvoke() {
 		this.isinvoke = true;
 	}
 

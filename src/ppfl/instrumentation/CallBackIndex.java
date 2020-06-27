@@ -8,18 +8,18 @@ import javassist.bytecode.ConstPool;
 public class CallBackIndex {
 
 	// use the logger set by TraceTransformer
-	int logstringindex;
-	int tsindex_int;
-	int tsindex_short;
-	int tsindex_byte;
-	int tsindex_char;
-	int tsindex_boolean;
-	int tsindex_long;
-	int tsindex_float;
-	int tsindex_double;
-	int tsindex_ldc;// use constp.getLdcValue to get type.
-	int tsindex_string;
-	int tsindex_object;
+	public int logstringindex;
+	public int tsindex_int;
+	public int tsindex_short;
+	public int tsindex_byte;
+	public int tsindex_char;
+	public int tsindex_boolean;
+	public int tsindex_long;
+	public int tsindex_float;
+	public int tsindex_double;
+	public int tsindex_ldc;// use constp.getLdcValue to get type.
+	public int tsindex_string;
+	public int tsindex_object;
 
 	public CallBackIndex(ConstPool constp) throws NotFoundException {
 		ClassPool cp = ClassPool.getDefault();
@@ -27,6 +27,9 @@ public class CallBackIndex {
 		int classindex = constp.addClassInfo(THISCLASS);
 		logstringindex = constp.addMethodrefInfo(classindex, "logString", "(Ljava/lang/String;)V");
 		tsindex_int = constp.addMethodrefInfo(classindex, "printTopStack1", "(I)I");
+		tsindex_long = constp.addMethodrefInfo(classindex, "printTopStack1", "(L)L");
+		
+		//TODO add all callback methods into constpool
 	}
 
 	// callbacks.
