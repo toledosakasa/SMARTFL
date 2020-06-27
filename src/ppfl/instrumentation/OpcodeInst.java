@@ -128,9 +128,10 @@ public class OpcodeInst {
 		return ret.toString();
 	}
 
-	// no need to overload this.
+	// there's no need to overload this.
 	void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo, CallBackIndex cbi)
 			throws BadBytecode {
+
 		String inst = getinst(ci, index, constp);
 		inst = linenumberinfo + inst;
 		if (inst != null) {
@@ -160,7 +161,7 @@ public class OpcodeInst {
 
 		if (this.pushnum == 1 && (this.opcode.startsWith("i"))) {
 			int instpos = ci.insertGap(8);
-			// ci.writeByte(93, instpos + 1);// buggy dup. can't explain(?) 
+			// ci.writeByte(93, instpos + 1);// buggy dup. can't explain(?)
 			// call (I)I callback instead of (I)V callback.
 			ci.writeByte(184, instpos + 2);// invokestatic
 			ci.write16bit(cbi.tsindex_int, instpos + 3);

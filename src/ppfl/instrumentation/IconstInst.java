@@ -27,9 +27,9 @@ public class IconstInst extends OpcodeInst {
 	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
 			throws BadBytecode {
-		int instpos = ci.insertGap(4);
-		ci.writeByte(184, instpos + 2);// invokestatic
-		ci.write16bit(cbi.tsindex_int, instpos + 3);
+		int instpos = ci.insertGap(4);// the gap must be long enough for the following instrumentation
+		ci.writeByte(184, instpos);// invokestatic
+		ci.write16bit(cbi.tsindex_int, instpos + 1);
 	}
 
 }

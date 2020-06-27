@@ -63,7 +63,7 @@ public class Interpreter {
 //				System.out.print("NI ");
 //				System.out.println(i + " " + Mnemonic.OPCODE[i]);
 			} else {
-				//if(map[i].pushnum != 1)continue;
+				// if(map[i].pushnum != 1)continue;
 				System.out.print(i + " " + Mnemonic.OPCODE[i] + " ");
 				System.out.println(map[i].getinst(null, 0, null));
 			}
@@ -115,7 +115,11 @@ public class Interpreter {
 				map[id].setPush(paratype.CONST, String.valueOf(bias));
 			}
 		}
-		//TODO register IconstInst here
+		// register IconstInst here
+		for (int i = 2; i <= 8; i++) {
+			map[i] = new IconstInst(i, i - 3);
+		}
+
 		for (int id : loadconst_pool) {
 			map[id] = new OpcodeInst(id, 1, 0);
 			map[id].setPush(paratype.POOL, null);
@@ -155,7 +159,7 @@ public class Interpreter {
 		for (int id : ret0) {
 			map[id] = new OpcodeInst(id, 0, -1);
 		}
-		for (int id : ret1) {//return value will be printed after called.
+		for (int id : ret1) {// return value will be printed after called.
 			map[id] = new OpcodeInst(id, 0, -1);
 		}
 		for (int id : jsr) {
