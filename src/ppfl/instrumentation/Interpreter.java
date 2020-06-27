@@ -2,6 +2,15 @@ package ppfl.instrumentation;
 
 import javassist.bytecode.Mnemonic;
 import ppfl.instrumentation.opcode.IconstInst;
+import ppfl.instrumentation.opcode.LcmpInst;
+import ppfl.instrumentation.opcode.FcmpInst;
+import ppfl.instrumentation.opcode.DcmpInst;
+import ppfl.instrumentation.opcode.IfInst;
+import ppfl.instrumentation.opcode.If_icmpInst;
+import ppfl.instrumentation.opcode.If_acmpInst;
+import ppfl.instrumentation.opcode.GotoInst;
+import ppfl.instrumentation.opcode.JsrInst;
+import ppfl.instrumentation.opcode.RetInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
 import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
@@ -217,5 +226,25 @@ public class Interpreter {
 			map[id].setPara(0, paratype.FIELD);
 			map[id].setPara(1, paratype.FIELD);
 		}
+		
+		map[148] = new LcmpInst(148);
+		for (int i = 149; i <= 150; i++) {
+			map[i] = new FcmpInst(i);
+		}
+		for (int i = 151; i <= 152; i++) {
+			map[i] = new DcmpInst(i);
+		}
+		for (int i = 153; i <= 158; i++) {
+			map[i] = new IfInst(i);
+		}
+		for (int i = 159; i <= 164; i++) {
+			map[i] = new If_icmpInst(i);
+		}
+		for (int i = 165; i <= 166; i++) {
+			map[i] = new If_acmpInst(i);
+		}
+		map[167] = new GotoInst(167);
+		map[168] = new JsrInst(168);
+		map[169] = new RetInst(169);
 	}
 }
