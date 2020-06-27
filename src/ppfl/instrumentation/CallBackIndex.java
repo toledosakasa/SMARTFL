@@ -27,9 +27,10 @@ public class CallBackIndex {
 		int classindex = constp.addClassInfo(THISCLASS);
 		logstringindex = constp.addMethodrefInfo(classindex, "logString", "(Ljava/lang/String;)V");
 		tsindex_int = constp.addMethodrefInfo(classindex, "printTopStack1", "(I)I");
-		tsindex_long = constp.addMethodrefInfo(classindex, "printTopStack1", "(L)L");
-		
 		//TODO add all callback methods into constpool
+		tsindex_long = constp.addMethodrefInfo(classindex, "printTopStack1", "(L)L");
+		tsindex_double = constp.addMethodrefInfo(classindex, "printTopStack1", "(D)D");
+		
 	}
 
 	// callbacks.
