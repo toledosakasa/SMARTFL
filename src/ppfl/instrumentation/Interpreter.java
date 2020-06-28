@@ -11,6 +11,23 @@ import ppfl.instrumentation.opcode.If_acmpInst;
 import ppfl.instrumentation.opcode.GotoInst;
 import ppfl.instrumentation.opcode.JsrInst;
 import ppfl.instrumentation.opcode.RetInst;
+import ppfl.instrumentation.opcode.IreturnInst;
+import ppfl.instrumentation.opcode.LreturnInst;
+import ppfl.instrumentation.opcode.FreturnInst;
+import ppfl.instrumentation.opcode.DreturnInst;
+import ppfl.instrumentation.opcode.AreturnInst;
+import ppfl.instrumentation.opcode.ReturnInst;
+import ppfl.instrumentation.opcode.GetstaticInst;
+
+import ppfl.instrumentation.opcode.InvokevirtualInst;
+import ppfl.instrumentation.opcode.InvokespecialInst;
+import ppfl.instrumentation.opcode.InvokestaticInst;
+import ppfl.instrumentation.opcode.InvokeinterfaceInst;
+import ppfl.instrumentation.opcode.InvokedynamicInst;
+import ppfl.instrumentation.opcode.IfnullInst;
+import ppfl.instrumentation.opcode.IfnonnullInst;
+import ppfl.instrumentation.opcode.Goto_wInst;
+import ppfl.instrumentation.opcode.Jsr_wInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
 import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
@@ -246,5 +263,25 @@ public class Interpreter {
 		map[167] = new GotoInst(167);
 		map[168] = new JsrInst(168);
 		map[169] = new RetInst(169);
+		
+		map[172] = new IreturnInst(172);
+		map[173] = new LreturnInst(173);
+		map[174] = new FreturnInst(174);
+		map[175] = new DreturnInst(175);
+		map[176] = new AreturnInst(176);
+		map[177] = new ReturnInst(177);
+		map[178] = new GetstaticInst(178);
+		
+		map[182] = new InvokevirtualInst(182);
+		map[183] = new InvokespecialInst(183);
+		map[184] = new InvokestaticInst(184);
+		map[185] = new InvokeinterfaceInst(185);
+		map[186] = new InvokedynamicInst(186);
+		
+		map[198] = new IfnullInst(198);
+		map[199] = new IfnonnullInst(199);
+		map[200] = new Goto_wInst(200);
+		map[201] = new Jsr_wInst(201);
+		
 	}
 }
