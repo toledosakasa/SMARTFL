@@ -2,6 +2,26 @@ package ppfl.instrumentation;
 
 import javassist.bytecode.Mnemonic;
 import ppfl.instrumentation.opcode.IconstInst;
+import ppfl.instrumentation.opcode.PopInst;
+import ppfl.instrumentation.opcode.Pop2Inst;
+import ppfl.instrumentation.opcode.IarithInst;
+import ppfl.instrumentation.opcode.LarithInst;
+import ppfl.instrumentation.opcode.FarithInst;
+import ppfl.instrumentation.opcode.DarithInst;
+import ppfl.instrumentation.opcode.InegInst;
+import ppfl.instrumentation.opcode.LnegInst;
+import ppfl.instrumentation.opcode.FnegInst;
+import ppfl.instrumentation.opcode.DnegInst;
+import ppfl.instrumentation.opcode.IlogicInst;
+import ppfl.instrumentation.opcode.LlogicInst;
+import ppfl.instrumentation.opcode.IincInst;
+import ppfl.instrumentation.opcode.IturntypeInst;
+import ppfl.instrumentation.opcode.LturntypeInst;
+import ppfl.instrumentation.opcode.FturntypeInst;
+import ppfl.instrumentation.opcode.DturntypeInst;
+import ppfl.instrumentation.opcode.I2bInst;
+import ppfl.instrumentation.opcode.I2cInst;
+import ppfl.instrumentation.opcode.I2sInst;
 import ppfl.instrumentation.opcode.LcmpInst;
 import ppfl.instrumentation.opcode.FcmpInst;
 import ppfl.instrumentation.opcode.DcmpInst;
@@ -243,6 +263,55 @@ public class Interpreter {
 			map[id].setPara(0, paratype.FIELD);
 			map[id].setPara(1, paratype.FIELD);
 		}
+		
+		map[87] = new PopInst(87);
+		map[88] = new Pop2Inst(88);
+		for (int i = 96; i <= 112; i+=4) {
+			map[i] = new IarithInst(i);
+		}
+		for (int i = 97; i <= 113; i+=4) {
+			map[i] = new LarithInst(i);
+		}
+		for (int i = 98; i <= 114; i+=4) {
+			map[i] = new FarithInst(i);
+		}
+		for (int i = 99; i <= 115; i+=4) {
+			map[i] = new DarithInst(i);
+		}
+		map[116] = new InegInst(116);
+		map[117] = new LnegInst(117);
+		map[118] = new FnegInst(118);
+		map[119] = new DnegInst(119);
+		for (int i = 120; i <= 124; i+=2) {
+			map[i] = new IarithInst(i);
+		}
+		for (int i = 121; i <= 125; i+=2) {
+			map[i] = new LarithInst(i);
+		}
+		for (int i = 126; i <= 130; i+=2) {
+			map[i] = new IlogicInst(i);
+		}
+		for (int i = 127; i <= 131; i+=2) {
+			map[i] = new LlogicInst(i);
+		}
+		map[132] = new IincInst(132);
+		map[132].setPara(0, paratype.PARAVAR);
+		map[132].setPara(1, paratype.PARACONST);
+		for (int i = 136; i <= 142; i+=3) {
+			map[i] = new IturntypeInst(i);
+		}
+		map[133] = new LturntypeInst(133);
+		map[134] = new FturntypeInst(134);
+		map[137] = new FturntypeInst(137);
+		map[140] = new LturntypeInst(140);
+		map[143] = new LturntypeInst(143);
+		map[144] = new FturntypeInst(144);
+		for (int i = 135; i <= 141; i+=3) {
+			map[i] = new DturntypeInst(i);
+		}
+		map[145] = new I2bInst(145);
+		map[146] = new I2cInst(146);
+		map[147] = new I2sInst(147);
 		
 		map[148] = new LcmpInst(148);
 		for (int i = 149; i <= 150; i++) {
