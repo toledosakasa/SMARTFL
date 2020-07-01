@@ -70,6 +70,12 @@ public class OpcodeInst {
 		return constp.getLdcValue(ci.byteAt(cindex + paraindex)).toString();
 	}
 
+	int get1para(CodeIterator ci, int index) {
+		if (ci == null)
+			return 0;
+		return ci.byteAt(index + 1);
+	}
+
 	int get2para(CodeIterator ci, int index) {
 		if (ci == null)
 			return 0;
@@ -130,8 +136,8 @@ public class OpcodeInst {
 	}
 
 	// there's no need to overload this.
-	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo, CallBackIndex cbi)
-			throws BadBytecode {
+	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo,
+			CallBackIndex cbi) throws BadBytecode {
 
 		String inst = getinst(ci, index, constp);
 		inst = linenumberinfo + inst;

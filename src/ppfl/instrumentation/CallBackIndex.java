@@ -21,6 +21,30 @@ public class CallBackIndex {
 	public int tsindex_string;
 	public int tsindex_object;
 
+	public int getLdcCallBack(Object o) {
+		// decide v's type using instanceof
+		if (o instanceof String)
+			return tsindex_string;
+		else if (o instanceof Short)
+			return tsindex_short;
+		else if (o instanceof Long)
+			return tsindex_long;
+		else if (o instanceof Integer)
+			return tsindex_int;
+		else if (o instanceof Byte)
+			return tsindex_byte;
+		else if (o instanceof Character)
+			return tsindex_char;
+		else if (o instanceof Boolean)
+			return tsindex_boolean;
+		else if (o instanceof Float)
+			return tsindex_float;
+		else if (o instanceof Double)
+			return tsindex_double;
+		else 
+			return tsindex_object;
+	}
+
 	public CallBackIndex(ConstPool constp) throws NotFoundException {
 		ClassPool cp = ClassPool.getDefault();
 		CtClass THISCLASS = cp.get("ppfl.instrumentation.CallBackIndex");
@@ -34,8 +58,10 @@ public class CallBackIndex {
 		tsindex_char = constp.addMethodrefInfo(classindex, "printTopStack1", "(C)C");
 		tsindex_boolean = constp.addMethodrefInfo(classindex, "printTopStack1", "(Z)Z");
 		tsindex_float = constp.addMethodrefInfo(classindex, "printTopStack1", "(F)F");
-		tsindex_string = constp.addMethodrefInfo(classindex, "printTopStack1", "(Ljava/lang/String;)Ljava/lang/String;");
-		tsindex_object = constp.addMethodrefInfo(classindex, "printTopStack1", "(Ljava/lang/Object;)Ljava/lang/Object;");
+		tsindex_string = constp.addMethodrefInfo(classindex, "printTopStack1",
+				"(Ljava/lang/String;)Ljava/lang/String;");
+		tsindex_object = constp.addMethodrefInfo(classindex, "printTopStack1",
+				"(Ljava/lang/Object;)Ljava/lang/Object;");
 	}
 
 	// callbacks.
@@ -49,32 +75,32 @@ public class CallBackIndex {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:double, value=" + String.valueOf(i));
 		return i;
 	}
-	
+
 	public static short printTopStack1(short i) {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:short, value=" + String.valueOf(i));
 		return i;
 	}
-	
+
 	public static char printTopStack1(char i) {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:char, value=" + String.valueOf(i));
 		return i;
 	}
-	
+
 	public static byte printTopStack1(byte i) {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:byte, value=" + String.valueOf(i));
 		return i;
 	}
-	
+
 	public static boolean printTopStack1(boolean i) {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:boolean, value=" + String.valueOf(i));
 		return i;
 	}
-	
+
 	public static float printTopStack1(float i) {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:float, value=" + String.valueOf(i));
 		return i;
 	}
-	
+
 	public static long printTopStack1(long i) {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:long, value=" + String.valueOf(i));
 		return i;
@@ -84,13 +110,14 @@ public class CallBackIndex {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:double, value=" + i);
 		return i;
 	}
-	
+
 	public static Object printTopStack1(Object i) {
-		//call system hashcode (jvm address)
-		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:object, value=" + java.lang.System.identityHashCode(i));
+		// call system hashcode (jvm address)
+		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO,
+				"Topstack:object, value=" + java.lang.System.identityHashCode(i));
 		return i;
 	}
-	
+
 	public static void logString(String s) {
 		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, s);
 	}
