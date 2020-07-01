@@ -555,11 +555,14 @@ public class Graph {
 
     private void mark_reduce(Node node){
         node.setreduced();
+        if(node.isStmt)
+            return;
         FactorNode deffactor = (node.getdedge()).getfactor();
         List<Node> pulist = deffactor.getpunodes();
         for(Node n : pulist){
             mark_reduce(n);
         }
+        deffactor.getstmt().setreduced();
     }
 
     private void path_reduce(){
@@ -576,6 +579,7 @@ public class Graph {
         }
     }
 
+    //TODO: how to slice in the graph to optimize the procedure, though the stmt result can be cut as the mark
     private void node_reduce(){
 
     }

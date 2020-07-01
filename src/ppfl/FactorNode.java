@@ -56,6 +56,10 @@ public class FactorNode {
         return ret;
     }
 
+    public Node getstmt(){
+        return this.stmt;
+    }
+
 	private void gettensor(List<Node> allnodes, int cur) {
 		if (cur < 0) {
 			tensor.add(getProb());
