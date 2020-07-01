@@ -7,14 +7,19 @@ import org.junit.jupiter.api.Test;
 class gcdtest {
 
 	public static int gcd(int a, int b) {
-		int r = 0;
+        int r = 0;
+        int c = 5;
+        int e = c + 3;
+        int d = c + 5;
+        d = d + e;
 		while (b > 0) {
 			r = a % b;
 			a = b;
 			b = r;
 		}
-		b = a + 1;
-
+        r = r + 1;
+        r = r + d;
+        a = a + d;
 		return a;
 	}
 

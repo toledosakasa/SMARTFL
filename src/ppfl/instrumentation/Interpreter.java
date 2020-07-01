@@ -2,6 +2,29 @@ package ppfl.instrumentation;
 
 import javassist.bytecode.Mnemonic;
 import ppfl.instrumentation.opcode.IconstInst;
+import ppfl.instrumentation.opcode.AaloadInst;
+import ppfl.instrumentation.opcode.AconstInst;
+import ppfl.instrumentation.opcode.AloadInst;
+import ppfl.instrumentation.opcode.BaloadInst;
+import ppfl.instrumentation.opcode.BipushInst;
+import ppfl.instrumentation.opcode.CaloadInst;
+import ppfl.instrumentation.opcode.DaloadInst;
+import ppfl.instrumentation.opcode.DconstInst;
+import ppfl.instrumentation.opcode.DloadInst;
+import ppfl.instrumentation.opcode.FaloadInst;
+import ppfl.instrumentation.opcode.FconstInst;
+import ppfl.instrumentation.opcode.FloadInst;
+import ppfl.instrumentation.opcode.IaloadInst;
+import ppfl.instrumentation.opcode.IloadInst;
+import ppfl.instrumentation.opcode.LaloadInst;
+import ppfl.instrumentation.opcode.LconstInst;
+import ppfl.instrumentation.opcode.LloadInst;
+import ppfl.instrumentation.opcode.NopInst;
+import ppfl.instrumentation.opcode.SaloadInst;
+import ppfl.instrumentation.opcode.SipushInst;
+import ppfl.instrumentation.opcode.XastoreInst;
+import ppfl.instrumentation.opcode.XstoreInst;
+
 import ppfl.instrumentation.opcode.PopInst;
 import ppfl.instrumentation.opcode.Pop2Inst;
 import ppfl.instrumentation.opcode.IarithInst;
@@ -263,7 +286,50 @@ public class Interpreter {
 			map[id].setPara(0, paratype.FIELD);
 			map[id].setPara(1, paratype.FIELD);
 		}
-		
+        
+        map[0] = new NopInst(0);
+        map[1] = new AconstInst(1);
+        // register IconstInst here
+		for (int i = 2; i <= 8; i++) {
+			map[i] = new IconstInst(i, i - 3);
+        }
+        map[9] = new LconstInst(9, 0);
+        map[10] = new LconstInst(10, 1);
+        map[11] = new FconstInst(11, 0);
+        map[12] = new FconstInst(12, 1);
+        map[13] = new FconstInst(13, 2);
+        map[14] = new DconstInst(14, 0);
+        map[15] = new DconstInst(15, 1);
+        map[16] = new BipushInst(16);
+        map[17] = new SipushInst(17);
+        //TODO: ldc
+        map[21] = new IloadInst(21);
+        for(int i = 26;i<=29;i++)
+            map[i] = new IloadInst(i, i-26);
+        map[22] = new LloadInst(22);
+        for(int i = 30;i<=33;i++)
+            map[i] = new LloadInst(i, i-30);
+        map[23] = new FloadInst(23);
+        for(int i = 34;i<=37;i++)
+            map[i] = new FloadInst(i, i-34);
+        map[24] = new DloadInst(24);
+        for(int i = 38;i<=41;i++)
+            map[i] = new DloadInst(i, i-38);
+        map[25] = new AloadInst(25);
+        for(int i = 42;i<=45;i++)
+            map[i] = new AloadInst(i, i-42);
+        map[46] = new IaloadInst(46);
+        map[47] = new LaloadInst(47);
+        map[48] = new FaloadInst(48);
+        map[49] = new DaloadInst(49);
+        map[50] = new AaloadInst(50);
+        map[51] = new BaloadInst(51);
+        map[52] = new CaloadInst(52);
+        map[53] = new SaloadInst(53);
+        for(int i = 54;i<=78;i++)
+            map[i] = new XstoreInst(i);
+        for(int i= 79;i<=86;i++)
+            map[i] = new XastoreInst(i);
 		map[87] = new PopInst(87);
 		map[88] = new Pop2Inst(88);
 		for (int i = 96; i <= 112; i+=4) {

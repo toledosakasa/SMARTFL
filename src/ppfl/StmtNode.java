@@ -4,7 +4,8 @@ public class StmtNode extends Node {
 
 	public StmtNode(String sname) {
 		super(sname);
-		this.isStmt = true;
+        this.isStmt = true;
+        this.reduced = false; // stmt node should not be reduced in slicing
 		// TODO Auto-generated constructor stub
 	}
 

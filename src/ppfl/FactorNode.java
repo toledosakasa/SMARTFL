@@ -49,6 +49,13 @@ public class FactorNode {
 		gettensor(allnodes, nnodes - 1);
 	}
 
+    public List<Node> getpunodes(){
+        ArrayList<Node> ret = new ArrayList<Node>();
+        ret.addAll(preds);
+        ret.addAll(uses);
+        return ret;
+    }
+
 	private void gettensor(List<Node> allnodes, int cur) {
 		if (cur < 0) {
 			tensor.add(getProb());

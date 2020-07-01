@@ -6,6 +6,7 @@ import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
+//2-8
 public class IconstInst extends OpcodeInst {
 
 	boolean isIntInst = true;
