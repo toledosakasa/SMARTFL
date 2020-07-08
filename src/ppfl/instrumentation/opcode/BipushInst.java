@@ -9,7 +9,6 @@ import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 //16
 public class BipushInst extends OpcodeInst {
 
-
 	public BipushInst(int _form) {
 		super(_form, 1, 0);
 	}

@@ -15,9 +15,9 @@ public class Node {
 	private double impF;// importance for True and False in importance sampling.
 	private String testname;
 	private List<Edge> edges;
-    private double epsilon = 1e-8;
-    private Edge degde;
-    protected boolean reduced;// should be reduced in the slice if val is true
+	private double epsilon = 1e-8;
+	private Edge degde;
+	protected boolean reduced;// should be reduced in the slice if val is true
 
 	StmtNode stmt;
 
@@ -28,8 +28,8 @@ public class Node {
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
 		edges = new ArrayList<Edge>();
-        stmt = null;
-        reduced = true;
+		stmt = null;
+		reduced = true;
 	}
 
 	public Node(String name, String testname, StmtNode _stmt) {
@@ -39,9 +39,9 @@ public class Node {
 		this.name = name;
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
-        edges = new ArrayList<Edge>();
-        stmt = _stmt;
-        reduced = true;
+		edges = new ArrayList<Edge>();
+		stmt = _stmt;
+		reduced = true;
 	}
 
 	public String getName() {
@@ -55,28 +55,28 @@ public class Node {
 	public void observe(boolean obsvalue) {
 		obs = true;
 		this.obsvalue = obsvalue;
-    }
-    
-    public boolean getobs(){
-        return obs;
-    }
+	}
 
-    public void setdedge(Edge e){
-        degde = e;
-    }
+	public boolean getobs() {
+		return obs;
+	}
 
-    public Edge getdedge(){
-        return degde;
-    }
+	public void setdedge(Edge e) {
+		degde = e;
+	}
 
-    //reduced should be false when the node is in the front slice of a obs node
-    public void setreduced(){
-        reduced = false;
-    }
+	public Edge getdedge() {
+		return degde;
+	}
 
-    public boolean getreduced(){
-        return reduced;
-    }
+	// reduced should be false when the node is in the front slice of a obs node
+	public void setreduced() {
+		reduced = false;
+	}
+
+	public boolean getreduced() {
+		return reduced;
+	}
 
 	public void setTemp(boolean t) {
 		tempvalue = obs ? obsvalue : t;

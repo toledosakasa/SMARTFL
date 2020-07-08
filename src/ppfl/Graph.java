@@ -395,37 +395,37 @@ public class Graph {
 			addNode(defname, defnode);
 		}
 
-        Edge dedge = new Edge();
-        dedge.setnode(defnode);
-        defnode.add_edge(dedge);
-        defnode.setdedge(dedge);
-        Edge sedge = new Edge();
-        sedge.setnode(stmt);
-        stmt.add_edge(sedge);
-        
+		Edge dedge = new Edge();
+		dedge.setnode(defnode);
+		defnode.add_edge(dedge);
+		defnode.setdedge(dedge);
+		Edge sedge = new Edge();
+		sedge.setnode(stmt);
+		stmt.add_edge(sedge);
+
 		List<Edge> pedges = new ArrayList<Edge>();
 		for (Node n : prednodes) {
-            Edge nedge = new Edge();
-            nedge.setnode(n);
+			Edge nedge = new Edge();
+			nedge.setnode(n);
 			pedges.add(nedge);
 			n.add_edge(nedge);
 		}
 		List<Edge> uedges = new ArrayList<Edge>();
 		for (Node n : usenodes) {
-            Edge nedge = new Edge();
-            nedge.setnode(n);
+			Edge nedge = new Edge();
+			nedge.setnode(n);
 			uedges.add(nedge);
 			n.add_edge(nedge);
 		}
 		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, ops, dedge, sedge, pedges, uedges);
-        factornodes.add(ret);
+		factornodes.add(ret);
 
-        dedge.setfactor(ret);
-        sedge.setfactor(ret);
-        for(Edge n: pedges)
-            n.setfactor(ret);
-        for(Edge n: uedges)
-            n.setfactor(ret);
+		dedge.setfactor(ret);
+		sedge.setfactor(ret);
+		for (Edge n : pedges)
+			n.setfactor(ret);
+		for (Edge n : uedges)
+			n.setfactor(ret);
 		return ret;
 	}
 
@@ -553,55 +553,55 @@ public class Graph {
 		return;
 	}
 
-    private void mark_reduce(Node node){
-        node.setreduced();
-        if(node.isStmt)
-            return;
-        FactorNode deffactor = (node.getdedge()).getfactor();
-        List<Node> pulist = deffactor.getpunodes();
-        for(Node n : pulist){
-            mark_reduce(n);
-        }
-        deffactor.getstmt().setreduced();
-    }
+	private void mark_reduce(Node node) {
+		node.setreduced();
+		if (node.isStmt)
+			return;
+		FactorNode deffactor = (node.getdedge()).getfactor();
+		List<Node> pulist = deffactor.getpunodes();
+		for (Node n : pulist) {
+			mark_reduce(n);
+		}
+		deffactor.getstmt().setreduced();
+	}
 
-    private void path_reduce(){
-        for (Node n : nodes) {
-            if (n.getobs()){
-                mark_reduce(n);
-            }
-        }
-        //maybe won't be used?
-        for(Node n: stmts){
-            if(n.getobs()){
-                mark_reduce(n);
-            }
-        }
-    }
+	private void path_reduce() {
+		for (Node n : nodes) {
+			if (n.getobs()) {
+				mark_reduce(n);
+			}
+		}
+		// maybe won't be used?
+		for (Node n : stmts) {
+			if (n.getobs()) {
+				mark_reduce(n);
+			}
+		}
+	}
 
-    //TODO: how to slice in the graph to optimize the procedure, though the stmt result can be cut as the mark
-    private void node_reduce(){
+	// TODO: how to slice in the graph to optimize the procedure, though the stmt
+	// result can be cut as the mark
+	private void node_reduce() {
 
-    }
+	}
 
 	public long bp_inference() {
-        long startTime = System.currentTimeMillis();
-        path_reduce();
+		long startTime = System.currentTimeMillis();
+		path_reduce();
 
-        boolean outreduced = true;
-        if(outreduced)
-        {
-            System.out.println("\nreduced Nodes: ");
-            for (Node n : stmts) {
-                if(n.getreduced())
-                    n.print();
-            }
-            for (Node n : nodes) {
-                if(n.getreduced())
-                n.print();
-            }
-            System.out.println("\n");
-        }
+		boolean outreduced = true;
+		if (outreduced) {
+			System.out.println("\nreduced Nodes: ");
+			for (Node n : stmts) {
+				if (n.getreduced())
+					n.print();
+			}
+			for (Node n : nodes) {
+				if (n.getreduced())
+					n.print();
+			}
+			System.out.println("\n");
+		}
 
 		for (int i = 0; i < bp_times; i++) {
 			boolean isend = true;

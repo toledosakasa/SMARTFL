@@ -7,7 +7,7 @@ import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 /*bytecode reference:
 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5*/
 public class Interpreter {
-	static OpcodeInst map[] = new OpcodeInst[256];
+	public static OpcodeInst map[] = new OpcodeInst[256];
 	// loads
 	static int[] loadvar_para = { 21, 22, 23, 24, 25 };// load 1 var, index at byte(pos + 1)
 	static int[] loadvar_opcode = { 26, 42 };// load 1 var, index based on (opcode-base_opcode)
@@ -75,7 +75,7 @@ public class Interpreter {
 		printopcodes();
 	}
 
-	static void init() {
+	public static void init() {
 		// construct inst map based on different opcode types.
 		// nop
 		map[0] = new OpcodeInst(0, 0, 0);

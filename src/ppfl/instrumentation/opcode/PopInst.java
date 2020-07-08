@@ -10,7 +10,7 @@ import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 public class PopInst extends OpcodeInst {
 
 	boolean ifPush = false;
-	
+
 	public PopInst(int _form) {
 		super(_form, 0, 1);
 		// TODO Auto-generated constructor stub
@@ -23,5 +23,5 @@ public class PopInst extends OpcodeInst {
 		ret.append(",popnum=" + this.popnum);
 		return ret.toString();
 	}
-	
+
 }

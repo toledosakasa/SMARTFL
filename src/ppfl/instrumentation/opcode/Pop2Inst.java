@@ -10,7 +10,7 @@ import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 public class Pop2Inst extends OpcodeInst {
 
 	boolean ifPush = false;
-	
+
 	public Pop2Inst(int _form) {
 		super(_form, 0, 2);
 	}
@@ -22,5 +22,5 @@ public class Pop2Inst extends OpcodeInst {
 		ret.append(",popnum=" + this.popnum);
 		return ret.toString();
 	}
-	
+
 }

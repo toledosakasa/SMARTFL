@@ -13,7 +13,7 @@ public class NopInst extends OpcodeInst {
 		super(_form, 0, 0);
 	}
 
-    @Override
+	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
 		ret.append("opcode=" + this.opcode);

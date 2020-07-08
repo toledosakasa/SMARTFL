@@ -12,21 +12,21 @@ public class Edge {
 
 	}
 
-    public void setnode(Node n){
-        node = n;
-    }
+	public void setnode(Node n) {
+		node = n;
+	}
 
-    public Node getnode(){
-        return node;
-    }
+	public Node getnode() {
+		return node;
+	}
 
-    public void setfactor(FactorNode f){
-        factor = f;
-    }
+	public void setfactor(FactorNode f) {
+		factor = f;
+	}
 
-    public FactorNode getfactor(){
-        return factor;
-    }
+	public FactorNode getfactor() {
+		return factor;
+	}
 
 	public void set_ntof(double val) {
 		ntof = val;

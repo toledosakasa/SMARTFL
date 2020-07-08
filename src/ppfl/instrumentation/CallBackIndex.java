@@ -42,8 +42,7 @@ public class CallBackIndex {
 		else if (o instanceof Double) {
 			System.out.println("here");
 			return tsindex_double;
-		}
-		else 
+		} else
 			return tsindex_object;
 	}
 

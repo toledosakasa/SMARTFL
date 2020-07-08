@@ -9,7 +9,6 @@ import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 //17
 public class SipushInst extends OpcodeInst {
 
-
 	public SipushInst(int _form) {
 		super(_form, 1, 0);
 	}

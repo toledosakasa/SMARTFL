@@ -1,5 +1,7 @@
 package ppfl;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,23 +23,25 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+import ppfl.instrumentation.Interpreter;
+
 public class ByteCodeGraph {
 
-	private List<FactorNode> factornodes;
-	private List<Node> nodes;
-	private List<StmtNode> stmts;
-	private Map<String, Node> nodemap;
-	private Map<String, Node> stmtmap;
-	private Map<String, Integer> varcountmap;
-	private Map<String, Integer> stmtcountmap;
+	public List<FactorNode> factornodes;
+	public List<Node> nodes;
+	public List<StmtNode> stmts;
+	public Map<String, Node> nodemap;
+	public Map<String, Node> stmtmap;
+	public Map<String, Integer> varcountmap;
+	public Map<String, Integer> stmtcountmap;
 	// if max_loop is set to negative, then no limit is set(unlimited loop
 	// unfolding)
-	int max_loop;
+	public int max_loop;
 
-	private String testname;
+	public String testname;
 
-	private int nsamples = 1 << 20;
-	private int bp_times = 100;
+	public int nsamples = 1 << 20;
+	public int bp_times = 100;
 	Random random;
 
 	Stack<Node> runtimestack;
@@ -46,7 +50,9 @@ public class ByteCodeGraph {
 	// input of test function as 1.0(always true)
 	// output (return value) of the function being tested as 0.0/1.0 depends on
 	// parameter testpass(true = 1.0,false = 0.0)
-	private boolean auto_oracle;
+	public boolean auto_oracle;
+	String last_defined_var = null;
+	StmtNode last_defined_stmt = null;
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
@@ -60,6 +66,7 @@ public class ByteCodeGraph {
 		random = new Random();
 		auto_oracle = true;
 		runtimestack = new Stack<Node>();
+		Interpreter.init();
 	}
 
 	public void setMaxLoop(int i) {
@@ -76,8 +83,7 @@ public class ByteCodeGraph {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
 			String t;
-			String last_defined_var = null;
-			StmtNode last_defined_stmt = null;
+
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
@@ -86,76 +92,11 @@ public class ByteCodeGraph {
 				String head = split[0];
 				assert (head == "INFO");
 
-				String domain = split[1];
-				int splitp = domain.lastIndexOf('$');
-				String traceclass = domain.substring(0, splitp);
-				String trace_method = domain.substring(splitp + 1);
-
-				int line = Integer.parseInt(split[2]);
-				int byteindex = Integer.parseInt(split[3]);
-				StmtNode stmt = null;
-				String stmtname = domain + "#" + String.valueOf(line);
-				// System.out.println("At line " + stmtname);
-				if (!hasNode(stmtname)) {
-					stmt = new StmtNode(stmtname);
-					addNode(stmtname, stmt);
-				} else {
-					stmt = (StmtNode) getNode(stmtname);
-					assert (stmt.isStmt());
-				}
-
-				// count how many times this statment has been executed
-				if (stmtcountmap.containsKey(stmtname)) {
-					stmtcountmap.put(stmtname, stmtcountmap.get(stmtname) + 1);
-				} else {
-					stmtcountmap.put(stmtname, 1);
-				}
-
-				if (max_loop > 0 && stmtcountmap.get(stmtname) > max_loop) {
-					continue;
-				}
-
-				// auto-assigned observation: test function always true
-				if (auto_oracle) {
-					if (trace_method.contentEquals(testname)) {
-						stmt.observe(true);
-						System.out.println("Observe " + stmt.getName() + " as true");
-					}
-				}
-
-				String instinfos[] = split[4].split(",");
-				String opcode = null;
-				int pushnum = 0;
-				int popnum = 0;
-				// invoke infos
-				String calltype = null;
-				String callclass = null;
-				String callname = null;
-				for (String instinfo : instinfos) {
-					String[] splitinstinfo = instinfo.split("=");
-					String infotype = splitinstinfo[0];
-					String infovalue = splitinstinfo[1];
-					if (infotype == "opcode") {
-						opcode = infovalue;
-					}
-					if (infotype == "pushnum") {
-						pushnum = Integer.valueOf(infovalue);
-					}
-					if (infotype == "popnum") {
-						popnum = Integer.valueOf(infovalue);
-					}
-					if (infotype == "calltype") {
-						calltype = infovalue;
-					}
-					if (infotype == "callclass") {
-						callclass = infovalue;
-					}
-					if (infotype == "callname") {
-						callname = infovalue;
-					}
-
-				}
-
+				String trace = split[1];
+				String fetchcode = trace.split(",")[0];
+				assert (fetchcode.startsWith("opcode"));
+				int opcodeform = Integer.valueOf(fetchcode.split("=()")[1]);
+				Interpreter.map[opcodeform].parsetrace(this, trace);
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
@@ -166,14 +107,12 @@ public class ByteCodeGraph {
 			}
 
 			reader.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, List<String> ops,
+	public FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, List<String> ops,
 			StmtNode stmt) {
 		HashSet<String> t = new HashSet<String>();
 		for (Set<String> use : uses) {
@@ -182,7 +121,7 @@ public class ByteCodeGraph {
 		return buildFactor(def, preds, t, ops, stmt);
 	}
 
-	private FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, List<String> ops, StmtNode stmt) {
+	public FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, List<String> ops, StmtNode stmt) {
 
 		// deal with Declaration and use/pred in the same line
 		// (e.g. for(int i = 0;i < n;i++))
@@ -292,20 +231,20 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
-	private String getVarName(String name, Map<String, Integer> map) {
+	public String getVarName(String name, Map<String, Integer> map) {
 		int count = map.get(name);
 		return name + "#" + String.valueOf(count);
 	}
 
-	private String getNodeName(String name) {
+	public String getNodeName(String name) {
 		return this.testname + "#" + name;
 	}
 
-	private boolean hasNode(String name) {
+	public boolean hasNode(String name) {
 		return nodemap.containsKey(getNodeName(name)) || stmtmap.containsKey(name);
 	}
 
-	private void addNode(String name, Node node) {
+	public void addNode(String name, Node node) {
 		if (node instanceof StmtNode) {
 			stmtmap.put(name, node);
 			stmts.add((StmtNode) node);
@@ -315,7 +254,7 @@ public class ByteCodeGraph {
 		}
 	}
 
-	private Node getNode(String name) {
+	public Node getNode(String name) {
 		if (nodemap.containsKey(getNodeName(name)))
 			return nodemap.get(getNodeName(name));
 		else if (stmtmap.containsKey(name))
@@ -324,7 +263,7 @@ public class ByteCodeGraph {
 			return null;
 	}
 
-	private void solve(List<Node> allnodes, int cur, int tot) {
+	public void solve(List<Node> allnodes, int cur, int tot) {
 		if (cur == tot) {
 			double product = 1.0;
 			for (FactorNode n : factornodes) {
@@ -416,7 +355,7 @@ public class ByteCodeGraph {
 		return;
 	}
 
-	private void mark_reduce(Node node) {
+	public void mark_reduce(Node node) {
 		node.setreduced();
 		if (node.isStmt)
 			return;
@@ -428,7 +367,7 @@ public class ByteCodeGraph {
 		deffactor.getstmt().setreduced();
 	}
 
-	private void path_reduce() {
+	public void path_reduce() {
 		for (Node n : nodes) {
 			if (n.getobs()) {
 				mark_reduce(n);
@@ -444,7 +383,7 @@ public class ByteCodeGraph {
 
 	// TODO: how to slice in the graph to optimize the procedure, though the stmt
 	// result can be cut as the mark
-	private void node_reduce() {
+	public void node_reduce() {
 
 	}
 
@@ -553,7 +492,7 @@ public class ByteCodeGraph {
 		}
 	}
 
-	private double getdiff(double a, double b) {
+	public double getdiff(double a, double b) {
 		double max = Math.max(Math.abs(a), Math.abs(b));
 		return max == 0.0 ? 0 : Math.abs(a - b) / max;
 	}
@@ -653,7 +592,7 @@ public class ByteCodeGraph {
 		}
 	}
 
-	private static String readFileToString(String filePath) {
+	public static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
 		BufferedReader reader;
 		try {

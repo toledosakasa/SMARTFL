@@ -49,16 +49,16 @@ public class FactorNode {
 		gettensor(allnodes, nnodes - 1);
 	}
 
-    public List<Node> getpunodes(){
-        ArrayList<Node> ret = new ArrayList<Node>();
-        ret.addAll(preds);
-        ret.addAll(uses);
-        return ret;
-    }
+	public List<Node> getpunodes() {
+		ArrayList<Node> ret = new ArrayList<Node>();
+		ret.addAll(preds);
+		ret.addAll(uses);
+		return ret;
+	}
 
-    public Node getstmt(){
-        return this.stmt;
-    }
+	public Node getstmt() {
+		return this.stmt;
+	}
 
 	private void gettensor(List<Node> allnodes, int cur) {
 		if (cur < 0) {

@@ -11,14 +11,14 @@ public class IaloadInst extends OpcodeInst {
 
 	public IaloadInst(int _form) {
 		super(_form, 1, 2);
-    }
+	}
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
-        ret.append("opcode=" + this.opcode);
-        ret.append(",popnum=" + this.popnum);
-        ret.append(",pushnum=" + this.pushnum);
+		ret.append("opcode=" + this.opcode);
+		ret.append(",popnum=" + this.popnum);
+		ret.append(",pushnum=" + this.pushnum);
 		return ret.toString();
 	}
 

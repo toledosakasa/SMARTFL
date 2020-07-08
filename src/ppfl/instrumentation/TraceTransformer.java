@@ -93,7 +93,8 @@ public class TraceTransformer implements ClassFileTransformer {
 						System.out.println(opc);
 						// linenumber information.
 						int ln = mi.getLineNumber(index);
-						String linenumberinfo = cc.getName() + "$" + m.getName() + ":" + ln + ":" + index + ":";
+						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
+								+ index;
 						if (ln != lastln) {
 							lastln = ln;
 							System.out.println(ln);

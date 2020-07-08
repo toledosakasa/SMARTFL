@@ -9,16 +9,16 @@ import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 //25,42-45
 public class AloadInst extends OpcodeInst {
 
-    int loadindex;
+	int loadindex;
 
 	public AloadInst(int _form) {
 		super(_form, 1, 0);
-    }
-    
-    public AloadInst(int _form,int _loadindex) {
-        super(_form, 1, 0);
-        loadindex = _loadindex;
-    }
+	}
+
+	public AloadInst(int _form, int _loadindex) {
+		super(_form, 1, 0);
+		loadindex = _loadindex;
+	}
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {

@@ -8,20 +8,20 @@ import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 //176
 public class AreturnInst extends OpcodeInst {
-	
+
 	public AreturnInst(int _form) {
-		super(_form,0,-1);
+		super(_form, 0, -1);
 	}
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
 		ret.append("opcode=" + this.opcode);
-		//ret.append(",pushnum=" + this.pushnum);
+		// ret.append(",pushnum=" + this.pushnum);
 		ret.append(",popnum=" + this.popnum);
 		return ret.toString();
 	}
-	
+
 	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
 			throws BadBytecode {
@@ -29,5 +29,5 @@ public class AreturnInst extends OpcodeInst {
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(cbi.tsindex_object, instpos + 1);
 	}
-	
+
 }

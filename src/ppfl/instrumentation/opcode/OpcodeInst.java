@@ -5,6 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
 import ppfl.ByteCodeGraph;
+import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
 
 public class OpcodeInst {
@@ -77,10 +78,16 @@ public class OpcodeInst {
 		return ci.byteAt(index + 1);
 	}
 
-	int get2para(CodeIterator ci, int index) {
+	int getu16bitpara(CodeIterator ci, int index) {
 		if (ci == null)
 			return 0;
-		return (ci.byteAt(index + 1)) << (8) | ci.byteAt(index + 2);
+		return ci.u16bitAt(index + 1);
+	}
+
+	int gets16bitpara(CodeIterator ci, int index) {
+		if (ci == null)
+			return 0;
+		return ci.s16bitAt(index + 1);
 	}
 
 	String getparas(CodeIterator ci, int index) {
@@ -105,24 +112,15 @@ public class OpcodeInst {
 	// extended class should override this method.
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
-		ret.append("opcode="+this.opcode);
-		//ret.append("opcode=" + this.form + "(" + this.opcode + ")");
+		// ret.append("opcode="+this.opcode);
+		ret.append("opcode=" + this.form + "(" + this.opcode + ")");
 		if (this.isinvoke) {
-			int callindex = get2para(ci, index);
+			int callindex = getu16bitpara(ci, index);
 			ret.append(getmethodinfo(ci, callindex, constp));
 			return ret.toString();
 		}
-
 		if (this.popnum != 0)
 			ret.append(",popnum=" + this.popnum);
-		if (this.storetype != paratype.NONE) {
-			ret.append(",storetype=" + this.storetype + ",store=");
-			if (this.storetype == paratype.VAR) {
-				ret.append(storevalue);
-			} else {
-				ret.append(getparas(ci, index));
-			}
-		}
 		if (this.pushnum != 0)
 			ret.append(",pushnum=" + this.pushnum);
 		return ret.toString();
@@ -133,7 +131,7 @@ public class OpcodeInst {
 			CallBackIndex cbi) throws BadBytecode {
 
 		String inst = getinst(ci, index, constp);
-		inst = linenumberinfo + inst;
+		inst = inst + linenumberinfo;
 		if (inst != null) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(8);
@@ -167,8 +165,76 @@ public class OpcodeInst {
 //			ci.write16bit(cbi.tsindex_int, instpos + 3);
 //		}
 	}
-	
-	public void parsetrace(ByteCodeGraph graph,String trace) {
-		
+
+	public void parsetrace(ByteCodeGraph graph, String trace) {
+		String[] split = trace.split(",");
+		String[] lineinfos = split[split.length - 1].split("=#");
+		String traceclass = lineinfos[1];
+		String tracemethod = lineinfos[2];
+		int line = Integer.parseInt(lineinfos[3]);
+		int byteindex = Integer.parseInt(lineinfos[4]);
+		StmtNode stmt = null;
+		String stmtname = traceclass + tracemethod + "#" + String.valueOf(line);
+		// System.out.println("At line " + stmtname);
+		if (!graph.hasNode(stmtname)) {
+			stmt = new StmtNode(stmtname);
+			graph.addNode(stmtname, stmt);
+		} else {
+			stmt = (StmtNode) graph.getNode(stmtname);
+			assert (stmt.isStmt());
+		}
+
+		// count how many times this statment has been executed
+		if (graph.stmtcountmap.containsKey(stmtname)) {
+			graph.stmtcountmap.put(stmtname, graph.stmtcountmap.get(stmtname) + 1);
+		} else {
+			graph.stmtcountmap.put(stmtname, 1);
+		}
+
+		if (graph.max_loop > 0 && graph.stmtcountmap.get(stmtname) > graph.max_loop) {
+			return;
+		}
+
+		// auto-assigned observation: test function always true
+		if (graph.auto_oracle) {
+			if (tracemethod.contentEquals(graph.testname)) {
+				stmt.observe(true);
+				System.out.println("Observe " + stmt.getName() + " as true");
+			}
+		}
+
+		String instinfos[] = split[4].split(",");
+		String opcode = null;
+		int pushnum = 0;
+		int popnum = 0;
+		// invoke infos
+		String calltype = null;
+		String callclass = null;
+		String callname = null;
+		for (String instinfo : instinfos) {
+			String[] splitinstinfo = instinfo.split("=");
+			String infotype = splitinstinfo[0];
+			String infovalue = splitinstinfo[1];
+			if (infotype == "opcode") {
+				opcode = infovalue;
+			}
+			if (infotype == "pushnum") {
+				pushnum = Integer.valueOf(infovalue);
+			}
+			if (infotype == "popnum") {
+				popnum = Integer.valueOf(infovalue);
+			}
+			if (infotype == "calltype") {
+				calltype = infovalue;
+			}
+			if (infotype == "callclass") {
+				callclass = infovalue;
+			}
+			if (infotype == "callname") {
+				callname = infovalue;
+			}
+
+		}
+
 	}
 }

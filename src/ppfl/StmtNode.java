@@ -4,7 +4,7 @@ public class StmtNode extends Node {
 
 	public StmtNode(String sname) {
 		super(sname);
-        this.isStmt = true;
+		this.isStmt = true;
 		// TODO Auto-generated constructor stub
 	}
 

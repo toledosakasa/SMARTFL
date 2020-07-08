@@ -24,9 +24,7 @@ public class LdcInst extends OpcodeInst {
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
-		StringBuilder ret = new StringBuilder();
-		ret.append("opcode=" + this.opcode);
-		ret.append(",pushnum=" + this.pushnum);
+		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
 		return ret.toString();
 	}
 
@@ -39,7 +37,7 @@ public class LdcInst extends OpcodeInst {
 		if (this.form == 18) {
 			instpara = this.get1para(ci, index);
 		} else {
-			instpara = this.get2para(ci, index);
+			instpara = this.getu16bitpara(ci, index);
 		}
 		Object v = constp.getLdcValue(instpara);
 		callbackindex = cbi.getLdcCallBack(v);
