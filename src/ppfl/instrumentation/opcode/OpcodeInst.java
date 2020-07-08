@@ -104,7 +104,8 @@ public class OpcodeInst {
 	// extended class should override this method.
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
-		ret.append("opcode=" + this.form + "(" + this.opcode + ")");
+		ret.append("opcode="+this.opcode);
+		//ret.append("opcode=" + this.form + "(" + this.opcode + ")");
 		if (this.isinvoke) {
 			int callindex = get2para(ci, index);
 			ret.append(getmethodinfo(ci, callindex, constp));
@@ -123,19 +124,10 @@ public class OpcodeInst {
 		}
 		if (this.pushnum != 0)
 			ret.append(",pushnum=" + this.pushnum);
-		if (this.pushnum == 0 && this.popnum == 0) {// iinc
-			if (this.para[0] != null && this.para[0] != paratype.NONE) {
-				ret.append("," + this.para[0] + "=" + getpara(ci, index, 1));
-			}
-			if (this.para[1] != null && this.para[1] != paratype.NONE) {
-				ret.append("," + this.para[1] + "=" + getpara(ci, index, 1));
-			}
-		}
-
 		return ret.toString();
 	}
 
-	// there's no need to overload this.
+	// there's no need to override this.
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo,
 			CallBackIndex cbi) throws BadBytecode {
 

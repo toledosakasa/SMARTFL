@@ -327,7 +327,7 @@ public class Interpreter {
         map[52] = new CaloadInst(52);
         map[53] = new SaloadInst(53);
         for(int i = 54;i<=78;i++)
-            map[i] = new XstoreInst(i);
+            map[i] = new XstoreInst(i); //TODO setstore and setpara
         for(int i= 79;i<=86;i++)
             map[i] = new XastoreInst(i);
 		map[87] = new PopInst(87);

@@ -20,8 +20,8 @@ public class IincInst extends OpcodeInst {
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
 		ret.append("opcode=" + this.opcode);
-		ret.append(",PARAVAR=" + this.para[0]);
-		ret.append(",PARACONST=" + this.para[1]);
+		ret.append(",PARAVAR=" + getpara(ci, index, 1));
+		ret.append(",PARACONST=" + getpara(ci, index, 2));
 		return ret.toString();
 	}
 

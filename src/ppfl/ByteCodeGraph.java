@@ -126,12 +126,22 @@ public class ByteCodeGraph {
 				}
 
 				String instinfos[] = split[4].split(",");
+				String opcode;
 				int pushnum;
 				int popnum;
 				for(String instinfo:instinfos) {
 					String[] splitinstinfo = instinfo.split("=");
-					String desc = splitinstinfo[0];
-					if(desc == "opcode")
+					String infotype = splitinstinfo[0];
+					String infovalue = splitinstinfo[1];
+					if(infotype == "opcode") {
+						opcode = infovalue;
+					}
+					if(infotype == "pushnum") {
+						pushnum = Integer.valueOf(infovalue);
+					}
+					if(infotype == "popnum") {
+						popnum = Integer.valueOf(infovalue);
+					}
 				}
 
 			}
