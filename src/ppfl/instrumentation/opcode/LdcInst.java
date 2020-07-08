@@ -44,7 +44,7 @@ public class LdcInst extends OpcodeInst {
 		Object v = constp.getLdcValue(instpara);
 		callbackindex = cbi.getLdcCallBack(v);
 
-		int instpos = ci.insertGap(4);// the gap must be long enough for the following instrumentation
+		int instpos = ci.insertGap(8);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(callbackindex, instpos + 1);
 	}

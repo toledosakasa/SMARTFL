@@ -39,8 +39,10 @@ public class CallBackIndex {
 			return tsindex_boolean;
 		else if (o instanceof Float)
 			return tsindex_float;
-		else if (o instanceof Double)
+		else if (o instanceof Double) {
+			System.out.println("here");
 			return tsindex_double;
+		}
 		else 
 			return tsindex_object;
 	}
@@ -107,7 +109,7 @@ public class CallBackIndex {
 	}
 
 	public static String printTopStack1(String i) {
-		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:double, value=" + i);
+		TraceTransformer.TRACELOGGER.log(java.util.logging.Level.INFO, "Topstack:String, value=" + i);
 		return i;
 	}
 

@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
+import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 public class OpcodeInst {
@@ -79,7 +80,7 @@ public class OpcodeInst {
 	int get2para(CodeIterator ci, int index) {
 		if (ci == null)
 			return 0;
-		return ci.byteAt(index + 1) << (8) | ci.byteAt(index + 2);
+		return (ci.byteAt(index + 1)) << (8) | ci.byteAt(index + 2);
 	}
 
 	String getparas(CodeIterator ci, int index) {
@@ -158,13 +159,16 @@ public class OpcodeInst {
 		// this should be inserted after the instruction is executed
 		// (after ci.next() is called)
 
-		if (this.pushnum == 1 && (this.opcode.startsWith("i"))) {
-			int instpos = ci.insertGap(8);
-			// ci.writeByte(93, instpos + 1);// buggy dup. can't explain(?)
-			// call (I)I callback instead of (I)V callback.
-			ci.writeByte(184, instpos + 2);// invokestatic
-			ci.write16bit(cbi.tsindex_int, instpos + 3);
-		}
-
+//		if (this.pushnum == 1 && (this.opcode.startsWith("i"))) {
+//			int instpos = ci.insertGap(8);
+//			// ci.writeByte(93, instpos + 1);// buggy dup. can't explain(?)
+//			// call (I)I callback instead of (I)V callback.
+//			ci.writeByte(184, instpos + 2);// invokestatic
+//			ci.write16bit(cbi.tsindex_int, instpos + 3);
+//		}
+	}
+	
+	public void parsetrace(ByteCodeGraph graph,String trace) {
+		
 	}
 }
