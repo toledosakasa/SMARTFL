@@ -14,6 +14,10 @@ class DomainTest {
 		if (a > 1)
 			a = a + 1;
 		a = a + 2;
+        double x = 1.0;
+        double y = 1.1;
+        if(x>y)
+            a= a+1;
 		return a;
 	}
 

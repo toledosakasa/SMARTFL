@@ -27,7 +27,7 @@ public class LcmpInst extends OpcodeInst {
 			throws BadBytecode {
 		int instpos = ci.insertGap(4);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.tsindex_long, instpos + 1);
+		ci.write16bit(cbi.tsindex_int, instpos + 1);
 	}
 	
 }
