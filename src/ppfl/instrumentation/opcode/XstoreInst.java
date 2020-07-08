@@ -18,12 +18,7 @@ public class XstoreInst extends OpcodeInst {
         StringBuilder ret = new StringBuilder();
         ret.append("opcode=" + this.opcode);
         ret.append(",popnum=" + this.popnum);
-        ret.append(",storetype=" + this.storetype + ",store=");
-        if (this.storetype == paratype.VAR) {
-            ret.append(this.storevalue);
-        } else {
-            ret.append(getparas(ci, index));
-        }
+        ret.append(",store="+ getpara(ci, index, 1));
         return ret.toString();
     }
 

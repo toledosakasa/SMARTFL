@@ -1,77 +1,7 @@
 package ppfl.instrumentation;
 
 import javassist.bytecode.Mnemonic;
-import ppfl.instrumentation.opcode.IconstInst;
-import ppfl.instrumentation.opcode.AaloadInst;
-import ppfl.instrumentation.opcode.AconstInst;
-import ppfl.instrumentation.opcode.AloadInst;
-import ppfl.instrumentation.opcode.BaloadInst;
-import ppfl.instrumentation.opcode.BipushInst;
-import ppfl.instrumentation.opcode.CaloadInst;
-import ppfl.instrumentation.opcode.DaloadInst;
-import ppfl.instrumentation.opcode.DconstInst;
-import ppfl.instrumentation.opcode.DloadInst;
-import ppfl.instrumentation.opcode.FaloadInst;
-import ppfl.instrumentation.opcode.FconstInst;
-import ppfl.instrumentation.opcode.FloadInst;
-import ppfl.instrumentation.opcode.IaloadInst;
-import ppfl.instrumentation.opcode.IloadInst;
-import ppfl.instrumentation.opcode.LaloadInst;
-import ppfl.instrumentation.opcode.LconstInst;
-import ppfl.instrumentation.opcode.LloadInst;
-import ppfl.instrumentation.opcode.NopInst;
-import ppfl.instrumentation.opcode.SaloadInst;
-import ppfl.instrumentation.opcode.SipushInst;
-import ppfl.instrumentation.opcode.XastoreInst;
-import ppfl.instrumentation.opcode.XstoreInst;
-
-import ppfl.instrumentation.opcode.PopInst;
-import ppfl.instrumentation.opcode.Pop2Inst;
-import ppfl.instrumentation.opcode.IarithInst;
-import ppfl.instrumentation.opcode.LarithInst;
-import ppfl.instrumentation.opcode.FarithInst;
-import ppfl.instrumentation.opcode.DarithInst;
-import ppfl.instrumentation.opcode.InegInst;
-import ppfl.instrumentation.opcode.LnegInst;
-import ppfl.instrumentation.opcode.FnegInst;
-import ppfl.instrumentation.opcode.DnegInst;
-import ppfl.instrumentation.opcode.IlogicInst;
-import ppfl.instrumentation.opcode.LlogicInst;
-import ppfl.instrumentation.opcode.IincInst;
-import ppfl.instrumentation.opcode.IturntypeInst;
-import ppfl.instrumentation.opcode.LturntypeInst;
-import ppfl.instrumentation.opcode.FturntypeInst;
-import ppfl.instrumentation.opcode.DturntypeInst;
-import ppfl.instrumentation.opcode.I2bInst;
-import ppfl.instrumentation.opcode.I2cInst;
-import ppfl.instrumentation.opcode.I2sInst;
-import ppfl.instrumentation.opcode.LcmpInst;
-import ppfl.instrumentation.opcode.FcmpInst;
-import ppfl.instrumentation.opcode.DcmpInst;
-import ppfl.instrumentation.opcode.IfInst;
-import ppfl.instrumentation.opcode.If_icmpInst;
-import ppfl.instrumentation.opcode.If_acmpInst;
-import ppfl.instrumentation.opcode.GotoInst;
-import ppfl.instrumentation.opcode.JsrInst;
-import ppfl.instrumentation.opcode.RetInst;
-import ppfl.instrumentation.opcode.IreturnInst;
-import ppfl.instrumentation.opcode.LreturnInst;
-import ppfl.instrumentation.opcode.FreturnInst;
-import ppfl.instrumentation.opcode.DreturnInst;
-import ppfl.instrumentation.opcode.AreturnInst;
-import ppfl.instrumentation.opcode.ReturnInst;
-import ppfl.instrumentation.opcode.GetstaticInst;
-
-import ppfl.instrumentation.opcode.InvokevirtualInst;
-import ppfl.instrumentation.opcode.InvokespecialInst;
-import ppfl.instrumentation.opcode.InvokestaticInst;
-import ppfl.instrumentation.opcode.InvokeinterfaceInst;
-import ppfl.instrumentation.opcode.InvokedynamicInst;
-import ppfl.instrumentation.opcode.IfnullInst;
-import ppfl.instrumentation.opcode.IfnonnullInst;
-import ppfl.instrumentation.opcode.Goto_wInst;
-import ppfl.instrumentation.opcode.Jsr_wInst;
-import ppfl.instrumentation.opcode.OpcodeInst;
+import ppfl.instrumentation.opcode.*;
 import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 /*bytecode reference:
@@ -326,9 +256,12 @@ public class Interpreter {
         map[51] = new BaloadInst(51);
         map[52] = new CaloadInst(52);
         map[53] = new SaloadInst(53);
-        for(int i = 54;i<=78;i++)
-            map[i] = new XstoreInst(i); //TODO setstore and setpara
-        for(int i= 79;i<=86;i++)
+        for(int i = 54;i<=58;i++)
+            map[i] = new XstoreInst(i);
+        for(int i = 59;i<=78;i++) {
+        	map[i] = new Xstore_NInst(i,(i+1)%4);//trick
+        }
+        for(int i= 79;i<=86;i++) 
             map[i] = new XastoreInst(i);
 		map[87] = new PopInst(87);
 		map[88] = new Pop2Inst(88);
