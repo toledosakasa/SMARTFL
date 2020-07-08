@@ -203,15 +203,13 @@ public class OpcodeInst {
 			}
 		}
 
-		String instinfos[] = split[4].split(",");
-		String opcode = null;
 		int pushnum = 0;
 		int popnum = 0;
 		// invoke infos
 		String calltype = null;
 		String callclass = null;
 		String callname = null;
-		for (String instinfo : instinfos) {
+		for (String instinfo : split) {
 			String[] splitinstinfo = instinfo.split("=");
 			String infotype = splitinstinfo[0];
 			String infovalue = splitinstinfo[1];
