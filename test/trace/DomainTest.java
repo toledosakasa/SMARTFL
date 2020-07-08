@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 class DomainTest {
 
 	//private static java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger("trace.DomainTest");
+	static boolean b[] = {true, true,false};
 	
 	public static int f(int a) {
-		int b = a;
+		boolean c = b[2];
 		if (a > 1)
 			a = a + 1;
 		a = a + 2;

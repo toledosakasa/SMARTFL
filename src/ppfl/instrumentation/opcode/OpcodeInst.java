@@ -104,7 +104,7 @@ public class OpcodeInst {
 	// extended class should override this method.
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder();
-		ret.append("opcode=" + this.opcode);
+		ret.append("opcode=" + this.form + "(" + this.opcode + ")");
 		if (this.isinvoke) {
 			int callindex = get2para(ci, index);
 			ret.append(getmethodinfo(ci, callindex, constp));
