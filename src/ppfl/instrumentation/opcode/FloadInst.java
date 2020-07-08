@@ -4,7 +4,6 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
-import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 //23,34-37
 public class FloadInst extends OpcodeInst {

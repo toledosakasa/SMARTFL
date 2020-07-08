@@ -1,7 +1,7 @@
 package ppfl;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Node {
 	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from

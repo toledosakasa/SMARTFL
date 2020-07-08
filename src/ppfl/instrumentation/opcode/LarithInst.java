@@ -4,7 +4,6 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
-import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 //97,101,105,109,113,121,123,125
 public class LarithInst extends OpcodeInst {

@@ -1,9 +1,9 @@
 package ppfl.instrumentation;
 
+import java.lang.instrument.Instrumentation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.instrument.Instrumentation;
 
 public class InstrumentationAgent {
 	private static Logger LOGGER = LoggerFactory.getLogger(InstrumentationAgent.class);

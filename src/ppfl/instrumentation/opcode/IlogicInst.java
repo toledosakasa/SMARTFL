@@ -4,7 +4,6 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
-import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 //126,128,130
 public class IlogicInst extends OpcodeInst {

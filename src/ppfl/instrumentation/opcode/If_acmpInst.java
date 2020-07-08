@@ -1,10 +1,7 @@
 package ppfl.instrumentation.opcode;
 
-import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
-import ppfl.instrumentation.CallBackIndex;
-import ppfl.instrumentation.opcode.OpcodeInst.paratype;
 
 //165-166, type reference is object?
 public class If_acmpInst extends OpcodeInst {
