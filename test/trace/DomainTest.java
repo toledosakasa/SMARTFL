@@ -9,10 +9,10 @@ class DomainTest {
 	//private static java.util.logging.Logger ppfl_logger = java.util.logging.Logger.getLogger("trace.DomainTest");
 	
 	public static int f(int a) {
-		int b = a;
-		if (a > 1)
-			a = a + 1;
-		a = a + 2;
+        double x = 1.0;
+        double y = 1.1;
+        if(x>y)
+            a= a+1;
 		return a;
 	}
 
