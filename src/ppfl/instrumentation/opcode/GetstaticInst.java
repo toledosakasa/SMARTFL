@@ -22,11 +22,13 @@ public class GetstaticInst extends OpcodeInst {
 		return ret.toString();
 	}
 
-	@Override
-	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
-			throws BadBytecode {
-		int instpos = ci.insertGap(4);// the gap must be long enough for the following instrumentation
-		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.tsindex_object, instpos + 1);//may be wrong
-	}
+    //TODO implement insertByteCodeAfter like ldc
+    
+	// @Override
+	// public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
+	// 		throws BadBytecode {
+	// 	int instpos = ci.insertGap(4);// the gap must be long enough for the following instrumentation
+	// 	ci.writeByte(184, instpos);// invokestatic
+	// 	ci.write16bit(cbi.tsindex_object, instpos + 1);//may be wrong
+	// }
 }
