@@ -41,13 +41,12 @@ public class ByteCodeGraph {
 	Random random;
 
 	Stack<Node> runtimestack;
-	
+
 	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
 	// input of test function as 1.0(always true)
 	// output (return value) of the function being tested as 0.0/1.0 depends on
 	// parameter testpass(true = 1.0,false = 0.0)
 	private boolean auto_oracle;
-
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
@@ -62,7 +61,6 @@ public class ByteCodeGraph {
 		auto_oracle = true;
 		runtimestack = new Stack<Node>();
 	}
-
 
 	public void setMaxLoop(int i) {
 		this.max_loop = i;
@@ -86,8 +84,8 @@ public class ByteCodeGraph {
 				String[] split = t.split(":");
 				assert (split.length >= 5);
 				String head = split[0];
-				assert(head == "INFO");
-				
+				assert (head == "INFO");
+
 				String domain = split[1];
 				int splitp = domain.lastIndexOf('$');
 				String traceclass = domain.substring(0, splitp);
@@ -112,7 +110,7 @@ public class ByteCodeGraph {
 				} else {
 					stmtcountmap.put(stmtname, 1);
 				}
-				
+
 				if (max_loop > 0 && stmtcountmap.get(stmtname) > max_loop) {
 					continue;
 				}
@@ -127,22 +125,35 @@ public class ByteCodeGraph {
 
 				String instinfos[] = split[4].split(",");
 				String opcode = null;
-				int pushnum;
-				int popnum;
-				//String 
-				for(String instinfo:instinfos) {
+				int pushnum = 0;
+				int popnum = 0;
+				// invoke infos
+				String calltype = null;
+				String callclass = null;
+				String callname = null;
+				for (String instinfo : instinfos) {
 					String[] splitinstinfo = instinfo.split("=");
 					String infotype = splitinstinfo[0];
 					String infovalue = splitinstinfo[1];
-					if(infotype == "opcode") {
+					if (infotype == "opcode") {
 						opcode = infovalue;
 					}
-					if(infotype == "pushnum") {
+					if (infotype == "pushnum") {
 						pushnum = Integer.valueOf(infovalue);
 					}
-					if(infotype == "popnum") {
+					if (infotype == "popnum") {
 						popnum = Integer.valueOf(infovalue);
 					}
+					if (infotype == "calltype") {
+						calltype = infovalue;
+					}
+					if (infotype == "callclass") {
+						callclass = infovalue;
+					}
+					if (infotype == "callname") {
+						callname = infovalue;
+					}
+
 				}
 
 			}
@@ -247,37 +258,37 @@ public class ByteCodeGraph {
 			addNode(defname, defnode);
 		}
 
-        Edge dedge = new Edge();
-        dedge.setnode(defnode);
-        defnode.add_edge(dedge);
-        defnode.setdedge(dedge);
-        Edge sedge = new Edge();
-        sedge.setnode(stmt);
-        stmt.add_edge(sedge);
-        
+		Edge dedge = new Edge();
+		dedge.setnode(defnode);
+		defnode.add_edge(dedge);
+		defnode.setdedge(dedge);
+		Edge sedge = new Edge();
+		sedge.setnode(stmt);
+		stmt.add_edge(sedge);
+
 		List<Edge> pedges = new ArrayList<Edge>();
 		for (Node n : prednodes) {
-            Edge nedge = new Edge();
-            nedge.setnode(n);
+			Edge nedge = new Edge();
+			nedge.setnode(n);
 			pedges.add(nedge);
 			n.add_edge(nedge);
 		}
 		List<Edge> uedges = new ArrayList<Edge>();
 		for (Node n : usenodes) {
-            Edge nedge = new Edge();
-            nedge.setnode(n);
+			Edge nedge = new Edge();
+			nedge.setnode(n);
 			uedges.add(nedge);
 			n.add_edge(nedge);
 		}
 		FactorNode ret = new FactorNode(defnode, stmt, prednodes, usenodes, ops, dedge, sedge, pedges, uedges);
-        factornodes.add(ret);
+		factornodes.add(ret);
 
-        dedge.setfactor(ret);
-        sedge.setfactor(ret);
-        for(Edge n: pedges)
-            n.setfactor(ret);
-        for(Edge n: uedges)
-            n.setfactor(ret);
+		dedge.setfactor(ret);
+		sedge.setfactor(ret);
+		for (Edge n : pedges)
+			n.setfactor(ret);
+		for (Edge n : uedges)
+			n.setfactor(ret);
 		return ret;
 	}
 
@@ -405,55 +416,55 @@ public class ByteCodeGraph {
 		return;
 	}
 
-    private void mark_reduce(Node node){
-        node.setreduced();
-        if(node.isStmt)
-            return;
-        FactorNode deffactor = (node.getdedge()).getfactor();
-        List<Node> pulist = deffactor.getpunodes();
-        for(Node n : pulist){
-            mark_reduce(n);
-        }
-        deffactor.getstmt().setreduced();
-    }
+	private void mark_reduce(Node node) {
+		node.setreduced();
+		if (node.isStmt)
+			return;
+		FactorNode deffactor = (node.getdedge()).getfactor();
+		List<Node> pulist = deffactor.getpunodes();
+		for (Node n : pulist) {
+			mark_reduce(n);
+		}
+		deffactor.getstmt().setreduced();
+	}
 
-    private void path_reduce(){
-        for (Node n : nodes) {
-            if (n.getobs()){
-                mark_reduce(n);
-            }
-        }
-        //maybe won't be used?
-        for(Node n: stmts){
-            if(n.getobs()){
-                mark_reduce(n);
-            }
-        }
-    }
+	private void path_reduce() {
+		for (Node n : nodes) {
+			if (n.getobs()) {
+				mark_reduce(n);
+			}
+		}
+		// maybe won't be used?
+		for (Node n : stmts) {
+			if (n.getobs()) {
+				mark_reduce(n);
+			}
+		}
+	}
 
-    //TODO: how to slice in the graph to optimize the procedure, though the stmt result can be cut as the mark
-    private void node_reduce(){
+	// TODO: how to slice in the graph to optimize the procedure, though the stmt
+	// result can be cut as the mark
+	private void node_reduce() {
 
-    }
+	}
 
 	public long bp_inference() {
-        long startTime = System.currentTimeMillis();
-        path_reduce();
+		long startTime = System.currentTimeMillis();
+		path_reduce();
 
-        boolean outreduced = true;
-        if(outreduced)
-        {
-            System.out.println("\nreduced Nodes: ");
-            for (Node n : stmts) {
-                if(n.getreduced())
-                    n.print();
-            }
-            for (Node n : nodes) {
-                if(n.getreduced())
-                n.print();
-            }
-            System.out.println("\n");
-        }
+		boolean outreduced = true;
+		if (outreduced) {
+			System.out.println("\nreduced Nodes: ");
+			for (Node n : stmts) {
+				if (n.getreduced())
+					n.print();
+			}
+			for (Node n : nodes) {
+				if (n.getreduced())
+					n.print();
+			}
+			System.out.println("\n");
+		}
 
 		for (int i = 0; i < bp_times; i++) {
 			boolean isend = true;

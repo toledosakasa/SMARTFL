@@ -232,7 +232,9 @@ public class Interpreter {
         map[15] = new DconstInst(15, 1);
         map[16] = new BipushInst(16);
         map[17] = new SipushInst(17);
-        //TODO: ldc
+        for(int i = 18;i<=20;i++) {
+        	map[i] = new LdcInst(i);
+        }
         map[21] = new IloadInst(21);
         for(int i = 26;i<=29;i++)
             map[i] = new IloadInst(i, i-26);

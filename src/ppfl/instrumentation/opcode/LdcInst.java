@@ -12,6 +12,10 @@ public class LdcInst extends OpcodeInst {
 	boolean isIntInst = true;
 	int loadedconst;
 
+	public LdcInst(int _form) {
+		super(_form, 1, 0);
+	}
+
 	public LdcInst(int _form, int _loadedconst) {
 		super(_form, 1, 0);
 		this.loadedconst = _loadedconst;
