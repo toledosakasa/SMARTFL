@@ -37,6 +37,9 @@ public class ByteCodeGraph {
 
 	Stack<Node> runtimestack;
 
+	//local vars used by parsing
+	//Parseinfo parseinfo;
+	
 	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
 	// input of test function as 1.0(always true)
 	// output (return value) of the function being tested as 0.0/1.0 depends on

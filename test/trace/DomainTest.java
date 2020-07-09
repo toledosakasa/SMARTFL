@@ -16,6 +16,9 @@ class DomainTest {
 		a = a + 2;
         double x = 1.0;
         double y = 1.1;
+        double z = 1.0;
+        int zz = 1;
+        int ttt = 2;
         if(x>y)
             a= a+1;
 		return a;

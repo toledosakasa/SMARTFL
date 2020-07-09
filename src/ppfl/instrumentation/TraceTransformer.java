@@ -104,6 +104,7 @@ public class TraceTransformer implements ClassFileTransformer {
 						// print basic information of this instruction
 						oi.insertByteCodeBefore(ci, index, constp, linenumberinfo, cbi);
 						// move to the next inst. everything below this will be inserted after the inst.
+						//ci.next();
 						index = ci.next();
 						// print advanced information(e.g. value pushed)
 						oi.insertByteCodeAfter(ci, index, constp, cbi);

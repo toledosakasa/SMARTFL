@@ -114,11 +114,11 @@ public class OpcodeInst {
 		StringBuilder ret = new StringBuilder();
 		// ret.append("opcode="+this.opcode);
 		ret.append("opcode=" + this.form + "(" + this.opcode + ")");
-		if (this.isinvoke) {
-			int callindex = getu16bitpara(ci, index);
-			ret.append(getmethodinfo(ci, callindex, constp));
-			return ret.toString();
-		}
+//		if (this.isinvoke) {
+//			int callindex = getu16bitpara(ci, index);
+//			ret.append(getmethodinfo(ci, callindex, constp));
+//			return ret.toString();
+//		}
 		if (this.popnum != 0)
 			ret.append(",popnum=" + this.popnum);
 		if (this.pushnum != 0)
@@ -233,6 +233,6 @@ public class OpcodeInst {
 			}
 
 		}
-
+		//stack
 	}
 }

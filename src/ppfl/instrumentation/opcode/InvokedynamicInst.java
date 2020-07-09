@@ -2,6 +2,7 @@ package ppfl.instrumentation.opcode;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
 
 //186
 public class InvokedynamicInst extends OpcodeInst {
@@ -19,6 +20,11 @@ public class InvokedynamicInst extends OpcodeInst {
 		int callindex = getu16bitpara(ci, index);
 		ret.append(getmethodinfo(ci, callindex, constp));
 		return ret.toString();
+	}
+	
+	@Override
+	public void parsetrace(ByteCodeGraph graph, String trace) {
+		//TODO
 	}
 
 }

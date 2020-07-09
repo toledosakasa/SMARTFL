@@ -305,6 +305,7 @@ public class Interpreter {
 		for (int i = 18; i <= 20; i++) {
 			map[i] = new LdcInst(i);
 		}
+		//TODO add load information at getinst
 		map[21] = new IloadInst(21);
 		for (int i = 26; i <= 29; i++)
 			map[i] = new IloadInst(i, i - 26);
