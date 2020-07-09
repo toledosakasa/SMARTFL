@@ -20,7 +20,7 @@ public class InvokedynamicInst extends OpcodeInst {
 	}
 	
 	@Override
-	public void parsetrace(ByteCodeGraph graph, String trace) {
+	public void buildtrace(ByteCodeGraph graph, String trace) {
 		//TODO
 	}
 

@@ -114,7 +114,7 @@ public class OpcodeInst {
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder("\n");
 		// ret.append("opcode="+this.opcode);
-		ret.append("opcode=" + this.form + "(" + this.opcode + ")");
+		ret.append("opcode=" + this.form + "(" + this.opcode + ")" );
 //		if (this.isinvoke) {
 //			int callindex = getu16bitpara(ci, index);
 //			ret.append(getmethodinfo(ci, callindex, constp));
@@ -167,17 +167,14 @@ public class OpcodeInst {
 //		}
 	}
 
-	public void parsetrace(ByteCodeGraph graph, String trace) {
-		graph.parseinfo = new ParseInfo(trace);
+	public void buildtrace(ByteCodeGraph graph) {
+		String traceclass = graph.parseinfo.traceclass;
+		String tracemethod = graph.parseinfo.tracemethod;
+		int linenumber = graph.parseinfo.linenumber;
+		int byteindex = graph.parseinfo.byteindex;
 		
-		String[] split = trace.split(",");
-		String[] lineinfos = split[split.length - 1].split("=#");
-		String traceclass = lineinfos[1];
-		String tracemethod = lineinfos[2];
-		int line = Integer.parseInt(lineinfos[3]);
-		int byteindex = Integer.parseInt(lineinfos[4]);
 		StmtNode stmt = null;
-		String stmtname = traceclass + tracemethod + "#" + String.valueOf(line);
+		String stmtname = traceclass + tracemethod + "#" + String.valueOf(linenumber);
 		// System.out.println("At line " + stmtname);
 		if (!graph.hasNode(stmtname)) {
 			stmt = new StmtNode(stmtname);
@@ -205,46 +202,7 @@ public class OpcodeInst {
 				System.out.println("Observe " + stmt.getName() + " as true");
 			}
 		}
-
-		int pushnum = 0;
-		int popnum = 0;
-		// invoke infos
-		String calltype = null;
-		String callclass = null;
-		String callname = null;
-		//for iinc
-		int incvar = -1;
-		int incvalue = -1;
-		for (String instinfo : split) {
-			String[] splitinstinfo = instinfo.split("=");
-			String infotype = splitinstinfo[0];
-			String infovalue = splitinstinfo[1];
-			if (infotype == "opcode") {
-				opcode = infovalue;
-			}
-			if (infotype == "pushnum") {
-				pushnum = Integer.valueOf(infovalue);
-			}
-			if (infotype == "popnum") {
-				popnum = Integer.valueOf(infovalue);
-			}
-			if (infotype == "calltype") {
-				calltype = infovalue;
-			}
-			if (infotype == "callclass") {
-				callclass = infovalue;
-			}
-			if (infotype == "callname") {
-				callname = infovalue;
-			}
-			if(infotype == "VAR") {
-				incvar = Integer.valueOf(infovalue);
-			}
-			if(infotype == "CONST") {
-				incvalue = Integer.valueOf(infovalue);
-			}
-
-		}
 		//stack
+		
 	}
 }

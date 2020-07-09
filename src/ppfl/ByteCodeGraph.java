@@ -37,9 +37,9 @@ public class ByteCodeGraph {
 
 	Stack<Node> runtimestack;
 
-	//local vars used by parsing
+	// local vars used by parsing
 	public ParseInfo parseinfo;
-	
+
 	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
 	// input of test function as 1.0(always true)
 	// output (return value) of the function being tested as 0.0/1.0 depends on
@@ -81,16 +81,8 @@ public class ByteCodeGraph {
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
-				String[] split = t.split(":");
-				assert (split.length >= 5);
-				String head = split[0];
-				assert (head == "INFO");
-
-				String trace = split[1];
-				String fetchcode = trace.split(",")[0];
-				assert (fetchcode.startsWith("opcode"));
-				int opcodeform = Integer.valueOf(fetchcode.split("=()")[1]);
-				Interpreter.map[opcodeform].parsetrace(this, trace);
+				this.parseinfo = new ParseInfo(t);
+				Interpreter.map[this.parseinfo.form].buildtrace(this);
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
@@ -99,7 +91,6 @@ public class ByteCodeGraph {
 				this.observe(observename, testpass);
 				System.out.println("Observe " + observename + " as " + testpass);
 			}
-
 			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
