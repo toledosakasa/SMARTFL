@@ -38,11 +38,15 @@ public class ParseInfo {
 	}
 
 	public String getvalue(String stype) {
-		return this.tracemap.get(stype);
+		if (this.tracemap.containsKey(stype))
+			return this.tracemap.get(stype);
+		return null;
 	}
 
 	public int getintvalue(String stype) {
-		return Integer.valueOf(this.tracemap.get(stype));
+		if (this.tracemap.containsKey(stype))
+			return Integer.valueOf(this.tracemap.get(stype));
+		return 0;
 	}
 
 }

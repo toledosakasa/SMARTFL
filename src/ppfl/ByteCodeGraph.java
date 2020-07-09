@@ -35,7 +35,11 @@ public class ByteCodeGraph {
 	public int bp_times = 100;
 	Random random;
 
-	Stack<Node> runtimestack;
+	//stack tracing
+	public Stack<Node> runtimestack;
+	//
+	public Map<String, Integer> totalstackheight;
+
 
 	// local vars used by parsing
 	public ParseInfo parseinfo;
@@ -77,7 +81,6 @@ public class ByteCodeGraph {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
 			String t;
-
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;

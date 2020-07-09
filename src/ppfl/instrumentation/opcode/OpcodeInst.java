@@ -5,6 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
 import ppfl.ByteCodeGraph;
+import ppfl.Node;
 import ppfl.ParseInfo;
 import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
@@ -114,7 +115,7 @@ public class OpcodeInst {
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder("\n");
 		// ret.append("opcode="+this.opcode);
-		ret.append("opcode=" + this.form + "(" + this.opcode + ")" );
+		ret.append("opcode=" + this.form + "(" + this.opcode + ")\t" );
 //		if (this.isinvoke) {
 //			int callindex = getu16bitpara(ci, index);
 //			ret.append(getmethodinfo(ci, callindex, constp));
@@ -168,10 +169,11 @@ public class OpcodeInst {
 	}
 
 	public void buildtrace(ByteCodeGraph graph) {
-		String traceclass = graph.parseinfo.traceclass;
-		String tracemethod = graph.parseinfo.tracemethod;
-		int linenumber = graph.parseinfo.linenumber;
-		int byteindex = graph.parseinfo.byteindex;
+		ParseInfo info = graph.parseinfo;
+		String traceclass = info.traceclass;
+		String tracemethod = info.tracemethod;
+		int linenumber = info.linenumber;
+		int byteindex = info.byteindex;
 		
 		StmtNode stmt = null;
 		String stmtname = traceclass + tracemethod + "#" + String.valueOf(linenumber);
@@ -203,6 +205,10 @@ public class OpcodeInst {
 			}
 		}
 		//stack
+		if(info.getintvalue("pushnum")!=0) {
+			//TODO
+			//graph.runtimestack.add(new Node())
+		}
 		
 	}
 }
