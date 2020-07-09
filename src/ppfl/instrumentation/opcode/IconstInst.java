@@ -17,13 +17,13 @@ public class IconstInst extends OpcodeInst {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	public String getinst(CodeIterator ci, int index, ConstPool constp) {
-		StringBuilder ret = new StringBuilder();
-		ret.append("opcode=" + this.opcode);
-		ret.append(",pushnum=" + this.pushnum);
-		return ret.toString();
-	}
+//	@Override
+//	public String getinst(CodeIterator ci, int index, ConstPool constp) {
+//		StringBuilder ret = new StringBuilder();
+//		ret.append("opcode=" + this.opcode);
+//		ret.append(",pushnum=" + this.pushnum);
+//		return ret.toString();
+//	}
 
 	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)

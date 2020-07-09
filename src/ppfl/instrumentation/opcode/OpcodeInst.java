@@ -5,6 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
 import ppfl.ByteCodeGraph;
+import ppfl.ParseInfo;
 import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -111,7 +112,7 @@ public class OpcodeInst {
 	// temporary.
 	// extended class should override this method.
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
-		StringBuilder ret = new StringBuilder();
+		StringBuilder ret = new StringBuilder("\n");
 		// ret.append("opcode="+this.opcode);
 		ret.append("opcode=" + this.form + "(" + this.opcode + ")");
 //		if (this.isinvoke) {
@@ -167,6 +168,8 @@ public class OpcodeInst {
 	}
 
 	public void parsetrace(ByteCodeGraph graph, String trace) {
+		graph.parseinfo = new ParseInfo(trace);
+		
 		String[] split = trace.split(",");
 		String[] lineinfos = split[split.length - 1].split("=#");
 		String traceclass = lineinfos[1];
@@ -209,6 +212,9 @@ public class OpcodeInst {
 		String calltype = null;
 		String callclass = null;
 		String callname = null;
+		//for iinc
+		int incvar = -1;
+		int incvalue = -1;
 		for (String instinfo : split) {
 			String[] splitinstinfo = instinfo.split("=");
 			String infotype = splitinstinfo[0];
@@ -230,6 +236,12 @@ public class OpcodeInst {
 			}
 			if (infotype == "callname") {
 				callname = infovalue;
+			}
+			if(infotype == "VAR") {
+				incvar = Integer.valueOf(infovalue);
+			}
+			if(infotype == "CONST") {
+				incvalue = Integer.valueOf(infovalue);
 			}
 
 		}

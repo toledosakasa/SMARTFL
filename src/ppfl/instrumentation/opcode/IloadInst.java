@@ -21,9 +21,7 @@ public class IloadInst extends OpcodeInst {
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
-		StringBuilder ret = new StringBuilder();
-		ret.append("opcode=" + this.opcode);
-		ret.append(",pushnum=" + this.pushnum);
+		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
 		return ret.toString();
 	}
 

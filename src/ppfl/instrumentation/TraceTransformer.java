@@ -157,7 +157,8 @@ public class TraceTransformer implements ClassFileTransformer {
 				fileHandler.setFormatter(new Formatter() {
 					@Override
 					public String format(LogRecord record) {
-						return record.getLevel() + ":" + record.getMessage() + "\n";
+						return record.getMessage();
+						//return record.getLevel() + ":" + record.getMessage() + "\n";
 					}
 				});
 
