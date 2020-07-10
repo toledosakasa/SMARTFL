@@ -1,5 +1,8 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -204,10 +207,28 @@ public class OpcodeInst {
 				System.out.println("Observe " + stmt.getName() + " as true");
 			}
 		}
+		//uses
+		List<Node> prednodes = new ArrayList<Node>();
+		List<Node> usenodes = new ArrayList<Node>();
+		Node defnode = null;
+		if(info.getintvalue("load")!=null) {
+			//TODO
+			
+		}
+		if(info.getintvalue("popnum")!=null) {
+			//TODO
+		}
+		//defs
 		//stack
-		if(info.getintvalue("pushnum")!=0) {
+		if(info.getintvalue("pushnum")!=null) {
 			//TODO
 			//graph.runtimestack.add(new Node())
+			//setup runtimestack, maintain map(stackcount)
+			
+		}
+		if(info.getintvalue("store")!=null) {
+			//TODO
+			//setup localvar
 		}
 		
 	}

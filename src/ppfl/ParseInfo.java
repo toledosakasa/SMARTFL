@@ -43,10 +43,10 @@ public class ParseInfo {
 		return null;
 	}
 
-	public int getintvalue(String stype) {
+	public Integer getintvalue(String stype) {
 		if (this.tracemap.containsKey(stype))
 			return Integer.valueOf(this.tracemap.get(stype));
-		return 0;
+		return null;
 	}
 
 }

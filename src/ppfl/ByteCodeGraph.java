@@ -100,90 +100,90 @@ public class ByteCodeGraph {
 		}
 	}
 
-	public FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, List<String> ops,
-			StmtNode stmt) {
-		HashSet<String> t = new HashSet<String>();
-		for (Set<String> use : uses) {
-			t.addAll(use);
-		}
-		return buildFactor(def, preds, t, ops, stmt);
-	}
+//	public FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, List<String> ops,
+//			StmtNode stmt) {
+//		HashSet<String> t = new HashSet<String>();
+//		for (Set<String> use : uses) {
+//			t.addAll(use);
+//		}
+//		return buildFactor(def, preds, t, ops, stmt);
+//	}
 
-	public FactorNode buildFactor(String def, Set<Integer> preds, Set<String> uses, List<String> ops, StmtNode stmt) {
+	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops, StmtNode stmt) {
 
-		// deal with Declaration and use/pred in the same line
-		// (e.g. for(int i = 0;i < n;i++))
-		// In this case, some use/pred are not in varcountmap.
-		Node defnode = null;
-		boolean initDef = false;
-		if (preds != null)
-			for (Integer i : preds) {
-				String s = LineMappingVisitor.getPredName(i);
-				if (!varcountmap.containsKey(s))
-					initDef = true;
-			}
-		if (uses != null)
-			for (String s : uses) {
-				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
-					if (!varcountmap.containsKey(s))
-						initDef = true;
-				}
-			}
-		// Add def earlier. for(int i = 1;i < n;i++) def:i#1 use:i#1
-		if (initDef) {
-			System.out.println("initdef " + def);
-			if (!varcountmap.containsKey(def)) {
-				varcountmap.put(def, 1);
-			} else {
-				varcountmap.put(def, varcountmap.get(def) + 1);
-			}
-			String defname = getVarName(def, varcountmap);
-			defnode = new Node(defname, testname, stmt);
-			// System.out.println("Adding def: " + defname);
-			addNode(defname, defnode);
-		}
-
-		List<Node> prednodes = new ArrayList<Node>();
-		if (preds != null)
-			for (Integer i : preds) {
-				String s = LineMappingVisitor.getPredName(i);
-				if (!varcountmap.containsKey(s)) {
-					// assert(i == )
-					continue;
-				}
-				String predname = getVarName(s, varcountmap);
-				prednodes.add(getNode(predname));
-			}
-		List<Node> usenodes = new ArrayList<Node>();
-		if (uses != null)
-			for (String s : uses) {
-				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
-					// System.out.print(s + " ");
-					if (!varcountmap.containsKey(s)) {
-						System.out.println("Undefined use:" + s);
-						// assert(false);
-						continue;
-					}
-					assert (varcountmap.containsKey(s));
-					String usename = getVarName(s, varcountmap);
-					// System.out.println("Setting uses: " + usename);
-					usenodes.add(getNode(usename));
-				}
-			}
-
-		// deal with def here.
-		// when a = a + 1; occurs, use should be a#1, def should be a#2
-		if (!initDef) {
-			if (!varcountmap.containsKey(def)) {
-				varcountmap.put(def, 1);
-			} else {
-				varcountmap.put(def, varcountmap.get(def) + 1);
-			}
-			String defname = getVarName(def, varcountmap);
-			defnode = new Node(defname, testname, stmt);
-			// System.out.println("Adding def: " + defname);
-			addNode(defname, defnode);
-		}
+//		// deal with Declaration and use/pred in the same line
+//		// (e.g. for(int i = 0;i < n;i++))
+//		// In this case, some use/pred are not in varcountmap.
+//		Node defnode = null;
+//		boolean initDef = false;
+//		if (preds != null)
+//			for (Integer i : preds) {
+//				String s = LineMappingVisitor.getPredName(i);
+//				if (!varcountmap.containsKey(s))
+//					initDef = true;
+//			}
+//		if (uses != null)
+//			for (String s : uses) {
+//				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
+//					if (!varcountmap.containsKey(s))
+//						initDef = true;
+//				}
+//			}
+//		// Add def earlier. for(int i = 1;i < n;i++) def:i#1 use:i#1
+//		if (initDef) {
+//			System.out.println("initdef " + def);
+//			if (!varcountmap.containsKey(def)) {
+//				varcountmap.put(def, 1);
+//			} else {
+//				varcountmap.put(def, varcountmap.get(def) + 1);
+//			}
+//			String defname = getVarName(def, varcountmap);
+//			defnode = new Node(defname, testname, stmt);
+//			// System.out.println("Adding def: " + defname);
+//			addNode(defname, defnode);
+//		}
+//
+//		List<Node> prednodes = new ArrayList<Node>();
+//		if (preds != null)
+//			for (Integer i : preds) {
+//				String s = LineMappingVisitor.getPredName(i);
+//				if (!varcountmap.containsKey(s)) {
+//					// assert(i == )
+//					continue;
+//				}
+//				String predname = getVarName(s, varcountmap);
+//				prednodes.add(getNode(predname));
+//			}
+//		List<Node> usenodes = new ArrayList<Node>();
+//		if (uses != null)
+//			for (String s : uses) {
+//				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
+//					// System.out.print(s + " ");
+//					if (!varcountmap.containsKey(s)) {
+//						System.out.println("Undefined use:" + s);
+//						// assert(false);
+//						continue;
+//					}
+//					assert (varcountmap.containsKey(s));
+//					String usename = getVarName(s, varcountmap);
+//					// System.out.println("Setting uses: " + usename);
+//					usenodes.add(getNode(usename));
+//				}
+//			}
+//
+//		// deal with def here.
+//		// when a = a + 1; occurs, use should be a#1, def should be a#2
+//		if (!initDef) {
+//			if (!varcountmap.containsKey(def)) {
+//				varcountmap.put(def, 1);
+//			} else {
+//				varcountmap.put(def, varcountmap.get(def) + 1);
+//			}
+//			String defname = getVarName(def, varcountmap);
+//			defnode = new Node(defname, testname, stmt);
+//			// System.out.println("Adding def: " + defname);
+//			addNode(defname, defnode);
+//		}
 
 		Edge dedge = new Edge();
 		dedge.setnode(defnode);
