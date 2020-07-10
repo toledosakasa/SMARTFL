@@ -118,7 +118,7 @@ public class OpcodeInst {
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder("\n");
 		// ret.append("opcode="+this.opcode);
-		ret.append("opcode=" + this.form + "(" + this.opcode + ")\t" );
+		ret.append("opcode=" + this.form + "(" + this.opcode + ")\t");
 //		if (this.isinvoke) {
 //			int callindex = getu16bitpara(ci, index);
 //			ret.append(getmethodinfo(ci, callindex, constp));
@@ -177,7 +177,7 @@ public class OpcodeInst {
 		String tracemethod = info.tracemethod;
 		int linenumber = info.linenumber;
 		int byteindex = info.byteindex;
-		
+
 		StmtNode stmt = null;
 		String stmtname = traceclass + tracemethod + "#" + String.valueOf(linenumber);
 		// System.out.println("At line " + stmtname);
@@ -207,29 +207,38 @@ public class OpcodeInst {
 				System.out.println("Observe " + stmt.getName() + " as true");
 			}
 		}
-		//uses
+		// uses
 		List<Node> prednodes = new ArrayList<Node>();
 		List<Node> usenodes = new ArrayList<Node>();
 		Node defnode = null;
-		if(info.getintvalue("load")!=null) {
-			//TODO
-			
+		if (info.getintvalue("load") != null) {
+			int loadvar = info.getintvalue("load");
+			usenodes.add(graph.getNode(graph.getFormalVarNameWithIndex(loadvar)));
 		}
-		if(info.getintvalue("popnum")!=null) {
-			//TODO
+		if (info.getintvalue("popnum") != null) {
+			int instpopnum = info.getintvalue("popnum");
+			for (int i = 0; i < instpopnum; i++) {
+				usenodes.add(graph.runtimestack.pop());
+			}
 		}
-		//defs
-		//stack
-		if(info.getintvalue("pushnum")!=null) {
-			//TODO
-			//graph.runtimestack.add(new Node())
-			//setup runtimestack, maintain map(stackcount)
-			
+		// defs
+		// stack
+		if (info.getintvalue("pushnum") != null) {
+			int instpushnum = info.getintvalue("pushnum");
+			//push must not be more than 1
+			assert(instpushnum == 1);
+			graph.incStackIndex();
+			defnode = graph.getNode(graph.getFormalStackNameWithIndex());
+			graph.runtimestack.add(defnode);
 		}
-		if(info.getintvalue("store")!=null) {
-			//TODO
-			//setup localvar
+		if (info.getintvalue("store") != null) {
+			int storevar = info.getintvalue("store");
+			graph.incVarIndex(storevar);
+			defnode = graph.getNode(graph.getFormalVarNameWithIndex(storevar));
 		}
-		
+
+		// build factor.
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+
 	}
 }

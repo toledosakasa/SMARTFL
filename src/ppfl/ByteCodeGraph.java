@@ -38,7 +38,7 @@ public class ByteCodeGraph {
 	//stack tracing
 	public Stack<Node> runtimestack;
 	//
-	public Map<String, Integer> totalstackheight;
+	public Map<String, Integer> stackheightmap;
 
 
 	// local vars used by parsing
@@ -75,9 +75,16 @@ public class ByteCodeGraph {
 		this.auto_oracle = b;
 	}
 
+	public void initmaps() {
+		//TODO this could be incomplete.
+		this.varcountmap = new HashMap<String, Integer>();
+		this.stackheightmap = new HashMap<String,Integer>();
+		this.runtimestack  = new Stack<Node>();
+	}
+	
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
-		varcountmap = new HashMap<String, Integer>();
+		this.initmaps();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
 			String t;
@@ -219,6 +226,48 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
+	public void incStackIndex() {
+		String domain = this.getDomain();
+		if (!stackheightmap.containsKey(domain)) {
+			stackheightmap.put(domain, 1);
+		} else {
+			stackheightmap.put(domain, stackheightmap.get(domain) + 1);
+		}
+	}
+	
+	public void incVarIndex(int varindex) {
+		String def = this.getFormalVarName(varindex);
+		if (!varcountmap.containsKey(def)) {
+			varcountmap.put(def, 1);
+		} else {
+			varcountmap.put(def, varcountmap.get(def) + 1);
+		}
+	}
+	
+	public String getDomain() {
+		return this.parseinfo.traceclass +":"+ this.parseinfo.tracemethod + ":";
+	}
+	
+	public String getFormalStackName() {
+		String domain = this.getDomain();
+		int number = this.stackheightmap.get(domain);
+		return domain + "Stack#" + String.valueOf(number);
+	}
+	
+	public String getFormalStackNameWithIndex() {
+		return getVarName(getFormalStackName(),this.varcountmap);
+	}
+	
+	public String getFormalVarName(int varindex) {
+		String name = String.valueOf(varindex);
+		return this.parseinfo.traceclass +":"+ this.parseinfo.tracemethod + ":" + name;
+	}
+	
+	public String getFormalVarNameWithIndex(int varindex)
+	{
+		return getVarName(getFormalVarName(varindex),this.varcountmap);
+	}
+	
 	public String getVarName(String name, Map<String, Integer> map) {
 		int count = map.get(name);
 		return name + "#" + String.valueOf(count);
