@@ -6,18 +6,20 @@ import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 
 //24,38-41
-public class DloadInst extends OpcodeInst {
+public class Dload_NInst extends OpcodeInst {
 
 	int loadindex;
 
-	public DloadInst(int _form) {
+	public Dload_NInst(int _form, int _loadindex) {
 		super(_form, 1, 0);
+		loadindex = _loadindex;
 	}
+
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
-		ret.append(",load=" + getpara(ci, index, 1));
+		ret.append(",load=" + loadindex);
 		return ret.toString();
 	}
 

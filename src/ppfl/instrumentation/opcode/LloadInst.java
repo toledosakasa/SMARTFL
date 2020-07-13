@@ -5,7 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 
-//22,30-33
+//22
 public class LloadInst extends OpcodeInst {
 
 	int loadindex;
@@ -14,14 +14,10 @@ public class LloadInst extends OpcodeInst {
 		super(_form, 1, 0);
 	}
 
-	public LloadInst(int _form, int _loadindex) {
-		super(_form, 1, 0);
-		loadindex = _loadindex;
-	}
-
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		ret.append(",load=" + getpara(ci, index, 1));
 		return ret.toString();
 	}
 

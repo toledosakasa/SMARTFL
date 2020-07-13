@@ -5,19 +5,20 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 
-//24,38-41
-public class DloadInst extends OpcodeInst {
+//23,34-37
+public class Fload_NInst extends OpcodeInst {
 
 	int loadindex;
-
-	public DloadInst(int _form) {
-		super(_form, 1, 0);
+	
+	public Fload_NInst(int _form,int _loadindex) {
+		super(_form,1,0);
+		loadindex = _loadindex;
 	}
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
-		ret.append(",load=" + getpara(ci, index, 1));
+		ret.append(",load=" + loadindex);
 		return ret.toString();
 	}
 
@@ -26,7 +27,7 @@ public class DloadInst extends OpcodeInst {
 			throws BadBytecode {
 		int instpos = ci.insertGap(4);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.tsindex_double, instpos + 1);
+		ci.write16bit(cbi.tsindex_float, instpos + 1);
 	}
 
 }

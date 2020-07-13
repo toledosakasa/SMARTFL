@@ -14,14 +14,10 @@ public class FloadInst extends OpcodeInst {
 		super(_form, 1, 0);
 	}
 
-	public FloadInst(int _form, int _loadindex) {
-		super(_form, 1, 0);
-		loadindex = _loadindex;
-	}
-
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		ret.append(",load=" + getpara(ci, index, 1));
 		return ret.toString();
 	}
 
