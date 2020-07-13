@@ -5,7 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 
-//24,38-41
+//24
 public class DloadInst extends OpcodeInst {
 
 	int loadindex;

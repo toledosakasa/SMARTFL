@@ -15,7 +15,6 @@ public class Iload_NInst extends OpcodeInst {
 		loadindex = _loadindex;
 	}
 
-
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));

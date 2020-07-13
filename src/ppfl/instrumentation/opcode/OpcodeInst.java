@@ -225,8 +225,8 @@ public class OpcodeInst {
 		// stack
 		if (info.getintvalue("pushnum") != null) {
 			int instpushnum = info.getintvalue("pushnum");
-			//push must not be more than 1
-			assert(instpushnum == 1);
+			// push must not be more than 1
+			assert (instpushnum == 1);
 			graph.incStackIndex();
 			defnode = graph.getNode(graph.getFormalStackNameWithIndex());
 			graph.runtimestack.add(defnode);

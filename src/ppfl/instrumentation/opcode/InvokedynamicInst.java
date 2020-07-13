@@ -18,10 +18,10 @@ public class InvokedynamicInst extends OpcodeInst {
 		ret.append(getmethodinfo(ci, callindex, constp));
 		return ret.toString();
 	}
-	
+
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
-		//TODO
+		// TODO
 	}
 
 }

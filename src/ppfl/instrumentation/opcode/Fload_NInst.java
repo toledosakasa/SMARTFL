@@ -5,13 +5,13 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 
-//23,34-37
+//34-37
 public class Fload_NInst extends OpcodeInst {
 
 	int loadindex;
-	
-	public Fload_NInst(int _form,int _loadindex) {
-		super(_form,1,0);
+
+	public Fload_NInst(int _form, int _loadindex) {
+		super(_form, 1, 0);
 		loadindex = _loadindex;
 	}
 
