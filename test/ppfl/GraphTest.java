@@ -87,6 +87,27 @@ class GraphTest {
 		return pgraph;
 	}
 
+	ByteCodeGraph dominit_bytecode() {
+		String ppflroot = ".";
+		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
+		String filepatht = ppflroot + "\\test\\trace\\DomainTest.java";
+		String tracepatht = ppflroot + "\\test\\trace\\logs\\mytrace\\DomainTest.test.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		// pgraph.observe("foo.main#14", true);
+		// pgraph.observe("a#3#3", false);
+		// pgraph.observe("trace.DomainTest.test#18", true);
+		// pgraph.observe("a#9#3", false);
+		//pgraph.parsesource(filepatht);
+		// 2nd parameter : test name(must be the same as in junit test, otherwise
+		// auto-oracle will fail)
+		// 3rd parameter : test execution state (pass = true, fail = false)
+		pgraph.parsetrace(tracepatht, "test", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+	
 	@Test
 	void domaintest() {
 		boolean fail = false;
@@ -102,6 +123,21 @@ class GraphTest {
 		assertFalse(fail);
 	}
 
+	@Test
+	void domaintest_bytecode() {
+		boolean fail = false;
+		ByteCodeGraph pgraph = dominit_bytecode();
+		try {
+			pgraph.inference();
+			pgraph.printprobs();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			fail = true;
+			e.printStackTrace();
+		}
+		assertFalse(fail);
+	}
+	
 	@Test
 	void BFtest() {
 		boolean fail = false;

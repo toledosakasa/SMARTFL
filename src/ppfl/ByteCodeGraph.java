@@ -49,8 +49,8 @@ public class ByteCodeGraph {
 	// output (return value) of the function being tested as 0.0/1.0 depends on
 	// parameter testpass(true = 1.0,false = 0.0)
 	public boolean auto_oracle;
-	String last_defined_var = null;
-	StmtNode last_defined_stmt = null;
+	public Node last_defined_var = null;
+	public StmtNode last_defined_stmt = null;
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
@@ -92,14 +92,14 @@ public class ByteCodeGraph {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
 				this.parseinfo = new ParseInfo(t);
+				//System.out.println(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
 			if (auto_oracle) {
-				String observename = getVarName(last_defined_var, varcountmap);
-				this.observe(observename, testpass);
-				System.out.println("Observe " + observename + " as " + testpass);
+				this.last_defined_var.observe(testpass);
+				System.out.println("Observe " + this.last_defined_var.name + " as " + testpass);
 			}
 			reader.close();
 		} catch (IOException e) {
@@ -228,10 +228,20 @@ public class ByteCodeGraph {
 
 	public void incStackIndex() {
 		String domain = this.getDomain();
+		System.out.println(domain);
 		if (!stackheightmap.containsKey(domain)) {
 			stackheightmap.put(domain, 1);
 		} else {
 			stackheightmap.put(domain, stackheightmap.get(domain) + 1);
+		}
+	}
+	
+	public void incVarIndex(int varindex,String traceclass,String tracemethod) {
+		String def = this.getFormalVarName(varindex,traceclass,tracemethod);
+		if (!varcountmap.containsKey(def)) {
+			varcountmap.put(def, 1);
+		} else {
+			varcountmap.put(def, varcountmap.get(def) + 1);
 		}
 	}
 	
@@ -250,17 +260,26 @@ public class ByteCodeGraph {
 	
 	public String getFormalStackName() {
 		String domain = this.getDomain();
-		int number = this.stackheightmap.get(domain);
-		return domain + "Stack#" + String.valueOf(number);
+		return domain + "Stack#";
 	}
 	
 	public String getFormalStackNameWithIndex() {
-		return getVarName(getFormalStackName(),this.varcountmap);
+		return getVarName(this.getDomain(),this.stackheightmap);
+	}
+	
+	public String getFormalVarName(int varindex, String traceclass,String tracemethod) {
+		String name = String.valueOf(varindex);
+		return traceclass +":"+ tracemethod + ":" + name;
 	}
 	
 	public String getFormalVarName(int varindex) {
 		String name = String.valueOf(varindex);
-		return this.parseinfo.traceclass +":"+ this.parseinfo.tracemethod + ":" + name;
+		return this.getDomain() + name;
+	}
+	
+	public String getFormalVarNameWithIndex(int varindex, String traceclass,String tracemethod)
+	{
+		return getVarName(getFormalVarName(varindex, traceclass,tracemethod),this.varcountmap);
 	}
 	
 	public String getFormalVarNameWithIndex(int varindex)
@@ -269,6 +288,8 @@ public class ByteCodeGraph {
 	}
 	
 	public String getVarName(String name, Map<String, Integer> map) {
+		if(!map.containsKey(name))
+			System.out.println(name);
 		int count = map.get(name);
 		return name + "#" + String.valueOf(count);
 	}

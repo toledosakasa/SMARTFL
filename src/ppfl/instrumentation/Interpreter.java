@@ -72,7 +72,8 @@ public class Interpreter {
 	}
 
 	public static void main(String args[]) {
-		printopcodes();
+		//OpcodeInst.splitMethodDesc("(BIDDLjava/lang/Object;I)I");
+		//printopcodes();
 	}
 
 	public static void init() {

@@ -32,7 +32,7 @@ public class ParseInfo {
 		this.tracemethod = lineinfos[1];
 		this.linenumber = Integer.valueOf(lineinfos[2]);
 		this.byteindex = Integer.valueOf(lineinfos[3]);
-		String[] opcodeinfos = this.getvalue("opcode").split("()");
+		String[] opcodeinfos = this.getvalue("opcode").split("\\(|\\)");
 		this.form = Integer.valueOf(opcodeinfos[0]);
 		this.opcode = opcodeinfos[1];
 	}
@@ -49,4 +49,9 @@ public class ParseInfo {
 		return null;
 	}
 
+	public void print() {
+		for (String s : tracemap.keySet()) {
+			System.out.println(s + "=" + tracemap.get(s));
+		}
+	}
 }

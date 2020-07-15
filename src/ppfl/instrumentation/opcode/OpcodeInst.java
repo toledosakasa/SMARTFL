@@ -2,6 +2,8 @@ package ppfl.instrumentation.opcode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
@@ -39,12 +41,53 @@ public class OpcodeInst {
 	// for weird instructions(e.g. iinc)
 	paratype para[] = new paratype[2];
 
+//	//for function calls
+//	String calltype;
+//	String callname;
+//	String callclass;
+
 	public OpcodeInst(int _form, int _pushnum, int _popnum) {
 		form = _form;
 		opcode = Mnemonic.OPCODE[_form];
 		pushnum = _pushnum;
 		popnum = _popnum;
 		this.isinvoke = false;
+	}
+
+	public static int getArgNumByDesc(String desc) {
+		return splitMethodDesc(desc).size();
+	}
+
+	public static ArrayList<String> splitMethodDesc(String desc) {
+		// \[*L[^;]+;|\[[ZBCSIFDJ]|[ZBCSIFDJ]
+		int beginIndex = desc.indexOf('(');
+		int endIndex = desc.lastIndexOf(')');
+		if ((beginIndex == -1 && endIndex != -1) || (beginIndex != -1 && endIndex == -1)) {
+			System.err.println(beginIndex);
+			System.err.println(endIndex);
+			throw new RuntimeException();
+		}
+		String x0;
+		if (beginIndex == -1 && endIndex == -1) {
+			x0 = desc;
+		} else {
+			x0 = desc.substring(beginIndex + 1, endIndex);
+		}
+		Pattern pattern = Pattern.compile("\\[*L[^;]+;|\\[[ZBCSIFDJ]|[ZBCSIFDJ]");
+		Matcher matcher = pattern.matcher(x0);
+
+		ArrayList<String> listMatches = new ArrayList<String>();
+
+		while (matcher.find()) {
+			listMatches.add(matcher.group());
+		}
+
+//        for(String s : listMatches)
+//        {
+//            System.out.print(s + " ");
+//        }
+//        System.out.println();
+		return listMatches;
 	}
 
 	public void setStore(paratype t, String _storevalue) {
@@ -109,8 +152,10 @@ public class OpcodeInst {
 	String getmethodinfo(CodeIterator ci, int callindex, ConstPool constp) {
 		if (ci == null)
 			return null;
-		return ",calltype=" + constp.getMethodrefType(callindex) + ",callclass="
-				+ constp.getMethodrefClassName(callindex) + ",callname=" + constp.getMethodrefName(callindex);
+		String calltype = constp.getMethodrefType(callindex);
+		String callclass = constp.getMethodrefClassName(callindex);
+		String callname = constp.getMethodrefName(callindex);
+		return ",calltype=" + calltype + ",callclass=" + callclass + ",callname=" + callname;
 	}
 
 	// temporary.
@@ -171,7 +216,7 @@ public class OpcodeInst {
 //		}
 	}
 
-	public void buildtrace(ByteCodeGraph graph) {
+	public StmtNode buildstmt(ByteCodeGraph graph) {
 		ParseInfo info = graph.parseinfo;
 		String traceclass = info.traceclass;
 		String tracemethod = info.tracemethod;
@@ -197,7 +242,7 @@ public class OpcodeInst {
 		}
 
 		if (graph.max_loop > 0 && graph.stmtcountmap.get(stmtname) > graph.max_loop) {
-			return;
+			return null;
 		}
 
 		// auto-assigned observation: test function always true
@@ -207,13 +252,29 @@ public class OpcodeInst {
 				System.out.println("Observe " + stmt.getName() + " as true");
 			}
 		}
+
+		return stmt;
+	}
+
+	// override needed.
+	public void buildtrace(ByteCodeGraph graph) {
+		// build the stmtnode(common)
+		StmtNode stmt = buildstmt(graph);
+
+		ParseInfo info = graph.parseinfo;
+		info.print();
 		// uses
 		List<Node> prednodes = new ArrayList<Node>();
 		List<Node> usenodes = new ArrayList<Node>();
 		Node defnode = null;
 		if (info.getintvalue("load") != null) {
 			int loadvar = info.getintvalue("load");
-			usenodes.add(graph.getNode(graph.getFormalVarNameWithIndex(loadvar)));
+			Node node = graph.getNode(graph.getFormalVarName(loadvar));
+			if (node == null) {
+				System.out.println(graph.getFormalVarName(loadvar));
+			}
+			assert (node != null);
+			usenodes.add(node);
 		}
 		if (info.getintvalue("popnum") != null) {
 			int instpopnum = info.getintvalue("popnum");
@@ -228,17 +289,29 @@ public class OpcodeInst {
 			// push must not be more than 1
 			assert (instpushnum == 1);
 			graph.incStackIndex();
-			defnode = graph.getNode(graph.getFormalStackNameWithIndex());
+			String nodename = graph.getFormalStackNameWithIndex();
+			Node node = new Node(nodename, graph.testname, stmt);
+			graph.addNode(nodename, node);
+			defnode = graph.getNode(nodename);
+			assert (node == defnode);
 			graph.runtimestack.add(defnode);
 		}
 		if (info.getintvalue("store") != null) {
 			int storevar = info.getintvalue("store");
 			graph.incVarIndex(storevar);
-			defnode = graph.getNode(graph.getFormalVarNameWithIndex(storevar));
+			String nodename = graph.getFormalVarNameWithIndex(storevar);
+			Node node = new Node(nodename, graph.testname, stmt);
+			graph.addNode(nodename, node);
+			defnode = graph.getNode(nodename);
+			assert (node == defnode);
 		}
 
 		// build factor.
-		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-
+		if (defnode != null) {
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			if (graph.auto_oracle) {
+				graph.last_defined_var = defnode;
+			}
+		}
 	}
 }
