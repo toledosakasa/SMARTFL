@@ -269,10 +269,11 @@ public class OpcodeInst {
 		List<Node> usenodes = new ArrayList<Node>();
 		Node defnode = null;
 		if (info.getintvalue("load") != null) {
+
 			int loadvar = info.getintvalue("load");
-			Node node = graph.getNode(graph.getFormalVarName(loadvar));
+			Node node = graph.getNode(graph.getFormalVarNameWithIndex(loadvar));
 			if (node == null) {
-				System.out.println(graph.getFormalVarName(loadvar));
+				System.out.println(graph.getFormalVarNameWithIndex(loadvar));
 			}
 			assert (node != null);
 			usenodes.add(node);

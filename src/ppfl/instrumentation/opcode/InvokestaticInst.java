@@ -31,8 +31,6 @@ public class InvokestaticInst extends OpcodeInst {
 		StmtNode stmt = buildstmt(graph);
 
 		ParseInfo info = graph.parseinfo;
-		// uses
-
 		// defs
 		int argcnt = OpcodeInst.getArgNumByDesc(info.getvalue("calltype"));
 		for (int i = 0; i < argcnt; i++) {
@@ -43,36 +41,15 @@ public class InvokestaticInst extends OpcodeInst {
 			// static arguments starts with 0
 			String traceclass = info.getvalue("callclass");
 			String tracemethod = info.getvalue("callname");
-			graph.incVarIndex(i, traceclass, tracemethod);
-			String nodename = graph.getFormalVarName(i, traceclass, tracemethod);
+			int paravarindex = argcnt - i - 1;
+			//non-static
+			//paravarindex = argcnt -i;
+			graph.incVarIndex(paravarindex, traceclass, tracemethod);
+			String nodename = graph.getFormalVarNameWithIndex(paravarindex, traceclass, tracemethod);
 			Node defnode = new Node(nodename, graph.testname, stmt);
 			graph.addNode(nodename, defnode);
 			assert (defnode == graph.getNode(nodename));
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
-//		if (info.getintvalue("pushnum") != null) {
-//			int instpushnum = info.getintvalue("pushnum");
-//			// push must not be more than 1
-//			assert (instpushnum == 1);
-//			graph.incStackIndex();
-//			String nodename = graph.getFormalStackNameWithIndex();
-//			Node node = new Node(nodename, graph.testname, stmt);
-//			graph.addNode(nodename, node);
-//			defnode = graph.getNode(nodename);
-//			assert(node == defnode);
-//			graph.runtimestack.add(defnode);
-//		}
-//		if (info.getintvalue("store") != null) {
-//		int storevar = info.getintvalue("store");
-//		graph.incVarIndex(storevar);
-//		String nodename = graph.getFormalVarNameWithIndex(storevar);
-//		Node node = new Node(nodename,graph.testname,stmt);
-//		graph.addNode(nodename, node);
-//		defnode = graph.getNode(nodename);
-//		assert(node == defnode);
-//		}
-
-		// build factor.
-
 	}
 }

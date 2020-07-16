@@ -1,7 +1,14 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
+import ppfl.Node;
+import ppfl.ParseInfo;
+import ppfl.StmtNode;
 
 //132
 public class IincInst extends OpcodeInst {
@@ -13,6 +20,39 @@ public class IincInst extends OpcodeInst {
 		super(_form, 0, 0);
 	}
 
+	@Override
+	public void buildtrace(ByteCodeGraph graph) {
+		// build the stmtnode(common)
+		StmtNode stmt = buildstmt(graph);
+
+		ParseInfo info = graph.parseinfo;
+		// info.print();
+		// uses
+		List<Node> prednodes = new ArrayList<Node>();
+		List<Node> usenodes = new ArrayList<Node>();
+		Node defnode = null;
+		
+		int varindex = info.getintvalue("VAR");
+		int incconst = info.getintvalue("CONST");
+		
+		//use
+		String nodename = graph.getFormalVarNameWithIndex(varindex);
+		usenodes.add(graph.getNode(nodename));
+		//def
+		graph.incVarIndex(varindex);
+		nodename = graph.getFormalVarNameWithIndex(varindex);
+		defnode = new Node(nodename, graph.testname, stmt);
+		graph.addNode(nodename, defnode);
+
+		// build factor.
+		if (defnode != null) {
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			if (graph.auto_oracle) {
+				graph.last_defined_var = defnode;
+			}
+		}
+	}
+	
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));

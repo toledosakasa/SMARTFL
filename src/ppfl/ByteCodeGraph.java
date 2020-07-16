@@ -258,7 +258,7 @@ public class ByteCodeGraph {
 		return this.parseinfo.traceclass +":"+ this.parseinfo.tracemethod + ":";
 	}
 	
-	public String getFormalStackName() {
+	private String getFormalStackName() {
 		String domain = this.getDomain();
 		return domain + "#Stack";
 	}
@@ -267,12 +267,12 @@ public class ByteCodeGraph {
 		return getVarName(this.getFormalStackName(),this.stackheightmap);
 	}
 	
-	public String getFormalVarName(int varindex, String traceclass,String tracemethod) {
+	private String getFormalVarName(int varindex, String traceclass,String tracemethod) {
 		String name = String.valueOf(varindex);
 		return traceclass +":"+ tracemethod + ":" + name;
 	}
 	
-	public String getFormalVarName(int varindex) {
+	private String getFormalVarName(int varindex) {
 		String name = String.valueOf(varindex);
 		return this.getDomain() + name;
 	}
