@@ -227,8 +227,8 @@ public class ByteCodeGraph {
 	}
 
 	public void incStackIndex() {
-		String domain = this.getDomain();
-		System.out.println(domain);
+		String domain = this.getFormalStackName();
+		//System.out.println(domain);
 		if (!stackheightmap.containsKey(domain)) {
 			stackheightmap.put(domain, 1);
 		} else {
@@ -260,11 +260,11 @@ public class ByteCodeGraph {
 	
 	public String getFormalStackName() {
 		String domain = this.getDomain();
-		return domain + "Stack#";
+		return domain + "#Stack";
 	}
 	
 	public String getFormalStackNameWithIndex() {
-		return getVarName(this.getDomain(),this.stackheightmap);
+		return getVarName(this.getFormalStackName(),this.stackheightmap);
 	}
 	
 	public String getFormalVarName(int varindex, String traceclass,String tracemethod) {
