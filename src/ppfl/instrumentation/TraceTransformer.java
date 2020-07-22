@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -80,9 +82,26 @@ public class TraceTransformer implements ClassFileTransformer {
 					ConstPool constp = mi.getConstPool();
 					CallBackIndex cbi = new CallBackIndex(constp);
 
-					// iterate every instruction
+					// record line info
+					CodeIterator tempci = ca.iterator();
 					int lastln = -1;
-					while (ci.hasNext()) {
+
+					Map<Integer, String> linenumberinfomap = new HashMap<Integer, String>();
+					for (int i = 0; tempci.hasNext(); i++) {
+						int index = tempci.lookAhead();
+						int ln = mi.getLineNumber(index);
+						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
+								+ index;
+						if (ln != lastln) {
+							lastln = ln;
+							System.out.println(ln);
+						}
+						linenumberinfomap.put(i, linenumberinfo);
+						tempci.next();
+					}
+					// iterate every instruction
+
+					for (int i = 0; ci.hasNext(); i++) {
 						// lookahead the next instruction.
 						int index = ci.lookAhead();
 						int op = ci.byteAt(index);
@@ -92,19 +111,13 @@ public class TraceTransformer implements ClassFileTransformer {
 						String opc = Mnemonic.OPCODE[op];
 						System.out.println(opc);
 						// linenumber information.
-						int ln = mi.getLineNumber(index);
-						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
-								+ index;
-						if (ln != lastln) {
-							lastln = ln;
-							System.out.println(ln);
-						}
+						String linenumberinfo = linenumberinfomap.get(i);
 
 						// insert bytecode right before this inst.
 						// print basic information of this instruction
 						oi.insertByteCodeBefore(ci, index, constp, linenumberinfo, cbi);
 						// move to the next inst. everything below this will be inserted after the inst.
-						//ci.next();
+						// ci.next();
 						index = ci.next();
 						// print advanced information(e.g. value pushed)
 						oi.insertByteCodeAfter(ci, index, constp, cbi);
@@ -158,7 +171,7 @@ public class TraceTransformer implements ClassFileTransformer {
 					@Override
 					public String format(LogRecord record) {
 						return record.getMessage();
-						//return record.getLevel() + ":" + record.getMessage() + "\n";
+						// return record.getLevel() + ":" + record.getMessage() + "\n";
 					}
 				});
 

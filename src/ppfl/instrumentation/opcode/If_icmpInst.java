@@ -13,6 +13,7 @@ public class If_icmpInst extends OpcodeInst {
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		ret.append(",branchbyte="+String.valueOf(this.gets16bitpara(ci, index)));
 		return ret.toString();
 	}
 
