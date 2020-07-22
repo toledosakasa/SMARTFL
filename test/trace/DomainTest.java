@@ -14,6 +14,8 @@ class DomainTest {
 		if (a > 1)
 			a = a + 1;
 		a = a + 2;
+		while(a < 7)
+			a++;
 //        double x = 1.0;
 //        double y = 1.1;
 //        double z = 1.0;

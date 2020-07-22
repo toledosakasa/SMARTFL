@@ -75,47 +75,52 @@ public class TraceTransformer implements ClassFileTransformer {
 					// get iterator
 					MethodInfo mi = m.getMethodInfo();
 					CodeAttribute ca = mi.getCodeAttribute();
-					CodeIterator ci = ca.iterator();
 
 					// add constants to constpool.
 					// index will be used during instrumentation.
 					ConstPool constp = mi.getConstPool();
 					CallBackIndex cbi = new CallBackIndex(constp);
 
-					// record line info
+					// record line info and instructions, since instrumentation will change
+					// branchbyte and byte index.
 					CodeIterator tempci = ca.iterator();
 					int lastln = -1;
 
-					Map<Integer, String> linenumberinfomap = new HashMap<Integer, String>();
+					Map<Integer, String> instmap = new HashMap<Integer, String>();
 					for (int i = 0; tempci.hasNext(); i++) {
 						int index = tempci.lookAhead();
 						int ln = mi.getLineNumber(index);
+						int op = tempci.byteAt(index);
+						OpcodeInst oi = Interpreter.map[op];
+
+						// debugging:opcode
+						String opc = Mnemonic.OPCODE[op];
+						System.out.println(opc);
+
+						String getinst = oi.getinst(tempci, index, constp);
 						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
 								+ index;
 						if (ln != lastln) {
 							lastln = ln;
 							System.out.println(ln);
 						}
-						linenumberinfomap.put(i, linenumberinfo);
+						instmap.put(i, getinst + linenumberinfo);
 						tempci.next();
 					}
 					// iterate every instruction
 
+					CodeIterator ci = ca.iterator();
 					for (int i = 0; ci.hasNext(); i++) {
 						// lookahead the next instruction.
 						int index = ci.lookAhead();
 						int op = ci.byteAt(index);
 						OpcodeInst oi = Interpreter.map[op];
-
-						// debugging:opcode
-						String opc = Mnemonic.OPCODE[op];
-						System.out.println(opc);
 						// linenumber information.
-						String linenumberinfo = linenumberinfomap.get(i);
+						String instinfo = instmap.get(i);
 
 						// insert bytecode right before this inst.
 						// print basic information of this instruction
-						oi.insertByteCodeBefore(ci, index, constp, linenumberinfo, cbi);
+						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 						// move to the next inst. everything below this will be inserted after the inst.
 						// ci.next();
 						index = ci.next();

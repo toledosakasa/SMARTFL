@@ -175,13 +175,11 @@ public class OpcodeInst {
 			ret.append(",pushnum=" + this.pushnum);
 		return ret.toString();
 	}
-
+	
 	// there's no need to override this.
-	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String linenumberinfo,
+	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst,
 			CallBackIndex cbi) throws BadBytecode {
 
-		String inst = getinst(ci, index, constp);
-		inst = inst + linenumberinfo;
 		if (inst != null) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(8);
