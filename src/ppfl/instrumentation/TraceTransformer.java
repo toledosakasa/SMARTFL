@@ -34,7 +34,8 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	// The logger name
 	public static Logger TRACELOGGER = Logger.getLogger("PPFL_LOGGER");
-
+	public static Logger SOURCELOGGER = Logger.getLogger("PPFL_LOGGER_SOURCE");
+	
 	/** The internal form class name of the class to transform */
 	private String targetClassName;
 	/** The class loader of the class we want to transform */
@@ -42,7 +43,6 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	/** filename for logging */
 	private String logFile = null;
-
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
@@ -51,6 +51,9 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	public void setLogFile(String s) {
 		this.logFile = s;
+	}
+	
+	public void setSourceLogFile(String s) {
 	}
 
 	@Override
@@ -90,14 +93,14 @@ public class TraceTransformer implements ClassFileTransformer {
 					for (int i = 0; tempci.hasNext(); i++) {
 						int index = tempci.lookAhead();
 						int ln = mi.getLineNumber(index);
-						int op = tempci.byteAt(index);
-						OpcodeInst oi = Interpreter.map[op];
+						
 
 						// debugging:opcode
+						int op = tempci.byteAt(index);
 						String opc = Mnemonic.OPCODE[op];
 						System.out.println(opc);
 
-						String getinst = oi.getinst(tempci, index, constp);
+						String getinst = getinst_map(tempci, index, constp);
 						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
 								+ index;
 						if (ln != lastln) {
@@ -120,6 +123,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 						// insert bytecode right before this inst.
 						// print basic information of this instruction
+						this.SOURCELOGGER.log(Level.INFO,instinfo);
 						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 						// move to the next inst. everything below this will be inserted after the inst.
 						// ci.next();
@@ -160,12 +164,13 @@ public class TraceTransformer implements ClassFileTransformer {
 		LOGGER.addHandler(debugHandler);
 		LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
 		if (this.logFile != null) {
-			FileHandler fileHandler;
+			FileHandler fileHandler,sourcefileHandler;
 			ConsoleHandler consoleHandler;
 
 			consoleHandler = new ConsoleHandler();
 			consoleHandler.setLevel(Level.WARNING);
 			TRACELOGGER.addHandler(consoleHandler);
+			SOURCELOGGER.addHandler(consoleHandler);
 			LOGGER.log(Level.INFO, "[Agent] Logfile: " + this.logFile);
 			try {
 				fileHandler = new FileHandler(this.logFile);
@@ -173,6 +178,17 @@ public class TraceTransformer implements ClassFileTransformer {
 				fileHandler.setLevel(Level.INFO);
 
 				fileHandler.setFormatter(new Formatter() {
+					@Override
+					public String format(LogRecord record) {
+						return record.getMessage();
+						// return record.getLevel() + ":" + record.getMessage() + "\n";
+					}
+				});
+				
+				sourcefileHandler = new FileHandler(this.logFile + ".source.log");
+				SOURCELOGGER.addHandler(sourcefileHandler);
+				sourcefileHandler.setLevel(Level.INFO);
+				sourcefileHandler.setFormatter(new Formatter() {
 					@Override
 					public String format(LogRecord record) {
 						return record.getMessage();
@@ -198,6 +214,5 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 		inst = oi.getinst(ci, index, constp);
 		return inst;
-		// return this.getLogStmt(inst);
 	}
 }

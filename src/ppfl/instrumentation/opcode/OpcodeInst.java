@@ -176,6 +176,8 @@ public class OpcodeInst {
 		return ret.toString();
 	}
 	
+	
+	
 	// there's no need to override this.
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst,
 			CallBackIndex cbi) throws BadBytecode {
@@ -184,7 +186,8 @@ public class OpcodeInst {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(8);
 			int instindex = constp.addStringInfo(inst);
-			System.out.println(constp.getStringInfo(instindex));
+			//System.out.println(constp.getStringInfo(instindex));
+			
 			ci.writeByte(19, instpos);// ldc_w
 			ci.write16bit(instindex, instpos + 1);
 

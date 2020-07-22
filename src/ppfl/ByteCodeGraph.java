@@ -82,6 +82,25 @@ public class ByteCodeGraph {
 		this.runtimestack  = new Stack<Node>();
 	}
 	
+	public void parsesource(String sourcefilename) {
+		//TODO
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(sourcefilename));
+			String t;
+			while ((t = reader.readLine()) != null) {
+				if (t.isEmpty() || t.startsWith("###"))
+					continue;
+				this.parseinfo = new ParseInfo(t);
+				//System.out.println(this.parseinfo.form);
+				//Interpreter.map[this.parseinfo.form].buildtrace(this);
+				//TODO build source
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
 		this.initmaps();
