@@ -102,13 +102,19 @@ public class TraceTransformer implements ClassFileTransformer {
 
 						String getinst = getinst_map(tempci, index, constp);
 						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
-								+ index;
+								+ index + ",nextinst=";
 						if (ln != lastln) {
 							lastln = ln;
 							System.out.println(ln);
 						}
-						instmap.put(i, getinst + linenumberinfo);
 						tempci.next();
+						if(!tempci.hasNext()) {
+							linenumberinfo = linenumberinfo + "-1";
+						}else {
+							linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
+						}
+						instmap.put(i, getinst + linenumberinfo);
+						
 					}
 					// iterate every instruction
 
