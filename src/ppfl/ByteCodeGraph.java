@@ -321,7 +321,38 @@ public class ByteCodeGraph {
 		return nodemap.containsKey(getNodeName(name)) || stmtmap.containsKey(name);
 	}
 
-	public void addNode(String name, Node node) {
+	public Node addNewStackNode(StmtNode stmt) {
+		this.incStackIndex();
+		String nodename = this.getFormalStackNameWithIndex();
+		Node node = new Node(nodename, this.testname, stmt);
+		this.addNode(nodename, node);
+		this.runtimestack.add(node);
+		return node;
+	}
+	
+	public Node addNewVarNode(int varindex,StmtNode stmt) {
+		this.incVarIndex(varindex);
+		String nodename = this.getFormalVarNameWithIndex(varindex);
+		Node defnode = new Node(nodename, this.testname, stmt);
+		this.addNode(nodename, defnode);
+		return defnode;
+	}
+	
+	public Node addNewVarNode(int varindex,StmtNode stmt,String traceclass,String tracemethod) {
+		this.incVarIndex(varindex, traceclass, tracemethod);
+		String nodename = this.getFormalVarNameWithIndex(varindex, traceclass, tracemethod);
+		Node defnode = new Node(nodename, this.testname, stmt);
+		this.addNode(nodename, defnode);
+		return defnode;
+	}
+	
+	public StmtNode addNewStmt(String name) {
+		StmtNode stmt =  new StmtNode(name);
+		this.addNode(name, stmt);
+		return stmt;
+	}
+	
+	private void addNode(String name, Node node) {
 		if (node instanceof StmtNode) {
 			stmtmap.put(name, node);
 			stmts.add((StmtNode) node);

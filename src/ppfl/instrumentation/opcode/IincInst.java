@@ -39,10 +39,11 @@ public class IincInst extends OpcodeInst {
 		String nodename = graph.getFormalVarNameWithIndex(varindex);
 		usenodes.add(graph.getNode(nodename));
 		//def
-		graph.incVarIndex(varindex);
-		nodename = graph.getFormalVarNameWithIndex(varindex);
-		defnode = new Node(nodename, graph.testname, stmt);
-		graph.addNode(nodename, defnode);
+		defnode = graph.addNewVarNode(varindex, stmt);
+//		graph.incVarIndex(varindex);
+//		nodename = graph.getFormalVarNameWithIndex(varindex);
+//		defnode = new Node(nodename, graph.testname, stmt);
+//		graph.addNode(nodename, defnode);
 
 		// build factor.
 		if (defnode != null) {

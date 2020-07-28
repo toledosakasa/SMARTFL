@@ -44,11 +44,12 @@ public class InvokestaticInst extends OpcodeInst {
 			int paravarindex = argcnt - i - 1;
 			//non-static
 			//paravarindex = argcnt -i;
-			graph.incVarIndex(paravarindex, traceclass, tracemethod);
-			String nodename = graph.getFormalVarNameWithIndex(paravarindex, traceclass, tracemethod);
-			Node defnode = new Node(nodename, graph.testname, stmt);
-			graph.addNode(nodename, defnode);
-			assert (defnode == graph.getNode(nodename));
+			Node defnode = graph.addNewVarNode(paravarindex, stmt, traceclass, tracemethod);
+//			graph.incVarIndex(paravarindex, traceclass, tracemethod);
+//			String nodename = graph.getFormalVarNameWithIndex(paravarindex, traceclass, tracemethod);
+//			Node defnode = new Node(nodename, graph.testname, stmt);
+//			graph.addNode(nodename, defnode);
+//			assert (defnode == graph.getNode(nodename));
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
 	}

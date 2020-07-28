@@ -229,8 +229,9 @@ public class OpcodeInst {
 		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + String.valueOf(byteindex);
 		if (!graph.hasNode(stmtname)) {
-			stmt = new StmtNode(stmtname);
-			graph.addNode(stmtname, stmt);
+//			stmt = new StmtNode(stmtname);
+//			graph.addNode(stmtname, stmt);
+			stmt = graph.addNewStmt(stmtname);
 		} else {
 			stmt = (StmtNode) graph.getNode(stmtname);
 			assert (stmt.isStmt());
@@ -291,22 +292,22 @@ public class OpcodeInst {
 			int instpushnum = info.getintvalue("pushnum");
 			// push must not be more than 1
 			assert (instpushnum == 1);
-			graph.incStackIndex();
-			String nodename = graph.getFormalStackNameWithIndex();
-			Node node = new Node(nodename, graph.testname, stmt);
-			graph.addNode(nodename, node);
-			defnode = graph.getNode(nodename);
-			assert (node == defnode);
-			graph.runtimestack.add(defnode);
+			defnode = graph.addNewStackNode(stmt);
+//			graph.incStackIndex();
+//			String nodename = graph.getFormalStackNameWithIndex();
+//			Node node = new Node(nodename, graph.testname, stmt);
+//			graph.addNode(nodename, node);
+//			defnode = graph.getNode(nodename);
+//			assert (node == defnode);
+			
 		}
 		if (info.getintvalue("store") != null) {
 			int storevar = info.getintvalue("store");
-			graph.incVarIndex(storevar);
-			String nodename = graph.getFormalVarNameWithIndex(storevar);
-			Node node = new Node(nodename, graph.testname, stmt);
-			graph.addNode(nodename, node);
-			defnode = graph.getNode(nodename);
-			assert (node == defnode);
+			defnode = graph.addNewVarNode(storevar, stmt);
+//			graph.incVarIndex(storevar);
+//			String nodename = graph.getFormalVarNameWithIndex(storevar);
+//			Node node = new Node(nodename, graph.testname, stmt);
+//			graph.addNode(nodename, node);
 		}
 
 		// build factor.
