@@ -158,6 +158,12 @@ class GraphTest {
 		Graph pgraph = dominit();
 		pgraph.check_bp_with_bf(true);
 	}
+	
+	@Test
+	void bptest_bytegraph() {
+		ByteCodeGraph pgraph = dominit_bytecode();
+		pgraph.check_bp_with_bf(true);
+	}
 
 	Graph mergeinit() {
 		boolean fail = false;

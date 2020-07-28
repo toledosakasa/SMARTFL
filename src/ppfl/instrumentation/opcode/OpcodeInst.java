@@ -175,19 +175,17 @@ public class OpcodeInst {
 			ret.append(",pushnum=" + this.pushnum);
 		return ret.toString();
 	}
-	
-	
-	
+
 	// there's no need to override this.
-	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst,
-			CallBackIndex cbi) throws BadBytecode {
+	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
+			throws BadBytecode {
 
 		if (inst != null) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(8);
 			int instindex = constp.addStringInfo(inst);
-			//System.out.println(constp.getStringInfo(instindex));
-			
+			// System.out.println(constp.getStringInfo(instindex));
+
 			ci.writeByte(19, instpos);// ldc_w
 			ci.write16bit(instindex, instpos + 1);
 
@@ -228,14 +226,15 @@ public class OpcodeInst {
 		String stmtname = traceclass + ":" + tracemethod + "#" + String.valueOf(linenumber);
 		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + String.valueOf(byteindex);
-		if (!graph.hasNode(stmtname)) {
-//			stmt = new StmtNode(stmtname);
-//			graph.addNode(stmtname, stmt);
-			stmt = graph.addNewStmt(stmtname);
-		} else {
-			stmt = (StmtNode) graph.getNode(stmtname);
-			assert (stmt.isStmt());
-		}
+//		if (!graph.hasNode(stmtname)) {
+////			stmt = new StmtNode(stmtname);
+////			graph.addNode(stmtname, stmt);
+//			stmt = graph.addNewStmt(stmtname);
+//		} else {
+//			stmt = (StmtNode) graph.getNode(stmtname);
+//			assert (stmt.isStmt());
+//		}
+		stmt = graph.getStmt(stmtname);
 
 		// count how many times this statment has been executed
 		if (graph.stmtcountmap.containsKey(stmtname)) {
@@ -273,11 +272,12 @@ public class OpcodeInst {
 		if (info.getintvalue("load") != null) {
 
 			int loadvar = info.getintvalue("load");
-			Node node = graph.getNode(graph.getFormalVarNameWithIndex(loadvar));
-			if (node == null) {
-				System.out.println(graph.getFormalVarNameWithIndex(loadvar));
-			}
-			assert (node != null);
+			// Node node = graph.getNode(graph.getFormalVarNameWithIndex(loadvar));
+			Node node = graph.getLoadNodeAsUse(loadvar);
+//			if (node == null) {
+//				System.out.println(graph.getFormalVarNameWithIndex(loadvar));
+//			}
+//			assert (node != null);
 			usenodes.add(node);
 		}
 		if (info.getintvalue("popnum") != null) {
@@ -299,7 +299,7 @@ public class OpcodeInst {
 //			graph.addNode(nodename, node);
 //			defnode = graph.getNode(nodename);
 //			assert (node == defnode);
-			
+
 		}
 		if (info.getintvalue("store") != null) {
 			int storevar = info.getintvalue("store");

@@ -36,8 +36,9 @@ public class IincInst extends OpcodeInst {
 		int incconst = info.getintvalue("CONST");
 		
 		//use
-		String nodename = graph.getFormalVarNameWithIndex(varindex);
-		usenodes.add(graph.getNode(nodename));
+		usenodes.add(graph.getLoadNodeAsUse(varindex));
+//		String nodename = graph.getFormalVarNameWithIndex(varindex);
+//		usenodes.add(graph.getNode(nodename));
 		//def
 		defnode = graph.addNewVarNode(varindex, stmt);
 //		graph.incVarIndex(varindex);

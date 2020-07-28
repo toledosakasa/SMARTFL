@@ -35,11 +35,10 @@ public class ByteCodeGraph {
 	public int bp_times = 100;
 	Random random;
 
-	//stack tracing
+	// stack tracing
 	public Stack<Node> runtimestack;
 	//
 	public Map<String, Integer> stackheightmap;
-
 
 	// local vars used by parsing
 	public ParseInfo parseinfo;
@@ -76,14 +75,14 @@ public class ByteCodeGraph {
 	}
 
 	public void initmaps() {
-		//TODO this could be incomplete.
+		// TODO this could be incomplete.
 		this.varcountmap = new HashMap<String, Integer>();
-		this.stackheightmap = new HashMap<String,Integer>();
-		this.runtimestack  = new Stack<Node>();
+		this.stackheightmap = new HashMap<String, Integer>();
+		this.runtimestack = new Stack<Node>();
 	}
-	
+
 	public void parsesource(String sourcefilename) {
-		//TODO
+		// TODO
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(sourcefilename));
 			String t;
@@ -91,16 +90,16 @@ public class ByteCodeGraph {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
 				this.parseinfo = new ParseInfo(t);
-				//System.out.println(this.parseinfo.form);
-				//Interpreter.map[this.parseinfo.form].buildtrace(this);
-				//TODO build source
+				// System.out.println(this.parseinfo.form);
+				// Interpreter.map[this.parseinfo.form].buildtrace(this);
+				// TODO build source
 			}
 			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
 		this.initmaps();
@@ -111,7 +110,7 @@ public class ByteCodeGraph {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
 				this.parseinfo = new ParseInfo(t);
-				//System.out.println(this.parseinfo.form);
+				// System.out.println(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
@@ -126,91 +125,8 @@ public class ByteCodeGraph {
 		}
 	}
 
-//	public FactorNode buildFactorWithArgUses(String def, Set<Integer> preds, List<Set<String>> uses, List<String> ops,
-//			StmtNode stmt) {
-//		HashSet<String> t = new HashSet<String>();
-//		for (Set<String> use : uses) {
-//			t.addAll(use);
-//		}
-//		return buildFactor(def, preds, t, ops, stmt);
-//	}
-
-	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops, StmtNode stmt) {
-
-//		// deal with Declaration and use/pred in the same line
-//		// (e.g. for(int i = 0;i < n;i++))
-//		// In this case, some use/pred are not in varcountmap.
-//		Node defnode = null;
-//		boolean initDef = false;
-//		if (preds != null)
-//			for (Integer i : preds) {
-//				String s = LineMappingVisitor.getPredName(i);
-//				if (!varcountmap.containsKey(s))
-//					initDef = true;
-//			}
-//		if (uses != null)
-//			for (String s : uses) {
-//				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
-//					if (!varcountmap.containsKey(s))
-//						initDef = true;
-//				}
-//			}
-//		// Add def earlier. for(int i = 1;i < n;i++) def:i#1 use:i#1
-//		if (initDef) {
-//			System.out.println("initdef " + def);
-//			if (!varcountmap.containsKey(def)) {
-//				varcountmap.put(def, 1);
-//			} else {
-//				varcountmap.put(def, varcountmap.get(def) + 1);
-//			}
-//			String defname = getVarName(def, varcountmap);
-//			defnode = new Node(defname, testname, stmt);
-//			// System.out.println("Adding def: " + defname);
-//			addNode(defname, defnode);
-//		}
-//
-//		List<Node> prednodes = new ArrayList<Node>();
-//		if (preds != null)
-//			for (Integer i : preds) {
-//				String s = LineMappingVisitor.getPredName(i);
-//				if (!varcountmap.containsKey(s)) {
-//					// assert(i == )
-//					continue;
-//				}
-//				String predname = getVarName(s, varcountmap);
-//				prednodes.add(getNode(predname));
-//			}
-//		List<Node> usenodes = new ArrayList<Node>();
-//		if (uses != null)
-//			for (String s : uses) {
-//				if (!s.equals(LineMappingVisitor.getConstName())) {// TODO deal with constants.
-//					// System.out.print(s + " ");
-//					if (!varcountmap.containsKey(s)) {
-//						System.out.println("Undefined use:" + s);
-//						// assert(false);
-//						continue;
-//					}
-//					assert (varcountmap.containsKey(s));
-//					String usename = getVarName(s, varcountmap);
-//					// System.out.println("Setting uses: " + usename);
-//					usenodes.add(getNode(usename));
-//				}
-//			}
-//
-//		// deal with def here.
-//		// when a = a + 1; occurs, use should be a#1, def should be a#2
-//		if (!initDef) {
-//			if (!varcountmap.containsKey(def)) {
-//				varcountmap.put(def, 1);
-//			} else {
-//				varcountmap.put(def, varcountmap.get(def) + 1);
-//			}
-//			String defname = getVarName(def, varcountmap);
-//			defnode = new Node(defname, testname, stmt);
-//			// System.out.println("Adding def: " + defname);
-//			addNode(defname, defnode);
-//		}
-
+	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
+			StmtNode stmt) {
 		Edge dedge = new Edge();
 		dedge.setnode(defnode);
 		defnode.add_edge(dedge);
@@ -245,26 +161,26 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
-	public void incStackIndex() {
+	private void incStackIndex() {
 		String domain = this.getFormalStackName();
-		//System.out.println(domain);
+		// System.out.println(domain);
 		if (!stackheightmap.containsKey(domain)) {
 			stackheightmap.put(domain, 1);
 		} else {
 			stackheightmap.put(domain, stackheightmap.get(domain) + 1);
 		}
 	}
-	
-	public void incVarIndex(int varindex,String traceclass,String tracemethod) {
-		String def = this.getFormalVarName(varindex,traceclass,tracemethod);
+
+	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
+		String def = this.getFormalVarName(varindex, traceclass, tracemethod);
 		if (!varcountmap.containsKey(def)) {
 			varcountmap.put(def, 1);
 		} else {
 			varcountmap.put(def, varcountmap.get(def) + 1);
 		}
 	}
-	
-	public void incVarIndex(int varindex) {
+
+	private void incVarIndex(int varindex) {
 		String def = this.getFormalVarName(varindex);
 		if (!varcountmap.containsKey(def)) {
 			varcountmap.put(def, 1);
@@ -272,52 +188,50 @@ public class ByteCodeGraph {
 			varcountmap.put(def, varcountmap.get(def) + 1);
 		}
 	}
-	
-	public String getDomain() {
-		return this.parseinfo.traceclass +":"+ this.parseinfo.tracemethod + ":";
+
+	private String getDomain() {
+		return this.parseinfo.traceclass + ":" + this.parseinfo.tracemethod + ":";
 	}
-	
+
 	private String getFormalStackName() {
 		String domain = this.getDomain();
 		return domain + "#Stack";
 	}
-	
-	public String getFormalStackNameWithIndex() {
-		return getVarName(this.getFormalStackName(),this.stackheightmap);
+
+	private String getFormalStackNameWithIndex() {
+		return getVarName(this.getFormalStackName(), this.stackheightmap);
 	}
-	
-	private String getFormalVarName(int varindex, String traceclass,String tracemethod) {
+
+	private String getFormalVarName(int varindex, String traceclass, String tracemethod) {
 		String name = String.valueOf(varindex);
-		return traceclass +":"+ tracemethod + ":" + name;
+		return traceclass + ":" + tracemethod + ":" + name;
 	}
-	
+
 	private String getFormalVarName(int varindex) {
 		String name = String.valueOf(varindex);
 		return this.getDomain() + name;
 	}
-	
-	public String getFormalVarNameWithIndex(int varindex, String traceclass,String tracemethod)
-	{
-		return getVarName(getFormalVarName(varindex, traceclass,tracemethod),this.varcountmap);
+
+	private String getFormalVarNameWithIndex(int varindex, String traceclass, String tracemethod) {
+		return getVarName(getFormalVarName(varindex, traceclass, tracemethod), this.varcountmap);
 	}
-	
-	public String getFormalVarNameWithIndex(int varindex)
-	{
-		return getVarName(getFormalVarName(varindex),this.varcountmap);
+
+	private String getFormalVarNameWithIndex(int varindex) {
+		return getVarName(getFormalVarName(varindex), this.varcountmap);
 	}
-	
-	public String getVarName(String name, Map<String, Integer> map) {
-		if(!map.containsKey(name))
+
+	private String getVarName(String name, Map<String, Integer> map) {
+		if (!map.containsKey(name))
 			System.out.println(name);
 		int count = map.get(name);
 		return name + "#" + String.valueOf(count);
 	}
 
-	public String getNodeName(String name) {
+	private String getNodeName(String name) {
 		return this.testname + "#" + name;
 	}
 
-	public boolean hasNode(String name) {
+	private boolean hasNode(String name) {
 		return nodemap.containsKey(getNodeName(name)) || stmtmap.containsKey(name);
 	}
 
@@ -329,29 +243,40 @@ public class ByteCodeGraph {
 		this.runtimestack.add(node);
 		return node;
 	}
-	
-	public Node addNewVarNode(int varindex,StmtNode stmt) {
+
+	public Node addNewVarNode(int varindex, StmtNode stmt) {
 		this.incVarIndex(varindex);
 		String nodename = this.getFormalVarNameWithIndex(varindex);
 		Node defnode = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, defnode);
 		return defnode;
 	}
-	
-	public Node addNewVarNode(int varindex,StmtNode stmt,String traceclass,String tracemethod) {
+
+	public Node addNewVarNode(int varindex, StmtNode stmt, String traceclass, String tracemethod) {
 		this.incVarIndex(varindex, traceclass, tracemethod);
 		String nodename = this.getFormalVarNameWithIndex(varindex, traceclass, tracemethod);
 		Node defnode = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, defnode);
 		return defnode;
 	}
-	
-	public StmtNode addNewStmt(String name) {
-		StmtNode stmt =  new StmtNode(name);
+
+	public StmtNode getStmt(String stmtname) {
+		StmtNode stmt;
+		if (!this.hasNode(stmtname)) {
+			stmt = this.addNewStmt(stmtname);
+		} else {
+			stmt = (StmtNode) this.getNode(stmtname);
+			assert (stmt.isStmt());
+		}
+		return stmt;
+	}
+
+	private StmtNode addNewStmt(String name) {
+		StmtNode stmt = new StmtNode(name);
 		this.addNode(name, stmt);
 		return stmt;
 	}
-	
+
 	private void addNode(String name, Node node) {
 		if (node instanceof StmtNode) {
 			stmtmap.put(name, node);
@@ -362,7 +287,11 @@ public class ByteCodeGraph {
 		}
 	}
 
-	public Node getNode(String name) {
+	public Node getLoadNodeAsUse(int loadvar) {
+		return this.getNode(this.getFormalVarNameWithIndex(loadvar));
+	}
+
+	private Node getNode(String name) {
 		if (nodemap.containsKey(getNodeName(name)))
 			return nodemap.get(getNodeName(name));
 		else if (stmtmap.containsKey(name))
