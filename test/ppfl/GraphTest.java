@@ -194,6 +194,35 @@ class GraphTest {
 		pgraph.check_bp_with_bf(true);
 	}
 
+	ByteCodeGraph mergeinit_bc() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.fail.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		//pgraph.parsesource(passpath);
+		pgraph.parsetrace(passtrace, "pass", true);
+		// pgraph.observe("trace.MergeTest.pass#18", true);
+		// pgraph.observe("a#9#2", true);
+		//pgraph.parsesource(failpath);
+		pgraph.parsetrace(failtrace, "fail", false);
+		// pgraph.observe("trace.MergeTest.fail#23", true);
+		// pgraph.observe("a#9#3", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+	
+	@Test
+	void mergetest_bc() {
+		ByteCodeGraph pgraph = mergeinit_bc();
+		pgraph.check_bp(true);
+	}
+	
 	Graph sqrtinit() {
 		String ppflroot = ".";
 		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
