@@ -34,7 +34,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	// The logger name
 	public static Logger TRACELOGGER = Logger.getLogger("PPFL_LOGGER");
-	public static Logger SOURCELOGGER = Logger.getLogger("PPFL_LOGGER_SOURCE");
+	public final Logger SOURCELOGGER = Logger.getLogger("PPFL_LOGGER_SOURCE");
 	
 	/** The internal form class name of the class to transform */
 	private String targetClassName;

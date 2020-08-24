@@ -1,8 +1,5 @@
 package ppfl.instrumentation;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.FileSystems;
@@ -16,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class InstrumentationAgent {
 	private static Logger LOGGER = LoggerFactory.getLogger(InstrumentationAgent.class);
 	private static String logFile = null;
-	private static String className = null;
+	private static String[] className = null;
 	private static List<String> classNames = null;
 	private static String prefix = null;
 
@@ -25,9 +22,7 @@ public class InstrumentationAgent {
 
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("class=")) {
-				className = s.split("=")[1];
-				classNames = new ArrayList<String>();
-				classNames.add(className);
+				className = s.split("=")[1].split(";");
 			}
 			if (s.startsWith("logfile=")) {
 				logFile = s.split("=")[1];
@@ -59,7 +54,7 @@ public class InstrumentationAgent {
 	public static void agentmain(String agentArgs, Instrumentation inst) {
 		LOGGER.info("[Agent] In agentmain method");
 
-		className = agentArgs;
+		className = agentArgs.split(";");
 		transformClass(inst);
 	}
 
@@ -94,39 +89,29 @@ public class InstrumentationAgent {
 //			return;
 //		}
 
-		for (String clazzname : classNames) {
+		for (String classname : className) {
 			// see if we can get the class using forName
 			try {
-				LOGGER.info("className:" + className);
-				targetCls = Class.forName(className);
+				LOGGER.info("className:" + classname);
+				targetCls = Class.forName(classname);
 				targetClassLoader = targetCls.getClassLoader();
 				transform(targetCls, targetClassLoader, instrumentation);
 				continue;
 			} catch (Exception ex) {
-				LOGGER.error("Class [{}] not found with Class.forName", className);
+				LOGGER.error("Class [{}] not found with Class.forName", classname);
 			}
 			// otherwise iterate all loaded classes and find what we want
 			for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
-				if (clazz.getName().equals(className)) {
+				if (clazz.getName().equals(classname)) {
 					targetCls = clazz;
 					targetClassLoader = targetCls.getClassLoader();
 					transform(targetCls, targetClassLoader, instrumentation);
 					continue;
 				}
 			}
-			throw new RuntimeException("Failed to find class [" + className + "]");
+			throw new RuntimeException("Failed to find class [" + classname + "]");
 		}
 
-	}
-
-	private static boolean isNeglect(String name) {
-		String negs[] = { "java", "org.slf4j" };
-		for (String neg : negs) {
-			if (name.startsWith(neg)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
