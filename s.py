@@ -19,7 +19,7 @@ for dir in dirs2make:
 def utf8open(filename):
 	return open(filename, encoding='utf-8',errors='ignore')
 
-def utf8open(filename,option)
+def utf8open(filename,option):
 	return open(filename, option, encoding='utf-8',errors='ignore')
 
 def btrace():
