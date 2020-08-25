@@ -17,10 +17,8 @@ for dir in dirs2make:
 # os.system("export BTRACE_HOME=%s" % (btrace_home))
 
 def utf8open(filename):
-	return open(filename, encoding='utf-8',errors='ignore')
+	return open(filename, 'w+', encoding='utf-8',errors='ignore')
 
-def utf8open(filename,option):
-	return open(filename, option, encoding='utf-8',errors='ignore')
 
 def btrace():
 	f=utf8open("%s/scripts/AllLines_pattern.java"%(btrace_home))
@@ -37,7 +35,7 @@ def btrace():
 				pattern_name = classname + "_pattern"
 				writestr = patternstr.replace('__CLASS__NAME__','trace.'+classname)
 				writestr = writestr.replace('AllLines',pattern_name)
-				tempf=utf8open("%s/%s.java"%(scriptroot,pattern_name),'w+')
+				tempf=utf8open("%s/%s.java"%(scriptroot,pattern_name))
 				tempf.write(writestr)
 				tempf.close()
 				
@@ -100,7 +98,7 @@ def mytrace():
 					f.close()
 					s = s.replace("#CLASSNAME#",classname)
 					s = s.replace("%TESTNAME%",testname)
-					f = utf8open("configs/mytrace/%s.%s.launch"%(classname,testname),'w+')
+					f = utf8open("configs/mytrace/%s.%s.launch"%(classname,testname))
 					f.write(s)
 					f.close()
 
