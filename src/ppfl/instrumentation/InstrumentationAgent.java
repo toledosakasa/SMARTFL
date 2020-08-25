@@ -19,7 +19,10 @@ public class InstrumentationAgent {
 	private static List<String> classNames = null;
 
 	public static void premain(String agentArgs, Instrumentation inst) {
-		//LOGGER.info("[Agent] In premain method");
+		System.out.println(agentArgs);
+		if (agentArgs == null || agentArgs == "")
+			return;
+		// LOGGER.info("[Agent] In premain method");
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter("/home/akarin/1.txt"));
 			writer.write("[Agent] In premain method");
@@ -28,9 +31,6 @@ public class InstrumentationAgent {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		System.out.println(agentArgs);
-		if (agentArgs == null)
-			return;
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("instrumentingclass=")) {
 				className = s.split("=")[1].split(":");
@@ -61,10 +61,8 @@ public class InstrumentationAgent {
 	}
 
 	public static void agentmain(String agentArgs, Instrumentation inst) {
-		LOGGER.info("[Agent] In agentmain method");
-
-		className = agentArgs.split(";");
-		transformClass(inst);
+		// LOGGER.info("[Agent] In agentmain method");
+		premain(agentArgs, inst);
 	}
 
 	private static void transformClass(Instrumentation instrumentation) {
