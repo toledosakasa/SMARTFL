@@ -22,7 +22,7 @@ public class InstrumentationAgent {
 	public static void premain(String agentArgs, Instrumentation inst) {
 		LOGGER.info("[Agent] In premain method");
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter("1.txt"));
+			BufferedWriter writer = new BufferedWriter(new FileWriter("/home/akarin/1.txt"));
 			writer.write("[Agent] In premain method");
 			writer.close();
 		} catch (IOException e1) {
