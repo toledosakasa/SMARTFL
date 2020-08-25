@@ -9,11 +9,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 public class InstrumentationAgent {
-	private static Logger LOGGER = LoggerFactory.getLogger(InstrumentationAgent.class);
+	//private static Logger LOGGER = LoggerFactory.getLogger(InstrumentationAgent.class);
 	private static String logFile = null;
 	private static String[] className = null;
 	private static List<String> classNames = null;
@@ -70,7 +70,7 @@ public class InstrumentationAgent {
 	}
 
 	private static void transformClass(Instrumentation instrumentation) {
-		LOGGER.info("[Agent] In transformClass method");
+		//LOGGER.info("[Agent] In transformClass method");
 		Class<?> targetCls = null;
 		ClassLoader targetClassLoader = null;
 
@@ -92,13 +92,13 @@ public class InstrumentationAgent {
 		for (String classname : className) {
 			// see if we can get the class using forName
 			try {
-				LOGGER.info("className:" + classname);
+				//LOGGER.info("className:" + classname);
 				targetCls = Class.forName(classname);
 				targetClassLoader = targetCls.getClassLoader();
 				transform(targetCls, targetClassLoader, instrumentation);
 				continue;
 			} catch (Exception ex) {
-				LOGGER.error("Class [{}] not found with Class.forName", classname);
+				//LOGGER.error("Class [{}] not found with Class.forName", classname);
 			}
 			// otherwise iterate all loaded classes and find what we want
 			for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
@@ -115,13 +115,13 @@ public class InstrumentationAgent {
 			for (String classname : classNames) {
 				// see if we can get the class using forName
 				try {
-					LOGGER.info("className:" + classname);
+					//LOGGER.info("className:" + classname);
 					targetCls = Class.forName(classname);
 					targetClassLoader = targetCls.getClassLoader();
 					transform(targetCls, targetClassLoader, instrumentation);
 					continue;
 				} catch (Exception ex) {
-					LOGGER.error("Class [{}] not found with Class.forName", classname);
+					//LOGGER.error("Class [{}] not found with Class.forName", classname);
 				}
 				// otherwise iterate all loaded classes and find what we want
 				for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
