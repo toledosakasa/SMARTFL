@@ -16,8 +16,11 @@ for dir in dirs2make:
 		os.makedirs(dir)
 # os.system("export BTRACE_HOME=%s" % (btrace_home))
 
+def utf8open(filename):
+	return open(filename, encoding='utf-8',errors='ignore')
+
 def btrace():
-	f=open("%s/scripts/AllLines_pattern.java"%(btrace_home))
+	f=utf8open("%s/scripts/AllLines_pattern.java"%(btrace_home))
 	patternstr=f.read()
 	f.close()
 
@@ -31,12 +34,12 @@ def btrace():
 				pattern_name = classname + "_pattern"
 				writestr = patternstr.replace('__CLASS__NAME__','trace.'+classname)
 				writestr = writestr.replace('AllLines',pattern_name)
-				tempf=open("%s/%s.java"%(scriptroot,pattern_name),'w+')
+				tempf=utf8open("%s/%s.java"%(scriptroot,pattern_name),'w+')
 				tempf.write(writestr)
 				tempf.close()
 				
 				#generate launch template for eclipse.
-				file = open(testdir+'/'+filename)
+				file = utf8open(testdir+'/'+filename)
 				lines = file.readlines()
 				flag = False
 				testnames = []
@@ -51,12 +54,12 @@ def btrace():
 					else:
 						flag = False
 				for testname in testnames:
-					f = open("templates/btrace_template.launch")
+					f = utf8open("templates/btrace_template.launch")
 					s = f.read()
 					f.close()
 					s = s.replace("#CLASSNAME#",classname)
 					s = s.replace("%TESTNAME%",testname)
-					f = open("configs/btrace/%s.%s.launch"%(classname,testname),'w+')
+					f = utf8open("configs/btrace/%s.%s.launch"%(classname,testname),'w+')
 					f.write(s)
 					f.close()
 
@@ -74,7 +77,7 @@ def mytrace():
 				classname = filename[0:-5]
 				
 				#generate launch template for eclipse.
-				file = open(testdir+'/'+filename)
+				file = utf8open(testdir+'/'+filename)
 				lines = file.readlines()
 				flag = False
 				testnames = []
@@ -89,12 +92,12 @@ def mytrace():
 					else:
 						flag = False
 				for testname in testnames:
-					f = open("templates/mytrace_template.launch")
+					f = utf8open("templates/mytrace_template.launch")
 					s = f.read()
 					f.close()
 					s = s.replace("#CLASSNAME#",classname)
 					s = s.replace("%TESTNAME%",testname)
-					f = open("configs/mytrace/%s.%s.launch"%(classname,testname),'w+')
+					f = utf8open("configs/mytrace/%s.%s.launch"%(classname,testname),'w+')
 					f.write(s)
 					f.close()
 
