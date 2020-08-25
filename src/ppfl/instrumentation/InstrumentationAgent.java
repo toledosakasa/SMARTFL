@@ -19,7 +19,7 @@ public class InstrumentationAgent {
 	private static List<String> classNames = null;
 
 	public static void premain(String agentArgs, Instrumentation inst) {
-		LOGGER.info("[Agent] In premain method");
+		//LOGGER.info("[Agent] In premain method");
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter("/home/akarin/1.txt"));
 			writer.write("[Agent] In premain method");
