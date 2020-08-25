@@ -17,7 +17,6 @@ public class InstrumentationAgent {
 	private static String logFile = null;
 	private static String[] className = null;
 	private static List<String> classNames = null;
-	private static String prefix = null;
 
 	public static void premain(String agentArgs, Instrumentation inst) {
 		LOGGER.info("[Agent] In premain method");
@@ -36,9 +35,6 @@ public class InstrumentationAgent {
 			}
 			if (s.startsWith("logfile=")) {
 				logFile = s.split("=")[1];
-			}
-			if (s.startsWith("prefix=")) {
-				prefix = s.split("=")[1];
 			}
 			if (s.startsWith("classnamefile=")) {
 				String cf = s.split("=")[1];
@@ -72,19 +68,6 @@ public class InstrumentationAgent {
 		LOGGER.info("[Agent] In transformClass method");
 		Class<?> targetCls = null;
 		ClassLoader targetClassLoader = null;
-		// if prefix available
-		if (prefix != null && !prefix.contentEquals("")) {
-			for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
-				System.out.println(clazz.getName());
-				if (clazz.getName().startsWith(prefix)) {
-
-					targetCls = clazz;
-					targetClassLoader = targetCls.getClassLoader();
-					transform(targetCls, targetClassLoader, instrumentation);
-				}
-			}
-			return;
-		}
 
 		// by default, transform all classes except neglected ones.
 //		if (className == null || className.contentEquals("")) {
@@ -98,7 +81,9 @@ public class InstrumentationAgent {
 //			}
 //			return;
 //		}
-
+		if(className == null) {
+			return;
+		}
 		for (String classname : className) {
 			// see if we can get the class using forName
 			try {
@@ -121,7 +106,31 @@ public class InstrumentationAgent {
 			}
 			throw new RuntimeException("Failed to find class [" + classname + "]");
 		}
-
+		if(classNames != null) {
+			for (String classname : classNames) {
+				// see if we can get the class using forName
+				try {
+					LOGGER.info("className:" + classname);
+					targetCls = Class.forName(classname);
+					targetClassLoader = targetCls.getClassLoader();
+					transform(targetCls, targetClassLoader, instrumentation);
+					continue;
+				} catch (Exception ex) {
+					LOGGER.error("Class [{}] not found with Class.forName", classname);
+				}
+				// otherwise iterate all loaded classes and find what we want
+				for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
+					if (clazz.getName().equals(classname)) {
+						targetCls = clazz;
+						targetClassLoader = targetCls.getClassLoader();
+						transform(targetCls, targetClassLoader, instrumentation);
+						continue;
+					}
+				}
+				throw new RuntimeException("Failed to find class [" + classname + "]");
+			}
+		}
+		
 	}
 
 	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
