@@ -12,5 +12,5 @@
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit5"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="trace.sumtest"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ppfl"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-noverify -javaagent:${workspace_project_locations}/lib/tracer.jar=logfile=${workspace_project_locations}/test/trace/logs/mytrace/sumtest.test.log,class=trace.sumtest"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-noverify -javaagent:${workspace_project_locations}/lib/tracer.jar=logfile=${workspace_project_locations}/test/trace/logs/mytrace/sumtest.test.log,instrumentingclass=trace.sumtest"/>
 </launchConfiguration>

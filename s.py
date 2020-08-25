@@ -98,7 +98,7 @@ def mytrace():
 					f.close()
 					s = s.replace("#CLASSNAME#",classname)
 					s = s.replace("%TESTNAME%",testname)
-					f = utf8open("configs/mytrace/%s.%s.launch"%(classname,testname))
+					f = open("configs/mytrace/%s.%s.launch"%(classname,testname),'w+')
 					f.write(s)
 					f.close()
 
