@@ -1,5 +1,7 @@
 package ppfl.instrumentation;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.FileSystems;
@@ -19,6 +21,14 @@ public class InstrumentationAgent {
 
 	public static void premain(String agentArgs, Instrumentation inst) {
 		LOGGER.info("[Agent] In premain method");
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter("1.txt"));
+			writer.write("[Agent] In premain method");
+			writer.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("instrumentingclass=")) {
