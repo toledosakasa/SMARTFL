@@ -19,6 +19,9 @@ for dir in dirs2make:
 def utf8open(filename):
 	return open(filename, encoding='utf-8',errors='ignore')
 
+def utf8open(filename,option)
+	return open(filename, option, encoding='utf-8',errors='ignore')
+
 def btrace():
 	f=utf8open("%s/scripts/AllLines_pattern.java"%(btrace_home))
 	patternstr=f.read()
