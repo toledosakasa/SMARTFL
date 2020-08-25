@@ -28,7 +28,9 @@ public class InstrumentationAgent {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
+		System.out.println(agentArgs);
+		if (agentArgs == null)
+			return;
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("instrumentingclass=")) {
 				className = s.split("=")[1].split(":");
@@ -53,7 +55,8 @@ public class InstrumentationAgent {
 				}
 			}
 		}
-
+		if (logFile == null && className == null && classNames == null)
+			return;
 		transformClass(inst);
 	}
 
@@ -81,7 +84,7 @@ public class InstrumentationAgent {
 //			}
 //			return;
 //		}
-		if(className == null) {
+		if (className == null) {
 			return;
 		}
 		for (String classname : className) {
@@ -106,7 +109,7 @@ public class InstrumentationAgent {
 			}
 			throw new RuntimeException("Failed to find class [" + classname + "]");
 		}
-		if(classNames != null) {
+		if (classNames != null) {
 			for (String classname : classNames) {
 				// see if we can get the class using forName
 				try {
@@ -130,7 +133,7 @@ public class InstrumentationAgent {
 				throw new RuntimeException("Failed to find class [" + classname + "]");
 			}
 		}
-		
+
 	}
 
 	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
