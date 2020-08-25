@@ -19,6 +19,15 @@ public class InstrumentationAgent {
 	private static List<String> classNames = null;
 
 	public static void premain(String agentArgs, Instrumentation inst) {
+		main(agentArgs, inst);
+	}
+
+	public static void agentmain(String agentArgs, Instrumentation inst) {
+		// LOGGER.info("[Agent] In agentmain method");
+		main(agentArgs, inst);
+	}
+
+	private static synchronized void main(String agentArgs, Instrumentation inst) {
 		System.out.println(agentArgs);
 		if (agentArgs == null || agentArgs == "")
 			return;
@@ -58,11 +67,6 @@ public class InstrumentationAgent {
 		if (logFile == null && className == null && classNames == null)
 			return;
 		transformClass(inst);
-	}
-
-	public static void agentmain(String agentArgs, Instrumentation inst) {
-		// LOGGER.info("[Agent] In agentmain method");
-		premain(agentArgs, inst);
 	}
 
 	private static void transformClass(Instrumentation instrumentation) {
