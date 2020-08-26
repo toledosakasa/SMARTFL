@@ -74,6 +74,10 @@ public class TraceTransformer implements ClassFileTransformer {
 				CtClass cc = cp.get(targetClassName);
 
 				for (CtBehavior m : cc.getDeclaredBehaviors()) {
+					LOGGER.log(Level.INFO, "[Agent] method : " + m.getName());
+				}
+				
+				for (CtBehavior m : cc.getDeclaredBehaviors()) {
 					// hello in console
 					LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
 
