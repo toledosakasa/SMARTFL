@@ -54,7 +54,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	public void setTargetClassName(String s) {
 		this.targetClassName = s;
 	}
-	
+
 	public void setLogFile(String s) {
 		this.logFile = s;
 	}
@@ -73,16 +73,15 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 		this.setLogger(this.targetClassName);
 		if (className.equals(finalTargetClassName) && loader.equals(targetClassLoader)) {
-
 			LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
 			try {
 				ClassPool cp = ClassPool.getDefault();
 				CtClass cc = cp.get(targetClassName);
 
-				for (CtBehavior m : cc.getDeclaredBehaviors()) {
-					LOGGER.log(Level.INFO, "[Agent] method : " + m.getName());
-				}
-				
+//				for (CtBehavior m : cc.getDeclaredBehaviors()) {
+//					LOGGER.log(Level.INFO, "[Agent] method : " + m.getName());
+//				}
+
 				for (CtBehavior m : cc.getDeclaredBehaviors()) {
 					// hello in console
 					LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
@@ -129,7 +128,6 @@ public class TraceTransformer implements ClassFileTransformer {
 							linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
 						}
 						instmap.put(i, getinst + linenumberinfo);
-
 					}
 					// iterate every instruction
 
@@ -139,12 +137,17 @@ public class TraceTransformer implements ClassFileTransformer {
 						int index = ci.lookAhead();
 						int op = ci.byteAt(index);
 						OpcodeInst oi = Interpreter.map[op];
+
+						// skip unimplemented insts.
+						if (oi == null)
+							continue;
+
 						// linenumber information.
 						String instinfo = instmap.get(i);
 
 						// insert bytecode right before this inst.
 						// print basic information of this instruction
-						if(instinfo != null && instinfo != "") {
+						if (instinfo != null && instinfo != "") {
 							this.SOURCELOGGER.log(Level.INFO, instinfo);
 							oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 						}
@@ -220,7 +223,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		clearHandler(l);
 		ConsoleHandler ch = new ConsoleHandler();
 		ch.setLevel(Level.WARNING);
-		
+
 		FileHandler fh = new FileHandler(fn) {
 			@Override
 			public synchronized void publish(final LogRecord record) {
@@ -236,7 +239,7 @@ public class TraceTransformer implements ClassFileTransformer {
 				// return record.getLevel() + ":" + record.getMessage() + "\n";
 			}
 		});
-		
+
 		l.addHandler(ch);
 		l.addHandler(fh);
 	}
