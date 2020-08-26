@@ -52,6 +52,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	public void setLogFile(String s) {
 		this.logFile = s;
+		this.setLogger();
 	}
 
 	public void setSourceLogFile(String s) {
@@ -67,7 +68,8 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 
 		if (className.equals(finalTargetClassName) && loader.equals(targetClassLoader)) {
-			this.setLogger();
+
+			LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
 			try {
 				ClassPool cp = ClassPool.getDefault();
 				CtClass cc = cp.get(targetClassName);
@@ -156,11 +158,11 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	private void setLogger() {
-		// disable console output
+		// disable default console output
 		Logger rootlogger = LOGGER.getParent();
-		for (Handler h : rootlogger.getHandlers()) {
-			rootlogger.removeHandler(h);
-		}
+		clearHandler(rootlogger);
+		
+		//set a debug handler formatter
 		ConsoleHandler debugHandler = new ConsoleHandler();
 		debugHandler.setLevel(Level.INFO);
 		debugHandler.setFormatter(new Formatter() {
@@ -171,48 +173,46 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 
 		});
+		
+		//add debug handler to LOGGER
+		clearHandler(LOGGER);
 		LOGGER.addHandler(debugHandler);
-		LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
-		if (this.logFile != null) {
-			FileHandler fileHandler, sourcefileHandler;
-			ConsoleHandler ch1, ch2;
 
-			ch1 = new ConsoleHandler();
-			ch1.setLevel(Level.WARNING);
-			ch2 = new ConsoleHandler();
-			ch2.setLevel(Level.WARNING);
-			TRACELOGGER.addHandler(ch1);
-			SOURCELOGGER.addHandler(ch2);
+		//set file handlers for dynamic & source tracing
+		if (this.logFile != null) {
 			LOGGER.log(Level.INFO, "[Agent] Logfile: " + this.logFile);
 			try {
-				fileHandler = new FileHandler(this.logFile);
-				TRACELOGGER.addHandler(fileHandler);
-				fileHandler.setLevel(Level.INFO);
-
-				fileHandler.setFormatter(new Formatter() {
-					@Override
-					public String format(LogRecord record) {
-						return record.getMessage();
-						// return record.getLevel() + ":" + record.getMessage() + "\n";
-					}
-				});
-
-				sourcefileHandler = new FileHandler(this.logFile + ".source.log");
-				SOURCELOGGER.addHandler(sourcefileHandler);
-				sourcefileHandler.setLevel(Level.INFO);
-				sourcefileHandler.setFormatter(new Formatter() {
-					@Override
-					public String format(LogRecord record) {
-						return record.getMessage();
-						// return record.getLevel() + ":" + record.getMessage() + "\n";
-					}
-				});
-
+				setHandler(TRACELOGGER,this.logFile);
+				setHandler(SOURCELOGGER,this.logFile + ".source.log");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void clearHandler(Logger l) {
+		for (Handler h : l.getHandlers()) {
+			l.removeHandler(h);
+		}
+		return;
+	}
+
+	private void setHandler(Logger l, String fn) throws IOException {
+		clearHandler(l);
+		ConsoleHandler ch = new ConsoleHandler();
+		ch.setLevel(Level.WARNING);
+		l.addHandler(ch);
+		FileHandler fh = new FileHandler();
+		l.addHandler(fh);
+		fh.setLevel(Level.INFO);
+		fh.setFormatter(new Formatter() {
+			@Override
+			public String format(LogRecord record) {
+				return record.getMessage();
+				// return record.getLevel() + ":" + record.getMessage() + "\n";
+			}
+		});
 	}
 
 	private String getinst_map(CodeIterator ci, int index, ConstPool constp) {
