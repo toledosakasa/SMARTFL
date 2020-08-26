@@ -63,7 +63,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.sourceFile = s;
 	}
 
-	private byte[] transformbody(ClassLoader loader, String className, Class<?> classBeingRedefined,
+	private byte[] transformBody(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 		byte[] byteCode = classfileBuffer;
 		this.setLogger(this.targetClassName);
@@ -73,76 +73,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			CtClass cc = cp.get(targetClassName);
 
 			for (CtBehavior m : cc.getDeclaredBehaviors()) {
-				// hello in console
-				LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
-
-				// get iterator
-				MethodInfo mi = m.getMethodInfo();
-				CodeAttribute ca = mi.getCodeAttribute();
-
-				// add constants to constpool.
-				// index will be used during instrumentation.
-				ConstPool constp = mi.getConstPool();
-				CallBackIndex cbi = new CallBackIndex(constp);
-
-				// record line info and instructions, since instrumentation will change
-				// branchbyte and byte index.
-				CodeIterator tempci = ca.iterator();
-				int lastln = -1;
-
-				Map<Integer, String> instmap = new HashMap<Integer, String>();
-				for (int i = 0; tempci.hasNext(); i++) {
-					int index = tempci.lookAhead();
-					int ln = mi.getLineNumber(index);
-
-					// debugging:line number
-					String getinst = getinst_map(tempci, index, constp);
-					String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index
-							+ ",nextinst=";
-					if (ln != lastln) {
-						lastln = ln;
-						LOGGER.log(Level.INFO, String.valueOf(ln));
-						// System.out.println(ln);
-					}
-
-					// debugging:opcode
-					int op = tempci.byteAt(index);
-					String opc = Mnemonic.OPCODE[op];
-					LOGGER.log(Level.INFO, opc);
-					// System.out.println(opc);
-
-					tempci.next();
-					if (!tempci.hasNext()) {
-						linenumberinfo = linenumberinfo + "-1";
-					} else {
-						linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
-					}
-					instmap.put(i, getinst + linenumberinfo);
-				}
-				// iterate every instruction
-				CodeIterator ci = ca.iterator();
-				for (int i = 0; ci.hasNext(); i++) {
-					// lookahead the next instruction.
-					int index = ci.lookAhead();
-					int op = ci.byteAt(index);
-					OpcodeInst oi = Interpreter.map[op];
-					// linenumber information.
-					String instinfo = instmap.get(i);
-
-					// insert bytecode right before this inst.
-					// print basic information of this instruction
-					this.SOURCELOGGER.log(Level.INFO, instinfo);
-					if (oi != null)
-						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
-					// move to the next inst. everything below this will be inserted after the inst.
-					// ci.next();
-					index = ci.next();
-					// print advanced information(e.g. value pushed)
-					if (oi != null)
-						oi.insertByteCodeAfter(ci, index, constp, cbi);
-				}
-				// not sure if this is necessary.
-				ca.computeMaxStack();
+				transformBehavior(m, cc);
 			}
 			byteCode = cc.toBytecode();
 			cc.detach();
@@ -152,6 +83,79 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 		this.closeLogger();
 		return byteCode;
+	}
+
+	private void transformBehavior(CtBehavior m, CtClass cc) throws NotFoundException, BadBytecode {
+		// hello in console
+		LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
+
+		// get iterator
+		MethodInfo mi = m.getMethodInfo();
+		CodeAttribute ca = mi.getCodeAttribute();
+
+		// add constants to constpool.
+		// index will be used during instrumentation.
+		ConstPool constp = mi.getConstPool();
+		CallBackIndex cbi = new CallBackIndex(constp);
+
+		// record line info and instructions, since instrumentation will change
+		// branchbyte and byte index.
+		CodeIterator tempci = ca.iterator();
+		int lastln = -1;
+
+		Map<Integer, String> instmap = new HashMap<Integer, String>();
+		for (int i = 0; tempci.hasNext(); i++) {
+			int index = tempci.lookAhead();
+			int ln = mi.getLineNumber(index);
+
+			// debugging:line number
+			String getinst = getinst_map(tempci, index, constp);
+			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index
+					+ ",nextinst=";
+			if (ln != lastln) {
+				lastln = ln;
+				LOGGER.log(Level.INFO, String.valueOf(ln));
+				// System.out.println(ln);
+			}
+
+			// debugging:opcode
+			int op = tempci.byteAt(index);
+			String opc = Mnemonic.OPCODE[op];
+			LOGGER.log(Level.INFO, opc);
+			// System.out.println(opc);
+
+			tempci.next();
+			if (!tempci.hasNext()) {
+				linenumberinfo = linenumberinfo + "-1";
+			} else {
+				linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
+			}
+			instmap.put(i, getinst + linenumberinfo);
+		}
+		// iterate every instruction
+		CodeIterator ci = ca.iterator();
+		for (int i = 0; ci.hasNext(); i++) {
+			// lookahead the next instruction.
+			int index = ci.lookAhead();
+			int op = ci.byteAt(index);
+			OpcodeInst oi = Interpreter.map[op];
+			// linenumber information.
+			String instinfo = instmap.get(i);
+
+			// insert bytecode right before this inst.
+			// print basic information of this instruction
+			this.SOURCELOGGER.log(Level.INFO, instinfo);
+			if (oi != null)
+				oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+			// move to the next inst. everything below this will be inserted after the inst.
+			// ci.next();
+			index = ci.next();
+			// print advanced information(e.g. value pushed)
+			if (oi != null)
+				oi.insertByteCodeAfter(ci, index, constp, cbi);
+		}
+		// not sure if this is necessary.
+		ca.computeMaxStack();
 	}
 
 	@Override
@@ -164,7 +168,7 @@ public class TraceTransformer implements ClassFileTransformer {
 					|| !loader.equals(targetClassLoader)) {
 				return byteCode;
 			}
-			return transformbody(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
+			return transformBody(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 		} catch (Throwable e) {
 			LOGGER.log(Level.SEVERE, "[Bug]Exception", e);
 			e.printStackTrace();
@@ -179,7 +183,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 		// set a debug handler formatter
 		ConsoleHandler debugHandler = new ConsoleHandler();
-		debugHandler.setLevel(Level.INFO);
+		debugHandler.setLevel(Level.WARNING);
 		debugHandler.setFormatter(new Formatter() {
 			@Override
 			public String format(LogRecord record) {
