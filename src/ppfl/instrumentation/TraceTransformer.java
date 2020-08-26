@@ -165,12 +165,10 @@ public class TraceTransformer implements ClassFileTransformer {
 		ConsoleHandler debugHandler = new ConsoleHandler();
 		debugHandler.setLevel(Level.INFO);
 		debugHandler.setFormatter(new Formatter() {
-
 			@Override
 			public String format(LogRecord record) {
 				return record.getLevel() + ":" + record.getMessage() + "\n";
 			}
-
 		});
 
 		// add debug handler to LOGGER
@@ -210,9 +208,14 @@ public class TraceTransformer implements ClassFileTransformer {
 		clearHandler(l);
 		ConsoleHandler ch = new ConsoleHandler();
 		ch.setLevel(Level.WARNING);
-		l.addHandler(ch);
-		FileHandler fh = new FileHandler(fn);
-		l.addHandler(fh);
+		
+		FileHandler fh = new FileHandler(fn) {
+			@Override
+			public synchronized void publish(final LogRecord record) {
+				super.publish(record);
+				flush();
+			}
+		};
 		fh.setLevel(Level.INFO);
 		fh.setFormatter(new Formatter() {
 			@Override
@@ -221,6 +224,9 @@ public class TraceTransformer implements ClassFileTransformer {
 				// return record.getLevel() + ":" + record.getMessage() + "\n";
 			}
 		});
+		
+		l.addHandler(ch);
+		l.addHandler(fh);
 	}
 
 	private String getinst_map(CodeIterator ci, int index, ConstPool constp) {

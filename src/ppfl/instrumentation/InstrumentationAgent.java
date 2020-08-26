@@ -26,7 +26,6 @@ public class InstrumentationAgent {
 	}
 
 	private static synchronized void main(String agentArgs, Instrumentation inst) {
-		System.out.println(agentArgs);
 		if (agentArgs == null || agentArgs == "")
 			return;
 		LOGGER.info("[Agent] In main method");
