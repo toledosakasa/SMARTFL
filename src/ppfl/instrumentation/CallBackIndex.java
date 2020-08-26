@@ -40,7 +40,6 @@ public class CallBackIndex {
 		else if (o instanceof Float)
 			return tsindex_float;
 		else if (o instanceof Double) {
-			System.out.println("here");
 			return tsindex_double;
 		} else
 			return tsindex_object;
