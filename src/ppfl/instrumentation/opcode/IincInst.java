@@ -33,7 +33,7 @@ public class IincInst extends OpcodeInst {
 		Node defnode = null;
 		
 		int varindex = info.getintvalue("VAR");
-		int incconst = info.getintvalue("CONST");
+		//int incconst = info.getintvalue("CONST");
 		
 		//use
 		usenodes.add(graph.getLoadNodeAsUse(varindex));

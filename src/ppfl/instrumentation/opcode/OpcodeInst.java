@@ -180,7 +180,7 @@ public class OpcodeInst {
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
 			throws BadBytecode {
 
-		if (inst != null) {
+		if (inst != null && inst != "") {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(8);
 			int instindex = constp.addStringInfo(inst);
@@ -194,6 +194,10 @@ public class OpcodeInst {
 		}
 	}
 
+	public boolean isInvoke() {
+		return this.isinvoke;
+	}
+	
 	public void setinvoke() {
 		this.isinvoke = true;
 	}
