@@ -66,105 +66,109 @@ public class TraceTransformer implements ClassFileTransformer {
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-		byte[] byteCode = classfileBuffer;
-		String finalTargetClassName = this.targetClassName.replaceAll("\\.", "/"); // replace . with /
-		if (!className.equals(finalTargetClassName)) {
-			return byteCode;
-		}
-		this.setLogger(this.targetClassName);
-		if (className.equals(finalTargetClassName) && loader.equals(targetClassLoader)) {
-			LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
-			try {
-				ClassPool cp = ClassPool.getDefault();
-				CtClass cc = cp.get(targetClassName);
+		try {
+			byte[] byteCode = classfileBuffer;
+			String finalTargetClassName = this.targetClassName.replaceAll("\\.", "/"); // replace . with /
+			if (className == null || !className.equals(finalTargetClassName)) {
+				return byteCode;
+			}
+			this.setLogger(this.targetClassName);
+			if (className.equals(finalTargetClassName) && loader.equals(targetClassLoader)) {
+				LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
+				try {
+					ClassPool cp = ClassPool.getDefault();
+					CtClass cc = cp.get(targetClassName);
 
 //				for (CtBehavior m : cc.getDeclaredBehaviors()) {
 //					LOGGER.log(Level.INFO, "[Agent] method : " + m.getName());
 //				}
 
-				for (CtBehavior m : cc.getDeclaredBehaviors()) {
-					// hello in console
-					LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
+					for (CtBehavior m : cc.getDeclaredBehaviors()) {
+						// hello in console
+						LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
 
-					// get iterator
-					MethodInfo mi = m.getMethodInfo();
-					CodeAttribute ca = mi.getCodeAttribute();
+						// get iterator
+						MethodInfo mi = m.getMethodInfo();
+						CodeAttribute ca = mi.getCodeAttribute();
 
-					// add constants to constpool.
-					// index will be used during instrumentation.
-					ConstPool constp = mi.getConstPool();
-					CallBackIndex cbi = new CallBackIndex(constp);
+						// add constants to constpool.
+						// index will be used during instrumentation.
+						ConstPool constp = mi.getConstPool();
+						CallBackIndex cbi = new CallBackIndex(constp);
 
-					// record line info and instructions, since instrumentation will change
-					// branchbyte and byte index.
-					CodeIterator tempci = ca.iterator();
-					int lastln = -1;
+						// record line info and instructions, since instrumentation will change
+						// branchbyte and byte index.
+						CodeIterator tempci = ca.iterator();
+						int lastln = -1;
 
-					Map<Integer, String> instmap = new HashMap<Integer, String>();
-					for (int i = 0; tempci.hasNext(); i++) {
-						int index = tempci.lookAhead();
-						int ln = mi.getLineNumber(index);
+						Map<Integer, String> instmap = new HashMap<Integer, String>();
+						for (int i = 0; tempci.hasNext(); i++) {
+							int index = tempci.lookAhead();
+							int ln = mi.getLineNumber(index);
 
-						// debugging:line number
-						String getinst = getinst_map(tempci, index, constp);
-						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index
-								+ ",nextinst=";
-						if (ln != lastln) {
-							lastln = ln;
-							LOGGER.log(Level.INFO, String.valueOf(ln));
-							// System.out.println(ln);
+							// debugging:line number
+							String getinst = getinst_map(tempci, index, constp);
+							String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
+									+ index + ",nextinst=";
+							if (ln != lastln) {
+								lastln = ln;
+								LOGGER.log(Level.INFO, String.valueOf(ln));
+								// System.out.println(ln);
+							}
+
+							// debugging:opcode
+							int op = tempci.byteAt(index);
+							String opc = Mnemonic.OPCODE[op];
+							LOGGER.log(Level.INFO, opc);
+							// System.out.println(opc);
+
+							tempci.next();
+							if (!tempci.hasNext()) {
+								linenumberinfo = linenumberinfo + "-1";
+							} else {
+								linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
+							}
+							instmap.put(i, getinst + linenumberinfo);
 						}
+						// iterate every instruction
+						CodeIterator ci = ca.iterator();
+						for (int i = 0; ci.hasNext(); i++) {
+							// lookahead the next instruction.
+							int index = ci.lookAhead();
+							int op = ci.byteAt(index);
+							OpcodeInst oi = Interpreter.map[op];
+							// linenumber information.
+							String instinfo = instmap.get(i);
 
-						// debugging:opcode
-						int op = tempci.byteAt(index);
-						String opc = Mnemonic.OPCODE[op];
-						LOGGER.log(Level.INFO, opc);
-						// System.out.println(opc);
-
-						tempci.next();
-						if (!tempci.hasNext()) {
-							linenumberinfo = linenumberinfo + "-1";
-						} else {
-							linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
+							// insert bytecode right before this inst.
+							// print basic information of this instruction
+							this.SOURCELOGGER.log(Level.INFO, instinfo);
+							if (oi != null)
+								oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+							// move to the next inst. everything below this will be inserted after the inst.
+							// ci.next();
+							index = ci.next();
+							// print advanced information(e.g. value pushed)
+							if (oi != null)
+								oi.insertByteCodeAfter(ci, index, constp, cbi);
 						}
-						instmap.put(i, getinst + linenumberinfo);
+						// not sure if this is necessary.
+						ca.computeMaxStack();
 					}
-					// iterate every instruction
+					byteCode = cc.toBytecode();
+					cc.detach();
 
-					CodeIterator ci = ca.iterator();
-					for (int i = 0; ci.hasNext(); i++) {
-						// lookahead the next instruction.
-						int index = ci.lookAhead();
-						int op = ci.byteAt(index);
-						OpcodeInst oi = Interpreter.map[op];
-
-						// linenumber information.
-						String instinfo = instmap.get(i);
-
-						// insert bytecode right before this inst.
-						// print basic information of this instruction
-						this.SOURCELOGGER.log(Level.INFO, instinfo);
-						if (oi != null)
-							oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
-						// move to the next inst. everything below this will be inserted after the inst.
-						// ci.next();
-						index = ci.next();
-						// print advanced information(e.g. value pushed)
-						if (oi != null)
-							oi.insertByteCodeAfter(ci, index, constp, cbi);
-					}
-					// not sure if this is necessary.
-					ca.computeMaxStack();
+				} catch (NotFoundException | CannotCompileException | IOException | BadBytecode e) {
+					LOGGER.log(Level.SEVERE, "[Bug]bytecode error", e);
 				}
-				byteCode = cc.toBytecode();
-				cc.detach();
-
-			} catch (NotFoundException | CannotCompileException | IOException | BadBytecode e) {
-				LOGGER.log(Level.SEVERE, "[Bug]Exception", e);
 			}
+			this.closeLogger();
+			return byteCode;
+		} catch (Throwable e) {
+			LOGGER.log(Level.SEVERE, "[Bug]Exception", e);
+			e.printStackTrace();
+			return null;
 		}
-		this.closeLogger();
-		return byteCode;
 	}
 
 	private void setLogger(String clazzname) {

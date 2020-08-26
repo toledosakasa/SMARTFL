@@ -72,12 +72,15 @@ public class Interpreter {
 	}
 
 	public static void main(String args[]) {
-		//OpcodeInst.splitMethodDesc("(BIDDLjava/lang/Object;I)I");
-		//printopcodes();
+		// OpcodeInst.splitMethodDesc("(BIDDLjava/lang/Object;I)I");
+		// printopcodes();
 	}
 
 	public static void init() {
 		// construct inst map based on different opcode types.
+		//FIXME:for robustness
+		//for (int i = 0; i < 202; i++)
+		//	map[i] = new OpcodeInst(i, 0, 0);
 		// nop
 		map[0] = new OpcodeInst(0, 0, 0);
 		// aconst_null
