@@ -154,7 +154,6 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 		this.closeLogger();
 		return byteCode;
-
 	}
 
 	private void setLogger(String clazzname) {
@@ -192,9 +191,9 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	private void closeLogger() {
-		for (Handler h : TRACELOGGER.getHandlers()) {
-			h.close();
-		}
+//		for (Handler h : TRACELOGGER.getHandlers()) {
+//			h.close();
+//		}
 		for (Handler h : SOURCELOGGER.getHandlers()) {
 			h.close();
 		}
