@@ -139,8 +139,11 @@ public class TraceTransformer implements ClassFileTransformer {
 						OpcodeInst oi = Interpreter.map[op];
 
 						// skip unimplemented insts.
-						if (oi == null)
+						if (oi == null) {
+							ci.next();
 							continue;
+						}
+							
 
 						// linenumber information.
 						String instinfo = instmap.get(i);
