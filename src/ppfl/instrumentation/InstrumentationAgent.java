@@ -1,7 +1,5 @@
 package ppfl.instrumentation;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.FileSystems;
@@ -31,15 +29,7 @@ public class InstrumentationAgent {
 		System.out.println(agentArgs);
 		if (agentArgs == null || agentArgs == "")
 			return;
-		// LOGGER.info("[Agent] In premain method");
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter("/home/akarin/1.txt"));
-			writer.write("[Agent] In premain method");
-			writer.close();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		LOGGER.info("[Agent] In main method");
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("instrumentingclass=")) {
 				className = s.split("=")[1].split(":");
@@ -53,11 +43,6 @@ public class InstrumentationAgent {
 				classNames = new ArrayList<String>();
 				try {
 					classNames = java.nio.file.Files.readAllLines(cpath);
-//					BufferedReader reader = new BufferedReader(new FileReader(cf));
-//					String tmp;
-//					while ((tmp = reader.readLine()) != null) {
-//						classNames.add(tmp);
-//					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -73,19 +58,6 @@ public class InstrumentationAgent {
 		LOGGER.info("[Agent] In transformClass method");
 		Class<?> targetCls = null;
 		ClassLoader targetClassLoader = null;
-
-		// by default, transform all classes except neglected ones.
-//		if (className == null || className.contentEquals("")) {
-//			for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
-//				if (!isNeglect(clazz.getName())) {
-//					System.out.println(clazz.getName());
-//					targetCls = clazz;
-//					targetClassLoader = targetCls.getClassLoader();
-//					transform(targetCls, targetClassLoader, instrumentation);
-//				}
-//			}
-//			return;
-//		}
 		if (className == null) {
 			return;
 		}

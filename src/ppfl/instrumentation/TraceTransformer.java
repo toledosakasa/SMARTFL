@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
+import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
@@ -35,7 +35,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	// The logger name
 	public static Logger TRACELOGGER = Logger.getLogger("PPFL_LOGGER");
 	public final Logger SOURCELOGGER = Logger.getLogger("PPFL_LOGGER_SOURCE");
-	
+
 	/** The internal form class name of the class to transform */
 	private String targetClassName;
 	/** The class loader of the class we want to transform */
@@ -43,6 +43,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	/** filename for logging */
 	private String logFile = null;
+
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
@@ -52,7 +53,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	public void setLogFile(String s) {
 		this.logFile = s;
 	}
-	
+
 	public void setSourceLogFile(String s) {
 	}
 
@@ -71,7 +72,7 @@ public class TraceTransformer implements ClassFileTransformer {
 				ClassPool cp = ClassPool.getDefault();
 				CtClass cc = cp.get(targetClassName);
 
-				for (CtMethod m : cc.getDeclaredMethods()) {
+				for (CtBehavior m : cc.getDeclaredBehaviors()) {
 					// hello in console
 					LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
 
@@ -93,28 +94,31 @@ public class TraceTransformer implements ClassFileTransformer {
 					for (int i = 0; tempci.hasNext(); i++) {
 						int index = tempci.lookAhead();
 						int ln = mi.getLineNumber(index);
-						
+
+						// debugging:line number
+						String getinst = getinst_map(tempci, index, constp);
+						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index
+								+ ",nextinst=";
+						if (ln != lastln) {
+							lastln = ln;
+							LOGGER.log(Level.INFO, String.valueOf(ln));
+							// System.out.println(ln);
+						}
 
 						// debugging:opcode
 						int op = tempci.byteAt(index);
 						String opc = Mnemonic.OPCODE[op];
-						System.out.println(opc);
+						LOGGER.log(Level.INFO, opc);
+						// System.out.println(opc);
 
-						String getinst = getinst_map(tempci, index, constp);
-						String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
-								+ index + ",nextinst=";
-						if (ln != lastln) {
-							lastln = ln;
-							System.out.println(ln);
-						}
 						tempci.next();
-						if(!tempci.hasNext()) {
+						if (!tempci.hasNext()) {
 							linenumberinfo = linenumberinfo + "-1";
-						}else {
+						} else {
 							linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
 						}
 						instmap.put(i, getinst + linenumberinfo);
-						
+
 					}
 					// iterate every instruction
 
@@ -129,7 +133,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 						// insert bytecode right before this inst.
 						// print basic information of this instruction
-						this.SOURCELOGGER.log(Level.INFO,instinfo);
+						this.SOURCELOGGER.log(Level.INFO, instinfo);
 						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 						// move to the next inst. everything below this will be inserted after the inst.
 						// ci.next();
@@ -170,13 +174,15 @@ public class TraceTransformer implements ClassFileTransformer {
 		LOGGER.addHandler(debugHandler);
 		LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
 		if (this.logFile != null) {
-			FileHandler fileHandler,sourcefileHandler;
-			ConsoleHandler consoleHandler;
+			FileHandler fileHandler, sourcefileHandler;
+			ConsoleHandler ch1, ch2;
 
-			consoleHandler = new ConsoleHandler();
-			consoleHandler.setLevel(Level.WARNING);
-			TRACELOGGER.addHandler(consoleHandler);
-			SOURCELOGGER.addHandler(consoleHandler);
+			ch1 = new ConsoleHandler();
+			ch1.setLevel(Level.WARNING);
+			ch2 = new ConsoleHandler();
+			ch2.setLevel(Level.WARNING);
+			TRACELOGGER.addHandler(ch1);
+			SOURCELOGGER.addHandler(ch2);
 			LOGGER.log(Level.INFO, "[Agent] Logfile: " + this.logFile);
 			try {
 				fileHandler = new FileHandler(this.logFile);
@@ -190,7 +196,7 @@ public class TraceTransformer implements ClassFileTransformer {
 						// return record.getLevel() + ":" + record.getMessage() + "\n";
 					}
 				});
-				
+
 				sourcefileHandler = new FileHandler(this.logFile + ".source.log");
 				SOURCELOGGER.addHandler(sourcefileHandler);
 				sourcefileHandler.setLevel(Level.INFO);
