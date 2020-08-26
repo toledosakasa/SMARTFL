@@ -143,11 +143,9 @@ public class TraceTransformer implements ClassFileTransformer {
 
 						// insert bytecode right before this inst.
 						// print basic information of this instruction
-						if (instinfo != null && instinfo != "") {
-							this.SOURCELOGGER.log(Level.INFO, instinfo);
-							if (oi != null)
-								oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
-						}
+						this.SOURCELOGGER.log(Level.INFO, instinfo);
+						if (oi != null)
+							oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 						// move to the next inst. everything below this will be inserted after the inst.
 						// ci.next();
 						index = ci.next();
