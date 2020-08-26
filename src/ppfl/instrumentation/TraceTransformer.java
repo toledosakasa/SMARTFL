@@ -52,7 +52,6 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	public void setLogFile(String s) {
 		this.logFile = s;
-		this.setLogger();
 	}
 
 	public void setSourceLogFile(String s) {
@@ -66,7 +65,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		if (!className.equals(finalTargetClassName)) {
 			return byteCode;
 		}
-
+		this.setLogger(this.targetClassName);
 		if (className.equals(finalTargetClassName) && loader.equals(targetClassLoader)) {
 
 			LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
@@ -153,16 +152,17 @@ public class TraceTransformer implements ClassFileTransformer {
 				LOGGER.log(Level.SEVERE, "Exception", e);
 			}
 		}
+		this.closeLogger();
 		return byteCode;
 
 	}
 
-	private void setLogger() {
+	private void setLogger(String clazzname) {
 		// disable default console output
 		Logger rootlogger = LOGGER.getParent();
 		clearHandler(rootlogger);
-		
-		//set a debug handler formatter
+
+		// set a debug handler formatter
 		ConsoleHandler debugHandler = new ConsoleHandler();
 		debugHandler.setLevel(Level.INFO);
 		debugHandler.setFormatter(new Formatter() {
@@ -173,21 +173,30 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 
 		});
-		
-		//add debug handler to LOGGER
+
+		// add debug handler to LOGGER
 		clearHandler(LOGGER);
 		LOGGER.addHandler(debugHandler);
 
-		//set file handlers for dynamic & source tracing
+		// set file handlers for dynamic & source tracing
 		if (this.logFile != null) {
 			LOGGER.log(Level.INFO, "[Agent] Logfile: " + this.logFile);
 			try {
-				setHandler(TRACELOGGER,this.logFile);
-				setHandler(SOURCELOGGER,this.logFile + ".source.log");
+				setHandler(TRACELOGGER, this.logFile);
+				setHandler(SOURCELOGGER, clazzname + ".source.log");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void closeLogger() {
+		for (Handler h : TRACELOGGER.getHandlers()) {
+			h.close();
+		}
+		for (Handler h : SOURCELOGGER.getHandlers()) {
+			h.close();
 		}
 	}
 
