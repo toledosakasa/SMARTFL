@@ -182,7 +182,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			LOGGER.log(Level.INFO, "[Agent] Logfile: " + this.logFile);
 			try {
 				setHandler(TRACELOGGER, this.logFile);
-				setHandler(SOURCELOGGER, clazzname + ".source.log");
+				setHandler(SOURCELOGGER, this.logFile + "." + clazzname + ".source.log");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -194,9 +194,9 @@ public class TraceTransformer implements ClassFileTransformer {
 //		for (Handler h : TRACELOGGER.getHandlers()) {
 //			h.close();
 //		}
-		for (Handler h : SOURCELOGGER.getHandlers()) {
-			h.close();
-		}
+//		for (Handler h : SOURCELOGGER.getHandlers()) {
+//			h.close();
+//		}
 	}
 
 	private void clearHandler(Logger l) {
