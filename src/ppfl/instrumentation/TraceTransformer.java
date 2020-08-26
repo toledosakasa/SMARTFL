@@ -203,7 +203,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		ConsoleHandler ch = new ConsoleHandler();
 		ch.setLevel(Level.WARNING);
 		l.addHandler(ch);
-		FileHandler fh = new FileHandler();
+		FileHandler fh = new FileHandler(fn);
 		l.addHandler(fh);
 		fh.setLevel(Level.INFO);
 		fh.setFormatter(new Formatter() {
