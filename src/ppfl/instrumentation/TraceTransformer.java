@@ -63,107 +63,108 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.sourceFile = s;
 	}
 
+	private byte[] transformbody(ClassLoader loader, String className, Class<?> classBeingRedefined,
+			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
+		byte[] byteCode = classfileBuffer;
+		this.setLogger(this.targetClassName);
+		LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
+		try {
+			ClassPool cp = ClassPool.getDefault();
+			CtClass cc = cp.get(targetClassName);
+
+			for (CtBehavior m : cc.getDeclaredBehaviors()) {
+				// hello in console
+				LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
+
+				// get iterator
+				MethodInfo mi = m.getMethodInfo();
+				CodeAttribute ca = mi.getCodeAttribute();
+
+				// add constants to constpool.
+				// index will be used during instrumentation.
+				ConstPool constp = mi.getConstPool();
+				CallBackIndex cbi = new CallBackIndex(constp);
+
+				// record line info and instructions, since instrumentation will change
+				// branchbyte and byte index.
+				CodeIterator tempci = ca.iterator();
+				int lastln = -1;
+
+				Map<Integer, String> instmap = new HashMap<Integer, String>();
+				for (int i = 0; tempci.hasNext(); i++) {
+					int index = tempci.lookAhead();
+					int ln = mi.getLineNumber(index);
+
+					// debugging:line number
+					String getinst = getinst_map(tempci, index, constp);
+					String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index
+							+ ",nextinst=";
+					if (ln != lastln) {
+						lastln = ln;
+						LOGGER.log(Level.INFO, String.valueOf(ln));
+						// System.out.println(ln);
+					}
+
+					// debugging:opcode
+					int op = tempci.byteAt(index);
+					String opc = Mnemonic.OPCODE[op];
+					LOGGER.log(Level.INFO, opc);
+					// System.out.println(opc);
+
+					tempci.next();
+					if (!tempci.hasNext()) {
+						linenumberinfo = linenumberinfo + "-1";
+					} else {
+						linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
+					}
+					instmap.put(i, getinst + linenumberinfo);
+				}
+				// iterate every instruction
+				CodeIterator ci = ca.iterator();
+				for (int i = 0; ci.hasNext(); i++) {
+					// lookahead the next instruction.
+					int index = ci.lookAhead();
+					int op = ci.byteAt(index);
+					OpcodeInst oi = Interpreter.map[op];
+					// linenumber information.
+					String instinfo = instmap.get(i);
+
+					// insert bytecode right before this inst.
+					// print basic information of this instruction
+					this.SOURCELOGGER.log(Level.INFO, instinfo);
+					if (oi != null)
+						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+					// move to the next inst. everything below this will be inserted after the inst.
+					// ci.next();
+					index = ci.next();
+					// print advanced information(e.g. value pushed)
+					if (oi != null)
+						oi.insertByteCodeAfter(ci, index, constp, cbi);
+				}
+				// not sure if this is necessary.
+				ca.computeMaxStack();
+			}
+			byteCode = cc.toBytecode();
+			cc.detach();
+
+		} catch (NotFoundException | CannotCompileException | IOException | BadBytecode e) {
+			LOGGER.log(Level.SEVERE, "[Bug]bytecode error", e);
+		}
+		this.closeLogger();
+		return byteCode;
+	}
+
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
 		try {
 			byte[] byteCode = classfileBuffer;
 			String finalTargetClassName = this.targetClassName.replaceAll("\\.", "/"); // replace . with /
-			if (className == null || !className.equals(finalTargetClassName)) {
+			if (className == null || !className.equals(finalTargetClassName) || loader == null
+					|| !loader.equals(targetClassLoader)) {
 				return byteCode;
 			}
-			this.setLogger(this.targetClassName);
-			if (className.equals(finalTargetClassName) && loader.equals(targetClassLoader)) {
-				LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
-				try {
-					ClassPool cp = ClassPool.getDefault();
-					CtClass cc = cp.get(targetClassName);
-
-//				for (CtBehavior m : cc.getDeclaredBehaviors()) {
-//					LOGGER.log(Level.INFO, "[Agent] method : " + m.getName());
-//				}
-
-					for (CtBehavior m : cc.getDeclaredBehaviors()) {
-						// hello in console
-						LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
-
-						// get iterator
-						MethodInfo mi = m.getMethodInfo();
-						CodeAttribute ca = mi.getCodeAttribute();
-
-						// add constants to constpool.
-						// index will be used during instrumentation.
-						ConstPool constp = mi.getConstPool();
-						CallBackIndex cbi = new CallBackIndex(constp);
-
-						// record line info and instructions, since instrumentation will change
-						// branchbyte and byte index.
-						CodeIterator tempci = ca.iterator();
-						int lastln = -1;
-
-						Map<Integer, String> instmap = new HashMap<Integer, String>();
-						for (int i = 0; tempci.hasNext(); i++) {
-							int index = tempci.lookAhead();
-							int ln = mi.getLineNumber(index);
-
-							// debugging:line number
-							String getinst = getinst_map(tempci, index, constp);
-							String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#"
-									+ index + ",nextinst=";
-							if (ln != lastln) {
-								lastln = ln;
-								LOGGER.log(Level.INFO, String.valueOf(ln));
-								// System.out.println(ln);
-							}
-
-							// debugging:opcode
-							int op = tempci.byteAt(index);
-							String opc = Mnemonic.OPCODE[op];
-							LOGGER.log(Level.INFO, opc);
-							// System.out.println(opc);
-
-							tempci.next();
-							if (!tempci.hasNext()) {
-								linenumberinfo = linenumberinfo + "-1";
-							} else {
-								linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
-							}
-							instmap.put(i, getinst + linenumberinfo);
-						}
-						// iterate every instruction
-						CodeIterator ci = ca.iterator();
-						for (int i = 0; ci.hasNext(); i++) {
-							// lookahead the next instruction.
-							int index = ci.lookAhead();
-							int op = ci.byteAt(index);
-							OpcodeInst oi = Interpreter.map[op];
-							// linenumber information.
-							String instinfo = instmap.get(i);
-
-							// insert bytecode right before this inst.
-							// print basic information of this instruction
-							this.SOURCELOGGER.log(Level.INFO, instinfo);
-							if (oi != null)
-								oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
-							// move to the next inst. everything below this will be inserted after the inst.
-							// ci.next();
-							index = ci.next();
-							// print advanced information(e.g. value pushed)
-							if (oi != null)
-								oi.insertByteCodeAfter(ci, index, constp, cbi);
-						}
-						// not sure if this is necessary.
-						ca.computeMaxStack();
-					}
-					byteCode = cc.toBytecode();
-					cc.detach();
-
-				} catch (NotFoundException | CannotCompileException | IOException | BadBytecode e) {
-					LOGGER.log(Level.SEVERE, "[Bug]bytecode error", e);
-				}
-			}
-			this.closeLogger();
-			return byteCode;
+			return transformbody(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 		} catch (Throwable e) {
 			LOGGER.log(Level.SEVERE, "[Bug]Exception", e);
 			e.printStackTrace();
