@@ -203,9 +203,9 @@ public class TraceTransformer implements ClassFileTransformer {
 //		for (Handler h : TRACELOGGER.getHandlers()) {
 //			h.close();
 //		}
-		for (Handler h : SOURCELOGGER.getHandlers()) {
-			h.close();
-		}
+//		for (Handler h : SOURCELOGGER.getHandlers()) {
+//			h.close();
+//		}
 	}
 
 	private void clearHandler(Logger l) {
