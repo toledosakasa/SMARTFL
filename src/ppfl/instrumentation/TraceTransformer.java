@@ -43,6 +43,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	/** filename for logging */
 	private String logFile = null;
+	private String sourceFile = null;
 
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
 		this.targetClassName = targetClassName;
@@ -50,11 +51,16 @@ public class TraceTransformer implements ClassFileTransformer {
 		Interpreter.init();
 	}
 
+	public void setTargetClassName(String s) {
+		this.targetClassName = s;
+	}
+	
 	public void setLogFile(String s) {
 		this.logFile = s;
 	}
 
 	public void setSourceLogFile(String s) {
+		this.sourceFile = s;
 	}
 
 	@Override
@@ -138,8 +144,10 @@ public class TraceTransformer implements ClassFileTransformer {
 
 						// insert bytecode right before this inst.
 						// print basic information of this instruction
-						this.SOURCELOGGER.log(Level.INFO, instinfo);
-						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+						if(instinfo != null && instinfo != "") {
+							this.SOURCELOGGER.log(Level.INFO, instinfo);
+							oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+						}
 						// move to the next inst. everything below this will be inserted after the inst.
 						// ci.next();
 						index = ci.next();
@@ -153,7 +161,7 @@ public class TraceTransformer implements ClassFileTransformer {
 				cc.detach();
 
 			} catch (NotFoundException | CannotCompileException | IOException | BadBytecode e) {
-				LOGGER.log(Level.SEVERE, "Exception", e);
+				LOGGER.log(Level.SEVERE, "[Bug]Exception", e);
 			}
 		}
 		this.closeLogger();
@@ -184,7 +192,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			LOGGER.log(Level.INFO, "[Agent] Logfile: " + this.logFile);
 			try {
 				setHandler(TRACELOGGER, this.logFile);
-				setHandler(SOURCELOGGER, this.logFile + "." + clazzname + ".source.log");
+				setHandler(SOURCELOGGER, this.sourceFile);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
