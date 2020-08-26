@@ -138,13 +138,6 @@ public class TraceTransformer implements ClassFileTransformer {
 						int op = ci.byteAt(index);
 						OpcodeInst oi = Interpreter.map[op];
 
-						// skip unimplemented insts.
-						if (oi == null) {
-							ci.next();
-							continue;
-						}
-							
-
 						// linenumber information.
 						String instinfo = instmap.get(i);
 
@@ -152,13 +145,15 @@ public class TraceTransformer implements ClassFileTransformer {
 						// print basic information of this instruction
 						if (instinfo != null && instinfo != "") {
 							this.SOURCELOGGER.log(Level.INFO, instinfo);
-							oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+							if (oi != null)
+								oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 						}
 						// move to the next inst. everything below this will be inserted after the inst.
 						// ci.next();
 						index = ci.next();
 						// print advanced information(e.g. value pushed)
-						oi.insertByteCodeAfter(ci, index, constp, cbi);
+						if (oi != null)
+							oi.insertByteCodeAfter(ci, index, constp, cbi);
 					}
 					// not sure if this is necessary.
 					ca.computeMaxStack();
