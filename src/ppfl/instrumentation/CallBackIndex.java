@@ -1,5 +1,7 @@
 package ppfl.instrumentation;
 
+import java.util.logging.Logger;
+
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -21,6 +23,7 @@ public class CallBackIndex {
 	public int tsindex_string;
 	public int tsindex_object;
 
+	
 	public int getLdcCallBack(Object o) {
 		// decide v's type using instanceof
 		if (o instanceof String)

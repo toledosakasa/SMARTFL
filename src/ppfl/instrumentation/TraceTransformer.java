@@ -18,6 +18,7 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
@@ -33,8 +34,10 @@ public class TraceTransformer implements ClassFileTransformer {
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
 	// The logger name
-	public static Logger TRACELOGGER = Logger.getLogger("PPFL_LOGGER");
-	public final Logger SOURCELOGGER = Logger.getLogger("PPFL_LOGGER_SOURCE");
+	public final static String traceLoggerName = "PPFL_LOGGER";
+	public final static String sourceLoggerName = "PPFL_LOGGER_SOURCE";
+	public final static Logger TRACELOGGER = Logger.getLogger(traceLoggerName);
+	public final static Logger SOURCELOGGER = Logger.getLogger(sourceLoggerName);
 
 	/** The internal form class name of the class to transform */
 	private String targetClassName;
@@ -89,6 +92,10 @@ public class TraceTransformer implements ClassFileTransformer {
 		// hello in console
 		LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
 
+		if(!(m instanceof CtMethod)) {
+			return;
+		}
+		
 		// get iterator
 		MethodInfo mi = m.getMethodInfo();
 		CodeAttribute ca = mi.getCodeAttribute();
@@ -234,7 +241,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			@Override
 			public synchronized void publish(final LogRecord record) {
 				super.publish(record);
-				flush();
+				//flush();
 			}
 		};
 		fh.setLevel(Level.INFO);
