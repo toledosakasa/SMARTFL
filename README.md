@@ -45,3 +45,16 @@ run tracing and get trace log.
 
 Add new test method in GraphTest (basically the same as existing ones.)
 
+## Run on defects4j
+Modify defects4j with the following:
+
+git fetch https://github.com/Ultimanecat/defects4j
+
+(cd to your working directory)
+
+defects4j checkout -w ./lang3b
+
+defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -w ./lang3b -a -Djvmargs=\"-javaagent:[pathtotracer.jar]=logfile=[pathtologfile],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils\"
+
+Note: log file name can be added with .1 as java.util.logging performs badly(FIXME)
+
