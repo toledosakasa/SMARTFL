@@ -56,5 +56,7 @@ defects4j checkout -w ./lang3b
 
 defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -w ./lang3b -a -Djvmargs=\"-javaagent:[pathtotracer.jar]=logfile=[pathtologfile],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils\"
 
+for debugging use, copy the ant commandline (you should see that by running the instructions above) and run it.
+
 Note: log file name can be added with .1 as java.util.logging performs badly(FIXME)
 
