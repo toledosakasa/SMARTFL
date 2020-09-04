@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/ppfl/test/trace/BadReturnTest.java"/>
+<listEntry value="/ppfl"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-<listEntry value="1"/>
+<listEntry value="4"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
 <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
 <stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value="fail"/>
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit5"/>
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="trace.BadReturnTest"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ppfl"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-noverify -javaagent:${workspace_project_locations}/lib/btrace/build/btrace-agent.jar=noserver,debug=true,scriptOutputFile=${workspace_project_locations}/test/trace/logs/btrace/BadReturnTest.fail.log,script=${resource_loc:/ppfl/test/trace/patterns/BadReturnTest_pattern.class}"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-noverify -javaagent:${workspace_project_locations}/lib/btrace/build/btrace-agent.jar=noserver,debug=true,scriptOutputFile=${workspace_project_locations}/trace/logs/btrace/BadReturnTest.fail.log,script=${resource_loc:/ppfl/trace/patterns/BadReturnTest_pattern.class}"/>
 </launchConfiguration>

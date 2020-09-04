@@ -11,6 +11,7 @@ if(platform.system() == 'Windows'):
 
 dirs2make = ["./configs","./test/trace/patterns","./test/trace/logs","./test/trace/logs/btrace","./test/trace/logs/mytrace"]
 testdir = os.path.abspath("./test/trace")
+tracedir = os.path.abspath("./trace")
 for dir in dirs2make:
 	if not(os.path.exists(dir)):
 		os.makedirs(dir)
@@ -27,7 +28,7 @@ def btrace():
 
 	#generate pattern file for btrace
 	files = os.listdir(testdir)
-	scriptroot = testdir + '/patterns'
+	scriptroot = tracedir + '/patterns'
 	for filename in files:
 		if not(os.path.isdir(filename)):
 			if filename.endswith('.java'):
