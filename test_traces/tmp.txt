@@ -1,8 +1,0 @@
-### BTrace Log: 20-3-1 обнГ5:57
-
-foo.main:14
-foo.f:5
-foo.f:6
-foo.f:7
-foo.f:8
-foo.main:15
