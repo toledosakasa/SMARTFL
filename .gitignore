@@ -5,3 +5,4 @@
 /configs/*.launch
 *.log
 /refs/
+target/ppfl-0.0.1-SNAPSHOT.jar

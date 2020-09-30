@@ -14,6 +14,15 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+       <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <configuration>
+          <archive>
+          	<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>

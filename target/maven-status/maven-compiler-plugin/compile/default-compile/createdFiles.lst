@@ -22,6 +22,7 @@ ppfl\instrumentation\opcode\SipushInst.class
 ppfl\instrumentation\TraceTransformer$2.class
 ppfl\instrumentation\opcode\IincInst.class
 ppfl\instrumentation\opcode\Aload_NInst.class
+ppfl\instrumentation\RuntimeFrame.class
 ppfl\instrumentation\opcode\XastoreInst.class
 ppfl\instrumentation\opcode\FturntypeInst.class
 ppfl\instrumentation\opcode\Lload_NInst.class
