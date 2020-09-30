@@ -26,14 +26,14 @@ public class RuntimeFrame {
 	public String getDomain() {
 		return this.traceclass + ":" + this.tracemethod + "#" + String.valueOf(entercnt) + ":";
 	}
-	
-	public static RuntimeFrame getFrame(String tclass,String tmethod) {
-		String id = tclass + ":" +tmethod;
-		if(!framemap.containsKey(id)) {
-			framemap.put(id,new RuntimeFrame(tclass,tmethod));
+
+	public static RuntimeFrame getFrame(String tclass, String tmethod) {
+		String id = tclass + ":" + tmethod;
+		if (!framemap.containsKey(id)) {
+			framemap.put(id, new RuntimeFrame(tclass, tmethod));
 		}
 		return framemap.get(id);
 	}
-	
+
 	private static Map<String, RuntimeFrame> framemap = new HashMap<String, RuntimeFrame>();
 }

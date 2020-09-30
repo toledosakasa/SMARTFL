@@ -1,7 +1,5 @@
 package ppfl.instrumentation;
 
-import java.util.logging.Logger;
-
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
