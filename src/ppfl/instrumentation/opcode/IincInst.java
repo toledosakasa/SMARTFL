@@ -49,9 +49,9 @@ public class IincInst extends OpcodeInst {
 		// build factor.
 		if (defnode != null) {
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-			if (graph.auto_oracle) {
-				graph.last_defined_var = defnode;
-			}
+//			if (graph.auto_oracle) {
+//				graph.last_defined_var = defnode;
+//			}
 		}
 	}
 	

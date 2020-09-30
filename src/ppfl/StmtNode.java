@@ -21,6 +21,11 @@ public class StmtNode extends Node {
 		System.out.println("");
 	}
 
+	public int getLineNumber() {
+		String[] sp = this.name.split("#");
+		return Integer.parseInt(sp[1]);
+	}
+	
 	public String getName() {
 		return this.name;
 	}

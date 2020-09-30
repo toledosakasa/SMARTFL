@@ -2,6 +2,7 @@ package ppfl.instrumentation.opcode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -9,6 +10,7 @@ import ppfl.ByteCodeGraph;
 import ppfl.Node;
 import ppfl.ParseInfo;
 import ppfl.StmtNode;
+import ppfl.instrumentation.RuntimeFrame;
 
 //184
 public class InvokestaticInst extends OpcodeInst {
@@ -31,26 +33,34 @@ public class InvokestaticInst extends OpcodeInst {
 		StmtNode stmt = buildstmt(graph);
 
 		ParseInfo info = graph.parseinfo;
+		String traceclass = info.getvalue("callclass");
+		String tracemethod = info.getvalue("callname");
 		// defs
 		int argcnt = OpcodeInst.getArgNumByDesc(info.getvalue("calltype"));
+		List<Node> prednodes = new ArrayList<Node>();
+
+		Vector<Node> usenodes = new Vector<Node>();
+		// collect arguments
 		for (int i = 0; i < argcnt; i++) {
-			List<Node> prednodes = new ArrayList<Node>();
-			List<Node> usenodes = new ArrayList<Node>();
-			Node node = graph.runtimestack.pop();
+			Node node = graph.getRuntimeStack().pop();
 			usenodes.add(node);
+
+		}
+
+		// switch stack frame
+		graph.pushStackFrame(traceclass, tracemethod);
+
+		for (int i = 0; i < argcnt; i++) {
 			// static arguments starts with 0
-			String traceclass = info.getvalue("callclass");
-			String tracemethod = info.getvalue("callname");
 			int paravarindex = argcnt - i - 1;
-			//non-static
-			//paravarindex = argcnt -i;
+			// non-static
+			// paravarindex = argcnt -i;
 			Node defnode = graph.addNewVarNode(paravarindex, stmt, traceclass, tracemethod);
-//			graph.incVarIndex(paravarindex, traceclass, tracemethod);
-//			String nodename = graph.getFormalVarNameWithIndex(paravarindex, traceclass, tracemethod);
-//			Node defnode = new Node(nodename, graph.testname, stmt);
-//			graph.addNode(nodename, defnode);
-//			assert (defnode == graph.getNode(nodename));
-			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+
+			List<Node> adduse = new ArrayList<Node>();
+			adduse.add(usenodes.get(i));
+
+			graph.buildFactor(defnode, prednodes, adduse, null, stmt);
 		}
 	}
 }

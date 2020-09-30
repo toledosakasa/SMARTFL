@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.Stack;
 
 import ppfl.instrumentation.Interpreter;
+import ppfl.instrumentation.RuntimeFrame;
 
 public class ByteCodeGraph {
 
@@ -34,9 +35,32 @@ public class ByteCodeGraph {
 	Random random;
 
 	// stack tracing
-	public Stack<Node> runtimestack;
-	//
-	public Map<String, Integer> stackheightmap;
+	private Stack<RuntimeFrame> stackframe;
+
+	// should be called while returning.
+	// e.g. return ireturn
+	public void popStackFrame() {
+		this.stackframe.pop().runtimestack.clear();
+	}
+
+	// should be called while invoking.
+	// e.g. invokestatic
+	public void pushStackFrame(String tclass, String tmethod) {
+		RuntimeFrame topush = RuntimeFrame.getFrame(tclass, tmethod);
+		topush.entercnt++;
+		this.stackframe.push(topush);
+	}
+
+	public RuntimeFrame getFrame() {
+		if (stackframe.empty()) {
+			stackframe.push(RuntimeFrame.getFrame(parseinfo.traceclass, parseinfo.tracemethod));
+		}
+		return stackframe.peek();
+	}
+
+	public Stack<Node> getRuntimeStack() {
+		return getFrame().runtimestack;
+	}
 
 	// local vars used by parsing
 	public ParseInfo parseinfo;
@@ -46,8 +70,10 @@ public class ByteCodeGraph {
 	// output (return value) of the function being tested as 0.0/1.0 depends on
 	// parameter testpass(true = 1.0,false = 0.0)
 	public boolean auto_oracle;
-	public Node last_defined_var = null;
-	public StmtNode last_defined_stmt = null;
+
+	public int last_defined_line = 0;
+	public List<Node> last_defined_var = new ArrayList<Node>();
+	public List<StmtNode> last_defined_stmt = new ArrayList<StmtNode>();
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
@@ -60,7 +86,7 @@ public class ByteCodeGraph {
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
-		runtimestack = new Stack<Node>();
+		stackframe = new Stack<RuntimeFrame>();
 		Interpreter.init();
 	}
 
@@ -75,8 +101,7 @@ public class ByteCodeGraph {
 	public void initmaps() {
 		// TODO this could be incomplete.
 		this.varcountmap = new HashMap<String, Integer>();
-		this.stackheightmap = new HashMap<String, Integer>();
-		this.runtimestack = new Stack<Node>();
+		this.stackframe = new Stack<RuntimeFrame>();
 	}
 
 	public void parsesource(String sourcefilename) {
@@ -114,8 +139,10 @@ public class ByteCodeGraph {
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
 			if (auto_oracle) {
-				this.last_defined_var.observe(testpass);
-				System.out.println("Observe " + this.last_defined_var.name + " as " + testpass);
+				for (Node i : last_defined_var) {
+					i.observe(testpass);
+					System.out.println("Observe " + i.name + " as " + testpass);
+				}
 			}
 			reader.close();
 		} catch (IOException e) {
@@ -125,6 +152,16 @@ public class ByteCodeGraph {
 
 	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
 			StmtNode stmt) {
+
+		if (auto_oracle) {
+			int ln = stmt.getLineNumber();
+			if(this.last_defined_line != ln) {
+				this.last_defined_line = ln;
+				this.last_defined_var.clear();
+			}
+			this.last_defined_var.add(defnode);
+		}
+
 		Edge dedge = new Edge();
 		dedge.setnode(defnode);
 		defnode.add_edge(dedge);
@@ -159,15 +196,15 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
-	private void incStackIndex() {
-		String domain = this.getFormalStackName();
-		// System.out.println(domain);
-		if (!stackheightmap.containsKey(domain)) {
-			stackheightmap.put(domain, 1);
-		} else {
-			stackheightmap.put(domain, stackheightmap.get(domain) + 1);
-		}
-	}
+//	private void incStackIndex() {
+//		String domain = this.getFormalStackName();
+//		// System.out.println(domain);
+//		if (!stackheightmap.containsKey(domain)) {
+//			stackheightmap.put(domain, 1);
+//		} else {
+//			stackheightmap.put(domain, stackheightmap.get(domain) + 1);
+//		}
+//	}
 
 	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
 		String def = this.getFormalVarName(varindex, traceclass, tracemethod);
@@ -188,7 +225,7 @@ public class ByteCodeGraph {
 	}
 
 	private String getDomain() {
-		return this.parseinfo.traceclass + ":" + this.parseinfo.tracemethod + ":";
+		return getFrame().getDomain();
 	}
 
 	private String getFormalStackName() {
@@ -197,12 +234,12 @@ public class ByteCodeGraph {
 	}
 
 	private String getFormalStackNameWithIndex() {
-		return getVarName(this.getFormalStackName(), this.stackheightmap);
+		return getVarName(this.getFormalStackName(), this.getRuntimeStack().size());
 	}
 
 	private String getFormalVarName(int varindex, String traceclass, String tracemethod) {
 		String name = String.valueOf(varindex);
-		return traceclass + ":" + tracemethod + ":" + name;
+		return this.getDomain() + name;
 	}
 
 	private String getFormalVarName(int varindex) {
@@ -218,11 +255,14 @@ public class ByteCodeGraph {
 		return getVarName(getFormalVarName(varindex), this.varcountmap);
 	}
 
+	private String getVarName(String name, int count) {
+		return name + "#" + String.valueOf(count);
+	}
+
 	private String getVarName(String name, Map<String, Integer> map) {
 		if (!map.containsKey(name))
 			System.out.println(name);
-		int count = map.get(name);
-		return name + "#" + String.valueOf(count);
+		return getVarName(name, map.get(name));
 	}
 
 	private String getNodeName(String name) {
@@ -234,11 +274,11 @@ public class ByteCodeGraph {
 	}
 
 	public Node addNewStackNode(StmtNode stmt) {
-		this.incStackIndex();
+		// this.incStackIndex();
 		String nodename = this.getFormalStackNameWithIndex();
 		Node node = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, node);
-		this.runtimestack.add(node);
+		this.getRuntimeStack().add(node);
 		return node;
 	}
 

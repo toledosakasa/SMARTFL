@@ -7,10 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.junit.jupiter.api.Test;
 
 class GraphTest {
@@ -197,10 +193,10 @@ class GraphTest {
 	ByteCodeGraph mergeinit_bc() {
 		boolean fail = false;
 		String ppflroot = ".";
-		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
+		String passpath = ppflroot + "\\trace\\MergeTest.java";
 		String failpath = passpath;
-		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.pass.log";
-		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.fail.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
