@@ -1,8 +1,9 @@
-/bin/
+bin/
 *.class
-/test/trace/patterns/
-/test/trace/logs
-/configs/*.launch
+test/trace/patterns/
+test/trace/logs
+configs/*.launch
 *.log
 /refs/
-target/ppfl-0.0.1-SNAPSHOT.jar
+trace/logs/
+target/

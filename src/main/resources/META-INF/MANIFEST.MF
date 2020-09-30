@@ -3,5 +3,3 @@ Agent-Class: ppfl.instrumentation.InstrumentationAgent
 Can-Redefine-Classes: true
 Can-Retransform-Classes: true
 Premain-Class: ppfl.instrumentation.InstrumentationAgent
-Boot-Class-Path: javassist-3.27.0-GA.jar slf4j-api-1.7.30.jar slf4j-simple-1.7.30.jar
-Class-Path: javassist-3.27.0-GA.jar slf4j-api-1.7.30.jar slf4j-simple-1.7.30.jar
