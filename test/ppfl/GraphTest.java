@@ -193,10 +193,10 @@ class GraphTest {
 	ByteCodeGraph mergeinit_bc() {
 		boolean fail = false;
 		String ppflroot = ".";
-		String passpath = ppflroot + "\\trace\\MergeTest.java";
+		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
 		String failpath = passpath;
-		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
-		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.fail.log";
+		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.fail.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
