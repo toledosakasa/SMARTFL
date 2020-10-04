@@ -405,7 +405,7 @@ class GraphTest {
 	}
 
 	//btrace:need to have different signs;
-	//TODOtest: use the same sign for the new mytrace
+	// TODO test: use the same sign for the new mytrace
 	@Test
 	void mulcalltest() {
 		Graph pgraph = mulcallinit();
@@ -529,6 +529,29 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 
+	ByteCodeGraph parainit_bc() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ParaTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ParaTest.fail.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		// TODO find the error in this parsetrace, missing key is "trace.ParaTest:func2#1:2"
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+	
+	@Test
+	void paratest_bc() {
+		ByteCodeGraph pgraph = parainit_bc();
+		pgraph.check_bp(true);
+	}
+
 	Graph modinit() {
 		boolean fail = false;
 		String ppflroot = ".";
@@ -551,6 +574,28 @@ class GraphTest {
 	@Test
 	void modtest() {
 		Graph pgraph = modinit();
+		pgraph.check_bp(true);
+	}
+
+	ByteCodeGraph modinit_bc() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\ModTest.java";
+		String failpath = passpath;
+		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ModTest.pass.log";
+		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ModTest.fail.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+	
+	@Test
+	void modtest_bc() {
+		ByteCodeGraph pgraph = modinit_bc();
 		pgraph.check_bp(true);
 	}
 
@@ -596,6 +641,26 @@ class GraphTest {
 	@Test
 	void simpleflowtest() {
 		Graph pgraph = simpleflowinit();
+		pgraph.check_bp(true);
+	}
+
+	ByteCodeGraph simpleflowinit_bc() {
+		boolean fail = false;
+		String ppflroot = ".";
+		String passpath = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
+		String failpath = passpath;
+		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\SimpleFlowTest.fail.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.printgraph();
+		return pgraph;
+	}
+	
+	@Test
+	void simpleflowtest_bc() {
+		ByteCodeGraph pgraph = simpleflowinit_bc();
 		pgraph.check_bp(true);
 	}
 

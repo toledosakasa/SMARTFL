@@ -14,12 +14,12 @@ class ModTest {
 
 	@Test
 	void pass() {
-		assertEquals(f(1), 2);
+		assertEquals(f(0), 1);
 	}
 
 	@Test
 	void fail() {
-		assertEquals(f(3), 4);
+		assertEquals(f(2), 3);
 	}
 
 }
