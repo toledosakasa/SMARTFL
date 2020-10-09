@@ -316,6 +316,7 @@ public class OpcodeInst {
 
 		// build factor.
 		if (defnode != null) {
+			// TODO should consider ops.
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
 	}
