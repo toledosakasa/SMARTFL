@@ -29,7 +29,7 @@ class GraphTest {
 	}
 
 	@Test
-	void gcdtest() {
+	public void gcdtest() {
 		boolean fail = false;
 		Graph pgraph = gengraph("gcdtest");
 		pgraph.observe("a#9#1", true);
@@ -48,7 +48,7 @@ class GraphTest {
 	}
 
 	@Test
-	void rectest() {
+	public void rectest() {
 		boolean fail = false;
 		// should there be a tmp var of the return value?"
 		Graph pgraph = gengraph("recursivetest");
@@ -56,7 +56,7 @@ class GraphTest {
 	}
 
 	@Test
-	void sumtest() {
+	public void sumtest() {
 		boolean fail = false;
 		// runtime error, seems to be caused by "for loop"
 		Graph pgraph = gengraph("sumtest");
@@ -105,7 +105,7 @@ class GraphTest {
 	}
 	
 	@Test
-	void domaintest() {
+	public void domaintest() {
 		boolean fail = false;
 		Graph pgraph = dominit();
 		try {
@@ -120,7 +120,7 @@ class GraphTest {
 	}
 
 	@Test
-	void domaintest_bytecode() {
+	public void domaintest_bytecode() {
 		boolean fail = false;
 		ByteCodeGraph pgraph = dominit_bytecode();
 		try {
@@ -135,7 +135,7 @@ class GraphTest {
 	}
 	
 	@Test
-	void BFtest() {
+	public void BFtest() {
 		boolean fail = false;
 		Graph pgraph = dominit();
 		try {
@@ -150,13 +150,13 @@ class GraphTest {
 	}
 
 	@Test
-	void bptest() {
+	public void bptest() {
 		Graph pgraph = dominit();
 		pgraph.check_bp_with_bf(true);
 	}
 	
 	@Test
-	void bptest_bytegraph() {
+	public void bptest_bytegraph() {
 		ByteCodeGraph pgraph = dominit_bytecode();
 		pgraph.check_bp_with_bf(true);
 	}
@@ -185,7 +185,7 @@ class GraphTest {
 	}
 
 	@Test
-	void mergetest() {
+	public void mergetest() {
 		Graph pgraph = mergeinit();
 		pgraph.check_bp_with_bf(true);
 	}
@@ -195,8 +195,8 @@ class GraphTest {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
 		String failpath = passpath;
-		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.pass.log";
-		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\MergeTest.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.fail.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
@@ -214,7 +214,7 @@ class GraphTest {
 	}
 	
 	@Test
-	void mergetest_bc() {
+	public void mergetest_bc() {
 		ByteCodeGraph pgraph = mergeinit_bc();
 		pgraph.check_bp(true);
 	}
@@ -234,7 +234,7 @@ class GraphTest {
 	}
 
 	@Test
-	void sqrttest() {
+	public void sqrttest() {
 		Graph pgraph = sqrtinit();
 		pgraph.check_bp(true);
 	}
@@ -254,7 +254,7 @@ class GraphTest {
 	}
 
 	@Test
-	void heavylooptest() {
+	public void heavylooptest() {
 		Graph pgraph = heavyloopinit();
 		pgraph.check_bp(false);
 	}
@@ -274,7 +274,7 @@ class GraphTest {
 	}
 
 	@Test
-	void lightlooptest() {
+	public void lightlooptest() {
 		Graph pgraph = lightloopinit();
 		pgraph.check_bp(true);
 	}
@@ -298,7 +298,7 @@ class GraphTest {
 	}
 
 	@Test
-	void breaktest() {
+	public void breaktest() {
 		Graph pgraph = breakinit();
 		pgraph.check_bp(true);
 	}
@@ -322,7 +322,7 @@ class GraphTest {
 	}
 
 	@Test
-	void badreturntest() {
+	public void badreturntest() {
 		Graph pgraph = badreturninit();
 		pgraph.check_bp(true);
 	}
@@ -352,7 +352,7 @@ class GraphTest {
 	}
 
 	@Test
-	void fourtest() {
+	public void fourtest() {
 		Graph pgraph = fourinit();
 		pgraph.check_bp(true);
 		/*
@@ -381,7 +381,7 @@ class GraphTest {
 	}
 
 	@Test
-	void newtest() {
+	public void newtest() {
 		Graph pgraph = newinit();
 		pgraph.check_bp(true);
 	}
@@ -407,7 +407,7 @@ class GraphTest {
 	//btrace:need to have different signs;
 	// TODO test: use the same sign for the new mytrace
 	@Test
-	void mulcalltest() {
+	public void mulcalltest() {
 		Graph pgraph = mulcallinit();
 		pgraph.check_bp(true);
 	}
@@ -431,7 +431,7 @@ class GraphTest {
 	}
 
 	@Test
-	void trycatchtest() {
+	public void trycatchtest() {
 		Graph pgraph = trycatchinit();
 		pgraph.check_bp(true);
 	}
@@ -455,7 +455,7 @@ class GraphTest {
 	}
 
 	@Test
-	void switchtest() {
+	public void switchtest() {
 		Graph pgraph = switchinit();
 		pgraph.check_bp(true);
 	}
@@ -500,7 +500,7 @@ class GraphTest {
 	}
 
 	@Test
-	void fulltest() {
+	public void fulltest() {
 		Graph pgraph = fullinit();
 		pgraph.check_bp(true);
 	}
@@ -524,7 +524,7 @@ class GraphTest {
 	}
 
 	@Test
-	void paratest() {
+	public void paratest() {
 		Graph pgraph = parainit();
 		pgraph.check_bp(true);
 	}
@@ -547,7 +547,7 @@ class GraphTest {
 	}
 	
 	@Test
-	void paratest_bc() {
+	public void paratest_bc() {
 		ByteCodeGraph pgraph = parainit_bc();
 		pgraph.check_bp(true);
 	}
@@ -572,7 +572,7 @@ class GraphTest {
 	}
 
 	@Test
-	void modtest() {
+	public void modtest() {
 		Graph pgraph = modinit();
 		pgraph.check_bp(true);
 	}
@@ -594,7 +594,7 @@ class GraphTest {
 	}
 	
 	@Test
-	void modtest_bc() {
+	public void modtest_bc() {
 		ByteCodeGraph pgraph = modinit_bc();
 		pgraph.check_bp(true);
 	}
@@ -619,7 +619,7 @@ class GraphTest {
 	}
 
 	@Test
-	void branchtest() {
+	public void branchtest() {
 		Graph pgraph = branchinit();
 		pgraph.check_bp(true);
 	}
@@ -639,7 +639,7 @@ class GraphTest {
 	}
 
 	@Test
-	void simpleflowtest() {
+	public void simpleflowtest() {
 		Graph pgraph = simpleflowinit();
 		pgraph.check_bp(true);
 	}
@@ -659,7 +659,7 @@ class GraphTest {
 	}
 	
 	@Test
-	void simpleflowtest_bc() {
+	public void simpleflowtest_bc() {
 		ByteCodeGraph pgraph = simpleflowinit_bc();
 		pgraph.check_bp(true);
 	}
