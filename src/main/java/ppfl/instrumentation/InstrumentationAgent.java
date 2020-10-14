@@ -113,7 +113,6 @@ public class InstrumentationAgent {
 		TraceTransformer dt = new TraceTransformer(clazz.getName(), classLoader);
 		if (logFile != null) {
 			dt.setLogFile(logFile);
-			dt.setSourceLogFile(logFile + clazz.getName() + ".source.log");
 		}
 		instrumentation.addTransformer(dt, true);
 		try {

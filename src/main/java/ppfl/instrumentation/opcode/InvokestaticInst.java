@@ -52,6 +52,7 @@ public class InvokestaticInst extends OpcodeInst {
 
 		for (int i = 0; i < argcnt; i++) {
 			// static arguments starts with 0
+			//FIXME double argument index
 			int paravarindex = argcnt - i - 1;
 			// non-static
 			// paravarindex = argcnt -i;

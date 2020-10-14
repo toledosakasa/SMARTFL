@@ -534,8 +534,8 @@ class GraphTest {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
 		String failpath = passpath;
-		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ParaTest.pass.log";
-		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ParaTest.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\ParaTest.pass.log";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\ParaTest.fail.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);

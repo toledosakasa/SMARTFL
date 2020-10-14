@@ -6,13 +6,10 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -30,14 +27,14 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
-	private static Logger LOGGER = Logger.getLogger("TraceTransformer");
+	private static Logger LOGGER = LoggerFactory.getLogger("TraceTransformer");
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
 	// The logger name
 	public final static String traceLoggerName = "PPFL_LOGGER";
 	public final static String sourceLoggerName = "PPFL_LOGGER_SOURCE";
-	public final static Logger TRACELOGGER = Logger.getLogger(traceLoggerName);
-	public final static Logger SOURCELOGGER = Logger.getLogger(sourceLoggerName);
+	public static Logger TRACELOGGER = LoggerFactory.getLogger(traceLoggerName);
+	public static Logger SOURCELOGGER = LoggerFactory.getLogger(sourceLoggerName);
 
 	/** The internal form class name of the class to transform */
 	private String targetClassName;
@@ -46,8 +43,6 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	/** filename for logging */
 	private String logFile = null;
-	private String sourceFile = null;
-
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
@@ -59,18 +54,15 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	public void setLogFile(String s) {
-		this.logFile = s;
-	}
-
-	public void setSourceLogFile(String s) {
-		this.sourceFile = s;
+		this.logFile = s.replace('\\','.').replace('/','.');
+		MDC.put("logfile", this.logFile);
 	}
 
 	private byte[] transformBody(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 		byte[] byteCode = classfileBuffer;
 		this.setLogger(this.targetClassName);
-		LOGGER.log(Level.INFO, "[Agent] Transforming class " + this.targetClassName);
+		LOGGER.info("[Agent] Transforming class " + this.targetClassName);
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(targetClassName);
@@ -82,20 +74,19 @@ public class TraceTransformer implements ClassFileTransformer {
 			cc.detach();
 
 		} catch (NotFoundException | CannotCompileException | IOException | BadBytecode e) {
-			LOGGER.log(Level.SEVERE, "[Bug]bytecode error", e);
+			LOGGER.error("[Bug]bytecode error", e);
 		}
-		this.closeLogger();
 		return byteCode;
 	}
 
 	private void transformBehavior(CtBehavior m, CtClass cc) throws NotFoundException, BadBytecode {
 		// hello in console
-		LOGGER.log(Level.INFO, "[Agent] Transforming method " + m.getName());
+		LOGGER.info("[Agent] Transforming method " + m.getName());
 
-		if(!(m instanceof CtMethod)) {
+		if (!(m instanceof CtMethod)) {
 			return;
 		}
-		
+
 		// get iterator
 		MethodInfo mi = m.getMethodInfo();
 		CodeAttribute ca = mi.getCodeAttribute();
@@ -121,14 +112,14 @@ public class TraceTransformer implements ClassFileTransformer {
 					+ ",nextinst=";
 			if (ln != lastln) {
 				lastln = ln;
-				LOGGER.log(Level.INFO, String.valueOf(ln));
+				LOGGER.info(String.valueOf(ln));
 				// System.out.println(ln);
 			}
 
 			// debugging:opcode
 			int op = tempci.byteAt(index);
 			String opc = Mnemonic.OPCODE[op];
-			LOGGER.log(Level.INFO, opc);
+			LOGGER.info(opc);
 			// System.out.println(opc);
 
 			tempci.next();
@@ -151,8 +142,8 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			// insert bytecode right before this inst.
 			// print basic information of this instruction
-			//LOGGER.log(Level.SEVERE, instinfo);
-			this.SOURCELOGGER.log(Level.INFO, instinfo);
+			// LOGGER.log(Level.SEVERE, instinfo);
+			SOURCELOGGER.info(instinfo);
 			if (oi != null)
 				oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 			// move to the next inst. everything below this will be inserted after the inst.
@@ -178,83 +169,14 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 			return transformBody(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 		} catch (Throwable e) {
-			LOGGER.log(Level.SEVERE, "[Bug]Exception", e);
+			LOGGER.error("[Bug]Exception", e);
 			e.printStackTrace();
 			return null;
 		}
 	}
 
 	private void setLogger(String clazzname) {
-		// disable default console output
-		Logger rootlogger = LOGGER.getParent();
-		clearHandler(rootlogger);
-
-		// set a debug handler formatter
-		ConsoleHandler debugHandler = new ConsoleHandler();
-		debugHandler.setLevel(Level.WARNING);
-		debugHandler.setFormatter(new Formatter() {
-			@Override
-			public String format(LogRecord record) {
-				return record.getLevel() + ":" + record.getMessage() + "\n";
-			}
-		});
-
-		// add debug handler to LOGGER
-		clearHandler(LOGGER);
-		LOGGER.addHandler(debugHandler);
-
-		// set file handlers for dynamic & source tracing
-		if (this.logFile != null) {
-			LOGGER.log(Level.INFO, "[Agent] Logfile: " + this.logFile);
-			try {
-				setHandler(TRACELOGGER, this.logFile);
-				setHandler(SOURCELOGGER, this.sourceFile);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private void closeLogger() {
-//		for (Handler h : TRACELOGGER.getHandlers()) {
-//			h.close();
-//		}
-//		for (Handler h : SOURCELOGGER.getHandlers()) {
-//			h.close();
-//		}
-	}
-
-	private void clearHandler(Logger l) {
-		for (Handler h : l.getHandlers()) {
-			l.removeHandler(h);
-		}
-		return;
-	}
-
-	private void setHandler(Logger l, String fn) throws IOException {
-		clearHandler(l);
-		ConsoleHandler ch = new ConsoleHandler();
-		ch.setLevel(Level.WARNING);
-
-		FileHandler fh = new FileHandler(fn) {
-			@Override
-			public synchronized void publish(final LogRecord record) {
-				super.publish(record);
-				//flush();
-			}
-		};
-		fh.setLevel(Level.INFO);
-		fh.setFormatter(new Formatter() {
-			@Override
-			public String format(LogRecord record) {
-				return record.getMessage();
-				// return record.getLevel() + ":" + record.getMessage() + "\n";
-			}
-		});
-
-		l.addHandler(ch);
-		l.addHandler(fh);
+		MDC.put("sourcefile", clazzname);
 	}
 
 	private String getinst_map(CodeIterator ci, int index, ConstPool constp) {
@@ -263,7 +185,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		String opc = Mnemonic.OPCODE[op];
 		OpcodeInst oi = Interpreter.map[op];
 		if (oi == null) {
-			LOGGER.log(Level.WARNING, "unsupported opcode: " + opc);
+			LOGGER.warn("unsupported opcode: " + opc);
 			return "";
 		}
 		inst = oi.getinst(ci, index, constp);

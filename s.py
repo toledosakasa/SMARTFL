@@ -12,6 +12,7 @@ if(platform.system() == 'Windows'):
 dirs2make = ["./configs","./test/trace/patterns","./test/trace/logs","./test/trace/logs/btrace","./test/trace/logs/mytrace"]
 testdir = os.path.abspath("./test/trace")
 tracedir = os.path.abspath("./trace")
+logconfigdir = os.path.abspath("./src\main\resources")
 for dir in dirs2make:
 	if not(os.path.exists(dir)):
 		os.makedirs(dir)
