@@ -9,6 +9,10 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.*;
+import org.graphstream.ui.view.*;
+
 class GraphTest {
 
 	Graph gengraph(String name) {
@@ -95,7 +99,7 @@ class GraphTest {
 		// pgraph.observe("a#3#3", false);
 		// pgraph.observe("trace.DomainTest.test#18", true);
 		// pgraph.observe("a#9#3", false);
-		//pgraph.parsesource(filepatht);
+		// pgraph.parsesource(filepatht);
 		// 2nd parameter : test name(must be the same as in junit test, otherwise
 		// auto-oracle will fail)
 		// 3rd parameter : test execution state (pass = true, fail = false)
@@ -103,7 +107,7 @@ class GraphTest {
 		pgraph.printgraph();
 		return pgraph;
 	}
-	
+
 	@Test
 	public void domaintest() {
 		boolean fail = false;
@@ -133,7 +137,7 @@ class GraphTest {
 		}
 		assertFalse(fail);
 	}
-	
+
 	@Test
 	public void BFtest() {
 		boolean fail = false;
@@ -154,7 +158,7 @@ class GraphTest {
 		Graph pgraph = dominit();
 		pgraph.check_bp_with_bf(true);
 	}
-	
+
 	@Test
 	public void bptest_bytegraph() {
 		ByteCodeGraph pgraph = dominit_bytecode();
@@ -200,11 +204,11 @@ class GraphTest {
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
-		//pgraph.parsesource(passpath);
+		// pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
 		// pgraph.observe("trace.MergeTest.pass#18", true);
 		// pgraph.observe("a#9#2", true);
-		//pgraph.parsesource(failpath);
+		// pgraph.parsesource(failpath);
 		pgraph.parsetrace(failtrace, "fail", false);
 		// pgraph.observe("trace.MergeTest.fail#23", true);
 		// pgraph.observe("a#9#3", false);
@@ -212,13 +216,45 @@ class GraphTest {
 
 		return pgraph;
 	}
-	
+
 	@Test
 	public void mergetest_bc() {
 		ByteCodeGraph pgraph = mergeinit_bc();
+		System.setProperty("org.graphstream.ui", "swing");
+		// for(org.graphstream.graph.Node n:pgraph.viewgraph) {
+		// System.out.println(n.getId());
+		// n.attributeKeys().forEach(attr -> {
+		// System.out.println(attr + ": "+ n.getAttribute(attr));
+		// });
+		// }
 		pgraph.check_bp(true);
+		pgraph.addviewlabel();
+		Viewer viewer = pgraph.viewgraph.display();
+		try {
+			Thread.sleep(8000);
+		} catch (Exception e) {
+			System.exit(0); // 退出程序
+		}
+		pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test1.png");
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			System.exit(0); // 退出程序
+		}
+		// Viewer viewer2 = pgraph.viewgraph.display();
+		// // pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test2.png");
+		// try {
+		// 	Thread.sleep(6000);
+		// } catch (Exception e) {
+		// 	System.exit(0); // 退出程序
+		// }
+		// try {
+		// 	Thread.sleep(1000);
+		// } catch (Exception e) {
+		// 	System.exit(0); // 退出程序
+		// }
 	}
-	
+
 	Graph sqrtinit() {
 		String ppflroot = ".";
 		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
@@ -368,7 +404,7 @@ class GraphTest {
 		String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\NewTest.pass.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\NewTest.fail.log";
-		
+
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
@@ -385,14 +421,14 @@ class GraphTest {
 		Graph pgraph = newinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph mulcallinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\MulcallTest.java";
 		String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\MulcallTest.pass.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
-		
+
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
@@ -404,27 +440,28 @@ class GraphTest {
 		return pgraph;
 	}
 
-	//btrace:need to have different signs;
+	// btrace:need to have different signs;
 	// TODO test: use the same sign for the new mytrace
 	@Test
 	public void mulcalltest() {
 		Graph pgraph = mulcallinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph trycatchinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\TrycatchTest.java";
 		String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\TrycatchTest.pass.log";
-		//String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
-		
+		// String failtrace1 = ppflroot +
+		// "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
+
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace1, "pass", true);
-		//pgraph.parsesource(failpath);
-		//pgraph.parsetrace(failtrace1, "fail", false);
+		// pgraph.parsesource(failpath);
+		// pgraph.parsetrace(failtrace1, "fail", false);
 		pgraph.printgraph();
 
 		return pgraph;
@@ -435,14 +472,14 @@ class GraphTest {
 		Graph pgraph = trycatchinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph switchinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\SwitchTest.java";
 		String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.pass.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.fail.log";
-		
+
 		Graph pgraph = new Graph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
@@ -459,18 +496,18 @@ class GraphTest {
 		Graph pgraph = switchinit();
 		pgraph.check_bp(true);
 	}
-	
+
 	Graph fullinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\FullTest.java";
 		String failpath = passpath;
 		String passtrace = ppflroot + "\\test\\trace\\logs\\FullTest.pass.log";
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\FullTest.pass1.log";
-		//String passtrace2 = ppflroot + "\\test\\trace\\logs\\FullTest.pass2.log";
-		//String passtrace3 = ppflroot + "\\test\\trace\\logs\\FullTest.pass3.log";
+		// String passtrace2 = ppflroot + "\\test\\trace\\logs\\FullTest.pass2.log";
+		// String passtrace3 = ppflroot + "\\test\\trace\\logs\\FullTest.pass3.log";
 		String passtrace4 = ppflroot + "\\test\\trace\\logs\\FullTest.pass4.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\FullTest.fail1.log";
-		//String failtrace2 = ppflroot + "\\test\\trace\\logs\\FullTest.fail2.log";
+		// String failtrace2 = ppflroot + "\\test\\trace\\logs\\FullTest.fail2.log";
 		String failtrace3 = ppflroot + "\\test\\trace\\logs\\FullTest.fail3.log";
 		String failtrace4 = ppflroot + "\\test\\trace\\logs\\FullTest.fail4.log";
 
@@ -480,16 +517,16 @@ class GraphTest {
 		pgraph.parsetrace(passtrace, "pass", true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace1, "pass1", true);
-		//pgraph.parsesource(passpath);
-		//pgraph.parsetrace(passtrace2, "pass2", true);
-		//pgraph.parsesource(passpath);
-		//pgraph.parsetrace(passtrace3, "pass3", true);
+		// pgraph.parsesource(passpath);
+		// pgraph.parsetrace(passtrace2, "pass2", true);
+		// pgraph.parsesource(passpath);
+		// pgraph.parsetrace(passtrace3, "pass3", true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace4, "pass4", true);
 		pgraph.parsesource(failpath);
 		pgraph.parsetrace(failtrace1, "fail1", false);
-		//pgraph.parsesource(failpath);
-		//pgraph.parsetrace(failtrace2, "fail2", false);
+		// pgraph.parsesource(failpath);
+		// pgraph.parsetrace(failtrace2, "fail2", false);
 		pgraph.parsesource(failpath);
 		pgraph.parsetrace(failtrace3, "fail3", false);
 		pgraph.parsesource(failpath);
@@ -539,13 +576,14 @@ class GraphTest {
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
-		// TODO find the error in this parsetrace, missing key is "trace.ParaTest:func2#1:2"
+		// TODO find the error in this parsetrace, missing key is
+		// "trace.ParaTest:func2#1:2"
 		pgraph.parsetrace(passtrace, "pass", true);
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.printgraph();
 		return pgraph;
 	}
-	
+
 	@Test
 	public void paratest_bc() {
 		ByteCodeGraph pgraph = parainit_bc();
@@ -592,7 +630,7 @@ class GraphTest {
 		pgraph.printgraph();
 		return pgraph;
 	}
-	
+
 	@Test
 	public void modtest_bc() {
 		ByteCodeGraph pgraph = modinit_bc();
@@ -657,7 +695,7 @@ class GraphTest {
 		pgraph.printgraph();
 		return pgraph;
 	}
-	
+
 	@Test
 	public void simpleflowtest_bc() {
 		ByteCodeGraph pgraph = simpleflowinit_bc();
