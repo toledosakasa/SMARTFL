@@ -13,6 +13,7 @@ dirs2make = ["./configs","./test/trace/patterns","./test/trace/logs","./test/tra
 testdir = os.path.abspath("./test/trace")
 tracedir = os.path.abspath("./trace")
 logconfigdir = os.path.abspath("./src\main\resources")
+bindir = os.path.abspath("./target")
 for dir in dirs2make:
 	if not(os.path.exists(dir)):
 		os.makedirs(dir)
@@ -104,8 +105,19 @@ def mytrace():
 					f.write(s)
 					f.close()
 
+def runtesttrace(cmdarg):
+	cmdargs = cmdarg.split('#')
+	cmdstr = "mvn test -Dtest={classname}#{testname} -DargLine=-javaagent:{jardir}\ppfl-0.0.1-SNAPSHOT.jar=logfile={classname}.{testname},instrumentingclass=trace.{classname}".format(classname = cmdargs[0],testname=cmdargs[1],jardir=bindir)
+	print(cmdstr)
+	os.system(cmdstr)
+	
+def runtest(cmdarg):
+	cmdstr = "mvn test -Dtest={testname}".format(testname=cmdarg)
+	print(cmdstr)
+	os.system(cmdstr)	
+
 args = sys.argv
-if len(args)!=2:
+if len(args)<=2:
 	print('''usage:
 	s.py btrace preprocessing for btrace tracing
 	s.py mytrace preprocessing for built-in tracing''')
@@ -117,6 +129,11 @@ if args[1] == 'mytrace':
 if args[1] == 'btrace':
 	btrace()
 
+if args[1] == 'trace':
+	runtesttrace(args[2])
+	
+if args[1] == 'test':
+	runtest(args[2])
 #tracedir = os.path.abspath("./test_traces")			
 #simpletestdir = os.path.abspath("./simpletests")
 

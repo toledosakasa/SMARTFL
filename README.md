@@ -26,22 +26,18 @@ You can re-generate by running s.py again.
 
 
 ## Run Tracing
-(in eclipse)Run -> Run configurations -> DomainTest.test -> run
+python s.py trace MergeTest#fail
 
 
-Trace log will be generated at test/trace/logs/
+Trace log will be generated at trace/logs/
 
 ## Run GraphTest
-Run As -> junit test
+python s.py test GraphTest#mergetest_bc
 
 ## Add new testcase
 New Junit testcase at test/trace/
 
-python s.py to pre-process.
-
-import config files.
-
-run tracing and get trace log.
+run tracing on all methods.
 
 Add new test method in GraphTest (basically the same as existing ones.)
 
