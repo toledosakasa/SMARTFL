@@ -50,9 +50,18 @@ git fetch https://github.com/Ultimanecat/defects4j
 
 defects4j checkout -w ./lang3b
 
+Look at relevant information:
+
+defects4j query -p Lang -q "bug.id,classes.relevant.src,classes.relevant.test,tests.relevant,tests.trigger"  -o langtest.csv
+
+The instrumented classes should be "classes.modified"+"tests.relevant"
+
+Test methods to run should be all test methods in "tests.relevant"
+
+From commandline run the following to trace d4j:
+
 defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -w ./lang3b -a -Djvmargs=\"-javaagent:[pathtotracer.jar]=logfile=[pathtologfile],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils\"
 
 for debugging use, copy the ant commandline (you should see that by running the instructions above) and run it.
 
-Note: log file name can be added with .1 as java.util.logging performs badly(FIXME)
 

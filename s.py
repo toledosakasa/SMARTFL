@@ -107,7 +107,7 @@ def mytrace():
 
 def runtesttrace(cmdarg):
 	cmdargs = cmdarg.split('#')
-	cmdstr = "mvn test -Dtest={classname}#{testname} -DargLine=-javaagent:{jardir}\ppfl-0.0.1-SNAPSHOT.jar=logfile={classname}.{testname},instrumentingclass=trace.{classname}".format(classname = cmdargs[0],testname=cmdargs[1],jardir=bindir)
+	cmdstr = " mvn package -DskipTests && mvn test -Dtest={classname}#{testname} -DargLine=-javaagent:{jardir}\ppfl-0.0.1-SNAPSHOT.jar=logfile={classname}.{testname},instrumentingclass=trace.{classname}".format(classname = cmdargs[0],testname=cmdargs[1],jardir=bindir)
 	print(cmdstr)
 	os.system(cmdstr)
 	
