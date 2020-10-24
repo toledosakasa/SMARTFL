@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Node {
 	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from
-							// inference procedure.
+	// inference procedure.
 	protected boolean obsvalue;
 	private boolean tempvalue;// for inference(sampling)
 	protected boolean isStmt;
@@ -19,6 +19,7 @@ public class Node {
 	private Edge degde;
 	protected boolean reduced;// should be reduced in the slice if val is true
 
+	private int stacksize; // for double:2. Other type:1.
 	StmtNode stmt;
 
 	public Node(String name) {
@@ -30,6 +31,7 @@ public class Node {
 		edges = new ArrayList<Edge>();
 		stmt = null;
 		reduced = true;
+		stacksize = 1;
 	}
 
 	public Node(String name, String testname, StmtNode _stmt) {
@@ -42,6 +44,16 @@ public class Node {
 		edges = new ArrayList<Edge>();
 		stmt = _stmt;
 		reduced = true;
+		stacksize = 1;
+	}
+
+	public int getSize() {
+		return this.stacksize;
+	}
+
+	public void setSize(int s) {
+		assert (s >= 1);
+		this.stacksize = s;
 	}
 
 	public String getName() {
@@ -162,8 +174,8 @@ public class Node {
 
 	public void printprob() {
 		if (this.obs) {
-			System.out.println(
-					this.getPrintName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
+			System.out
+					.println(this.getPrintName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
 		} else
 			System.out.println(this.getPrintName() + " prob = " + String.valueOf(getprob()));
 	}
@@ -171,4 +183,5 @@ public class Node {
 	public void bp_printprob() {
 		System.out.println(this.getPrintName() + " prob_bp = " + String.valueOf(bp_getprob()));
 	}
+
 }
