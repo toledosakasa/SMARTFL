@@ -16,7 +16,6 @@ import java.util.Vector;
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
 
-import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.*;
 
 public class ByteCodeGraph {
@@ -30,9 +29,11 @@ public class ByteCodeGraph {
 	public Map<String, Integer> stmtcountmap;
 	public org.graphstream.graph.Graph viewgraph;
 	private boolean shouldview;
-	public void stopview(){
+
+	public void stopview() {
 		shouldview = false;
 	}
+
 	// if max_loop is set to negative, then no limit is set(unlimited loop
 	// unfolding)
 	public int max_loop;
@@ -86,7 +87,7 @@ public class ByteCodeGraph {
 
 	//
 	Vector<Node> predicates = new Vector<Node>();
-	
+
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
@@ -99,69 +100,48 @@ public class ByteCodeGraph {
 		random = new Random();
 		auto_oracle = true;
 		stackframe = new Stack<RuntimeFrame>();
-		viewgraph = new org.graphstream.graph.implementations.SingleGraph("Outgraph");
+		viewgraph = new SingleGraph("Outgraph");
 		viewgraph.setStrict(false);
 		viewgraph.setAutoCreate(true);
 		viewgraph.setAttribute("layout.quality", 4);
 		viewgraph.setAttribute("layout.force");
 		shouldview = true;
-		String styleSheet =
-		"node {" +
-		// "	text-background-mode: rounded-box;"+
-		"	text-alignment: at-right;"+
-		"	text-offset: 5px, 0px;"+
-		"	text-style: italic;"+
-		"	size: 15px, 15px;"+
-		"}" +
-		// "node.thenode {" +
-		// // "	shape: box;"+
-		// "	size: 15px, 15px;"+
-		// // "	fill-color: green;" +
-		// "}" +
-		"node.factor {" +
-		"	shape: box;"+
-		"	text-mode: hidden;"+
-		// "	size: 15px, 15px;"+
-		"	fill-color: red;" +
-		// "	stroke-mode: plain; /* Default is none.  */"+
-		// "	stroke-color: blue; /* Default is black. */"+
-		"}" +
-		"node.stmt {" +
-		// "	shape: box;"+
-		"	size: 10px, 10px;"+
-		"	fill-color: brown;" +
-		"}" +
-		"edge {" +
-		"	fill-color: red;" +
-		// "	layout.weight: 10;"+
-		"}" +
-		"edge.def {" +
-		"	fill-color: green;" +
-		"}" +
-		"edge.use {" +
-		"	fill-color: blue;" +
-		"}" +
-		"edge.pred {" +
-		"	fill-color: yellow;" +
-		"edge.stmt {" +
-		"	fill-color: black;" +
-		"}";
+		String styleSheet = "node {" +
+		// " text-background-mode: rounded-box;"+
+				"	text-alignment: at-right;" + "	text-offset: 5px, 0px;" + "	text-style: italic;" + "	size: 15px, 15px;" + "}"
+				+
+				// "node.thenode {" +
+				// // " shape: box;"+
+				// " size: 15px, 15px;"+
+				// // " fill-color: green;" +
+				// "}" +
+				"node.factor {" + "	shape: box;" + "	text-mode: hidden;" +
+				// " size: 15px, 15px;"+
+				"	fill-color: red;" +
+				// " stroke-mode: plain; /* Default is none. */"+
+				// " stroke-color: blue; /* Default is black. */"+
+				"}" + "node.stmt {" +
+				// " shape: box;"+
+				"	size: 10px, 10px;" + "	fill-color: brown;" + "}" + "edge {" + "	fill-color: red;" +
+				// " layout.weight: 10;"+
+				"}" + "edge.def {" + "	fill-color: green;" + "}" + "edge.use {" + "	fill-color: blue;" + "}" + "edge.pred {"
+				+ "	fill-color: yellow;" + "edge.stmt {" + "	fill-color: black;" + "}";
 		viewgraph.setAttribute("ui.stylesheet", styleSheet);
 		viewgraph.setAttribute("ui.quality");
 		viewgraph.setAttribute("ui.antialias");
 		Interpreter.init();
 	}
 
-	public void addviewlabel(){
+	public void addviewlabel() {
 		for (Node n : nodes) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
-			if(thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName()+" prob_bp = " + String.valueOf(n.bp_getprob()));
+			if (thenode != null)
+				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + String.valueOf(n.bp_getprob()));
 		}
 		for (StmtNode n : stmts) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
-			if(thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName()+" prob_bp = " + String.valueOf(n.bp_getprob()));
+			if (thenode != null)
+				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + String.valueOf(n.bp_getprob()));
 		}
 	}
 
@@ -230,7 +210,7 @@ public class ByteCodeGraph {
 
 		if (auto_oracle) {
 			int ln = stmt.getLineNumber();
-			if(this.last_defined_line != ln) {
+			if (this.last_defined_line != ln) {
 				this.last_defined_line = ln;
 				this.last_defined_var.clear();
 			}
@@ -268,54 +248,54 @@ public class ByteCodeGraph {
 			n.setfactor(ret);
 		for (Edge n : uedges)
 			n.setfactor(ret);
-		if(!shouldview)
+		if (!shouldview)
 			return ret;
 		String factorname = "Factor" + factornodes.size();
-		viewgraph.addEdge(factorname+stmt.getPrintName(), factorname, stmt.getPrintName());
+		viewgraph.addEdge(factorname + stmt.getPrintName(), factorname, stmt.getPrintName());
 		org.graphstream.graph.Node outfactor = viewgraph.getNode(factorname);
 		outfactor.setAttribute("ui.class", "factor");
 		org.graphstream.graph.Node outstmt = viewgraph.getNode(stmt.getPrintName());
 		outstmt.setAttribute("ui.class", "stmt");
-		org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname+stmt.getPrintName());
+		org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname + stmt.getPrintName());
 		outedge.setAttribute("ui.class", "stmt");
 		outedge.setAttribute("layout.weight", 2);
 
-		viewgraph.addEdge(factorname+defnode.getPrintName(), factorname, defnode.getPrintName());
+		viewgraph.addEdge(factorname + defnode.getPrintName(), factorname, defnode.getPrintName());
 		org.graphstream.graph.Node outdef = viewgraph.getNode(defnode.getPrintName());
 
 		// System.out.println("hhhhhhhhhhhui"+outdef.getId());
 		outdef.setAttribute("ui.class", "thenode");
-		outedge = viewgraph.getEdge(factorname+defnode.getPrintName());
+		outedge = viewgraph.getEdge(factorname + defnode.getPrintName());
 		outedge.setAttribute("ui.class", "def");
 		outedge.setAttribute("layout.weight", 2);
-		for (Node node : prednodes){
-			viewgraph.addEdge(factorname+node.getPrintName(), factorname, node.getPrintName());
+		for (Node node : prednodes) {
+			viewgraph.addEdge(factorname + node.getPrintName(), factorname, node.getPrintName());
 			org.graphstream.graph.Node outpred = viewgraph.getNode(node.getPrintName());
 			outpred.setAttribute("ui.class", "thenode");
-			outedge = viewgraph.getEdge(factorname+node.getPrintName());
+			outedge = viewgraph.getEdge(factorname + node.getPrintName());
 			outedge.setAttribute("ui.class", "pred");
 			outedge.setAttribute("layout.weight", 2);
 		}
-		for (Node node : usenodes){
-			viewgraph.addEdge(factorname+node.getPrintName(), factorname, node.getPrintName());
+		for (Node node : usenodes) {
+			viewgraph.addEdge(factorname + node.getPrintName(), factorname, node.getPrintName());
 			org.graphstream.graph.Node outuse = viewgraph.getNode(node.getPrintName());
 			outuse.setAttribute("ui.class", "thenode");
-			outedge = viewgraph.getEdge(factorname+node.getPrintName());
+			outedge = viewgraph.getEdge(factorname + node.getPrintName());
 			outedge.setAttribute("ui.class", "use");
 			outedge.setAttribute("layout.weight", 2);
 		}
 		return ret;
 	}
 
-//	private void incStackIndex() {
-//		String domain = this.getFormalStackName();
-//		// System.out.println(domain);
-//		if (!stackheightmap.containsKey(domain)) {
-//			stackheightmap.put(domain, 1);
-//		} else {
-//			stackheightmap.put(domain, stackheightmap.get(domain) + 1);
-//		}
-//	}
+	// private void incStackIndex() {
+	// String domain = this.getFormalStackName();
+	// // System.out.println(domain);
+	// if (!stackheightmap.containsKey(domain)) {
+	// stackheightmap.put(domain, 1);
+	// } else {
+	// stackheightmap.put(domain, stackheightmap.get(domain) + 1);
+	// }
+	// }
 
 	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
 		String def = this.getFormalVarName(varindex, traceclass, tracemethod);
@@ -343,7 +323,7 @@ public class ByteCodeGraph {
 			varcountmap.put(def, varcountmap.get(def) + 1);
 		}
 	}
-	
+
 	private String getDomain() {
 		return getFrame().getDomain();
 	}
@@ -366,11 +346,11 @@ public class ByteCodeGraph {
 		String name = stmt.getName();
 		return "Pred#" + name;
 	}
-	
+
 	private String getFormalPredNameWithIndex(StmtNode stmt) {
 		return getVarName(getFormalPredName(stmt), this.varcountmap);
 	}
-	
+
 	private String getFormalVarName(int varindex) {
 		String name = String.valueOf(varindex);
 		return this.getDomain() + name;
@@ -428,13 +408,13 @@ public class ByteCodeGraph {
 		this.addNode(nodename, defnode);
 		return defnode;
 	}
-	
+
 	public Node addNewPredNode(StmtNode stmt) {
 		this.incPredIndex(stmt);
 		String nodename = this.getFormalPredNameWithIndex(stmt);
 		Node defnode = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, defnode);
-		//TODO use interface to manipulate vector(predicates).
+		// TODO use interface to manipulate vector(predicates).
 		this.predicates.add(defnode);
 		return defnode;
 	}
