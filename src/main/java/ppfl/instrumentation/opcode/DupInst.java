@@ -12,20 +12,19 @@ import ppfl.ParseInfo;
 import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
 
-//38-41
-public class Dload_NInst extends OpcodeInst {
+//24
+public class DupInst extends OpcodeInst {
 
 	int loadindex;
 
-	public Dload_NInst(int _form, int _loadindex) {
-		super(_form, 1, 0);
-		loadindex = _loadindex;
+	public DupInst(int _form) {
+		super(_form, 1, 1);
 	}
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
-		ret.append(",load=" + loadindex);
+		ret.append(",load=" + getpara(ci, index, 1));
 		return ret.toString();
 	}
 
@@ -45,17 +44,17 @@ public class Dload_NInst extends OpcodeInst {
 		List<Node> prednodes = new ArrayList<Node>();
 		List<Node> usenodes = new ArrayList<Node>();
 		Node defnode = null;
-		if (info.getintvalue("load") != null) {
-			int loadvar = info.getintvalue("load");
-			Node node = graph.getLoadNodeAsUse(loadvar);
-			usenodes.add(node);
-		}
+		
+		usenodes.add(graph.getRuntimeStack().peek());
+		
+		// defs
+		// stack
 		if (info.getintvalue("pushnum") != null) {
 			int instpushnum = info.getintvalue("pushnum");
 			// push must not be more than 1
 			assert (instpushnum == 1);
 			defnode = graph.addNewStackNode(stmt);
-			defnode.setSize(2);
+			defnode.setSize(usenodes.get(0).getSize());
 		}
 		// build factor.
 		if (defnode != null) {
@@ -63,4 +62,5 @@ public class Dload_NInst extends OpcodeInst {
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
 	}
+
 }

@@ -41,11 +41,6 @@ public class OpcodeInst {
 	// for weird instructions(e.g. iinc)
 	paratype para[] = new paratype[2];
 
-//	//for function calls
-//	String calltype;
-//	String callname;
-//	String callclass;
-
 	public OpcodeInst(int _form, int _pushnum, int _popnum) {
 		form = _form;
 		opcode = Mnemonic.OPCODE[_form];
@@ -81,12 +76,6 @@ public class OpcodeInst {
 		while (matcher.find()) {
 			listMatches.add(matcher.group());
 		}
-
-//        for(String s : listMatches)
-//        {
-//            System.out.print(s + " ");
-//        }
-//        System.out.println();
 		return listMatches;
 	}
 
@@ -162,13 +151,7 @@ public class OpcodeInst {
 	// extended class should override this method.
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder("\n");
-		// ret.append("opcode="+this.opcode);
 		ret.append("opcode=" + this.form + "(" + this.opcode + ")\t");
-//		if (this.isinvoke) {
-//			int callindex = getu16bitpara(ci, index);
-//			ret.append(getmethodinfo(ci, callindex, constp));
-//			return ret.toString();
-//		}
 		if (this.popnum != 0)
 			ret.append(",popnum=" + this.popnum);
 		if (this.pushnum != 0)
@@ -197,12 +180,11 @@ public class OpcodeInst {
 	public boolean isInvoke() {
 		return this.isinvoke;
 	}
-	
+
 	public void setinvoke() {
 		this.isinvoke = true;
 	}
 
-	// temporary solution for integer insts.
 	// extended class should override this method.
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
 			throws BadBytecode {
@@ -274,14 +256,8 @@ public class OpcodeInst {
 		List<Node> usenodes = new ArrayList<Node>();
 		Node defnode = null;
 		if (info.getintvalue("load") != null) {
-
 			int loadvar = info.getintvalue("load");
-			// Node node = graph.getNode(graph.getFormalVarNameWithIndex(loadvar));
 			Node node = graph.getLoadNodeAsUse(loadvar);
-//			if (node == null) {
-//				System.out.println(graph.getFormalVarNameWithIndex(loadvar));
-//			}
-//			assert (node != null);
 			usenodes.add(node);
 		}
 		if (info.getintvalue("popnum") != null) {
@@ -297,21 +273,10 @@ public class OpcodeInst {
 			// push must not be more than 1
 			assert (instpushnum == 1);
 			defnode = graph.addNewStackNode(stmt);
-//			graph.incStackIndex();
-//			String nodename = graph.getFormalStackNameWithIndex();
-//			Node node = new Node(nodename, graph.testname, stmt);
-//			graph.addNode(nodename, node);
-//			defnode = graph.getNode(nodename);
-//			assert (node == defnode);
-
 		}
 		if (info.getintvalue("store") != null) {
 			int storevar = info.getintvalue("store");
 			defnode = graph.addNewVarNode(storevar, stmt);
-//			graph.incVarIndex(storevar);
-//			String nodename = graph.getFormalVarNameWithIndex(storevar);
-//			Node node = new Node(nodename, graph.testname, stmt);
-//			graph.addNode(nodename, node);
 		}
 
 		// build factor.

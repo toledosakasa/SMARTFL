@@ -46,17 +46,15 @@ public class InvokestaticInst extends OpcodeInst {
 			Node node = graph.getRuntimeStack().pop();
 			usenodes.add(node);
 		}
-
+		
 		// switch stack frame
 		graph.pushStackFrame(traceclass, tracemethod);
 
+		// static arguments starts with 0
 		int paravarindex = 0;
+		// non-static
+		// paravarindex = 1;
 		for (int i = 0; i < argcnt; i++) {
-			// static arguments starts with 0
-			//FIXME double argument index
-			// paravarindex = argcnt - i - 1;
-			// non-static
-			// paravarindex = argcnt -i;
 
 			List<Node> adduse = new ArrayList<Node>(); 
 			Node curArgument =usenodes.get(argcnt - i - 1);
