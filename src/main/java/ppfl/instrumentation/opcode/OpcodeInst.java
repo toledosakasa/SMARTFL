@@ -253,6 +253,7 @@ public class OpcodeInst {
 		// info.print();
 		// uses
 		List<Node> prednodes = new ArrayList<Node>();
+		//prednodes.addAll(graph.predicates);
 		List<Node> usenodes = new ArrayList<Node>();
 		Node defnode = null;
 		if (info.getintvalue("load") != null) {

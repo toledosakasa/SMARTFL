@@ -86,7 +86,7 @@ public class ByteCodeGraph {
 	public List<StmtNode> last_defined_stmt = new ArrayList<StmtNode>();
 
 	//
-	Vector<Node> predicates = new Vector<Node>();
+	public Vector<Node> predicates = new Vector<Node>();
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
@@ -157,6 +157,7 @@ public class ByteCodeGraph {
 		// TODO this could be incomplete.
 		this.varcountmap = new HashMap<String, Integer>();
 		this.stackframe = new Stack<RuntimeFrame>();
+		this.predicates.clear();
 	}
 
 	public void parsesource(String sourcefilename) {
