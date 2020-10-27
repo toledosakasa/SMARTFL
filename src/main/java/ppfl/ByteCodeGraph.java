@@ -16,7 +16,7 @@ import java.util.Vector;
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
 
-import org.graphstream.graph.*;
+import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.*;
 
 public class ByteCodeGraph {

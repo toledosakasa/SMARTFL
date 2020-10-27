@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-public class Graph {
+public class SimpleProbGraph {
 
 	private List<FactorNode> factornodes;
 	private List<Node> nodes;
@@ -65,7 +65,7 @@ public class Graph {
 	// libraries)
 	private boolean add_return_arg_factor;
 
-	public Graph() {
+	public SimpleProbGraph() {
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
 		stmts = new ArrayList<StmtNode>();
@@ -647,7 +647,7 @@ public class Graph {
 		return stmts.subList(0, k);
 	}
 
-	public void merge(Graph oth) {
+	public void merge(SimpleProbGraph oth) {
 		return;// TODO
 	}
 

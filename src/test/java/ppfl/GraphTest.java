@@ -9,18 +9,18 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import org.graphstream.graph.*;
+import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.*;
-import org.graphstream.ui.view.*;
+import org.graphstream.ui.view.Viewer;
 
 class GraphTest {
 
-	Graph gengraph(String name) {
+	SimpleProbGraph gengraph(String name) {
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\test\\trace\\" + name + ".java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\" + name + ".test.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(false);
 
 		// set this to false will make a cleaner graph of recursive test.
@@ -35,7 +35,7 @@ class GraphTest {
 	@Test
 	public void gcdtest() {
 		boolean fail = false;
-		Graph pgraph = gengraph("gcdtest");
+		SimpleProbGraph pgraph = gengraph("gcdtest");
 		pgraph.observe("a#9#1", true);
 		pgraph.observe("b#9#1", true);
 		pgraph.observe("a#9#3", true);
@@ -55,7 +55,7 @@ class GraphTest {
 	public void rectest() {
 		boolean fail = false;
 		// should there be a tmp var of the return value?"
-		Graph pgraph = gengraph("recursivetest");
+		SimpleProbGraph pgraph = gengraph("recursivetest");
 
 	}
 
@@ -63,16 +63,16 @@ class GraphTest {
 	public void sumtest() {
 		boolean fail = false;
 		// runtime error, seems to be caused by "for loop"
-		Graph pgraph = gengraph("sumtest");
+		SimpleProbGraph pgraph = gengraph("sumtest");
 	}
 
-	Graph dominit() {
+	SimpleProbGraph dominit() {
 		String ppflroot = ".";
 		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
 		String filepatht = ppflroot + "\\test\\trace\\DomainTest.java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\DomainTest.test.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		// pgraph.observe("foo.main#14", true);
 		// pgraph.observe("a#3#3", false);
@@ -111,7 +111,7 @@ class GraphTest {
 	@Test
 	public void domaintest() {
 		boolean fail = false;
-		Graph pgraph = dominit();
+		SimpleProbGraph pgraph = dominit();
 		try {
 			pgraph.inference();
 			pgraph.printprobs();
@@ -141,7 +141,7 @@ class GraphTest {
 	@Test
 	public void BFtest() {
 		boolean fail = false;
-		Graph pgraph = dominit();
+		SimpleProbGraph pgraph = dominit();
 		try {
 			pgraph.bf_inference();
 			pgraph.printprobs();
@@ -155,7 +155,7 @@ class GraphTest {
 
 	@Test
 	public void bptest() {
-		Graph pgraph = dominit();
+		SimpleProbGraph pgraph = dominit();
 		pgraph.check_bp_with_bf(true);
 	}
 
@@ -165,7 +165,7 @@ class GraphTest {
 		pgraph.check_bp_with_bf(true);
 	}
 
-	Graph mergeinit() {
+	SimpleProbGraph mergeinit() {
 		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
@@ -173,7 +173,7 @@ class GraphTest {
 		String passtrace = ppflroot + "\\test\\trace\\logs\\MergeTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\MergeTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
@@ -190,7 +190,7 @@ class GraphTest {
 
 	@Test
 	public void mergetest() {
-		Graph pgraph = mergeinit();
+		SimpleProbGraph pgraph = mergeinit();
 		pgraph.check_bp_with_bf(true);
 	}
 
@@ -233,35 +233,35 @@ class GraphTest {
 		try {
 			Thread.sleep(8000);
 		} catch (Exception e) {
-			System.exit(0); // 退出程序
+			System.exit(0); 
 		}
 		pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test1.png");
 		try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
-			System.exit(0); // 退出程序
+			System.exit(0); 
 		}
 		// Viewer viewer2 = pgraph.viewgraph.display();
 		// // pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test2.png");
 		// try {
 		// 	Thread.sleep(6000);
 		// } catch (Exception e) {
-		// 	System.exit(0); // 退出程序
+		// 	System.exit(0); 
 		// }
 		// try {
 		// 	Thread.sleep(1000);
 		// } catch (Exception e) {
-		// 	System.exit(0); // 退出程序
+		// 	System.exit(0); 
 		// }
 	}
 
-	Graph sqrtinit() {
+	SimpleProbGraph sqrtinit() {
 		String ppflroot = ".";
 		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
 		String filepatht = ppflroot + "\\test\\trace\\SqrtTest.java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\SqrtTest.test.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(filepatht);
 		pgraph.parsetrace(tracepatht, "test", false);
@@ -271,16 +271,16 @@ class GraphTest {
 
 	@Test
 	public void sqrttest() {
-		Graph pgraph = sqrtinit();
+		SimpleProbGraph pgraph = sqrtinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph heavyloopinit() {
+	SimpleProbGraph heavyloopinit() {
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\test\\trace\\HeavyLoopTest.java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\HeavyLoopTest.test.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 
 		pgraph.parsesource(filepatht);
@@ -291,16 +291,16 @@ class GraphTest {
 
 	@Test
 	public void heavylooptest() {
-		Graph pgraph = heavyloopinit();
+		SimpleProbGraph pgraph = heavyloopinit();
 		pgraph.check_bp(false);
 	}
 
-	Graph lightloopinit() {
+	SimpleProbGraph lightloopinit() {
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\test\\trace\\LightLoopTest.java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\LightLoopTest.test.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 
 		pgraph.parsesource(filepatht);
@@ -311,11 +311,11 @@ class GraphTest {
 
 	@Test
 	public void lightlooptest() {
-		Graph pgraph = lightloopinit();
+		SimpleProbGraph pgraph = lightloopinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph breakinit() {
+	SimpleProbGraph breakinit() {
 		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\BreakTest.java";
@@ -323,7 +323,7 @@ class GraphTest {
 		String passtrace = ppflroot + "\\test\\trace\\logs\\BreakTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\BreakTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
@@ -335,11 +335,11 @@ class GraphTest {
 
 	@Test
 	public void breaktest() {
-		Graph pgraph = breakinit();
+		SimpleProbGraph pgraph = breakinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph badreturninit() {
+	SimpleProbGraph badreturninit() {
 		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\BadReturnTest.java";
@@ -347,7 +347,7 @@ class GraphTest {
 		String passtrace = ppflroot + "\\test\\trace\\logs\\BadReturnTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\BadReturnTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
@@ -359,11 +359,11 @@ class GraphTest {
 
 	@Test
 	public void badreturntest() {
-		Graph pgraph = badreturninit();
+		SimpleProbGraph pgraph = badreturninit();
 		pgraph.check_bp(true);
 	}
 
-	Graph fourinit() {
+	SimpleProbGraph fourinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\FourTest.java";
 		String failpath = passpath;
@@ -372,7 +372,7 @@ class GraphTest {
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\FourTest.fail.log";
 		String failtrace2 = ppflroot + "\\test\\trace\\logs\\FourTest.fail2.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace1, "pass1", true);
@@ -389,7 +389,7 @@ class GraphTest {
 
 	@Test
 	public void fourtest() {
-		Graph pgraph = fourinit();
+		SimpleProbGraph pgraph = fourinit();
 		pgraph.check_bp(true);
 		/*
 		 * boolean fail = false; Graph pgraph = fourinit(); try { pgraph.inference();
@@ -398,14 +398,14 @@ class GraphTest {
 		 */
 	}
 
-	Graph newinit() {
+	SimpleProbGraph newinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\NewTest.java";
 		String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\NewTest.pass.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\NewTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace1, "pass", true);
@@ -418,18 +418,18 @@ class GraphTest {
 
 	@Test
 	public void newtest() {
-		Graph pgraph = newinit();
+		SimpleProbGraph pgraph = newinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph mulcallinit() {
+	SimpleProbGraph mulcallinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\MulcallTest.java";
 		String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\MulcallTest.pass.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace1, "pass", true);
@@ -444,11 +444,11 @@ class GraphTest {
 	// TODO test: use the same sign for the new mytrace
 	@Test
 	public void mulcalltest() {
-		Graph pgraph = mulcallinit();
+		SimpleProbGraph pgraph = mulcallinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph trycatchinit() {
+	SimpleProbGraph trycatchinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\TrycatchTest.java";
 		String failpath = passpath;
@@ -456,7 +456,7 @@ class GraphTest {
 		// String failtrace1 = ppflroot +
 		// "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace1, "pass", true);
@@ -469,18 +469,18 @@ class GraphTest {
 
 	@Test
 	public void trycatchtest() {
-		Graph pgraph = trycatchinit();
+		SimpleProbGraph pgraph = trycatchinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph switchinit() {
+	SimpleProbGraph switchinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\SwitchTest.java";
 		String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.pass.log";
 		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace1, "pass", true);
@@ -493,11 +493,11 @@ class GraphTest {
 
 	@Test
 	public void switchtest() {
-		Graph pgraph = switchinit();
+		SimpleProbGraph pgraph = switchinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph fullinit() {
+	SimpleProbGraph fullinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\FullTest.java";
 		String failpath = passpath;
@@ -511,7 +511,7 @@ class GraphTest {
 		String failtrace3 = ppflroot + "\\test\\trace\\logs\\FullTest.fail3.log";
 		String failtrace4 = ppflroot + "\\test\\trace\\logs\\FullTest.fail4.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
@@ -538,11 +538,11 @@ class GraphTest {
 
 	@Test
 	public void fulltest() {
-		Graph pgraph = fullinit();
+		SimpleProbGraph pgraph = fullinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph parainit() {
+	SimpleProbGraph parainit() {
 		// boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
@@ -550,7 +550,7 @@ class GraphTest {
 		String passtrace = ppflroot + "\\test\\trace\\logs\\ParaTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\ParaTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
@@ -562,7 +562,7 @@ class GraphTest {
 
 	@Test
 	public void paratest() {
-		Graph pgraph = parainit();
+		SimpleProbGraph pgraph = parainit();
 		pgraph.check_bp(true);
 	}
 
@@ -590,7 +590,7 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 
-	Graph modinit() {
+	SimpleProbGraph modinit() {
 		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\ModTest.java";
@@ -598,7 +598,7 @@ class GraphTest {
 		String passtrace = ppflroot + "\\test\\trace\\logs\\ModTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\ModTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
@@ -611,7 +611,7 @@ class GraphTest {
 
 	@Test
 	public void modtest() {
-		Graph pgraph = modinit();
+		SimpleProbGraph pgraph = modinit();
 		pgraph.check_bp(true);
 	}
 
@@ -637,7 +637,7 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 
-	Graph branchinit() {
+	SimpleProbGraph branchinit() {
 		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\BranchTest.java";
@@ -645,7 +645,7 @@ class GraphTest {
 		String passtrace = ppflroot + "\\test\\trace\\logs\\BranchTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\BranchTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(passpath);
 		pgraph.parsetrace(passtrace, "pass", true);
@@ -658,16 +658,16 @@ class GraphTest {
 
 	@Test
 	public void branchtest() {
-		Graph pgraph = branchinit();
+		SimpleProbGraph pgraph = branchinit();
 		pgraph.check_bp(true);
 	}
 
-	Graph simpleflowinit() {
+	SimpleProbGraph simpleflowinit() {
 		String ppflroot = ".";
 		String filepatht = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\SimpleFlowTest.fail.log";
 
-		Graph pgraph = new Graph();
+		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);
 
 		pgraph.parsesource(filepatht);
@@ -678,7 +678,7 @@ class GraphTest {
 
 	@Test
 	public void simpleflowtest() {
-		Graph pgraph = simpleflowinit();
+		SimpleProbGraph pgraph = simpleflowinit();
 		pgraph.check_bp(true);
 	}
 
