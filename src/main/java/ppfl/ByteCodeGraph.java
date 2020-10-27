@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
+import java.util.Vector;
 
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
@@ -83,6 +84,9 @@ public class ByteCodeGraph {
 	public List<Node> last_defined_var = new ArrayList<Node>();
 	public List<StmtNode> last_defined_stmt = new ArrayList<StmtNode>();
 
+	//
+	Vector<Node> predicates = new Vector<Node>();
+	
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
 		nodes = new ArrayList<Node>();
@@ -331,6 +335,15 @@ public class ByteCodeGraph {
 		}
 	}
 
+	private void incPredIndex(StmtNode stmt) {
+		String def = this.getFormalPredName(stmt);
+		if (!varcountmap.containsKey(def)) {
+			varcountmap.put(def, 1);
+		} else {
+			varcountmap.put(def, varcountmap.get(def) + 1);
+		}
+	}
+	
 	private String getDomain() {
 		return getFrame().getDomain();
 	}
@@ -349,6 +362,15 @@ public class ByteCodeGraph {
 		return this.getDomain() + name;
 	}
 
+	private String getFormalPredName(StmtNode stmt) {
+		String name = stmt.getName();
+		return "Pred#" + name;
+	}
+	
+	private String getFormalPredNameWithIndex(StmtNode stmt) {
+		return getVarName(getFormalPredName(stmt), this.varcountmap);
+	}
+	
 	private String getFormalVarName(int varindex) {
 		String name = String.valueOf(varindex);
 		return this.getDomain() + name;
@@ -381,6 +403,8 @@ public class ByteCodeGraph {
 	}
 
 	public Node addNewStackNode(StmtNode stmt) {
+		// TODO stack node's name may get confused(same name, different node).
+		// TODO currently works fine, but may bring difficulty to debugging.
 		// this.incStackIndex();
 		String nodename = this.getFormalStackNameWithIndex();
 		Node node = new Node(nodename, this.testname, stmt);
@@ -402,6 +426,16 @@ public class ByteCodeGraph {
 		String nodename = this.getFormalVarNameWithIndex(varindex, traceclass, tracemethod);
 		Node defnode = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, defnode);
+		return defnode;
+	}
+	
+	public Node addNewPredNode(StmtNode stmt) {
+		this.incPredIndex(stmt);
+		String nodename = this.getFormalPredNameWithIndex(stmt);
+		Node defnode = new Node(nodename, this.testname, stmt);
+		this.addNode(nodename, defnode);
+		//TODO use interface to manipulate vector(predicates).
+		this.predicates.add(defnode);
 		return defnode;
 	}
 
