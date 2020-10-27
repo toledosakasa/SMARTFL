@@ -271,6 +271,7 @@ public class Interpreter {
 			map[i] = new XastoreInst(i);
 		map[87] = new PopInst(87);
 		map[88] = new Pop2Inst(88);
+		map[89] = new DupInst(89);
 		for (int i = 96; i <= 112; i += 4) {
 			map[i] = new IarithInst(i);
 		}
