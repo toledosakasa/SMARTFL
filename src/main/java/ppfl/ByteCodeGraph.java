@@ -259,7 +259,7 @@ public class ByteCodeGraph {
 		outstmt.setAttribute("ui.class", "stmt");
 		org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname + stmt.getPrintName());
 		outedge.setAttribute("ui.class", "stmt");
-		outedge.setAttribute("layout.weight", 2);
+		outedge.setAttribute("layout.weight", 3);
 
 		viewgraph.addEdge(factorname + defnode.getPrintName(), factorname, defnode.getPrintName());
 		org.graphstream.graph.Node outdef = viewgraph.getNode(defnode.getPrintName());
@@ -275,7 +275,7 @@ public class ByteCodeGraph {
 			outpred.setAttribute("ui.class", "thenode");
 			outedge = viewgraph.getEdge(factorname + node.getPrintName());
 			outedge.setAttribute("ui.class", "pred");
-			outedge.setAttribute("layout.weight", 2);
+			outedge.setAttribute("layout.weight", 3);
 		}
 		for (Node node : usenodes) {
 			viewgraph.addEdge(factorname + node.getPrintName(), factorname, node.getPrintName());
@@ -283,7 +283,7 @@ public class ByteCodeGraph {
 			outuse.setAttribute("ui.class", "thenode");
 			outedge = viewgraph.getEdge(factorname + node.getPrintName());
 			outedge.setAttribute("ui.class", "use");
-			outedge.setAttribute("layout.weight", 2);
+			outedge.setAttribute("layout.weight", 3);
 		}
 		return ret;
 	}
