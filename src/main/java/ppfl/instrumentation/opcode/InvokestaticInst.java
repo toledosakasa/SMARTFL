@@ -10,7 +10,6 @@ import ppfl.ByteCodeGraph;
 import ppfl.Node;
 import ppfl.ParseInfo;
 import ppfl.StmtNode;
-import ppfl.instrumentation.RuntimeFrame;
 
 //184
 public class InvokestaticInst extends OpcodeInst {
@@ -37,10 +36,10 @@ public class InvokestaticInst extends OpcodeInst {
 		String tracemethod = info.getvalue("callname");
 		// defs
 		int argcnt = OpcodeInst.getArgNumByDesc(info.getvalue("calltype"));
-		List<Node> prednodes = new ArrayList<Node>();
+		List<Node> prednodes = new ArrayList<>();
 
-		Vector<Node> usenodes = new Vector<Node>();
-		Vector<Integer> argindex = new Vector<Integer>();
+		Vector<Node> usenodes = new Vector<>();
+		//Vector<Integer> argindex = new Vector<>();
 		// collect arguments
 		for (int i = 0; i < argcnt; i++) {
 			Node node = graph.getRuntimeStack().pop();
@@ -56,7 +55,7 @@ public class InvokestaticInst extends OpcodeInst {
 		// paravarindex = 1;
 		for (int i = 0; i < argcnt; i++) {
 
-			List<Node> adduse = new ArrayList<Node>(); 
+			List<Node> adduse = new ArrayList<>(); 
 			Node curArgument =usenodes.get(argcnt - i - 1);
 			adduse.add(curArgument);
 
