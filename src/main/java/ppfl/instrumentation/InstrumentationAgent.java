@@ -11,10 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InstrumentationAgent {
-	private static Logger LOGGER = LoggerFactory.getLogger(InstrumentationAgent.class);
+	private static Logger debugLogger = LoggerFactory.getLogger(InstrumentationAgent.class);
 	private static String logFile = null;
 	private static String[] className = null;
 	private static List<String> classNames = null;
+
+	private InstrumentationAgent() {
+		throw new IllegalStateException("Agent class");
+	}
 
 	public static void premain(String agentArgs, Instrumentation inst) {
 		main(agentArgs, inst);
@@ -26,9 +30,9 @@ public class InstrumentationAgent {
 	}
 
 	private static synchronized void main(String agentArgs, Instrumentation inst) {
-		if (agentArgs == null || agentArgs == "")
+		if (agentArgs == null || agentArgs.equals(""))
 			return;
-		LOGGER.info("[Agent] In main method");
+		debugLogger.info("[Agent] In main method");
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("instrumentingclass=")) {
 				className = s.split("=")[1].split(":");
@@ -39,11 +43,10 @@ public class InstrumentationAgent {
 			if (s.startsWith("classnamefile=")) {
 				String cf = s.split("=")[1];
 				Path cpath = FileSystems.getDefault().getPath(cf);
-				classNames = new ArrayList<String>();
+				classNames = new ArrayList<>();
 				try {
 					classNames = java.nio.file.Files.readAllLines(cpath);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -54,7 +57,7 @@ public class InstrumentationAgent {
 	}
 
 	private static void transformClass(Instrumentation instrumentation) {
-		LOGGER.info("[Agent] In transformClass method");
+		debugLogger.info("[Agent] In transformClass method");
 		Class<?> targetCls = null;
 		ClassLoader targetClassLoader = null;
 		if (className == null) {
@@ -63,13 +66,13 @@ public class InstrumentationAgent {
 		for (String classname : className) {
 			// see if we can get the class using forName
 			try {
-				LOGGER.info("className:" + classname);
+				debugLogger.info("className:" + classname);
 				targetCls = Class.forName(classname);
 				targetClassLoader = targetCls.getClassLoader();
 				transform(targetCls, targetClassLoader, instrumentation);
 				continue;
 			} catch (Exception ex) {
-				LOGGER.error("Class [{}] not found with Class.forName", classname);
+				debugLogger.error("Class [{}] not found with Class.forName", classname);
 			}
 			// otherwise iterate all loaded classes and find what we want
 			for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
@@ -77,34 +80,9 @@ public class InstrumentationAgent {
 					targetCls = clazz;
 					targetClassLoader = targetCls.getClassLoader();
 					transform(targetCls, targetClassLoader, instrumentation);
-					continue;
 				}
 			}
 			throw new RuntimeException("Failed to find class [" + classname + "]");
-		}
-		if (classNames != null) {
-			for (String classname : classNames) {
-				// see if we can get the class using forName
-				try {
-					LOGGER.info("className:" + classname);
-					targetCls = Class.forName(classname);
-					targetClassLoader = targetCls.getClassLoader();
-					transform(targetCls, targetClassLoader, instrumentation);
-					continue;
-				} catch (Exception ex) {
-					LOGGER.error("Class [{}] not found with Class.forName", classname);
-				}
-				// otherwise iterate all loaded classes and find what we want
-				for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
-					if (clazz.getName().equals(classname)) {
-						targetCls = clazz;
-						targetClassLoader = targetCls.getClassLoader();
-						transform(targetCls, targetClassLoader, instrumentation);
-						continue;
-					}
-				}
-				throw new RuntimeException("Failed to find class [" + classname + "]");
-			}
 		}
 
 	}

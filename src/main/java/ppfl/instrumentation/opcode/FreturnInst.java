@@ -13,8 +13,8 @@ import ppfl.StmtNode;
 //174
 public class FreturnInst extends OpcodeInst {
 
-	public FreturnInst(int _form) {
-		super(_form, 0, -1);
+	public FreturnInst(int form) {
+		super(form, 0, -1);
 	}
 
 	@Override
@@ -29,8 +29,8 @@ public class FreturnInst extends OpcodeInst {
 		StmtNode stmt = buildstmt(graph);
 
 		ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<Node>();
-		List<Node> usenodes = new ArrayList<Node>();
+		List<Node> prednodes = new ArrayList<>();
+		List<Node> usenodes = new ArrayList<>();
 		// uses
 		usenodes.add(graph.getRuntimeStack().pop());
 		// switch stack frame

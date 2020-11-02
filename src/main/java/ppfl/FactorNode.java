@@ -34,13 +34,13 @@ public class FactorNode {
 		this.sedge = sedge;
 		this.pedges = pedges;
 		this.uedges = uedges;
-		this.tensor = new ArrayList<Double>();
-		this.allnodes = new ArrayList<Node>();
+		this.tensor = new ArrayList<>();
+		this.allnodes = new ArrayList<>();
 		allnodes.add(stmt);
 		allnodes.add(def);
 		allnodes.addAll(preds);
 		allnodes.addAll(uses);
-		this.alledges = new ArrayList<Edge>();
+		this.alledges = new ArrayList<>();
 		alledges.add(sedge);
 		alledges.add(dedge);
 		alledges.addAll(pedges);
@@ -50,7 +50,7 @@ public class FactorNode {
 	}
 
 	public List<Node> getpunodes() {
-		ArrayList<Node> ret = new ArrayList<Node>();
+		ArrayList<Node> ret = new ArrayList<>();
 		ret.addAll(preds);
 		ret.addAll(uses);
 		return ret;
@@ -73,7 +73,7 @@ public class FactorNode {
 
 	public void send_message() {
 		// used to save all the messages from the nodes
-		List<Double> tmpvlist = new ArrayList<Double>();
+		List<Double> tmpvlist = new ArrayList<>();
 		for (int i = 0; i < nnodes; i++) {
 			tmpvlist.add(alledges.get(i).get_ntof());
 		}

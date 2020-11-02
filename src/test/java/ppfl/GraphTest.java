@@ -1,17 +1,14 @@
 package ppfl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.junit.jupiter.api.Test;
-
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.view.Viewer;
+import org.junit.jupiter.api.Test;
 
 class GraphTest {
 
@@ -55,7 +52,15 @@ class GraphTest {
 	public void rectest() {
 		boolean fail = false;
 		// should there be a tmp var of the return value?"
-		SimpleProbGraph pgraph = gengraph("recursivetest");
+		try {
+			SimpleProbGraph pgraph = gengraph("recursivetest");
+			pgraph.bp_inference();
+			pgraph.bp_printprobs();
+		} catch (Exception e) {
+			fail = true;
+			e.printStackTrace();
+		}
+		assertFalse(fail);
 
 	}
 
@@ -63,7 +68,15 @@ class GraphTest {
 	public void sumtest() {
 		boolean fail = false;
 		// runtime error, seems to be caused by "for loop"
-		SimpleProbGraph pgraph = gengraph("sumtest");
+		try {
+			SimpleProbGraph pgraph = gengraph("sumtest");
+			pgraph.bp_inference();
+			pgraph.bp_printprobs();
+		} catch (Exception e) {
+			fail = true;
+			e.printStackTrace();
+		}
+		assertFalse(fail);
 	}
 
 	SimpleProbGraph dominit() {
@@ -89,8 +102,7 @@ class GraphTest {
 
 	ByteCodeGraph dominit_bytecode() {
 		String ppflroot = ".";
-		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
-		String filepatht = ppflroot + "\\test\\trace\\DomainTest.java";
+		//String filepatht = ppflroot + "\\test\\trace\\DomainTest.java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\mytrace\\DomainTest.test.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
@@ -166,7 +178,6 @@ class GraphTest {
 	}
 
 	SimpleProbGraph mergeinit() {
-		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
 		String failpath = passpath;
@@ -195,10 +206,9 @@ class GraphTest {
 	}
 
 	ByteCodeGraph mergeinit_bc() {
-		boolean fail = false;
 		String ppflroot = ".";
-		String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
-		String failpath = passpath;
+		//String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
+		//String failpath = passpath;
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.fail.log";
 
@@ -233,25 +243,25 @@ class GraphTest {
 		try {
 			Thread.sleep(8000);
 		} catch (Exception e) {
-			System.exit(0); 
+			System.exit(0);
 		}
 		pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test1.png");
 		try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
-			System.exit(0); 
+			System.exit(0);
 		}
 		// Viewer viewer2 = pgraph.viewgraph.display();
 		// // pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test2.png");
 		// try {
-		// 	Thread.sleep(6000);
+		// Thread.sleep(6000);
 		// } catch (Exception e) {
-		// 	System.exit(0); 
+		// System.exit(0);
 		// }
 		// try {
-		// 	Thread.sleep(1000);
+		// Thread.sleep(1000);
 		// } catch (Exception e) {
-		// 	System.exit(0); 
+		// System.exit(0);
 		// }
 	}
 
@@ -316,7 +326,6 @@ class GraphTest {
 	}
 
 	SimpleProbGraph breakinit() {
-		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\BreakTest.java";
 		String failpath = passpath;
@@ -340,7 +349,6 @@ class GraphTest {
 	}
 
 	SimpleProbGraph badreturninit() {
-		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\BadReturnTest.java";
 		String failpath = passpath;
@@ -451,7 +459,7 @@ class GraphTest {
 	SimpleProbGraph trycatchinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\TrycatchTest.java";
-		String failpath = passpath;
+		//String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\TrycatchTest.pass.log";
 		// String failtrace1 = ppflroot +
 		// "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
@@ -567,10 +575,9 @@ class GraphTest {
 	}
 
 	ByteCodeGraph parainit_bc() {
-		boolean fail = false;
 		String ppflroot = ".";
-		String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
-		String failpath = passpath;
+		//String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
+		//String failpath = passpath;
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\ParaTest.pass.log";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\ParaTest.fail.log";
 
@@ -591,7 +598,6 @@ class GraphTest {
 	}
 
 	SimpleProbGraph modinit() {
-		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\ModTest.java";
 		String failpath = passpath;
@@ -616,10 +622,9 @@ class GraphTest {
 	}
 
 	ByteCodeGraph modinit_bc() {
-		boolean fail = false;
 		String ppflroot = ".";
-		String passpath = ppflroot + "\\test\\trace\\ModTest.java";
-		String failpath = passpath;
+		//String passpath = ppflroot + "\\test\\trace\\ModTest.java";
+		//String failpath = passpath;
 		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ModTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ModTest.fail.log";
 
@@ -638,7 +643,6 @@ class GraphTest {
 	}
 
 	SimpleProbGraph branchinit() {
-		boolean fail = false;
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\BranchTest.java";
 		String failpath = passpath;
@@ -683,10 +687,9 @@ class GraphTest {
 	}
 
 	ByteCodeGraph simpleflowinit_bc() {
-		boolean fail = false;
 		String ppflroot = ".";
-		String passpath = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
-		String failpath = passpath;
+		//String passpath = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
+		//String failpath = passpath;
 		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\SimpleFlowTest.fail.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
@@ -702,7 +705,7 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 
-	private static String readFileToString(String filePath) {
+	public static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
 		BufferedReader reader;
 		try {
@@ -720,7 +723,6 @@ class GraphTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		return fileData.toString();
 	}
 

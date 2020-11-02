@@ -1,10 +1,10 @@
 package trace;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
-class gcdtest {
+class GcdTest {
 
 	public static int gcd(int a, int b) {
         int r = 0;
@@ -25,7 +25,14 @@ class gcdtest {
 
 	@Test
 	void test() {
-		gcd(28, 8);
+		boolean fail = false;
+		try{
+			gcd(28, 8);
+		}
+		catch(Exception e){
+			fail = true;
+		}
+		assertFalse(fail);
 	}
 
 }

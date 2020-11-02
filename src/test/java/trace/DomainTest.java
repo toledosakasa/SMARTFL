@@ -1,6 +1,6 @@
 package trace;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ class DomainTest {
 			f(2);
 		}
 		catch(Exception e) {
-			
+			fail();
 		}
 		
 	}

@@ -18,4 +18,8 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/eclipse/platform/org.eclipse.core.filesystem/1.7.700/org.eclipse.core.filesystem-1.7.700.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/eclipse/platform/org.eclipse.text/3.10.300/org.eclipse.text-3.10.300.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/eclipse/platform/org.eclipse.core.commands/3.9.700/org.eclipse.core.commands-3.9.700.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/graphstream/gs-core/2.0/gs-core-2.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/graphstream/pherd/1.0/pherd-1.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/graphstream/mbox2/1.0/mbox2-1.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/graphstream/gs-ui-swing/2.0/gs-ui-swing-2.0.jar" enabled="true" runInBatchMode="false"/>
 </factorypath>

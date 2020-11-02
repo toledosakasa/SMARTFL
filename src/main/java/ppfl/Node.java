@@ -2,8 +2,13 @@ package ppfl;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Node {
+
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+
 	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from
 	// inference procedure.
 	protected boolean obsvalue;
@@ -28,7 +33,7 @@ public class Node {
 		this.name = name;
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
-		edges = new ArrayList<Edge>();
+		edges = new ArrayList<>();
 		stmt = null;
 		reduced = true;
 		stacksize = 1;
@@ -41,10 +46,23 @@ public class Node {
 		this.name = name;
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
-		edges = new ArrayList<Edge>();
+		edges = new ArrayList<>();
 		stmt = _stmt;
 		reduced = true;
 		stacksize = 1;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		Node other = (Node) o;
+		return this.name.equals(other.name);
 	}
 
 	public int getSize() {
@@ -52,7 +70,9 @@ public class Node {
 	}
 
 	public void setSize(int s) {
-		assert (s >= 1);
+		if (s < 1) {
+			throw new IllegalArgumentException("Invalid stack size: " + s);
+		}
 		this.stacksize = s;
 	}
 
@@ -164,24 +184,23 @@ public class Node {
 	}
 
 	public void print() {
-		System.out.print(this.getPrintName());
-		// System.out.print("(Statement)");
+		debugLogger.info(this.getPrintName());
 		if (this.obs) {
-			System.out.print(" observed = " + this.obsvalue);
+			debugLogger.info(" observed = " + this.obsvalue);
 		}
-		System.out.println("");
+		debugLogger.info("\n");
 	}
 
 	public void printprob() {
 		if (this.obs) {
-			System.out
-					.println(this.getPrintName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
+			debugLogger
+					.info(this.getPrintName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
 		} else
-			System.out.println(this.getPrintName() + " prob = " + String.valueOf(getprob()));
+			debugLogger.info(this.getPrintName() + " prob = " + String.valueOf(getprob()));
 	}
 
-	public void bp_printprob() {
-		System.out.println(this.getPrintName() + " prob_bp = " + String.valueOf(bp_getprob()));
+	public void bpPrintProb() {
+		debugLogger.info(this.getPrintName() + " prob_bp = " + String.valueOf(bp_getprob()));
 	}
 
 }

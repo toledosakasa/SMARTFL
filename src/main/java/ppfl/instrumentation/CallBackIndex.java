@@ -7,6 +7,10 @@ import javassist.bytecode.ConstPool;
 
 public class CallBackIndex {
 
+	/**
+	 *
+	 */
+	private static final String PRINT_CALLBACK_NAME = "printTopStack1";
 	// use the logger set by TraceTransformer
 	public int logstringindex;
 	public int tsindex_int;
@@ -17,7 +21,7 @@ public class CallBackIndex {
 	public int tsindex_long;
 	public int tsindex_float;
 	public int tsindex_double;
-	public int tsindex_ldc;// use constp.getLdcValue to get type.
+	// private int tsindex_ldc;// use constp.getLdcValue to get type.
 	public int tsindex_string;
 	public int tsindex_object;
 
@@ -47,78 +51,77 @@ public class CallBackIndex {
 
 	public CallBackIndex(ConstPool constp) throws NotFoundException {
 		ClassPool cp = ClassPool.getDefault();
-		CtClass THISCLASS = cp.get("ppfl.instrumentation.CallBackIndex");
-		int classindex = constp.addClassInfo(THISCLASS);
+		CtClass thisKlass = cp.get("ppfl.instrumentation.CallBackIndex");
+		int classindex = constp.addClassInfo(thisKlass);
+
 		logstringindex = constp.addMethodrefInfo(classindex, "logString", "(Ljava/lang/String;)V");
-		tsindex_int = constp.addMethodrefInfo(classindex, "printTopStack1", "(I)I");
-		tsindex_long = constp.addMethodrefInfo(classindex, "printTopStack1", "(J)J");
-		tsindex_double = constp.addMethodrefInfo(classindex, "printTopStack1", "(D)D");
-		tsindex_short = constp.addMethodrefInfo(classindex, "printTopStack1", "(S)S");
-		tsindex_byte = constp.addMethodrefInfo(classindex, "printTopStack1", "(B)B");
-		tsindex_char = constp.addMethodrefInfo(classindex, "printTopStack1", "(C)C");
-		tsindex_boolean = constp.addMethodrefInfo(classindex, "printTopStack1", "(Z)Z");
-		tsindex_float = constp.addMethodrefInfo(classindex, "printTopStack1", "(F)F");
-		tsindex_string = constp.addMethodrefInfo(classindex, "printTopStack1",
-				"(Ljava/lang/String;)Ljava/lang/String;");
-		tsindex_object = constp.addMethodrefInfo(classindex, "printTopStack1",
-				"(Ljava/lang/Object;)Ljava/lang/Object;");
+		tsindex_int = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(I)I");
+		tsindex_long = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(J)J");
+		tsindex_double = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(D)D");
+		tsindex_short = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(S)S");
+		tsindex_byte = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(B)B");
+		tsindex_char = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(C)C");
+		tsindex_boolean = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(Z)Z");
+		tsindex_float = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(F)F");
+		tsindex_string = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(Ljava/lang/String;)Ljava/lang/String;");
+		tsindex_object = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(Ljava/lang/Object;)Ljava/lang/Object;");
 	}
 
 	// callbacks.
 	// will be called by bytecode instrumentation
 	public static int printTopStack1(int i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=int,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=int,pushvalue=%d", i));
 		return i;
 	}
 
 	public static double printTopStack1(double i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=double,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=double,pushvalue=%lf", i));
 		return i;
 	}
 
 	public static short printTopStack1(short i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=short,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=short,pushvalue=%hd", i));
 		return i;
 	}
 
 	public static char printTopStack1(char i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=char,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=char,pushvalue=%c", i));
 		return i;
 	}
 
 	public static byte printTopStack1(byte i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=byte,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=byte,pushvalue=%d", i));
 		return i;
 	}
 
 	public static boolean printTopStack1(boolean i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=boolean,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=boolean,pushvalue=%d" + i));
 		return i;
 	}
 
 	public static float printTopStack1(float i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=float,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=float,pushvalue=%f", i));
 		return i;
 	}
 
 	public static long printTopStack1(long i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=long,pushvalue=" + String.valueOf(i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=long,pushvalue=%ld", i));
 		return i;
 	}
 
 	public static String printTopStack1(String i) {
-		TraceTransformer.TRACELOGGER.info(",pushtype=String,pushvalue=" + i);
+		TraceTransformer.traceLogger.info(",pushtype=String,pushvalue=" + i);
 		return i;
 	}
 
 	public static Object printTopStack1(Object i) {
 		// call system hashcode (jvm address)
-		TraceTransformer.TRACELOGGER.info(",pushtype=object,pushvalue=" + java.lang.System.identityHashCode(i));
+		TraceTransformer.traceLogger.info(",pushtype=object,pushvalue=" + java.lang.System.identityHashCode(i));
 		return i;
 	}
 
 	public static void logString(String s) {
-		TraceTransformer.TRACELOGGER.info(s);
+		TraceTransformer.traceLogger.info(s);
 	}
 
 }
