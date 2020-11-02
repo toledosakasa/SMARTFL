@@ -12,6 +12,15 @@ public class StmtNode extends Node {
 	}
 
 	@Override
+	public void print(String prefix) {
+		if (this.obs) {
+			debugLogger.info(prefix + this.name + "(Statement) observed = " + this.obsvalue);
+		} else {
+			debugLogger.info(prefix + this.name + "(Statement)");
+		}
+	}
+
+	@Override
 	public void print() {
 		if (this.obs) {
 			debugLogger.info(this.name + "(Statement) observed = " + this.obsvalue);

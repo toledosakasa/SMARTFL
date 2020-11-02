@@ -3,7 +3,13 @@ package ppfl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FactorNode {
+
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+
 	private List<Node> preds;
 	private Node def;
 	private Node stmt;
@@ -187,44 +193,46 @@ public class FactorNode {
 					return MEDIUM;
 				return LOW;
 			}
-//			if (!defv) {
-//				if (hasUNKoperator)
-//					return MEDIUM;
-//				return HIGH;
-//			}
-//			// else: def = true
-//			else if (pu) {
-//				if (hasUNKoperator)
-//					return MEDIUM;
-//				return LOW;
-//			}
-//			// def = true stmt = false use = false
-//			return LOW;// TODO should be medium when using certain ops.
+			// if (!defv) {
+			// if (hasUNKoperator)
+			// return MEDIUM;
+			// return HIGH;
+			// }
+			// // else: def = true
+			// else if (pu) {
+			// if (hasUNKoperator)
+			// return MEDIUM;
+			// return LOW;
+			// }
+			// // def = true stmt = false use = false
+			// return LOW;// TODO should be medium when using certain ops.
 		}
 		return MEDIUM;
 	}
 
 	public void print() {
-		System.out.print("Statement: ");
-		stmt.print();
-		System.out.print("def:");
-		def.print();
+		stmt.print("Statement: ");
+		debugLogger.info("def:");
+		def.print("\t");
 
 		if (uses != null) {
-			System.out.println("uses:");
+			debugLogger.info("uses:");
 			for (Node n : uses) {
-				n.print();
+				n.print("\t");
 			}
 		}
 		if (preds != null) {
-			System.out.println("preds:");
+			debugLogger.info("preds:");
 			for (Node n : preds) {
-				n.print();
+				n.print("\t");
 			}
 		}
 		if (ops != null) {
-			System.out.print("ops:");
-			System.out.println(ops);
+			debugLogger.info("ops:");
+			for (String eachop : ops) {
+				debugLogger.info("\t" + eachop);
+			}
+
 		}
 	}
 }

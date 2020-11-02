@@ -183,12 +183,20 @@ public class Node {
 		return p;
 	}
 
-	public void print() {
-		debugLogger.info(this.getPrintName());
+	public void print(String prefix){
 		if (this.obs) {
-			debugLogger.info(" observed = " + this.obsvalue);
+			debugLogger.info(prefix + this.getPrintName() + " observed = " + this.obsvalue);
+		} else {
+			debugLogger.info(prefix + this.getPrintName());
 		}
-		debugLogger.info("\n");
+	}
+
+	public void print() {
+		if (this.obs) {
+			debugLogger.info(this.getPrintName() + " observed = " + this.obsvalue);
+		} else {
+			debugLogger.info(this.getPrintName());
+		}
 	}
 
 	public void printprob() {
