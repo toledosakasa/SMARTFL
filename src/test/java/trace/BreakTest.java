@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class BreakTest {
 
-	public double f(int n) {
+	public static int f(int n) {
 		int sum = 0;
 		for (int i = 0; i < n; i++) {
 			if (sum > 30)
