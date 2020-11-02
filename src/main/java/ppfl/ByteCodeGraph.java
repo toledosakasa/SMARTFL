@@ -603,7 +603,7 @@ public class ByteCodeGraph {
 				break;
 			}
 		}
-		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.getprob(), arg1.getprob());
+		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(),arg1.bp_getprob());
 		nodes.sort(comp);
 		stmts.sort(comp);
 
