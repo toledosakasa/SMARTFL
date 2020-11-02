@@ -7,7 +7,6 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
-import ppfl.ParseInfo;
 import ppfl.StmtNode;
 
 //174
@@ -28,7 +27,7 @@ public class FreturnInst extends OpcodeInst {
 		// build the stmtnode(common)
 		StmtNode stmt = buildstmt(graph);
 
-		ParseInfo info = graph.parseinfo;
+		//ParseInfo info = graph.parseinfo;
 		List<Node> prednodes = new ArrayList<>();
 		List<Node> usenodes = new ArrayList<>();
 		// uses

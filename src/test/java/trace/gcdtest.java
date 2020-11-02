@@ -1,6 +1,6 @@
 package trace;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class GcdTest {
 		catch(Exception e){
 			fail = true;
 		}
-		assertFalse(fail);
+		assertFalse(fail, "should not fail");
 	}
 
 }

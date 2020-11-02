@@ -92,17 +92,17 @@ public class ByteCodeGraph {
 	public Vector<Node> predicates = new Vector<>();
 
 	public ByteCodeGraph() {
-		factornodes = new ArrayList<FactorNode>();
-		nodes = new ArrayList<Node>();
-		stmts = new ArrayList<StmtNode>();
-		nodemap = new HashMap<String, Node>();
-		stmtmap = new HashMap<String, Node>();
-		varcountmap = new HashMap<String, Integer>();
-		stmtcountmap = new HashMap<String, Integer>();
+		factornodes = new ArrayList<>();
+		nodes = new ArrayList<>();
+		stmts = new ArrayList<>();
+		nodemap = new HashMap<>();
+		stmtmap = new HashMap<>();
+		varcountmap = new HashMap<>();
+		stmtcountmap = new HashMap<>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
-		stackframe = new Stack<RuntimeFrame>();
+		stackframe = new Stack<>();
 		viewgraph = new SingleGraph("Outgraph");
 		viewgraph.setStrict(false);
 		viewgraph.setAutoCreate(true);
@@ -158,8 +158,8 @@ public class ByteCodeGraph {
 
 	public void initmaps() {
 		// TODO this could be incomplete.
-		this.varcountmap = new HashMap<String, Integer>();
-		this.stackframe = new Stack<RuntimeFrame>();
+		this.varcountmap = new HashMap<>();
+		this.stackframe = new Stack<>();
 		this.predicates.clear();
 	}
 
@@ -226,14 +226,14 @@ public class ByteCodeGraph {
 		sedge.setnode(stmt);
 		stmt.add_edge(sedge);
 
-		List<Edge> pedges = new ArrayList<Edge>();
+		List<Edge> pedges = new ArrayList<>();
 		for (Node n : prednodes) {
 			Edge nedge = new Edge();
 			nedge.setnode(n);
 			pedges.add(nedge);
 			n.add_edge(nedge);
 		}
-		List<Edge> uedges = new ArrayList<Edge>();
+		List<Edge> uedges = new ArrayList<>();
 		for (Node n : usenodes) {
 			Edge nedge = new Edge();
 			nedge.setnode(n);
@@ -489,7 +489,7 @@ public class ByteCodeGraph {
 			n.init();
 		}
 
-		List<Node> allnodes = new ArrayList<Node>();
+		List<Node> allnodes = new ArrayList<>();
 		allnodes.addAll(nodes);
 		allnodes.addAll(stmts);
 		int nnodes = allnodes.size();

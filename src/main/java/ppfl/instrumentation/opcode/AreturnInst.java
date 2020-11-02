@@ -8,7 +8,6 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
-import ppfl.ParseInfo;
 import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -38,7 +37,7 @@ public class AreturnInst extends OpcodeInst {
 		// build the stmtnode(common)
 		StmtNode stmt = buildstmt(graph);
 
-		ParseInfo info = graph.parseinfo;
+		//ParseInfo info = graph.parseinfo;
 		List<Node> prednodes = new ArrayList<Node>();
 		List<Node> usenodes = new ArrayList<Node>();
 		// uses
