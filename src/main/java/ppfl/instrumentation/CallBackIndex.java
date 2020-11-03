@@ -75,12 +75,12 @@ public class CallBackIndex {
 	}
 
 	public static double printTopStack1(double i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=double,pushvalue=%lf", i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=double,pushvalue=%f", i));
 		return i;
 	}
 
 	public static short printTopStack1(short i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=short,pushvalue=%hd", i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=short,pushvalue=%d", i));
 		return i;
 	}
 
@@ -95,7 +95,7 @@ public class CallBackIndex {
 	}
 
 	public static boolean printTopStack1(boolean i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=boolean,pushvalue=%d" + i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=boolean,pushvalue=%b" + i));
 		return i;
 	}
 
@@ -105,7 +105,7 @@ public class CallBackIndex {
 	}
 
 	public static long printTopStack1(long i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=long,pushvalue=%ld", i));
+		TraceTransformer.traceLogger.info(String.format(",pushtype=long,pushvalue=%d", i));
 		return i;
 	}
 
