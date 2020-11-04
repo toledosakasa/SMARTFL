@@ -1,30 +1,31 @@
 package ppfl.instrumentation;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import ppfl.Node;
 
 public class RuntimeFrame {
 	public int entercnt;
-	public Stack<Node> runtimestack;
+	public Deque<Node> runtimestack;
 	public String traceclass;
 	public String tracemethod;
 
 	public RuntimeFrame() {
 		entercnt = 0;
-		runtimestack = new Stack<Node>();
+		runtimestack = new ArrayDeque<>();
 	}
 
 	private RuntimeFrame(String tclass, String tmethod) {
 		entercnt = 0;
-		runtimestack = new Stack<Node>();
+		runtimestack = new ArrayDeque<>();
 		traceclass = tclass;
 		tracemethod = tmethod;
 	}
 
 	public String getDomain() {
-		return this.traceclass + ":" + this.tracemethod + "#" + String.valueOf(entercnt) + ":";
+		return this.traceclass + ":" + this.tracemethod + "#" + entercnt + ":";
 	}
 
 	public static RuntimeFrame getFrame(String tclass, String tmethod) {
@@ -35,5 +36,5 @@ public class RuntimeFrame {
 		return framemap.get(id);
 	}
 
-	private static Map<String, RuntimeFrame> framemap = new HashMap<String, RuntimeFrame>();
+	private static Map<String, RuntimeFrame> framemap = new HashMap<>();
 }

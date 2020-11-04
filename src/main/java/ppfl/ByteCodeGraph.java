@@ -3,8 +3,10 @@ package ppfl;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,8 @@ public class ByteCodeGraph {
 	Random random;
 
 	// stack tracing
-	private Stack<RuntimeFrame> stackframe;
+	//private Stack<RuntimeFrame> stackframe;
+	private Deque<RuntimeFrame> stackframe;
 
 	// should be called while returning.
 	// e.g. return ireturn
@@ -64,13 +67,13 @@ public class ByteCodeGraph {
 	}
 
 	public RuntimeFrame getFrame() {
-		if (stackframe.empty()) {
+		if (stackframe.isEmpty()) {
 			stackframe.push(RuntimeFrame.getFrame(parseinfo.traceclass, parseinfo.tracemethod));
 		}
 		return stackframe.peek();
 	}
 
-	public Stack<Node> getRuntimeStack() {
+	public Deque<Node> getRuntimeStack() {
 		return getFrame().runtimestack;
 	}
 
@@ -101,7 +104,7 @@ public class ByteCodeGraph {
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
-		stackframe = new Stack<>();
+		stackframe = new ArrayDeque<>();
 		viewgraph = new SingleGraph("Outgraph");
 		viewgraph.setStrict(false);
 		viewgraph.setAutoCreate(true);
@@ -158,7 +161,7 @@ public class ByteCodeGraph {
 	public void initmaps() {
 		// TODO this could be incomplete.
 		this.varcountmap = new HashMap<>();
-		this.stackframe = new Stack<>();
+		this.stackframe = new ArrayDeque<>();
 		this.predicates.clear();
 	}
 
