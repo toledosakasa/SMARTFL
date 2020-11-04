@@ -2,7 +2,6 @@ package ppfl.instrumentation;
 
 import javassist.bytecode.Mnemonic;
 import ppfl.instrumentation.opcode.*;
-import ppfl.instrumentation.opcode.OpcodeInst.*;
 
 /*bytecode reference:
 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5*/
@@ -110,8 +109,8 @@ public class Interpreter {
 			map[i] = new LlogicInst(i);
 		}
 		map[132] = new IincInst(132);
-		map[132].setPara(0, paratype.PARAVAR);
-		map[132].setPara(1, paratype.PARACONST);
+		// map[132].setPara(0, paratype.PARAVAR);
+		// map[132].setPara(1, paratype.PARACONST);
 		for (int i = 136; i <= 142; i += 3) {
 			map[i] = new IturntypeInst(i);
 		}

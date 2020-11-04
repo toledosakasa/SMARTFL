@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
-import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +88,7 @@ public class ByteCodeGraph {
 	public List<StmtNode> lastDefinedStmt = new ArrayList<>();
 
 	//
-	public Vector<Node> predicates = new Vector<>();
+	public List<Node> predicates = new ArrayList<>();
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<>();

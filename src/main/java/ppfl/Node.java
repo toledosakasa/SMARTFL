@@ -39,7 +39,7 @@ public class Node {
 		stacksize = 1;
 	}
 
-	public Node(String name, String testname, StmtNode _stmt) {
+	public Node(String name, String testname, StmtNode stmt) {
 		this.testname = testname;
 		this.obs = false;
 		this.p = 0.5;
@@ -47,7 +47,7 @@ public class Node {
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
 		edges = new ArrayList<>();
-		stmt = _stmt;
+		this.stmt = stmt;
 		reduced = true;
 		stacksize = 1;
 	}
@@ -63,6 +63,11 @@ public class Node {
 
 		Node other = (Node) o;
 		return this.name.equals(other.name);
+	}
+
+	@Override
+	public int hashCode(){
+		return this.name.hashCode();
 	}
 
 	public int getSize() {
@@ -204,11 +209,11 @@ public class Node {
 			debugLogger
 					.info(this.getPrintName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
 		} else
-			debugLogger.info(this.getPrintName() + " prob = " + String.valueOf(getprob()));
+			debugLogger.info(this.getPrintName() + " prob = " + getprob());
 	}
 
 	public void bpPrintProb() {
-		debugLogger.info(this.getPrintName() + " prob_bp = " + String.valueOf(bp_getprob()));
+		debugLogger.info(this.getPrintName() + " prob_bp = " + bp_getprob());
 	}
 
 }
