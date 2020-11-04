@@ -18,12 +18,12 @@ class BreakTest {
 
 	@Test
 	void pass() {
-		assertEquals(f(0), 0);
+		assertEquals(0, f(0));
 	}
 
 	@Test
 	void fail() {
-		assertEquals(f(11), 55);
+		assertEquals(55, f(11));
 	}
 
 }

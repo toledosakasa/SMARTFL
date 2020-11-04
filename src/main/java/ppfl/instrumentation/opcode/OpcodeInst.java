@@ -16,7 +16,6 @@ import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
 
 public class OpcodeInst {
-	private boolean isinvoke;
 	int form;
 	String opcode;
 
@@ -46,7 +45,6 @@ public class OpcodeInst {
 		opcode = Mnemonic.OPCODE[_form];
 		pushnum = _pushnum;
 		popnum = _popnum;
-		this.isinvoke = false;
 	}
 
 	public static int getArgNumByDesc(String desc) {
@@ -71,7 +69,7 @@ public class OpcodeInst {
 		Pattern pattern = Pattern.compile("\\[*L[^;]+;|\\[[ZBCSIFDJ]|[ZBCSIFDJ]");
 		Matcher matcher = pattern.matcher(x0);
 
-		ArrayList<String> listMatches = new ArrayList<String>();
+		ArrayList<String> listMatches = new ArrayList<>();
 
 		while (matcher.find()) {
 			listMatches.add(matcher.group());
@@ -163,7 +161,7 @@ public class OpcodeInst {
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
 			throws BadBytecode {
 
-		if (inst != null && inst != "") {
+		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(8);
 			int instindex = constp.addStringInfo(inst);
@@ -175,14 +173,6 @@ public class OpcodeInst {
 			ci.writeByte(184, instpos + 3);// invokestatic
 			ci.write16bit(cbi.logstringindex, instpos + 4);
 		}
-	}
-
-	public boolean isInvoke() {
-		return this.isinvoke;
-	}
-
-	public void setinvoke() {
-		this.isinvoke = true;
 	}
 
 	// extended class should override this method.

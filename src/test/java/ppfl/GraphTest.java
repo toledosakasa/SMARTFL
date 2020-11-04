@@ -128,7 +128,6 @@ class GraphTest {
 			pgraph.inference();
 			pgraph.printprobs();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			fail = true;
 			e.printStackTrace();
 		}
@@ -143,7 +142,6 @@ class GraphTest {
 			pgraph.inference();
 			pgraph.printprobs();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			fail = true;
 			e.printStackTrace();
 		}

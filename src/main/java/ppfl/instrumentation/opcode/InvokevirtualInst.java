@@ -2,7 +2,6 @@ package ppfl.instrumentation.opcode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -14,8 +13,8 @@ import ppfl.StmtNode;
 //182
 public class InvokevirtualInst extends OpcodeInst {
 
-	public InvokevirtualInst(int _form) {
-		super(_form, 0, 0);
+	public InvokevirtualInst(int form) {
+		super(form, 0, 0);
 	}
 
 	@Override
@@ -38,7 +37,7 @@ public class InvokevirtualInst extends OpcodeInst {
 		int argcnt = OpcodeInst.getArgNumByDesc(info.getvalue("calltype"));
 		List<Node> prednodes = new ArrayList<>();
 
-		Vector<Node> usenodes = new Vector<>();
+		List<Node> usenodes = new ArrayList<>();
 		//Vector<Integer> argindex = new Vector<>();
 		
 		//An extra argument: caller:object->callee:this
