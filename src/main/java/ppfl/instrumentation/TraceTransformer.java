@@ -27,7 +27,7 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
-	private static Logger debugLogger = LoggerFactory.getLogger("TraceTransformer");
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
 	// The logger name

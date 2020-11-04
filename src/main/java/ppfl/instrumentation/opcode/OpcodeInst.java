@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -16,6 +19,8 @@ import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
 
 public class OpcodeInst {
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+
 	int form;
 	String opcode;
 
@@ -191,7 +196,7 @@ public class OpcodeInst {
 		if (graph.auto_oracle) {
 			if (tracemethod.contentEquals(graph.testname)) {
 				stmt.observe(true);
-				System.out.println("Observe " + stmt.getName() + " as true");
+				debugLogger.info("Observe " + stmt.getName() + " as true");
 			}
 		}
 

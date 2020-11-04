@@ -212,25 +212,25 @@ public class FactorNode {
 
 	public void print() {
 		stmt.print("Statement: ");
-		debugLogger.info("def:");
-		def.print("\t");
+		debugLogger.info("\tdef:");
+		def.print("\t\t");
 
 		if (uses != null) {
-			debugLogger.info("uses:");
+			debugLogger.info("\tuses:");
 			for (Node n : uses) {
-				n.print("\t");
+				n.print("\t\t");
 			}
 		}
 		if (preds != null) {
-			debugLogger.info("preds:");
+			debugLogger.info("\tpreds:");
 			for (Node n : preds) {
-				n.print("\t");
+				n.print("\t\t");
 			}
 		}
 		if (ops != null) {
-			debugLogger.info("ops:");
+			debugLogger.info("\tops:");
 			for (String eachop : ops) {
-				debugLogger.info("\t" + eachop);
+				debugLogger.info("\t\t" + eachop);
 			}
 
 		}

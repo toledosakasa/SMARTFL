@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +48,7 @@ public class ByteCodeGraph {
 	Random random;
 
 	// stack tracing
-	//private Stack<RuntimeFrame> stackframe;
+	// private Stack<RuntimeFrame> stackframe;
 	private Deque<RuntimeFrame> stackframe;
 
 	// should be called while returning.
@@ -141,12 +140,12 @@ public class ByteCodeGraph {
 		for (Node n : nodes) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + String.valueOf(n.bp_getprob()));
+				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
 		}
 		for (StmtNode n : stmts) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + String.valueOf(n.bp_getprob()));
+				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
 		}
 	}
 
@@ -177,7 +176,6 @@ public class ByteCodeGraph {
 				// Interpreter.map[this.parseinfo.form].buildtrace(this);
 				// TODO build source
 			}
-			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -290,23 +288,16 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
-	// private void incStackIndex() {
-	// String domain = this.getFormalStackName();
-	// // debugLogger.info(domain);
-	// if (!stackheightmap.containsKey(domain)) {
-	// stackheightmap.put(domain, 1);
-	// } else {
-	// stackheightmap.put(domain, stackheightmap.get(domain) + 1);
-	// }
-	// }
-
 	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
-		String def = this.getFormalVarName(varindex, traceclass, tracemethod);
-		if (!varcountmap.containsKey(def)) {
-			varcountmap.put(def, 1);
-		} else {
-			varcountmap.put(def, varcountmap.get(def) + 1);
-		}
+		assert (traceclass.equals(this.getFrame().traceclass));
+		assert (tracemethod.equals(this.getFrame().tracemethod));
+		incVarIndex(varindex);
+		// String def = this.getFormalVarName(varindex, traceclass, tracemethod);
+		// if (!varcountmap.containsKey(def)) {
+		// varcountmap.put(def, 1);
+		// } else {
+		// varcountmap.put(def, varcountmap.get(def) + 1);
+		// }
 	}
 
 	private void incVarIndex(int varindex) {
@@ -341,8 +332,11 @@ public class ByteCodeGraph {
 	}
 
 	private String getFormalVarName(int varindex, String traceclass, String tracemethod) {
-		String name = String.valueOf(varindex);
-		return this.getDomain() + name;
+		assert (traceclass.equals(this.getFrame().traceclass));
+		assert (tracemethod.equals(this.getFrame().tracemethod));
+		return getFormalVarName(varindex);
+		// String name = String.valueOf(varindex);
+		// return this.getDomain() + name;
 	}
 
 	private String getFormalPredName(StmtNode stmt) {
@@ -368,7 +362,7 @@ public class ByteCodeGraph {
 	}
 
 	private String getVarName(String name, int count) {
-		return name + "#" + String.valueOf(count);
+		return name + "#" + count;
 	}
 
 	private String getVarName(String name, Map<String, Integer> map) {
@@ -388,7 +382,6 @@ public class ByteCodeGraph {
 	public Node addNewStackNode(StmtNode stmt) {
 		// TODO stack node's name may get confused(same name, different node).
 		// TODO currently works fine, but may bring difficulty to debugging.
-		// this.incStackIndex();
 		String nodename = this.getFormalStackNameWithIndex();
 		Node node = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, node);
@@ -605,7 +598,7 @@ public class ByteCodeGraph {
 				break;
 			}
 		}
-		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(),arg1.bp_getprob());
+		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
 		nodes.sort(comp);
 		stmts.sort(comp);
 
