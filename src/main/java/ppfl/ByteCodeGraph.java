@@ -177,10 +177,10 @@ public class ByteCodeGraph {
 	}
 
 	public void parsesource(String sourcefilename) {
+        Map<String,String> assistnamemap = new HashMap<String, String>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(sourcefilename));
 			String t;
-			Map<String,String> assistnamemap = new HashMap<String, String>();
 			Set<String> nonextinsts = new HashSet<String>();
 			nonextinsts.add("goto_w");
 			nonextinsts.add("goto");
@@ -217,8 +217,6 @@ public class ByteCodeGraph {
 					theedges.add("OUT_"+classandmethod);
 					instset.add("OUT_"+classandmethod);
 				}
-				// System.out.println(thisinst+"__put__");
-				// System.out.println(theedges);
 				predataflowmap.put(thisinst,theedges);
 				instset.add(thisinst);
 			}
