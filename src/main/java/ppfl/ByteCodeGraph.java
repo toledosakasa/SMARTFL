@@ -186,7 +186,7 @@ public class ByteCodeGraph {
 					continue;
 				ParseInfo info = new ParseInfo(t);
 				String thisinst = info.getvalue("lineinfo");
-				String classandmethod = info.traceclass + info.tracemethod;
+				String classandmethod = info.traceclass +"#"+info.tracemethod;
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
 				List<String> theedges = new ArrayList<String> ();
@@ -289,9 +289,9 @@ public class ByteCodeGraph {
 				dataflowsets.put(instname, newset);
 			}
 			System.out.println("size =" + dataflowsets.size());
-			for(String key : dataflowsets.keySet()){
-				System.out.println(key);
-				System.out.println(dataflowsets.get(key));
+			for(String key : predataflowmap.keySet()){
+				System.out.println("key_"+key);
+				System.out.println(predataflowmap.get(key));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

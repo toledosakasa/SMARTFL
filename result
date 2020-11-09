@@ -1,0 +1,998 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------------< ppfl:ppfl >------------------------------
+[INFO] Building ppfl 0.0.1-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ ppfl ---
+[WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ ppfl ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
+[INFO] Compiling 92 source files to C:\ppfl\target\classes
+[INFO] /C:/ppfl/src/main/java/ppfl/SimpleProbGraph.java: C:\ppfl\src\main\java\ppfl\SimpleProbGraph.java使用或覆盖了已过时的 API。
+[INFO] /C:/ppfl/src/main/java/ppfl/SimpleProbGraph.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] /C:/ppfl/src/main/java/ppfl/LineMappingVisitor.java: C:\ppfl\src\main\java\ppfl\LineMappingVisitor.java使用了未经检查或不安全的操作。
+[INFO] /C:/ppfl/src/main/java/ppfl/LineMappingVisitor.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ ppfl ---
+[WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory C:\ppfl\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ ppfl ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
+[INFO] Compiling 22 source files to C:\ppfl\target\test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.0.0-M5:test (default-test) @ ppfl ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running ppfl.GraphTest
+Observe trace.ControlTest:fail#33#0 as true
+Observe trace.ControlTest:fail#33#1 as true
+Observe trace.ControlTest:fail#33#4 as true
+Observe trace.ControlTest:fail#33#7 as true
+Observe trace.ControlTest:fail#0:#Stack#1 as false
+Observe org.junit.jupiter.api.Assertions:assertEquals#1:0#1 as false
+Observe org.junit.jupiter.api.Assertions:assertEquals#1:1#1 as false
+Observe trace.ControlTest:pass#28#0 as true
+Observe trace.ControlTest:pass#28#2 as true
+Observe trace.ControlTest:pass#28#5 as true
+Observe trace.ControlTest:pass#28#7 as true
+Observe trace.ControlTest:pass#0:#Stack#1 as true
+Observe org.junit.jupiter.api.Assertions:assertEquals#2:0#1 as true
+Observe org.junit.jupiter.api.Assertions:assertEquals#2:1#1 as true
+size =35
+key_trace.ControlTest#foo#11#13
+[trace.ControlTest#foo#11#14]
+key_trace.ControlTest#foo#12#22
+[trace.ControlTest#foo#12#23]
+key_trace.ControlTest#foo#12#23
+[trace.ControlTest#foo#15#24]
+key_trace.ControlTest#foo#11#16
+[trace.ControlTest#foo#12#19, trace.ControlTest#foo#15#24]
+key_trace.ControlTest#foo#11#14
+[trace.ControlTest#foo#11#16]
+key_trace.ControlTest#foo#8#5
+[trace.ControlTest#foo#10#8, trace.ControlTest#foo#23#39]
+key_trace.ControlTest#foo#12#20
+[trace.ControlTest#foo#12#22]
+key_trace.ControlTest#foo#7#1
+[trace.ControlTest#foo#8#2]
+key_trace.ControlTest#foo#21#33
+[trace.ControlTest#foo#21#36]
+key_trace.ControlTest#foo#7#0
+[trace.ControlTest#foo#7#1]
+key_trace.ControlTest#foo#8#2
+[trace.ControlTest#foo#8#3]
+key_trace.ControlTest#fail#33#1
+[trace.ControlTest#fail#33#4]
+key_trace.ControlTest#foo#21#36
+[trace.ControlTest#foo#8#2]
+key_trace.ControlTest#foo#8#3
+[trace.ControlTest#foo#8#5]
+key_trace.ControlTest#foo#23#39
+[trace.ControlTest#foo#23#40]
+key_trace.ControlTest#fail#33#0
+[trace.ControlTest#fail#33#1]
+key_trace.ControlTest#fail#33#4
+[trace.ControlTest#fail#33#7]
+key_trace.ControlTest#fail#33#7
+[trace.ControlTest#fail#34#10]
+key_trace.ControlTest#foo#10#10
+[trace.ControlTest#foo#11#13, trace.ControlTest#foo#19#30]
+key_trace.ControlTest#foo#15#27
+[trace.ControlTest#foo#21#33]
+key_trace.ControlTest#pass#29#10
+[OUT_trace.ControlTest#pass]
+key_trace.ControlTest#foo#15#24
+[trace.ControlTest#foo#15#27]
+key_trace.ControlTest#foo#19#30
+[trace.ControlTest#foo#21#33]
+key_trace.ControlTest#pass#28#7
+[trace.ControlTest#pass#29#10]
+key_trace.ControlTest#pass#28#5
+[trace.ControlTest#pass#28#7]
+key_trace.ControlTest#pass#28#2
+[trace.ControlTest#pass#28#5]
+key_trace.ControlTest#foo#10#9
+[trace.ControlTest#foo#10#10]
+key_trace.ControlTest#pass#28#0
+[trace.ControlTest#pass#28#2]
+key_trace.ControlTest#foo#10#8
+[trace.ControlTest#foo#10#9]
+key_trace.ControlTest#foo#12#19
+[trace.ControlTest#foo#12#20]
+key_trace.ControlTest#fail#34#10
+[OUT_trace.ControlTest#fail]
+key_trace.ControlTest#foo#23#40
+[OUT_trace.ControlTest#foo]
+
+Nodes: 
+trace.ControlTest:fail#33#0(Statement) observed = true
+trace.ControlTest:fail#33#1(Statement) observed = true
+trace.ControlTest:foo#7#0(Statement)
+trace.ControlTest:foo#7#1(Statement)
+trace.ControlTest:foo#8#2(Statement)
+trace.ControlTest:foo#8#3(Statement)
+trace.ControlTest:foo#8#5(Statement)
+trace.ControlTest:foo#10#8(Statement)
+trace.ControlTest:foo#10#9(Statement)
+trace.ControlTest:foo#10#10(Statement)
+trace.ControlTest:foo#19#30(Statement)
+trace.ControlTest:foo#21#33(Statement)
+trace.ControlTest:foo#21#36(Statement)
+trace.ControlTest:foo#11#13(Statement)
+trace.ControlTest:foo#11#14(Statement)
+trace.ControlTest:foo#11#16(Statement)
+trace.ControlTest:foo#15#24(Statement)
+trace.ControlTest:foo#15#27(Statement)
+trace.ControlTest:foo#12#19(Statement)
+trace.ControlTest:foo#12#20(Statement)
+trace.ControlTest:foo#12#22(Statement)
+trace.ControlTest:foo#12#23(Statement)
+trace.ControlTest:fail#33#4(Statement) observed = true
+trace.ControlTest:fail#33#7(Statement) observed = true
+trace.ControlTest:pass#28#0(Statement) observed = true
+trace.ControlTest:pass#28#2(Statement) observed = true
+trace.ControlTest:pass#28#5(Statement) observed = true
+trace.ControlTest:pass#28#7(Statement) observed = true
+fail#trace.ControlTest:fail#0:#Stack#0@trace.ControlTest:fail#33#0
+fail#trace.ControlTest:foo#1:0#1@trace.ControlTest:fail#33#1
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#7#0
+fail#trace.ControlTest:foo#1:1#1@trace.ControlTest:foo#7#1
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#1@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#1@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:1#2@trace.ControlTest:foo#19#30
+fail#trace.ControlTest:foo#1:0#2@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#2@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#2@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:1#3@trace.ControlTest:foo#19#30
+fail#trace.ControlTest:foo#1:0#3@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#3@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#3@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:1#4@trace.ControlTest:foo#19#30
+fail#trace.ControlTest:foo#1:0#4@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#4@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#4@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:1#5@trace.ControlTest:foo#19#30
+fail#trace.ControlTest:foo#1:0#5@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#5@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#5@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:1#6@trace.ControlTest:foo#19#30
+fail#trace.ControlTest:foo#1:0#6@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#6@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#6@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:1#7@trace.ControlTest:foo#19#30
+fail#trace.ControlTest:foo#1:0#7@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#7@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#7@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+fail#Pred#trace.ControlTest:foo#11#16#1@trace.ControlTest:foo#11#16
+fail#trace.ControlTest:foo#1:1#8@trace.ControlTest:foo#15#24
+fail#trace.ControlTest:foo#1:0#8@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#8@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#8@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+fail#Pred#trace.ControlTest:foo#11#16#2@trace.ControlTest:foo#11#16
+fail#trace.ControlTest:foo#1:1#9@trace.ControlTest:foo#15#24
+fail#trace.ControlTest:foo#1:0#9@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#9@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#9@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+fail#Pred#trace.ControlTest:foo#11#16#3@trace.ControlTest:foo#11#16
+fail#trace.ControlTest:foo#1:1#10@trace.ControlTest:foo#15#24
+fail#trace.ControlTest:foo#1:0#10@trace.ControlTest:foo#21#33
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+fail#Pred#trace.ControlTest:foo#8#5#10@trace.ControlTest:foo#8#5
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+fail#Pred#trace.ControlTest:foo#10#10#10@trace.ControlTest:foo#10#10
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+fail#Pred#trace.ControlTest:foo#11#16#4@trace.ControlTest:foo#11#16
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#12#19
+fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#12#20
+fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#12#22
+fail#trace.ControlTest:fail#0:#Stack#0@trace.ControlTest:foo#12#23
+fail#trace.ControlTest:fail#0:#Stack#1@trace.ControlTest:fail#33#4 observed = false
+fail#org.junit.jupiter.api.Assertions:assertEquals#1:0#1@trace.ControlTest:fail#33#7 observed = false
+fail#org.junit.jupiter.api.Assertions:assertEquals#1:1#1@trace.ControlTest:fail#33#7 observed = false
+pass#trace.ControlTest:pass#0:#Stack#0@trace.ControlTest:pass#28#0
+pass#trace.ControlTest:foo#2:0#1@trace.ControlTest:pass#28#2
+pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#7#0
+pass#trace.ControlTest:foo#2:1#1@trace.ControlTest:foo#7#1
+pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#8#2
+pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#8#3
+pass#Pred#trace.ControlTest:foo#8#5#1@trace.ControlTest:foo#8#5
+pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#10#8
+pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#10#9
+pass#Pred#trace.ControlTest:foo#10#10#1@trace.ControlTest:foo#10#10
+pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#11#13
+pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#11#14
+pass#Pred#trace.ControlTest:foo#11#16#1@trace.ControlTest:foo#11#16
+pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#12#19
+pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#12#20
+pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#12#22
+pass#trace.ControlTest:pass#0:#Stack#0@trace.ControlTest:foo#12#23
+pass#trace.ControlTest:pass#0:#Stack#1@trace.ControlTest:pass#28#5 observed = true
+pass#org.junit.jupiter.api.Assertions:assertEquals#2:0#1@trace.ControlTest:pass#28#7 observed = true
+pass#org.junit.jupiter.api.Assertions:assertEquals#2:1#1@trace.ControlTest:pass#28#7 observed = true
+Factors:
+Statement: trace.ControlTest:fail#33#0(Statement) observed = true
+	def:
+		fail#trace.ControlTest:fail#0:#Stack#0@trace.ControlTest:fail#33#0
+	uses:
+	preds:
+Statement: trace.ControlTest:fail#33#1(Statement) observed = true
+	def:
+		fail#trace.ControlTest:foo#1:0#1@trace.ControlTest:fail#33#1
+	uses:
+		fail#trace.ControlTest:fail#0:#Stack#0@trace.ControlTest:fail#33#0
+	preds:
+Statement: trace.ControlTest:foo#7#0(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#7#0
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#7#1(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#1@trace.ControlTest:foo#7#1
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#7#0
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#1@trace.ControlTest:fail#33#1
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#1@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#1@trace.ControlTest:fail#33#1
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#1@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#19#30(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#2@trace.ControlTest:foo#19#30
+	uses:
+		fail#trace.ControlTest:foo#1:1#1@trace.ControlTest:foo#7#1
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#2@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#1@trace.ControlTest:fail#33#1
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#2@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#2@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#2@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#2@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#19#30(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#3@trace.ControlTest:foo#19#30
+	uses:
+		fail#trace.ControlTest:foo#1:1#2@trace.ControlTest:foo#19#30
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#3@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#2@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#3@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#3@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#3@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#3@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#19#30(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#4@trace.ControlTest:foo#19#30
+	uses:
+		fail#trace.ControlTest:foo#1:1#3@trace.ControlTest:foo#19#30
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#4@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#3@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#4@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#4@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#4@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#4@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#19#30(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#5@trace.ControlTest:foo#19#30
+	uses:
+		fail#trace.ControlTest:foo#1:1#4@trace.ControlTest:foo#19#30
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#5@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#4@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#5@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#5@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#5@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#5@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#19#30(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#6@trace.ControlTest:foo#19#30
+	uses:
+		fail#trace.ControlTest:foo#1:1#5@trace.ControlTest:foo#19#30
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#6@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#5@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#6@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#6@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#6@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#6@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#19#30(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#7@trace.ControlTest:foo#19#30
+	uses:
+		fail#trace.ControlTest:foo#1:1#6@trace.ControlTest:foo#19#30
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#7@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#6@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#7@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#7@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#7@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#7@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#11#13(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+	uses:
+		fail#trace.ControlTest:foo#1:0#7@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#11#14(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#11#16(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#11#16#1@trace.ControlTest:foo#11#16
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	preds:
+Statement: trace.ControlTest:foo#15#24(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#8@trace.ControlTest:foo#15#24
+	uses:
+		fail#trace.ControlTest:foo#1:1#7@trace.ControlTest:foo#19#30
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#8@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#7@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#8@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#8@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#8@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#8@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#11#13(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+	uses:
+		fail#trace.ControlTest:foo#1:0#8@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#11#14(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#11#16(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#11#16#2@trace.ControlTest:foo#11#16
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	preds:
+Statement: trace.ControlTest:foo#15#24(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#9@trace.ControlTest:foo#15#24
+	uses:
+		fail#trace.ControlTest:foo#1:1#8@trace.ControlTest:foo#15#24
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#9@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#8@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#9@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#9@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#9@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#9@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#11#13(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+	uses:
+		fail#trace.ControlTest:foo#1:0#9@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#11#14(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#11#16(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#11#16#3@trace.ControlTest:foo#11#16
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	preds:
+Statement: trace.ControlTest:foo#15#24(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:1#10@trace.ControlTest:foo#15#24
+	uses:
+		fail#trace.ControlTest:foo#1:1#9@trace.ControlTest:foo#15#24
+	preds:
+Statement: trace.ControlTest:foo#21#33(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:0#10@trace.ControlTest:foo#21#33
+	uses:
+		fail#trace.ControlTest:foo#1:0#9@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		fail#trace.ControlTest:foo#1:0#10@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#8#5#10@trace.ControlTest:foo#8#5
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#8#2
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		fail#trace.ControlTest:foo#1:0#10@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#10#10#10@trace.ControlTest:foo#10#10
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#10#8
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#11#13(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+	uses:
+		fail#trace.ControlTest:foo#1:0#10@trace.ControlTest:foo#21#33
+	preds:
+Statement: trace.ControlTest:foo#11#14(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#11#16(Statement)
+	def:
+		fail#Pred#trace.ControlTest:foo#11#16#4@trace.ControlTest:foo#11#16
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#11#13
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#11#14
+	preds:
+Statement: trace.ControlTest:foo#12#19(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#12#19
+	uses:
+		fail#trace.ControlTest:foo#1:1#10@trace.ControlTest:foo#15#24
+	preds:
+Statement: trace.ControlTest:foo#12#20(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#12#20
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#12#22(Statement)
+	def:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#12#22
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#12#19
+		fail#trace.ControlTest:foo#1:#Stack#1@trace.ControlTest:foo#12#20
+	preds:
+Statement: trace.ControlTest:foo#12#23(Statement)
+	def:
+		fail#trace.ControlTest:fail#0:#Stack#0@trace.ControlTest:foo#12#23
+	uses:
+		fail#trace.ControlTest:foo#1:#Stack#0@trace.ControlTest:foo#12#22
+	preds:
+Statement: trace.ControlTest:fail#33#4(Statement) observed = true
+	def:
+		fail#trace.ControlTest:fail#0:#Stack#1@trace.ControlTest:fail#33#4 observed = false
+	uses:
+	preds:
+Statement: trace.ControlTest:fail#33#7(Statement) observed = true
+	def:
+		fail#org.junit.jupiter.api.Assertions:assertEquals#1:0#1@trace.ControlTest:fail#33#7 observed = false
+	uses:
+		fail#trace.ControlTest:fail#0:#Stack#1@trace.ControlTest:fail#33#4 observed = false
+	preds:
+Statement: trace.ControlTest:fail#33#7(Statement) observed = true
+	def:
+		fail#org.junit.jupiter.api.Assertions:assertEquals#1:1#1@trace.ControlTest:fail#33#7 observed = false
+	uses:
+		fail#trace.ControlTest:fail#0:#Stack#0@trace.ControlTest:foo#12#23
+	preds:
+Statement: trace.ControlTest:pass#28#0(Statement) observed = true
+	def:
+		pass#trace.ControlTest:pass#0:#Stack#0@trace.ControlTest:pass#28#0
+	uses:
+	preds:
+Statement: trace.ControlTest:pass#28#2(Statement) observed = true
+	def:
+		pass#trace.ControlTest:foo#2:0#1@trace.ControlTest:pass#28#2
+	uses:
+		pass#trace.ControlTest:pass#0:#Stack#0@trace.ControlTest:pass#28#0
+	preds:
+Statement: trace.ControlTest:foo#7#0(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#7#0
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#7#1(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:1#1@trace.ControlTest:foo#7#1
+	uses:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#7#0
+	preds:
+Statement: trace.ControlTest:foo#8#2(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#8#2
+	uses:
+		pass#trace.ControlTest:foo#2:0#1@trace.ControlTest:pass#28#2
+	preds:
+Statement: trace.ControlTest:foo#8#3(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#8#3
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#8#5(Statement)
+	def:
+		pass#Pred#trace.ControlTest:foo#8#5#1@trace.ControlTest:foo#8#5
+	uses:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#8#2
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#8#3
+	preds:
+Statement: trace.ControlTest:foo#10#8(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#10#8
+	uses:
+		pass#trace.ControlTest:foo#2:0#1@trace.ControlTest:pass#28#2
+	preds:
+Statement: trace.ControlTest:foo#10#9(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#10#9
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#10#10(Statement)
+	def:
+		pass#Pred#trace.ControlTest:foo#10#10#1@trace.ControlTest:foo#10#10
+	uses:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#10#8
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#10#9
+	preds:
+Statement: trace.ControlTest:foo#11#13(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#11#13
+	uses:
+		pass#trace.ControlTest:foo#2:0#1@trace.ControlTest:pass#28#2
+	preds:
+Statement: trace.ControlTest:foo#11#14(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#11#14
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#11#16(Statement)
+	def:
+		pass#Pred#trace.ControlTest:foo#11#16#1@trace.ControlTest:foo#11#16
+	uses:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#11#13
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#11#14
+	preds:
+Statement: trace.ControlTest:foo#12#19(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#12#19
+	uses:
+		pass#trace.ControlTest:foo#2:1#1@trace.ControlTest:foo#7#1
+	preds:
+Statement: trace.ControlTest:foo#12#20(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#12#20
+	uses:
+	preds:
+Statement: trace.ControlTest:foo#12#22(Statement)
+	def:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#12#22
+	uses:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#12#19
+		pass#trace.ControlTest:foo#2:#Stack#1@trace.ControlTest:foo#12#20
+	preds:
+Statement: trace.ControlTest:foo#12#23(Statement)
+	def:
+		pass#trace.ControlTest:pass#0:#Stack#0@trace.ControlTest:foo#12#23
+	uses:
+		pass#trace.ControlTest:foo#2:#Stack#0@trace.ControlTest:foo#12#22
+	preds:
+Statement: trace.ControlTest:pass#28#5(Statement) observed = true
+	def:
+		pass#trace.ControlTest:pass#0:#Stack#1@trace.ControlTest:pass#28#5 observed = true
+	uses:
+	preds:
+Statement: trace.ControlTest:pass#28#7(Statement) observed = true
+	def:
+		pass#org.junit.jupiter.api.Assertions:assertEquals#2:0#1@trace.ControlTest:pass#28#7 observed = true
+	uses:
+		pass#trace.ControlTest:pass#0:#Stack#1@trace.ControlTest:pass#28#5 observed = true
+	preds:
+Statement: trace.ControlTest:pass#28#7(Statement) observed = true
+	def:
+		pass#org.junit.jupiter.api.Assertions:assertEquals#2:1#1@trace.ControlTest:pass#28#7 observed = true
+	uses:
+		pass#trace.ControlTest:pass#0:#Stack#0@trace.ControlTest:foo#12#23
+	preds:
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.421 s - in ppfl.GraphTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.573 s
+[INFO] Finished at: 2020-11-09T22:47:05+08:00
+[INFO] ------------------------------------------------------------------------
+mvn test -Dtest=GraphTest#controltest_bc

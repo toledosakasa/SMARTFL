@@ -281,6 +281,26 @@ class GraphTest {
 		// }
 	}
 
+	ByteCodeGraph controlinit_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\ControlTest.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\ControlTest.pass.log";
+		String sourcetrace = ppflroot+ "\\trace\\logs\\mytrace\\trace.ControlTest.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		// pgraph.parsesource(passpath);
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void controltest_bc() {
+		ByteCodeGraph pgraph = controlinit_bc();
+	}
+
 	SimpleProbGraph sqrtinit() {
 		String ppflroot = ".";
 		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
