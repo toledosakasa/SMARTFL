@@ -181,6 +181,17 @@ public class ByteCodeGraph {
 			BufferedReader reader = new BufferedReader(new FileReader(sourcefilename));
 			String t;
 			Map<String,String> assistnamemap = new HashMap<String, String>();
+			Set<String> nonextinsts = new HashSet<String>();
+			nonextinsts.add("goto_w");
+			nonextinsts.add("goto");
+			nonextinsts.add("return");
+			nonextinsts.add("areturn");
+			nonextinsts.add("dreturn");
+			nonextinsts.add("freturn");
+			nonextinsts.add("ireturn");
+			nonextinsts.add("lreturn");
+			// TODO consider throw
+
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
@@ -190,7 +201,7 @@ public class ByteCodeGraph {
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
 				List<String> theedges = new ArrayList<String> ();
-				if(!info.getvalue("nextinst").equals("-1")&& !(info.opcode.equals("goto_w")||info.opcode.equals("goto")))
+				if(!(nonextinsts.contains(info.opcode)))
 				{
 					String nextinst = classandmethod +info.getvalue("nextinst");
 					theedges.add(nextinst);
@@ -289,9 +300,9 @@ public class ByteCodeGraph {
 				dataflowsets.put(instname, newset);
 			}
 			System.out.println("size =" + dataflowsets.size());
-			for(String key : predataflowmap.keySet()){
+			for(String key : dataflowsets.keySet()){
 				System.out.println("key_"+key);
-				System.out.println(predataflowmap.get(key));
+				System.out.println(dataflowsets.get(key));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
