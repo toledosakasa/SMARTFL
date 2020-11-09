@@ -7,14 +7,13 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
-import ppfl.ParseInfo;
 import ppfl.StmtNode;
 
 //173
 public class LreturnInst extends OpcodeInst {
 
-	public LreturnInst(int _form) {
-		super(_form, 0, -1);
+	public LreturnInst(int form) {
+		super(form, 0, -1);
 	}
 
 	@Override
@@ -28,9 +27,9 @@ public class LreturnInst extends OpcodeInst {
 		// build the stmtnode(common)
 		StmtNode stmt = buildstmt(graph);
 
-		ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<Node>();
-		List<Node> usenodes = new ArrayList<Node>();
+		//ParseInfo info = graph.parseinfo;
+		List<Node> prednodes = new ArrayList<>();
+		List<Node> usenodes = new ArrayList<>();
 		// uses
 		usenodes.add(graph.getRuntimeStack().pop());
 		// switch stack frame

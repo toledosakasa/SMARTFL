@@ -1,11 +1,12 @@
 package ppfl;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.Set;
 import java.util.HashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
@@ -21,6 +24,8 @@ import ppfl.instrumentation.RuntimeFrame;
 import org.graphstream.graph.implementations.*;
 
 public class ByteCodeGraph {
+
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 
 	public List<FactorNode> factornodes;
 	public List<Node> nodes;
@@ -34,7 +39,6 @@ public class ByteCodeGraph {
 	public Map<String,List<String>> predataflowmap;
 	public Map<String,List<String>> postdataflowmap;
 	public Map<String,Set<String>> dataflowsets;
-	public Map<String,Set<String>> killtags;
 	private boolean shouldview;
 
 	public void stopview() {
@@ -52,7 +56,8 @@ public class ByteCodeGraph {
 	Random random;
 
 	// stack tracing
-	private Stack<RuntimeFrame> stackframe;
+	// private Stack<RuntimeFrame> stackframe;
+	private Deque<RuntimeFrame> stackframe;
 
 	// should be called while returning.
 	// e.g. return ireturn
@@ -69,13 +74,13 @@ public class ByteCodeGraph {
 	}
 
 	public RuntimeFrame getFrame() {
-		if (stackframe.empty()) {
+		if (stackframe.isEmpty()) {
 			stackframe.push(RuntimeFrame.getFrame(parseinfo.traceclass, parseinfo.tracemethod));
 		}
 		return stackframe.peek();
 	}
 
-	public Stack<Node> getRuntimeStack() {
+	public Deque<Node> getRuntimeStack() {
 		return getFrame().runtimestack;
 	}
 
@@ -88,12 +93,12 @@ public class ByteCodeGraph {
 	// parameter testpass(true = 1.0,false = 0.0)
 	public boolean auto_oracle;
 
-	public int last_defined_line = 0;
-	public List<Node> last_defined_var = new ArrayList<Node>();
-	public List<StmtNode> last_defined_stmt = new ArrayList<StmtNode>();
+	public int lastDefinedLine = 0;
+	public List<Node> lastDefinedVar = new ArrayList<>();
+	public List<StmtNode> lastDefinedStmt = new ArrayList<>();
 
 	//
-	public Vector<Node> predicates = new Vector<Node>();
+	public List<Node> predicates = new ArrayList<>();
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<FactorNode>();
@@ -107,11 +112,10 @@ public class ByteCodeGraph {
 		predataflowmap = new HashMap<String, List<String>>();
 		postdataflowmap = new HashMap<String, List<String>>();
 		dataflowsets = new HashMap<String, Set<String>>();
-		killtags = new HashMap<String, Set<String>>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
-		stackframe = new Stack<RuntimeFrame>();
+		stackframe = new ArrayDeque<>();
 		viewgraph = new SingleGraph("Outgraph");
 		viewgraph.setStrict(false);
 		viewgraph.setAutoCreate(true);
@@ -120,24 +124,24 @@ public class ByteCodeGraph {
 		shouldview = true;
 		String styleSheet = "node {" +
 		// " text-background-mode: rounded-box;"+
-				"	text-alignment: at-right;" + "	text-offset: 5px, 0px;" + "	text-style: italic;" + "	size: 15px, 15px;" + "}"
-				+
+				"\ttext-alignment: at-right;" + "\ttext-offset: 5px, 0px;" + "\ttext-style: italic;" + "\tsize: 15px, 15px;"
+				+ "}" +
 				// "node.thenode {" +
 				// // " shape: box;"+
 				// " size: 15px, 15px;"+
 				// // " fill-color: green;" +
 				// "}" +
-				"node.factor {" + "	shape: box;" + "	text-mode: hidden;" +
+				"node.factor {" + "\tshape: box;" + "\ttext-mode: hidden;" +
 				// " size: 15px, 15px;"+
-				"	fill-color: red;" +
+				"\tfill-color: red;" +
 				// " stroke-mode: plain; /* Default is none. */"+
 				// " stroke-color: blue; /* Default is black. */"+
 				"}" + "node.stmt {" +
 				// " shape: box;"+
-				"	size: 10px, 10px;" + "	fill-color: brown;" + "}" + "edge {" + "	fill-color: red;" +
+				"\tsize: 10px, 10px;" + "\tfill-color: brown;" + "}" + "edge {" + "\tfill-color: red;" +
 				// " layout.weight: 10;"+
-				"}" + "edge.def {" + "	fill-color: green;" + "}" + "edge.use {" + "	fill-color: blue;" + "}" + "edge.pred {"
-				+ "	fill-color: yellow;" + "edge.stmt {" + "	fill-color: black;" + "}";
+				"}" + "edge.def {" + "\tfill-color: green;" + "}" + "edge.use {" + "\tfill-color: blue;" + "}" + "edge.pred {"
+				+ "\tfill-color: yellow;" + "edge.stmt {" + "\tfill-color: black;" + "}";
 		viewgraph.setAttribute("ui.stylesheet", styleSheet);
 		viewgraph.setAttribute("ui.quality");
 		viewgraph.setAttribute("ui.antialias");
@@ -148,12 +152,12 @@ public class ByteCodeGraph {
 		for (Node n : nodes) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + String.valueOf(n.bp_getprob()));
+				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
 		}
 		for (StmtNode n : stmts) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + String.valueOf(n.bp_getprob()));
+				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
 		}
 	}
 
@@ -167,8 +171,8 @@ public class ByteCodeGraph {
 
 	public void initmaps() {
 		// TODO this could be incomplete.
-		this.varcountmap = new HashMap<String, Integer>();
-		this.stackframe = new Stack<RuntimeFrame>();
+		this.varcountmap = new HashMap<>();
+		this.stackframe = new ArrayDeque<>();
 		this.predicates.clear();
 	}
 
@@ -284,90 +288,11 @@ public class ByteCodeGraph {
 				}
 				dataflowsets.put(instname, newset);
 			}
-
-				// for (String instname : postdataflowmap.keySet()){
-				// 	List<String> theedges = postdataflowmap.get(instname);
-				// 	Set<String> theset =  dataflowsets.get(instname);
-				// 	int tmpindex = 0;
-				// 	if(theedges.size() == 0){
-				// 		tagset.add("killall");
-				// 	}
-				// 	for(String nextinst: theedges){
-				// 		Set<String> nextinsttagset = dataflowsets.get(nextinst);
-				// 		Set<String> oldset = new HashSet<String>();
-				// 		for(String tmps: nextinsttagset)
-				// 			oldset.add(tmps);
-				// 		nextinsttagset.clear();
-				// 		for(String thetag: tagset){
-				// 			//ifbranch will kill the tag itself to the succ
-				// 			if(theedges.size()>1&&thetag.startsWith(instname))
-				// 			{
-				// 				String[] splittag = thetag.split("_");
-				// 				String thetag0 = splittag[0]+"_"+"0";
-				// 				String thetag1 = splittag[0]+"_"+"1";
-				// 				if(tagset.contains(thetag0)&&tagset.contains(thetag1))
-				// 				{
-
-				// 					if(tmpindex == 0){
-				// 						if(nextinsttagset.remove(thetag1))
-				// 						{
-				// 							// System.out.println(nextinst+"has remove"+thetag1);
-				// 							haschanged = 1;
-				// 						}
-				// 					}
-				// 					else if(tmpindex == 1){
-				// 						if(nextinsttagset.remove(thetag0))
-				// 						{
-				// 							// System.out.println(nextinst+"has remove"+thetag0);
-				// 							haschanged = 1;
-				// 						}
-				// 					}
-				// 					continue;
-				// 				}
-				// 			}
-				// 			nextinsttagset.add(thetag);
-				// 		}
-				// 		if(theedges.size()>1){
-				// 			nextinsttagset.add(instname+"_"+tmpindex);
-				// 		}
-				// 		if(!(nextinsttagset.size()==oldset.size()&&nextinsttagset.containsAll(oldset)))
-				// 		{
-				// 			System.out.println("here debugger");
-				// 			System.out.println(nextinst);
-				// 			System.out.println(oldset);
-				// 			System.out.println(nextinsttagset);
-				// 			haschanged = 1;
-				// 		}
-				// 		tmpindex++;
-				// 	}
-				// }
-
-			// for(String instname : dataflowtags.keySet()){
-			// 	Set<String> killset = new HashSet<String>();
-			// 	Set<String> tagset = dataflowtags.get(instname);
-			// 	for(String thetag: tagset){
-			// 		if(thetag.equals("killall"))
-			// 		{
-			// 			killset.add("killall");
-			// 			continue;
-			// 		}
-			// 		String[] splittag = thetag.split("_");
-			// 		String theothertag = splittag[0]+"_";
-			// 		if(splittag[1].equals("0"))
-			// 			theothertag = theothertag + "1";
-			// 		else
-			// 			theothertag = theothertag + "0";
-			// 		if(tagset.contains(theothertag))
-			// 			killset.add(splittag[0]);
-			// 	}
-			// 	killtags.put(instname,killset);
-			// }
 			System.out.println("size =" + dataflowsets.size());
 			for(String key : dataflowsets.keySet()){
 				System.out.println(key);
 				System.out.println(dataflowsets.get(key));
 			}
-			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -376,25 +301,23 @@ public class ByteCodeGraph {
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.testname = testname;
 		this.initmaps();
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(tracefilename));
+		try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
 			String t;
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
 				this.parseinfo = new ParseInfo(t);
-				// System.out.println(this.parseinfo.form);
+				// debugLogger.info(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
 			if (auto_oracle) {
-				for (Node i : last_defined_var) {
+				for (Node i : lastDefinedVar) {
 					i.observe(testpass);
-					System.out.println("Observe " + i.name + " as " + testpass);
+					debugLogger.info("Observe " + i.name + " as " + testpass);
 				}
 			}
-			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -405,11 +328,11 @@ public class ByteCodeGraph {
 
 		if (auto_oracle) {
 			int ln = stmt.getLineNumber();
-			if (this.last_defined_line != ln) {
-				this.last_defined_line = ln;
-				this.last_defined_var.clear();
+			if (this.lastDefinedLine != ln) {
+				this.lastDefinedLine = ln;
+				this.lastDefinedVar.clear();
 			}
-			this.last_defined_var.add(defnode);
+			this.lastDefinedVar.add(defnode);
 		}
 
 		Edge dedge = new Edge();
@@ -420,14 +343,14 @@ public class ByteCodeGraph {
 		sedge.setnode(stmt);
 		stmt.add_edge(sedge);
 
-		List<Edge> pedges = new ArrayList<Edge>();
+		List<Edge> pedges = new ArrayList<>();
 		for (Node n : prednodes) {
 			Edge nedge = new Edge();
 			nedge.setnode(n);
 			pedges.add(nedge);
 			n.add_edge(nedge);
 		}
-		List<Edge> uedges = new ArrayList<Edge>();
+		List<Edge> uedges = new ArrayList<>();
 		for (Node n : usenodes) {
 			Edge nedge = new Edge();
 			nedge.setnode(n);
@@ -458,7 +381,7 @@ public class ByteCodeGraph {
 		viewgraph.addEdge(factorname + defnode.getPrintName(), factorname, defnode.getPrintName());
 		org.graphstream.graph.Node outdef = viewgraph.getNode(defnode.getPrintName());
 
-		// System.out.println("hhhhhhhhhhhui"+outdef.getId());
+		// debugLogger.info("hhhhhhhhhhhui"+outdef.getId());
 		outdef.setAttribute("ui.class", "thenode");
 		outedge = viewgraph.getEdge(factorname + defnode.getPrintName());
 		outedge.setAttribute("ui.class", "def");
@@ -482,23 +405,16 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
-	// private void incStackIndex() {
-	// String domain = this.getFormalStackName();
-	// // System.out.println(domain);
-	// if (!stackheightmap.containsKey(domain)) {
-	// stackheightmap.put(domain, 1);
-	// } else {
-	// stackheightmap.put(domain, stackheightmap.get(domain) + 1);
-	// }
-	// }
-
 	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
-		String def = this.getFormalVarName(varindex, traceclass, tracemethod);
-		if (!varcountmap.containsKey(def)) {
-			varcountmap.put(def, 1);
-		} else {
-			varcountmap.put(def, varcountmap.get(def) + 1);
-		}
+		assert (traceclass.equals(this.getFrame().traceclass));
+		assert (tracemethod.equals(this.getFrame().tracemethod));
+		incVarIndex(varindex);
+		// String def = this.getFormalVarName(varindex, traceclass, tracemethod);
+		// if (!varcountmap.containsKey(def)) {
+		// varcountmap.put(def, 1);
+		// } else {
+		// varcountmap.put(def, varcountmap.get(def) + 1);
+		// }
 	}
 
 	private void incVarIndex(int varindex) {
@@ -533,8 +449,11 @@ public class ByteCodeGraph {
 	}
 
 	private String getFormalVarName(int varindex, String traceclass, String tracemethod) {
-		String name = String.valueOf(varindex);
-		return this.getDomain() + name;
+		assert (traceclass.equals(this.getFrame().traceclass));
+		assert (tracemethod.equals(this.getFrame().tracemethod));
+		return getFormalVarName(varindex);
+		// String name = String.valueOf(varindex);
+		// return this.getDomain() + name;
 	}
 
 	private String getFormalPredName(StmtNode stmt) {
@@ -560,12 +479,12 @@ public class ByteCodeGraph {
 	}
 
 	private String getVarName(String name, int count) {
-		return name + "#" + String.valueOf(count);
+		return name + "#" + count;
 	}
 
 	private String getVarName(String name, Map<String, Integer> map) {
 		if (!map.containsKey(name))
-			System.out.println(name);
+			debugLogger.info(name);
 		return getVarName(name, map.get(name));
 	}
 
@@ -580,7 +499,6 @@ public class ByteCodeGraph {
 	public Node addNewStackNode(StmtNode stmt) {
 		// TODO stack node's name may get confused(same name, different node).
 		// TODO currently works fine, but may bring difficulty to debugging.
-		// this.incStackIndex();
 		String nodename = this.getFormalStackNameWithIndex();
 		Node node = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, node);
@@ -620,7 +538,7 @@ public class ByteCodeGraph {
 			stmt = this.addNewStmt(stmtname);
 		} else {
 			stmt = (StmtNode) this.getNode(stmtname);
-			assert (stmt.isStmt());
+			assert (stmt != null && stmt.isStmt());
 		}
 		return stmt;
 	}
@@ -683,24 +601,16 @@ public class ByteCodeGraph {
 			n.init();
 		}
 
-		List<Node> allnodes = new ArrayList<Node>();
+		List<Node> allnodes = new ArrayList<>();
 		allnodes.addAll(nodes);
 		allnodes.addAll(stmts);
 		int nnodes = allnodes.size();
 		solve(allnodes, 0, nnodes);
 
-		nodes.sort(new Comparator<Node>() {
-			@Override
-			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.getprob(), arg1.getprob());
-			}
-		});
-		stmts.sort(new Comparator<Node>() {
-			@Override
-			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.getprob(), arg1.getprob());
-			}
-		});
+		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.getprob(), arg1.getprob());
+		nodes.sort(comp);
+		stmts.sort(comp);
+
 		long endTime = System.currentTimeMillis();
 		return (endTime - startTime);
 	}
@@ -731,19 +641,10 @@ public class ByteCodeGraph {
 			}
 		}
 
-		nodes.sort(new Comparator<Node>() {
-			@Override
-			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.getprob(), arg1.getprob());
-			}
-		});
-		stmts.sort(new Comparator<Node>() {
-			@Override
-			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.getprob(), arg1.getprob());
-			}
-		});
-		return;
+		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.getprob(), arg1.getprob());
+		nodes.sort(comp);
+		stmts.sort(comp);
+
 	}
 
 	public void mark_reduce(Node node) {
@@ -784,7 +685,7 @@ public class ByteCodeGraph {
 
 		boolean outreduced = true;
 		if (outreduced) {
-			System.out.println("\nreduced Nodes: ");
+			debugLogger.info("\nreduced Nodes: ");
 			for (Node n : stmts) {
 				if (n.getreduced())
 					n.print();
@@ -793,7 +694,7 @@ public class ByteCodeGraph {
 				if (n.getreduced())
 					n.print();
 			}
-			System.out.println("\n");
+			debugLogger.info("\n");
 		}
 
 		for (int i = 0; i < bp_times; i++) {
@@ -810,27 +711,16 @@ public class ByteCodeGraph {
 					isend = false;
 			}
 			if (isend) {
-				System.out.println("\n\n" + i + "\n\n");
-				System.out.println("\n\n" + i + "\n\n");
+				debugLogger.info("\n\n" + i + "\n\n");
 				break;
 			}
 		}
-		nodes.sort(new Comparator<Node>() {
-			@Override
-			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
-			}
-		});
-		stmts.sort(new Comparator<Node>() {
-			@Override
-			public int compare(Node arg0, Node arg1) {
-				return Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
-			}
-		});
+		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
+		nodes.sort(comp);
+		stmts.sort(comp);
+
 		long endTime = System.currentTimeMillis();
-
 		return (endTime - startTime);
-
 	}
 
 	public StmtNode getTopStmt() {// should be called after inference()
@@ -841,45 +731,41 @@ public class ByteCodeGraph {
 		return stmts.subList(0, k);
 	}
 
-	public void merge(ByteCodeGraph oth) {
-		return;// TODO
-	}
-
 	public void printgraph() {
-		System.out.println("\nNodes: ");
+		debugLogger.info("\nNodes: ");
 		for (Node n : stmts) {
 			n.print();
 		}
 		for (Node n : nodes) {
 			n.print();
 		}
-		System.out.println("Factors:");
+		debugLogger.info("Factors:");
 		for (FactorNode n : factornodes) {
 			n.print();
 		}
 	}
 
 	public void printprobs() {
-		System.out.println("\nProbabilities: ");
-		System.out.println("Vars:" + nodes.size());
+		debugLogger.info("\nProbabilities: ");
+		debugLogger.info("Vars:" + nodes.size());
 		for (Node n : nodes) {
 			n.printprob();
 		}
-		System.out.println("Stmts:" + stmts.size());
+		debugLogger.info("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
 			n.printprob();
 		}
 	}
 
 	public void bp_printprobs() {
-		System.out.println("\nProbabilities: ");
-		System.out.println("Vars:" + nodes.size());
+		debugLogger.info("\nProbabilities: ");
+		debugLogger.info("Vars:" + nodes.size());
 		for (Node n : nodes) {
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
-		System.out.println("Stmts:" + stmts.size());
+		debugLogger.info("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
 	}
 
@@ -891,8 +777,8 @@ public class ByteCodeGraph {
 	public void check_bp(boolean verbose) {
 		long bptime = this.bp_inference();
 
-		System.out.println("\nProbabilities: ");
-		System.out.println("Vars:" + nodes.size());
+		debugLogger.info("\nProbabilities: ");
+		debugLogger.info("Vars:" + nodes.size());
 		int cnt = 0;
 		for (Node n : nodes) {
 			if (!verbose) {
@@ -900,13 +786,13 @@ public class ByteCodeGraph {
 				if (cnt > 10)
 					break;
 			}
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
-		System.out.println("Stmts:" + stmts.size());
+		debugLogger.info("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
-		System.out.println("Belief propagation time : " + bptime / 1000.0 + "s");
+		debugLogger.info("Belief propagation time : " + bptime / 1000.0 + "s");
 	}
 
 	public double check_bp_with_bf(boolean verbose) {
@@ -917,13 +803,13 @@ public class ByteCodeGraph {
 		long bftime = this.bf_inference();
 		long bptime = this.bp_inference();
 		if (verbose) {
-			System.out.println("\nProbabilities: ");
-			System.out.println("Vars:" + nodes.size());
+			debugLogger.info("\nProbabilities: ");
+			debugLogger.info("Vars:" + nodes.size());
 		}
 		for (Node n : nodes) {
 			if (verbose) {
 				n.printprob();
-				n.bp_printprob();
+				n.bpPrintProb();
 			}
 			if (!n.obs) {
 				double diff = getdiff(n.bp_getprob(), n.getprob());
@@ -935,11 +821,11 @@ public class ByteCodeGraph {
 			}
 		}
 		if (verbose)
-			System.out.println("Stmts:" + stmts.size());
+			debugLogger.info("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
 			if (verbose) {
 				n.printprob();
-				n.bp_printprob();
+				n.bpPrintProb();
 			}
 			if (!n.obs) {
 				double diff = getdiff(n.bp_getprob(), n.getprob());
@@ -950,10 +836,10 @@ public class ByteCodeGraph {
 			}
 		}
 		if (verbose) {
-			System.out.println("Var max relative difference:" + maxdiff + " at " + diffname);
-			System.out.println("Stmt max relative difference:" + maxdiffstmt + " at " + diffnamestmt);
-			System.out.println("Brute force time : " + bftime / 1000.0 + "s");
-			System.out.println("Belief propagation time : " + bptime / 1000.0 + "s");
+			debugLogger.info("Var max relative difference:" + maxdiff + " at " + diffname);
+			debugLogger.info("Stmt max relative difference:" + maxdiffstmt + " at " + diffnamestmt);
+			debugLogger.info("Brute force time : " + bftime / 1000.0 + "s");
+			debugLogger.info("Belief propagation time : " + bptime / 1000.0 + "s");
 		}
 
 		return maxdiff;
@@ -967,27 +853,25 @@ public class ByteCodeGraph {
 		for (Node n : nodes) {
 			if (n.getName().equals(name)) {
 				valid = true;
-				System.out.println("Node observed as " + v);
+				debugLogger.info("Node observed as " + v);
 				n.observe(v);
 			}
 		}
 		for (Node n : stmts) {
 			if (n.getName().equals(s)) {
 				valid = true;
-				System.out.println("Stmt observed as " + v);
+				debugLogger.info("Stmt observed as " + v);
 				n.observe(v);
 			}
 		}
 		if (!valid) {
-			System.out.println("Invalid Observe");
+			debugLogger.info("Invalid Observe");
 		}
 	}
 
 	public static String readFileToString(String filePath) {
 		StringBuilder fileData = new StringBuilder(1000);
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filePath));
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			char[] buf = new char[10];
 			int numRead = 0;
 			while ((numRead = reader.read(buf)) != -1) {
@@ -995,9 +879,6 @@ public class ByteCodeGraph {
 				fileData.append(readData);
 				buf = new char[1024];
 			}
-			reader.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

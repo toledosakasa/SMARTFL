@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -16,7 +19,8 @@ import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
 
 public class OpcodeInst {
-	private boolean isinvoke;
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+
 	int form;
 	String opcode;
 
@@ -30,36 +34,28 @@ public class OpcodeInst {
 
 	// pushs
 	int pushnum;
-	paratype pushtype = paratype.NONE;
-	datatype pushdatatype = datatype.NONE;
-	String pushvalue = null;
 	// pops
 	int popnum;
 	// store(var)
-	paratype storetype = paratype.NONE;
-	String storevalue = null;
-	// for weird instructions(e.g. iinc)
-	paratype para[] = new paratype[2];
 
-	public OpcodeInst(int _form, int _pushnum, int _popnum) {
-		form = _form;
-		opcode = Mnemonic.OPCODE[_form];
-		pushnum = _pushnum;
-		popnum = _popnum;
-		this.isinvoke = false;
+	public OpcodeInst(int form, int pushnum, int popnum) {
+		this.form = form;
+		this.opcode = Mnemonic.OPCODE[form];
+		this.pushnum = pushnum;
+		this.popnum = popnum;
 	}
 
 	public static int getArgNumByDesc(String desc) {
 		return splitMethodDesc(desc).size();
 	}
 
-	public static ArrayList<String> splitMethodDesc(String desc) {
+	public static List<String> splitMethodDesc(String desc) {
 		// \[*L[^;]+;|\[[ZBCSIFDJ]|[ZBCSIFDJ]
 		int beginIndex = desc.indexOf('(');
 		int endIndex = desc.lastIndexOf(')');
 		if ((beginIndex == -1 && endIndex != -1) || (beginIndex != -1 && endIndex == -1)) {
-			System.err.println(beginIndex);
-			System.err.println(endIndex);
+			//System.err.println(beginIndex);
+			//System.err.println(endIndex);
 			throw new RuntimeException();
 		}
 		String x0;
@@ -71,30 +67,12 @@ public class OpcodeInst {
 		Pattern pattern = Pattern.compile("\\[*L[^;]+;|\\[[ZBCSIFDJ]|[ZBCSIFDJ]");
 		Matcher matcher = pattern.matcher(x0);
 
-		ArrayList<String> listMatches = new ArrayList<String>();
+		ArrayList<String> listMatches = new ArrayList<>();
 
 		while (matcher.find()) {
 			listMatches.add(matcher.group());
 		}
 		return listMatches;
-	}
-
-	public void setStore(paratype t, String _storevalue) {
-		this.storetype = t;
-		this.storevalue = _storevalue;
-	}
-
-	public void setPush(paratype t, String _pushvalue) {
-		this.pushtype = t;
-		this.pushvalue = _pushvalue;
-	}
-
-	public void setPushDataType(datatype t) {
-		this.pushdatatype = t;
-	}
-
-	public void setPara(int id, paratype t) {
-		para[id] = t;
 	}
 
 	String getpara(CodeIterator ci, int cindex, int paraindex) {
@@ -127,17 +105,6 @@ public class OpcodeInst {
 		return ci.s16bitAt(index + 1);
 	}
 
-	String getparas(CodeIterator ci, int index) {
-		if (ci == null)
-			return null;
-		String ret = "";
-		if (this.para[0] != null)
-			ret = ret + getpara(ci, index, 1);
-		if (this.para[1] != null)
-			ret = ret + getpara(ci, index, 2);
-		return ret;
-	}
-
 	String getmethodinfo(CodeIterator ci, int callindex, ConstPool constp) {
 		if (ci == null)
 			return null;
@@ -163,7 +130,7 @@ public class OpcodeInst {
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
 			throws BadBytecode {
 
-		if (inst != null && inst != "") {
+		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(8);
 			int instindex = constp.addStringInfo(inst);
@@ -175,14 +142,6 @@ public class OpcodeInst {
 			ci.writeByte(184, instpos + 3);// invokestatic
 			ci.write16bit(cbi.logstringindex, instpos + 4);
 		}
-	}
-
-	public boolean isInvoke() {
-		return this.isinvoke;
-	}
-
-	public void setinvoke() {
-		this.isinvoke = true;
 	}
 
 	// extended class should override this method.
@@ -237,7 +196,7 @@ public class OpcodeInst {
 		if (graph.auto_oracle) {
 			if (tracemethod.contentEquals(graph.testname)) {
 				stmt.observe(true);
-				System.out.println("Observe " + stmt.getName() + " as true");
+				debugLogger.info("Observe " + stmt.getName() + " as true");
 			}
 		}
 

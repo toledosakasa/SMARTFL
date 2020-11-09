@@ -2,21 +2,18 @@ package ppfl.instrumentation.opcode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
-import ppfl.ParseInfo;
 import ppfl.StmtNode;
-import ppfl.instrumentation.RuntimeFrame;
 
 //172
 public class IreturnInst extends OpcodeInst {
 
-	public IreturnInst(int _form) {
-		super(_form, 0, -1);
+	public IreturnInst(int form) {
+		super(form, 0, -1);
 	}
 
 	@Override
@@ -30,9 +27,9 @@ public class IreturnInst extends OpcodeInst {
 		// build the stmtnode(common)
 		StmtNode stmt = buildstmt(graph);
 
-		ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<Node>();
-		List<Node> usenodes = new ArrayList<Node>();
+		//ParseInfo info = graph.parseinfo;
+		List<Node> prednodes = new ArrayList<>();
+		List<Node> usenodes = new ArrayList<>();
 		// uses
 		usenodes.add(graph.getRuntimeStack().pop());
 		// switch stack frame

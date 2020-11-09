@@ -2,20 +2,20 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
     </Console>
-	<!--
+    <Console name="DebugConsole" target="SYSTEM_OUT">
+      <PatternLayout pattern="%msg%n" />
+    </Console>
+    <!--
 	<File name="TraceAppender" fileName="trace/logs/mytrace/1.txt" Append="false">
 		<PatternLayout pattern="%msg"/>
 	</File>
 	-->
-	<Routing name="TraceAppender" ignoreExceptions="false">
+    <Routing name="TraceAppender" ignoreExceptions="false">
       <Routes pattern="${ctx:logfile}">
         <Route>
-          <File
-            name="File"
-            fileName="trace/logs/mytrace/${ctx:logfile}.log"
-			Append="false">
+          <File name="File" fileName="trace/logs/mytrace/${ctx:logfile}.log" Append="false">
             <PatternLayout>
               <pattern>%msg</pattern>
             </PatternLayout>
@@ -23,15 +23,12 @@
         </Route>
       </Routes>
       <!-- Created appender TTL -->
-      <IdlePurgePolicy timeToLive="15" timeUnit="minutes"/>
+      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
     </Routing>
-	<Routing name="SourceAppender" ignoreExceptions="false">
+    <Routing name="SourceAppender" ignoreExceptions="false">
       <Routes pattern="${ctx:sourcefile}">
         <Route>
-          <File
-            name="File"
-            fileName="trace/logs/mytrace/${ctx:sourcefile}.source.log"
-			Append="false">
+          <File name="File" fileName="trace/logs/mytrace/${ctx:sourcefile}.source.log" Append="false">
             <PatternLayout>
               <pattern>%msg</pattern>
             </PatternLayout>
@@ -39,9 +36,9 @@
         </Route>
       </Routes>
       <!-- Created appender TTL -->
-      <IdlePurgePolicy timeToLive="15" timeUnit="minutes"/>
+      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
     </Routing>
-	<!--
+    <!--
 	<File name="SourceAppender" fileName="trace/logs/mytrace/1.source.txt" Append="false">
 		<PatternLayout pattern="%msg"/>
 	</File>
@@ -51,14 +48,17 @@
     <Root level="trace">
       <!-- AppenderRef ref="Console" /!-->
     </Root>
-	<Logger name="TraceTransformer" level="trace" additivity="false">
-		<AppenderRef ref="Console"/>
-	</Logger>
-	<Logger name="PPFL_LOGGER" level="trace" additivity="false">
-		<AppenderRef ref="TraceAppender"/>
-	</Logger>
-	<Logger name="PPFL_LOGGER_SOURCE" level="trace" additivity="false">
-		<AppenderRef ref="SourceAppender"/>
-	</Logger>
+    <Logger name="Debugger" level="trace" additivity="false">
+      <AppenderRef ref="DebugConsole" />
+    </Logger>
+    <Logger name="TraceTransformer" level="trace" additivity="false">
+      <AppenderRef ref="Console" />
+    </Logger>
+    <Logger name="PPFL_LOGGER" level="trace" additivity="false">
+      <AppenderRef ref="TraceAppender" />
+    </Logger>
+    <Logger name="PPFL_LOGGER_SOURCE" level="trace" additivity="false">
+      <AppenderRef ref="SourceAppender" />
+    </Logger>
   </Loggers>
 </Configuration>

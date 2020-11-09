@@ -681,11 +681,11 @@ public class SimpleProbGraph {
 		System.out.println("\nProbabilities: ");
 		System.out.println("Vars:" + nodes.size());
 		for (Node n : nodes) {
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
 		System.out.println("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
 	}
 
@@ -706,11 +706,11 @@ public class SimpleProbGraph {
 				if (cnt > 10)
 					break;
 			}
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
 		System.out.println("Stmts:" + stmts.size());
 		for (StmtNode n : stmts) {
-			n.bp_printprob();
+			n.bpPrintProb();
 		}
 		System.out.println("Belief propagation time : " + bptime / 1000.0 + "s");
 	}
@@ -729,7 +729,7 @@ public class SimpleProbGraph {
 		for (Node n : nodes) {
 			if (verbose) {
 				n.printprob();
-				n.bp_printprob();
+				n.bpPrintProb();
 			}
 			if (!n.obs) {
 				double diff = getdiff(n.bp_getprob(), n.getprob());
@@ -745,7 +745,7 @@ public class SimpleProbGraph {
 		for (StmtNode n : stmts) {
 			if (verbose) {
 				n.printprob();
-				n.bp_printprob();
+				n.bpPrintProb();
 			}
 			if (!n.obs) {
 				double diff = getdiff(n.bp_getprob(), n.getprob());

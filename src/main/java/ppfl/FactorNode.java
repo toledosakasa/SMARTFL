@@ -3,7 +3,13 @@ package ppfl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FactorNode {
+
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+
 	private List<Node> preds;
 	private Node def;
 	private Node stmt;
@@ -34,13 +40,13 @@ public class FactorNode {
 		this.sedge = sedge;
 		this.pedges = pedges;
 		this.uedges = uedges;
-		this.tensor = new ArrayList<Double>();
-		this.allnodes = new ArrayList<Node>();
+		this.tensor = new ArrayList<>();
+		this.allnodes = new ArrayList<>();
 		allnodes.add(stmt);
 		allnodes.add(def);
 		allnodes.addAll(preds);
 		allnodes.addAll(uses);
-		this.alledges = new ArrayList<Edge>();
+		this.alledges = new ArrayList<>();
 		alledges.add(sedge);
 		alledges.add(dedge);
 		alledges.addAll(pedges);
@@ -50,7 +56,7 @@ public class FactorNode {
 	}
 
 	public List<Node> getpunodes() {
-		ArrayList<Node> ret = new ArrayList<Node>();
+		ArrayList<Node> ret = new ArrayList<>();
 		ret.addAll(preds);
 		ret.addAll(uses);
 		return ret;
@@ -73,7 +79,7 @@ public class FactorNode {
 
 	public void send_message() {
 		// used to save all the messages from the nodes
-		List<Double> tmpvlist = new ArrayList<Double>();
+		List<Double> tmpvlist = new ArrayList<>();
 		for (int i = 0; i < nnodes; i++) {
 			tmpvlist.add(alledges.get(i).get_ntof());
 		}
@@ -187,44 +193,46 @@ public class FactorNode {
 					return MEDIUM;
 				return LOW;
 			}
-//			if (!defv) {
-//				if (hasUNKoperator)
-//					return MEDIUM;
-//				return HIGH;
-//			}
-//			// else: def = true
-//			else if (pu) {
-//				if (hasUNKoperator)
-//					return MEDIUM;
-//				return LOW;
-//			}
-//			// def = true stmt = false use = false
-//			return LOW;// TODO should be medium when using certain ops.
+			// if (!defv) {
+			// if (hasUNKoperator)
+			// return MEDIUM;
+			// return HIGH;
+			// }
+			// // else: def = true
+			// else if (pu) {
+			// if (hasUNKoperator)
+			// return MEDIUM;
+			// return LOW;
+			// }
+			// // def = true stmt = false use = false
+			// return LOW;// TODO should be medium when using certain ops.
 		}
 		return MEDIUM;
 	}
 
 	public void print() {
-		System.out.print("Statement: ");
-		stmt.print();
-		System.out.print("def:");
-		def.print();
+		stmt.print("Statement: ");
+		debugLogger.info("\tdef:");
+		def.print("\t\t");
 
 		if (uses != null) {
-			System.out.println("uses:");
+			debugLogger.info("\tuses:");
 			for (Node n : uses) {
-				n.print();
+				n.print("\t\t");
 			}
 		}
 		if (preds != null) {
-			System.out.println("preds:");
+			debugLogger.info("\tpreds:");
 			for (Node n : preds) {
-				n.print();
+				n.print("\t\t");
 			}
 		}
 		if (ops != null) {
-			System.out.print("ops:");
-			System.out.println(ops);
+			debugLogger.info("\tops:");
+			for (String eachop : ops) {
+				debugLogger.info("\t\t" + eachop);
+			}
+
 		}
 	}
 }

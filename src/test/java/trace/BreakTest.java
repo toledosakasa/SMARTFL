@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class BreakTest {
 
-	public double f(int n) {
+	public int f(int n) {
 		int sum = 0;
 		for (int i = 0; i < n; i++) {
 			if (sum > 30)
@@ -18,12 +18,12 @@ class BreakTest {
 
 	@Test
 	void pass() {
-		assertEquals(f(0), 0);
+		assertEquals(0, f(0));
 	}
 
 	@Test
 	void fail() {
-		assertEquals(f(11), 55);
+		assertEquals(55, f(11));
 	}
 
 }

@@ -4,13 +4,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LineInfo {
+	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+
 	private Map<Integer, Line> linemap;
 	public final CompilationUnit cu;
 
 	public LineInfo(CompilationUnit _cu) {
-		linemap = new TreeMap<Integer, Line>();
+		linemap = new TreeMap<>();
 		cu = _cu;
 	}
 
@@ -34,10 +38,10 @@ public class LineInfo {
 	}
 
 	public void print() {
-		System.out.println("lineinfo: ");
-		for (Integer k : linemap.keySet()) {
-			System.out.println(k + ":");
-			linemap.get(k).print();
+		debugLogger.info("lineinfo: ");
+		for (Map.Entry<Integer,Line> k : linemap.entrySet()) {
+			debugLogger.info(k.getKey() + ":");
+			k.getValue().print();
 		}
 	}
 }
