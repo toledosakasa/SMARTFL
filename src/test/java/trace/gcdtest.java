@@ -16,6 +16,12 @@ class gcdtest {
 			r = a % b;
 			a = b;
 			b = r;
+			if(a == 1000){
+				d = d +10;
+			}
+			else{
+				d = d +100;
+			}
 		}
         r = r + 1;
         r = r + d;
@@ -25,7 +31,7 @@ class gcdtest {
 
 	@Test
 	void test() {
-		gcd(28, 8);
+		assertEquals(gcd(28, 8), 4);
 	}
 
 }

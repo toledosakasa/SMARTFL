@@ -194,6 +194,25 @@ class GraphTest {
 		pgraph.check_bp_with_bf(true);
 	}
 
+	ByteCodeGraph gcdinit_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\gcdtest.test.log";
+		String sourcetrace = ppflroot+ "\\trace\\logs\\mytrace\\trace.gcdtest.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		// pgraph.parsesource(passpath);
+		pgraph.parsetrace(failtrace, "test", false);
+		pgraph.parsesource(sourcetrace);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	public void gcdtest_bc() {
+		ByteCodeGraph pgraph = gcdinit_bc();
+	}
+
 	ByteCodeGraph mergeinit_bc() {
 		boolean fail = false;
 		String ppflroot = ".";
@@ -201,7 +220,7 @@ class GraphTest {
 		String failpath = passpath;
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.fail.log";
-
+		String sourcetrace = ppflroot+ "\\trace\\logs\\mytrace\\trace.MergeTest.source.log";
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		// pgraph.parsesource(passpath);
@@ -212,6 +231,7 @@ class GraphTest {
 		pgraph.parsetrace(failtrace, "fail", false);
 		// pgraph.observe("trace.MergeTest.fail#23", true);
 		// pgraph.observe("a#9#3", false);
+		pgraph.parsesource(sourcetrace);
 		pgraph.printgraph();
 
 		return pgraph;
