@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Stack;
-import java.util.Vector;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +35,9 @@ public class ByteCodeGraph {
 	public Map<String, Integer> stmtcountmap;
 	public org.graphstream.graph.Graph viewgraph;
 	public Set<String> instset;
-	public Map<String,List<String>> predataflowmap;
-	public Map<String,List<String>> postdataflowmap;
-	public Map<String,Set<String>> dataflowsets;
+	public Map<String, List<String>> predataflowmap;
+	public Map<String, List<String>> postdataflowmap;
+	public Map<String, Set<String>> dataflowsets;
 	private boolean shouldview;
 
 	public void stopview() {
@@ -101,17 +100,17 @@ public class ByteCodeGraph {
 	public List<Node> predicates = new ArrayList<>();
 
 	public ByteCodeGraph() {
-		factornodes = new ArrayList<FactorNode>();
-		nodes = new ArrayList<Node>();
-		stmts = new ArrayList<StmtNode>();
-		nodemap = new HashMap<String, Node>();
-		stmtmap = new HashMap<String, Node>();
-		varcountmap = new HashMap<String, Integer>();
-		stmtcountmap = new HashMap<String, Integer>();
-		instset = new HashSet<String>();
-		predataflowmap = new HashMap<String, List<String>>();
-		postdataflowmap = new HashMap<String, List<String>>();
-		dataflowsets = new HashMap<String, Set<String>>();
+		factornodes = new ArrayList<>();
+		nodes = new ArrayList<>();
+		stmts = new ArrayList<>();
+		nodemap = new HashMap<>();
+		stmtmap = new HashMap<>();
+		varcountmap = new HashMap<>();
+		stmtcountmap = new HashMap<>();
+		instset = new HashSet<>();
+		predataflowmap = new HashMap<>();
+		postdataflowmap = new HashMap<>();
+		dataflowsets = new TreeMap<>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
@@ -177,11 +176,10 @@ public class ByteCodeGraph {
 	}
 
 	public void parsesource(String sourcefilename) {
-        Map<String,String> assistnamemap = new HashMap<String, String>();
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(sourcefilename));
+		Map<String, String> assistnamemap = new HashMap<>();
+		try(BufferedReader reader = new BufferedReader(new FileReader(sourcefilename))) {
 			String t;
-			Set<String> nonextinsts = new HashSet<String>();
+			Set<String> nonextinsts = new HashSet<>();
 			nonextinsts.add("goto_w");
 			nonextinsts.add("goto");
 			nonextinsts.add("return");
@@ -197,117 +195,106 @@ public class ByteCodeGraph {
 					continue;
 				ParseInfo info = new ParseInfo(t);
 				String thisinst = info.getvalue("lineinfo");
-				String classandmethod = info.traceclass +"#"+info.tracemethod;
+				String classandmethod = info.traceclass + "#" + info.tracemethod;
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
-				List<String> theedges = new ArrayList<String> ();
-				if(!(nonextinsts.contains(info.opcode)))
-				{
-					String nextinst = classandmethod +info.getvalue("nextinst");
+				List<String> theedges = new ArrayList<>();
+				if (!(nonextinsts.contains(info.opcode))) {
+					String nextinst = classandmethod + info.getvalue("nextinst");
 					theedges.add(nextinst);
 				}
 				Integer branchbyte = info.getintvalue("branchbyte");
-				if(branchbyte != null)
-				{
+				if (branchbyte != null) {
 					String branchinst = classandmethod + (branchbyte.intValue() + info.byteindex);
 					theedges.add(branchinst);
 				}
-				if(theedges.size()==0)
-				{
-					theedges.add("OUT_"+classandmethod);
-					instset.add("OUT_"+classandmethod);
+				if (theedges.isEmpty()) {
+					theedges.add("OUT_" + classandmethod);
+					instset.add("OUT_" + classandmethod);
 				}
-				predataflowmap.put(thisinst,theedges);
+				predataflowmap.put(thisinst, theedges);
 				instset.add(thisinst);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-        }
-        //change the name (to include the line number)
-        for(List<String> theedges : predataflowmap.values()){
-            int valuelen = theedges.size();
-            for(int i =0;i < valuelen;i++){
-                if(assistnamemap.containsKey(theedges.get(i)))
-                {
-                    String newname = assistnamemap.get(theedges.get(i));
-                    theedges.set(i, newname);
-                }
-            }
-        }
-        //init the postmap, keys including OUT_xx
-        for(String instname : instset){
-            List<String> theedges = new ArrayList<String> ();
-            postdataflowmap.put(instname, theedges);
-        }
-        //get the postmap
-        for(String instname : predataflowmap.keySet()){
-            List<String> preedges = predataflowmap.get(instname);
-            for(String prenode: preedges)
-            {
-                // System.out.println(preedges);
-                // System.out.println(instname+"__"+prenode);
-                List<String> postedges = postdataflowmap.get(prenode);
-                postedges.add(instname);
-            }
-        }
-        // init the dataflow set
-        Set<String> changedset = new HashSet<String>();
-        for (String instname : postdataflowmap.keySet()){
-            if(instname.startsWith("OUT_"))
-            {
-                HashSet<String> emptyset = new HashSet<String>();
-                emptyset.add(instname);
-                dataflowsets.put(instname, emptyset);
-            }
-            else
-            {
-                HashSet<String> theallset = new HashSet<String>();
-                theallset.addAll(instset);
-                dataflowsets.put(instname, theallset);
-                changedset.add(instname);
-            }
-        }
+		}
+		// change the name (to include the line number)
+		for (List<String> theedges : predataflowmap.values()) {
+			int valuelen = theedges.size();
+			for (int i = 0; i < valuelen; i++) {
+				if (assistnamemap.containsKey(theedges.get(i))) {
+					String newname = assistnamemap.get(theedges.get(i));
+					theedges.set(i, newname);
+				}
+			}
+		}
+		// init the postmap, keys including OUT_xx
+		for (String instname : instset) {
+			List<String> theedges = new ArrayList<>();
+			postdataflowmap.put(instname, theedges);
+		}
+		// get the postmap
+		for (String instname : predataflowmap.keySet()) {
+			List<String> preedges = predataflowmap.get(instname);
+			for (String prenode : preedges) {
+				// System.out.println(preedges);
+				// System.out.println(instname+"__"+prenode);
+				List<String> postedges = postdataflowmap.get(prenode);
+				postedges.add(instname);
+			}
+		}
+		// init the dataflow set
+		Set<String> changedset = new HashSet<>();
+		for (String instname : postdataflowmap.keySet()) {
+			if (instname.startsWith("OUT_")) {
+				HashSet<String> emptyset = new HashSet<>();
+				emptyset.add(instname);
+				dataflowsets.put(instname, emptyset);
+			} else {
+				HashSet<String> theallset = new HashSet<>();
+				theallset.addAll(instset);
+				dataflowsets.put(instname, theallset);
+				changedset.add(instname);
+			}
+		}
 
-        while(!changedset.isEmpty()){	
-            int changedsetsize = changedset.size();
-            int item = new Random().nextInt(changedsetsize);
-            int tmpindex = 0;
-            String instname = "";
-            for(String obj : changedset)
-            {
-                if (tmpindex == item)
-                {
-                    instname = obj;
-                    break;
-                }
-                tmpindex++;
-            }
-            changedset.remove(instname);
-            Set<String> oldset =  dataflowsets.get(instname);
-            Set<String> newset = new HashSet<String>();
-            newset.addAll(instset);
-            List<String> succlist = predataflowmap.get(instname);
-            for(String succinst : succlist){
-                newset.retainAll (dataflowsets.get(succinst));
-            }
-            newset.add(instname);
-            if(!((oldset.size()==newset.size())&&oldset.containsAll(newset)))
-            {
-                List<String> predlist = postdataflowmap.get(instname);
-                for(String predinst : predlist){
-                    changedset.add(predinst);
-                }
-            }
-            dataflowsets.put(instname, newset);
-        }
-        boolean printdataflow = true;
-        if(printdataflow){
-            System.out.println("size =" + dataflowsets.size());
-            for(String key : dataflowsets.keySet()){
-                System.out.println("key_"+key);
-                System.out.println(dataflowsets.get(key));
-            }
-        }
+		while (!changedset.isEmpty()) {
+			int changedsetsize = changedset.size();
+			int item = new Random().nextInt(changedsetsize);
+			int tmpindex = 0;
+			String instname = "";
+			for (String obj : changedset) {
+				if (tmpindex == item) {
+					instname = obj;
+					break;
+				}
+				tmpindex++;
+			}
+			changedset.remove(instname);
+			Set<String> oldset = dataflowsets.get(instname);
+			Set<String> newset = new HashSet<>();
+			newset.addAll(instset);
+			List<String> succlist = predataflowmap.get(instname);
+			for (String succinst : succlist) {
+				newset.retainAll(dataflowsets.get(succinst));
+			}
+			newset.add(instname);
+			if (!((oldset.size() == newset.size()) && oldset.containsAll(newset))) {
+				List<String> predlist = postdataflowmap.get(instname);
+				for (String predinst : predlist) {
+					changedset.add(predinst);
+				}
+			}
+			dataflowsets.put(instname, newset);
+		}
+		boolean printdataflow = true;
+		if (printdataflow) {
+			debugLogger.info("size =" + dataflowsets.size());
+			for (String key : dataflowsets.keySet()) {
+				debugLogger.info("key_" + key);
+				debugLogger.info(dataflowsets.get(key).toString());
+			}
+		}
 	}
 
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
