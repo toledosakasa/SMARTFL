@@ -54,8 +54,8 @@ public class OpcodeInst {
 		int beginIndex = desc.indexOf('(');
 		int endIndex = desc.lastIndexOf(')');
 		if ((beginIndex == -1 && endIndex != -1) || (beginIndex != -1 && endIndex == -1)) {
-			//System.err.println(beginIndex);
-			//System.err.println(endIndex);
+			// System.err.println(beginIndex);
+			// System.err.println(endIndex);
 			throw new RuntimeException();
 		}
 		String x0;
@@ -145,19 +145,19 @@ public class OpcodeInst {
 	}
 
 	// extended class should override this method.
-	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
-			throws BadBytecode {
+	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		// print stack value pushed by this instruction.
 		// this should be inserted after the instruction is executed
 		// (after ci.next() is called)
 
-//		if (this.pushnum == 1 && (this.opcode.startsWith("i"))) {
-//			int instpos = ci.insertGap(8);
-//			// ci.writeByte(93, instpos + 1);// buggy dup. can't explain(?)
-//			// call (I)I callback instead of (I)V callback.
-//			ci.writeByte(184, instpos + 2);// invokestatic
-//			ci.write16bit(cbi.tsindex_int, instpos + 3);
-//		}
+		// if (this.pushnum == 1 && (this.opcode.startsWith("i"))) {
+		// should use insertExGap here.
+		// int instpos = ci.insertExGap(8);
+		// // ci.writeByte(93, instpos + 1);// buggy dup. can't explain(?)
+		// // call (I)I callback instead of (I)V callback.
+		// ci.writeByte(184, instpos + 2);// invokestatic
+		// ci.write16bit(cbi.tsindex_int, instpos + 3);
+		// }
 	}
 
 	public StmtNode buildstmt(ByteCodeGraph graph) {
@@ -171,14 +171,14 @@ public class OpcodeInst {
 		String stmtname = traceclass + ":" + tracemethod + "#" + linenumber;
 		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + byteindex;
-//		if (!graph.hasNode(stmtname)) {
-////			stmt = new StmtNode(stmtname);
-////			graph.addNode(stmtname, stmt);
-//			stmt = graph.addNewStmt(stmtname);
-//		} else {
-//			stmt = (StmtNode) graph.getNode(stmtname);
-//			assert (stmt.isStmt());
-//		}
+		// if (!graph.hasNode(stmtname)) {
+		//// stmt = new StmtNode(stmtname);
+		//// graph.addNode(stmtname, stmt);
+		// stmt = graph.addNewStmt(stmtname);
+		// } else {
+		// stmt = (StmtNode) graph.getNode(stmtname);
+		// assert (stmt.isStmt());
+		// }
 		stmt = graph.getStmt(stmtname);
 
 		// count how many times this statment has been executed
@@ -212,7 +212,7 @@ public class OpcodeInst {
 		// info.print();
 		// uses
 		List<Node> prednodes = new ArrayList<>();
-		//prednodes.addAll(graph.predicates);
+		// prednodes.addAll(graph.predicates);
 		List<Node> usenodes = new ArrayList<>();
 		Node defnode = null;
 		if (info.getintvalue("load") != null) {
