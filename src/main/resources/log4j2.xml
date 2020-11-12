@@ -4,7 +4,7 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
     </Console>
-    <Console name="DebugConsole" target="SYSTEM_OUT">
+    <Console name="DebugConsole" target="SYSTEM_ERR">
       <PatternLayout pattern="%msg%n" />
     </Console>
     <!--
