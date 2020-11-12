@@ -45,7 +45,7 @@ cd lang3b
 
 defects4j compile
 
-defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -a -Djvmargs="-noverify -Djvmargs=-javaagent:[pathToAssembledTracer.jar]=logfile=[logfilename],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils:org.apache.commons.lang3.math.NumberUtilsTest"
+defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -a "-Djvmargs=-noverify -Djvmargs=-javaagent:[pathToAssembledTracer.jar]=logfile=[logfilename],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils:org.apache.commons.lang3.math.NumberUtilsTest"
 ```
 
 for debugging use, copy the ant commandline (you should see that by running the instructions above) and run it.
