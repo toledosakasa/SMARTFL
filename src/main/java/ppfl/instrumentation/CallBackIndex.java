@@ -70,53 +70,53 @@ public class CallBackIndex {
 	// callbacks.
 	// will be called by bytecode instrumentation
 	public static int printTopStack1(int i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=int,pushvalue=%d", i));
+		TraceTransformer.traceLogger.info(",pushtype=int,pushvalue={}", i);
 		return i;
 	}
 
 	public static double printTopStack1(double i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=double,pushvalue=%f", i));
+		TraceTransformer.traceLogger.info(",pushtype=double,pushvalue={}", i);
 		return i;
 	}
 
 	public static short printTopStack1(short i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=short,pushvalue=%d", i));
+		TraceTransformer.traceLogger.info(",pushtype=short,pushvalue={}", i);
 		return i;
 	}
 
 	public static char printTopStack1(char i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=char,pushvalue=%c", i));
+		TraceTransformer.traceLogger.info(",pushtype=char,pushvalue={}", i);
 		return i;
 	}
 
 	public static byte printTopStack1(byte i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=byte,pushvalue=%d", i));
+		TraceTransformer.traceLogger.info(",pushtype=byte,pushvalue={}", i);
 		return i;
 	}
 
 	public static boolean printTopStack1(boolean i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=boolean,pushvalue=%b" + i));
+		TraceTransformer.traceLogger.info(",pushtype=boolean,pushvalue={}", i);
 		return i;
 	}
 
 	public static float printTopStack1(float i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=float,pushvalue=%f", i));
+		TraceTransformer.traceLogger.info(",pushtype=float,pushvalue={}", i);
 		return i;
 	}
 
 	public static long printTopStack1(long i) {
-		TraceTransformer.traceLogger.info(String.format(",pushtype=long,pushvalue=%d", i));
+		TraceTransformer.traceLogger.info(",pushtype=long,pushvalue={}", i);
 		return i;
 	}
 
 	public static String printTopStack1(String i) {
-		TraceTransformer.traceLogger.info(",pushtype=String,pushvalue=" + i);
+		TraceTransformer.traceLogger.info(",pushtype=String,pushvalue=\"{}\"", i);
 		return i;
 	}
 
 	public static Object printTopStack1(Object i) {
 		// call system hashcode (jvm address)
-		TraceTransformer.traceLogger.info(",pushtype=object,pushvalue=" + java.lang.System.identityHashCode(i));
+		TraceTransformer.traceLogger.info(",pushtype=object,pushvalue={}", java.lang.System.identityHashCode(i));
 		return i;
 	}
 
