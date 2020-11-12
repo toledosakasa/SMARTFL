@@ -230,7 +230,7 @@ public class FactorNode {
 		if (ops != null) {
 			debugLogger.info("\tops:");
 			for (String eachop : ops) {
-				debugLogger.info("\t\t" + eachop);
+				debugLogger.info("\t\t{}" , eachop);
 			}
 
 		}

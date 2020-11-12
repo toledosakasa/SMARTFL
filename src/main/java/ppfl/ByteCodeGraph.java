@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,7 +178,7 @@ public class ByteCodeGraph {
 
 	public void parsesource(String sourcefilename) {
 		Map<String, String> assistnamemap = new HashMap<>();
-		try(BufferedReader reader = new BufferedReader(new FileReader(sourcefilename))) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(sourcefilename))) {
 			String t;
 			Set<String> nonextinsts = new HashSet<>();
 			nonextinsts.add("goto_w");
@@ -234,13 +235,13 @@ public class ByteCodeGraph {
 			postdataflowmap.put(instname, theedges);
 		}
 		// get the postmap
-		for (String instname : predataflowmap.keySet()) {
-			List<String> preedges = predataflowmap.get(instname);
+		for (Map.Entry<String, List<String>> instname : predataflowmap.entrySet()) {
+			List<String> preedges = instname.getValue();
 			for (String prenode : preedges) {
 				// System.out.println(preedges);
 				// System.out.println(instname+"__"+prenode);
 				List<String> postedges = postdataflowmap.get(prenode);
-				postedges.add(instname);
+				postedges.add(instname.getKey());
 			}
 		}
 		// init the dataflow set
@@ -289,10 +290,10 @@ public class ByteCodeGraph {
 		}
 		boolean printdataflow = true;
 		if (printdataflow) {
-			debugLogger.info("size =" + dataflowsets.size());
-			for (String key : dataflowsets.keySet()) {
-				debugLogger.info("key_" + key);
-				debugLogger.info(dataflowsets.get(key).toString());
+			debugLogger.info("size ={}", dataflowsets.size());
+			for (Entry<String, Set<String>> entry : dataflowsets.entrySet()) {
+				debugLogger.info("key_{}", entry);
+				debugLogger.info("value_{}", entry.getValue());
 			}
 		}
 	}
@@ -314,7 +315,7 @@ public class ByteCodeGraph {
 			if (auto_oracle) {
 				for (Node i : lastDefinedVar) {
 					i.observe(testpass);
-					debugLogger.info("Observe " + i.name + " as " + testpass);
+					debugLogger.info("Observe {} as {}", i.name, testpass);
 				}
 			}
 		} catch (IOException e) {
@@ -681,7 +682,6 @@ public class ByteCodeGraph {
 	public long bp_inference() {
 		long startTime = System.currentTimeMillis();
 		path_reduce();
-
 		boolean outreduced = true;
 		if (outreduced) {
 			debugLogger.info("\nreduced Nodes: ");
@@ -710,7 +710,7 @@ public class ByteCodeGraph {
 					isend = false;
 			}
 			if (isend) {
-				debugLogger.info("\n\n" + i + "\n\n");
+				debugLogger.info("\n\n{}\n\n", i);
 				break;
 			}
 		}
@@ -746,11 +746,11 @@ public class ByteCodeGraph {
 
 	public void printprobs() {
 		debugLogger.info("\nProbabilities: ");
-		debugLogger.info("Vars:" + nodes.size());
+		debugLogger.info("Vars:{}", nodes.size());
 		for (Node n : nodes) {
 			n.printprob();
 		}
-		debugLogger.info("Stmts:" + stmts.size());
+		debugLogger.info("Stmts:{}", stmts.size());
 		for (StmtNode n : stmts) {
 			n.printprob();
 		}
@@ -758,11 +758,11 @@ public class ByteCodeGraph {
 
 	public void bp_printprobs() {
 		debugLogger.info("\nProbabilities: ");
-		debugLogger.info("Vars:" + nodes.size());
+		debugLogger.info("Vars:{}", nodes.size());
 		for (Node n : nodes) {
 			n.bpPrintProb();
 		}
-		debugLogger.info("Stmts:" + stmts.size());
+		debugLogger.info("Stmts:{}", stmts.size());
 		for (StmtNode n : stmts) {
 			n.bpPrintProb();
 		}
@@ -777,7 +777,7 @@ public class ByteCodeGraph {
 		long bptime = this.bp_inference();
 
 		debugLogger.info("\nProbabilities: ");
-		debugLogger.info("Vars:" + nodes.size());
+		debugLogger.info("Vars:{}", nodes.size());
 		int cnt = 0;
 		for (Node n : nodes) {
 			if (!verbose) {
@@ -787,11 +787,11 @@ public class ByteCodeGraph {
 			}
 			n.bpPrintProb();
 		}
-		debugLogger.info("Stmts:" + stmts.size());
+		debugLogger.info("Stmts:{}", stmts.size());
 		for (StmtNode n : stmts) {
 			n.bpPrintProb();
 		}
-		debugLogger.info("Belief propagation time : " + bptime / 1000.0 + "s");
+		debugLogger.info("Belief propagation time : {}s", bptime / 1000.0);
 	}
 
 	public double check_bp_with_bf(boolean verbose) {
@@ -803,7 +803,7 @@ public class ByteCodeGraph {
 		long bptime = this.bp_inference();
 		if (verbose) {
 			debugLogger.info("\nProbabilities: ");
-			debugLogger.info("Vars:" + nodes.size());
+			debugLogger.info("Vars:{}", nodes.size());
 		}
 		for (Node n : nodes) {
 			if (verbose) {
@@ -820,7 +820,7 @@ public class ByteCodeGraph {
 			}
 		}
 		if (verbose)
-			debugLogger.info("Stmts:" + stmts.size());
+			debugLogger.info("Stmts:{}", stmts.size());
 		for (StmtNode n : stmts) {
 			if (verbose) {
 				n.printprob();
@@ -835,10 +835,10 @@ public class ByteCodeGraph {
 			}
 		}
 		if (verbose) {
-			debugLogger.info("Var max relative difference:" + maxdiff + " at " + diffname);
-			debugLogger.info("Stmt max relative difference:" + maxdiffstmt + " at " + diffnamestmt);
-			debugLogger.info("Brute force time : " + bftime / 1000.0 + "s");
-			debugLogger.info("Belief propagation time : " + bptime / 1000.0 + "s");
+			debugLogger.info("Var max relative difference:{} at {}", maxdiff, diffname);
+			debugLogger.info("Stmt max relative difference:{} at {}", maxdiffstmt, diffnamestmt);
+			debugLogger.info("Brute force time : {}s", bftime / 1000.0);
+			debugLogger.info("Belief propagation time : {}s", bptime / 1000.0);
 		}
 
 		return maxdiff;
@@ -852,14 +852,14 @@ public class ByteCodeGraph {
 		for (Node n : nodes) {
 			if (n.getName().equals(name)) {
 				valid = true;
-				debugLogger.info("Node observed as " + v);
+				debugLogger.info("Node observed as {}", v);
 				n.observe(v);
 			}
 		}
 		for (Node n : stmts) {
 			if (n.getName().equals(s)) {
 				valid = true;
-				debugLogger.info("Stmt observed as " + v);
+				debugLogger.info("Stmt observed as {}", v);
 				n.observe(v);
 			}
 		}
