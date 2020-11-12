@@ -60,7 +60,13 @@ Test methods to run should be all test methods in "tests.relevant"
 
 From commandline run the following to trace d4j:
 
-defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -w ./lang3b -a -Djvmargs=\"-javaagent:[pathtotracer.jar]=logfile=[pathtologfile],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils\"
+defects4j checkout -p Lang -v 3b -w ./lang3b
+
+cd lang3b
+
+defects4j compile
+
+defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -a -Djvmargs="-noverify -Djvmargs=-javaagent:[pathToAssembledTracer.jar]=logfile=[logfilename],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils:org.apache.commons.lang3.math.NumberUtilsTest"
 
 for debugging use, copy the ant commandline (you should see that by running the instructions above) and run it.
 
