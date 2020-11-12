@@ -244,6 +244,9 @@ public class ByteCodeGraph {
 				postedges.add(instname.getKey());
 			}
 		}
+	}
+
+	public void dataflow(){
 		// init the dataflow set
 		Set<String> changedset = new HashSet<>();
 		for (String instname : postdataflowmap.keySet()) {
