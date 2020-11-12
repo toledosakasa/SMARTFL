@@ -25,7 +25,7 @@ public class Lload_NInst extends OpcodeInst {
 	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
 			throws BadBytecode {
-		int instpos = ci.insertExGap(4);// the gap must be long enough for the following instrumentation
+		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(cbi.tsindex_long, instpos + 1);
 	}

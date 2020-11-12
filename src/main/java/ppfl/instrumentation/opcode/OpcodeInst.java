@@ -56,7 +56,7 @@ public class OpcodeInst {
 		if ((beginIndex == -1 && endIndex != -1) || (beginIndex != -1 && endIndex == -1)) {
 			// System.err.println(beginIndex);
 			// System.err.println(endIndex);
-			throw new RuntimeException();
+			throw new IllegalArgumentException("bracket mismatch in descriptor");
 		}
 		String x0;
 		if (beginIndex == -1 && endIndex == -1) {
@@ -132,7 +132,7 @@ public class OpcodeInst {
 
 		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
-			int instpos = ci.insertGap(8);
+			int instpos = ci.insertGap(6);
 			int instindex = constp.addStringInfo(inst);
 			// System.out.println(constp.getStringInfo(instindex));
 
@@ -196,7 +196,7 @@ public class OpcodeInst {
 		if (graph.auto_oracle) {
 			if (tracemethod.contentEquals(graph.testname)) {
 				stmt.observe(true);
-				debugLogger.info("Observe " + stmt.getName() + " as true");
+				debugLogger.info("Observe {} as true", stmt.getName());
 			}
 		}
 
