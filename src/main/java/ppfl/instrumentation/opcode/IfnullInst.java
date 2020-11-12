@@ -28,8 +28,8 @@ public class IfnullInst extends OpcodeInst {
 		// build the stmtnode(common)
 		StmtNode stmt = buildstmt(graph);
 		ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<Node>();
-		List<Node> usenodes = new ArrayList<Node>();
+		List<Node> prednodes = new ArrayList<>();
+		List<Node> usenodes = new ArrayList<>();
 		Node defnode = null;
 		if (info.getintvalue("popnum") != null) {
 			int instpopnum = info.getintvalue("popnum");

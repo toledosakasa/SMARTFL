@@ -20,7 +20,7 @@ public class IfInst extends OpcodeInst {
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
-		ret.append(",branchbyte="+String.valueOf(this.gets16bitpara(ci, index)));
+		ret.append(",branchbyte="+this.gets16bitpara(ci, index));
 		return ret.toString();
 	}
 
@@ -29,8 +29,8 @@ public class IfInst extends OpcodeInst {
 		// build the stmtnode(common)
 		StmtNode stmt = buildstmt(graph);
 		ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<Node>();
-		List<Node> usenodes = new ArrayList<Node>();
+		List<Node> prednodes = new ArrayList<>();
+		List<Node> usenodes = new ArrayList<>();
 		Node defnode = null;
 		if (info.getintvalue("popnum") != null) {
 			int instpopnum = info.getintvalue("popnum");

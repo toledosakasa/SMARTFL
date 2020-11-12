@@ -168,9 +168,9 @@ public class OpcodeInst {
 		int byteindex = info.byteindex;
 
 		StmtNode stmt = null;
-		String stmtname = traceclass + ":" + tracemethod + "#" + String.valueOf(linenumber);
+		String stmtname = traceclass + ":" + tracemethod + "#" + linenumber;
 		// System.out.println("At line " + stmtname);
-		stmtname = stmtname + "#" + String.valueOf(byteindex);
+		stmtname = stmtname + "#" + byteindex;
 //		if (!graph.hasNode(stmtname)) {
 ////			stmt = new StmtNode(stmtname);
 ////			graph.addNode(stmtname, stmt);
@@ -211,9 +211,9 @@ public class OpcodeInst {
 		ParseInfo info = graph.parseinfo;
 		// info.print();
 		// uses
-		List<Node> prednodes = new ArrayList<Node>();
+		List<Node> prednodes = new ArrayList<>();
 		//prednodes.addAll(graph.predicates);
-		List<Node> usenodes = new ArrayList<Node>();
+		List<Node> usenodes = new ArrayList<>();
 		Node defnode = null;
 		if (info.getintvalue("load") != null) {
 			int loadvar = info.getintvalue("load");
