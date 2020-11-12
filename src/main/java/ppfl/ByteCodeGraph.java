@@ -178,6 +178,9 @@ public class ByteCodeGraph {
 
 	public void parsesource(String sourcefilename) {
 		Map<String, String> assistnamemap = new HashMap<>();
+		Map<String, List<String>> _predataflowmap = new HashMap<>();
+		Map<String, List<String>> _postdataflowmap = new HashMap<>();
+		Set<String> _instset = new HashSet<>();
 		try (BufferedReader reader = new BufferedReader(new FileReader(sourcefilename))) {
 			String t;
 			Set<String> nonextinsts = new HashSet<>();
@@ -211,16 +214,16 @@ public class ByteCodeGraph {
 				}
 				if (theedges.isEmpty()) {
 					theedges.add("OUT_" + classandmethod);
-					instset.add("OUT_" + classandmethod);
+					_instset.add("OUT_" + classandmethod);
 				}
-				predataflowmap.put(thisinst, theedges);
-				instset.add(thisinst);
+				_predataflowmap.put(thisinst, theedges);
+				_instset.add(thisinst);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		// change the name (to include the line number)
-		for (List<String> theedges : predataflowmap.values()) {
+		for (List<String> theedges : _predataflowmap.values()) {
 			int valuelen = theedges.size();
 			for (int i = 0; i < valuelen; i++) {
 				if (assistnamemap.containsKey(theedges.get(i))) {
@@ -230,20 +233,23 @@ public class ByteCodeGraph {
 			}
 		}
 		// init the postmap, keys including OUT_xx
-		for (String instname : instset) {
+		for (String instname : _instset) {
 			List<String> theedges = new ArrayList<>();
-			postdataflowmap.put(instname, theedges);
+			_postdataflowmap.put(instname, theedges);
 		}
 		// get the postmap
-		for (Map.Entry<String, List<String>> instname : predataflowmap.entrySet()) {
+		for (Map.Entry<String, List<String>> instname : _predataflowmap.entrySet()) {
 			List<String> preedges = instname.getValue();
 			for (String prenode : preedges) {
 				// System.out.println(preedges);
 				// System.out.println(instname+"__"+prenode);
-				List<String> postedges = postdataflowmap.get(prenode);
+				List<String> postedges = _postdataflowmap.get(prenode);
 				postedges.add(instname.getKey());
 			}
 		}
+		predataflowmap.putAll(_predataflowmap);
+		postdataflowmap.putAll(_postdataflowmap);
+		instset.addAll(_instset);
 	}
 
 	public void dataflow(){
@@ -293,6 +299,11 @@ public class ByteCodeGraph {
 		}
 		boolean printdataflow = true;
 		if (printdataflow) {
+			// System.out.println("size =" + dataflowsets.size());
+            // for(String key : dataflowsets.keySet()){
+            //     System.out.println("key_"+key);
+            //     System.out.println(dataflowsets.get(key));
+            // }
 			debugLogger.info("size ={}", dataflowsets.size());
 			for (Entry<String, Set<String>> entry : dataflowsets.entrySet()) {
 				debugLogger.info("key_{}", entry);

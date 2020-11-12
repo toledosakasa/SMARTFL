@@ -288,9 +288,11 @@ class GraphTest {
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\ControlTest.fail.log";
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\ControlTest.pass.log";
 		String sourcetrace = ppflroot+ "\\trace\\logs\\mytrace\\trace.ControlTest.source.log";
+		// String tt = ppflroot+ "\\trace\\logs\\mytrace\\test.log";
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
+		// pgraph.parsesource(tt);
 		pgraph.dataflow();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
