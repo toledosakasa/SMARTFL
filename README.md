@@ -28,13 +28,15 @@ git fetch https://github.com/Ultimanecat/defects4j
 
 Look at relevant information:
 
+```
 defects4j query -p Lang -q "bug.id,classes.relevant.src,classes.relevant.test,tests.relevant,tests.trigger"  -o langtest.csv
+```
 
-The instrumented classes should be "classes.modified"+"tests.relevant"
+The instrumented classes should be "classes.relevant.src"+"tests.relevant"
 
 Test methods to run should be all test methods in "tests.relevant"
 
-From commandline run the following to trace d4j:
+Commandline tracing example:
 
 ```
 defects4j checkout -p Lang -v 3b -w ./lang3b
