@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.HashSet;
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +102,44 @@ public class ByteCodeGraph {
 	//
 	public List<Node> predicates = new ArrayList<>();
 
+	// predicate stack for building factor
+	private Deque<Node> predstack;
+
+	public void popPredStack() {
+		this.predstack.pop();
+	}
+
+	public void pushPredStack(Node newpred){
+		this.predstack.push(newpred);
+	}
+
+	public Node getPredStack(){
+		return this.predstack.peek();
+	}
+	
+	public List<Node> reversePredStack(){
+		List<Node> newlist = new ArrayList<>();
+		newlist.addAll(predstack);
+		Collections.reverse(newlist);
+		return newlist;
+	}
+
+	public void killPredStack(String thisinst){
+		boolean willcontinue = true;
+		while(willcontinue){
+			willcontinue = false;
+			if(this.predstack.peek() != null){
+				String  stmtName = this.predstack.peek().getStmtName();
+				// System.out.println("in kill "+stmtName);
+				if(post_idom.get(stmtName).equals(thisinst)){
+					this.predstack.pop();
+					willcontinue = true;
+				}
+			}
+		}
+	}
+
+
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<>();
 		nodes = new ArrayList<>();
@@ -118,6 +157,7 @@ public class ByteCodeGraph {
 		random = new Random();
 		auto_oracle = true;
 		stackframe = new ArrayDeque<>();
+		predstack = new ArrayDeque<>();
 		viewgraph = new SingleGraph("Outgraph");
 		viewgraph.setStrict(false);
 		viewgraph.setAutoCreate(true);
@@ -299,19 +339,19 @@ public class ByteCodeGraph {
 			}
 			dataflowsets.put(instname, newset);
 		}
-		boolean printdataflow = true;
-		if (printdataflow) {
-			// System.out.println("size =" + dataflowsets.size());
-            // for(String key : dataflowsets.keySet()){
-            //     System.out.println("key_"+key);
-            //     System.out.println(dataflowsets.get(key));
-            // }
-			debugLogger.info("size ={}", dataflowsets.size());
-			for (Entry<String, Set<String>> entry : dataflowsets.entrySet()) {
-				debugLogger.info("key_{}", entry);
-				debugLogger.info("value_{}", entry.getValue());
-			}
-		}
+		// boolean printdataflow = true;
+		// if (printdataflow) {
+		// 	// System.out.println("size =" + dataflowsets.size());
+        //     // for(String key : dataflowsets.keySet()){
+        //     //     System.out.println("key_"+key);
+        //     //     System.out.println(dataflowsets.get(key));
+        //     // }
+		// 	debugLogger.info("size ={}", dataflowsets.size());
+		// 	for (Entry<String, Set<String>> entry : dataflowsets.entrySet()) {
+		// 		debugLogger.info("key_{}", entry);
+		// 		debugLogger.info("value_{}", entry.getValue());
+		// 	}
+		// }
 
 		//get the post_idom
 		List<String> allkeys = new ArrayList<>();
@@ -354,6 +394,7 @@ public class ByteCodeGraph {
 	}
 
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
+		this.predstack.clear();
 		this.testname = testname;
 		this.initmaps();
 		try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
@@ -362,8 +403,12 @@ public class ByteCodeGraph {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
 				this.parseinfo = new ParseInfo(t);
+				// System.out.println(t);
+				// System.out.println(this.parseinfo.getvalue("lineinfo"));
+				killPredStack(this.parseinfo.getvalue("lineinfo"));
 				// debugLogger.info(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
+				// System.out.println("After "+this.parseinfo.getvalue("lineinfo")+" preds "+ predstack);
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
