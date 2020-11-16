@@ -39,7 +39,7 @@ public class ByteCodeGraph {
 	public Map<String, List<String>> predataflowmap;
 	public Map<String, List<String>> postdataflowmap;
 	public Map<String, Set<String>> dataflowsets;
-	public Map<String, String> idom;
+	public Map<String, String> post_idom;
 	private boolean shouldview;
 
 	public void stopview() {
@@ -113,7 +113,7 @@ public class ByteCodeGraph {
 		predataflowmap = new HashMap<>();
 		postdataflowmap = new HashMap<>();
 		dataflowsets = new TreeMap<>();
-		idom = new TreeMap<>();
+		post_idom = new TreeMap<>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
@@ -313,7 +313,7 @@ public class ByteCodeGraph {
 			}
 		}
 
-		//get the idom
+		//get the post_idom
 		List<String> allkeys = new ArrayList<>();
 		allkeys.addAll(instset);
 		Comparator<String> comp = (arg0, arg1) -> Integer.compare(dataflowsets.get(arg0).size(), 
@@ -339,16 +339,16 @@ public class ByteCodeGraph {
 			for(String dominst : thevalue){
 				if(oldvset.contains(dominst))
 				{
-					idom.put(thekey, dominst);
+					post_idom.put(thekey, dominst);
 					break;
 				}
 			}
 		}
 		// if (printdataflow) {
-		// 	System.out.println("size =" + idom.size());
-        //     for(String key : idom.keySet()){
+		// 	System.out.println("size =" + post_idom.size());
+        //     for(String key : post_idom.keySet()){
         //         System.out.println("key_"+key);
-        //         System.out.println("idom = " + idom.get(key));
+        //         System.out.println("post_idom = " + post_idom.get(key));
         //     }
 		// }
 	}
