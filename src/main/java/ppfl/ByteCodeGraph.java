@@ -39,6 +39,7 @@ public class ByteCodeGraph {
 	public Map<String, List<String>> predataflowmap;
 	public Map<String, List<String>> postdataflowmap;
 	public Map<String, Set<String>> dataflowsets;
+	public Map<String, String> idom;
 	private boolean shouldview;
 
 	public void stopview() {
@@ -112,6 +113,7 @@ public class ByteCodeGraph {
 		predataflowmap = new HashMap<>();
 		postdataflowmap = new HashMap<>();
 		dataflowsets = new TreeMap<>();
+		idom = new TreeMap<>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
@@ -310,6 +312,45 @@ public class ByteCodeGraph {
 				debugLogger.info("value_{}", entry.getValue());
 			}
 		}
+
+		//get the idom
+		List<String> allkeys = new ArrayList<>();
+		allkeys.addAll(instset);
+		Comparator<String> comp = (arg0, arg1) -> Integer.compare(dataflowsets.get(arg0).size(), 
+				dataflowsets.get(arg1).size());
+		allkeys.sort(comp);
+		Set<String> oldvset = new HashSet<>();
+		Set<String> newvset = new HashSet<>();
+		int nowsize = 2;
+		for(String thekey : allkeys){
+			Set<String> thevalue = dataflowsets.get(thekey);
+			int thesize = thevalue.size();
+			if(thesize == 1){
+				oldvset.add(thekey); // OUT_xxx
+				continue;
+			}
+			if(thesize > nowsize){
+				nowsize ++;
+				oldvset.clear();
+				oldvset.addAll(newvset);
+				newvset.clear();
+			}
+			newvset.add(thekey);
+			for(String dominst : thevalue){
+				if(oldvset.contains(dominst))
+				{
+					idom.put(thekey, dominst);
+					break;
+				}
+			}
+		}
+		// if (printdataflow) {
+		// 	System.out.println("size =" + idom.size());
+        //     for(String key : idom.keySet()){
+        //         System.out.println("key_"+key);
+        //         System.out.println("idom = " + idom.get(key));
+        //     }
+		// }
 	}
 
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
