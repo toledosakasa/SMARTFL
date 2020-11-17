@@ -44,6 +44,13 @@ public class InvokevirtualInst extends OpcodeInst {
 			usenodes.add(node);
 		}
 
+		// if not traced
+		if (!graph.isTraced(traceclass)) {
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			return;
+		}
+
 		// switch stack frame
 		graph.pushStackFrame(traceclass, tracemethod);
 
@@ -52,7 +59,6 @@ public class InvokevirtualInst extends OpcodeInst {
 		// non-static
 		// paravarindex = 1;
 		for (int i = 0; i < argcnt; i++) {
-
 			List<Node> adduse = new ArrayList<>();
 			Node curArgument = usenodes.get(argcnt - i - 1);
 			adduse.add(curArgument);

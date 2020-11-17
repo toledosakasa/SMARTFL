@@ -41,6 +41,13 @@ public class InvokestaticInst extends OpcodeInst {
 			usenodes.add(node);
 		}
 
+		// if not traced
+		if (!graph.isTraced(traceclass)) {
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			return;
+		}
+
 		// switch stack frame
 		graph.pushStackFrame(traceclass, tracemethod);
 

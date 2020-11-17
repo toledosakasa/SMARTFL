@@ -5,25 +5,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
-import java.util.HashSet;
-import java.util.Collections;
+
+import org.graphstream.graph.implementations.SingleGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
-
-import org.graphstream.graph.implementations.*;
 
 public class ByteCodeGraph {
 
@@ -38,6 +38,21 @@ public class ByteCodeGraph {
 	public static void setResultLogger(String resultfile) {
 		MDC.put("resultfile", resultfile);
 		graphLogger = LoggerFactory.getLogger("ResultLogger");
+	}
+
+	private static Set<String> tracedClass = new HashSet<>();
+
+	public void addTracedClass(String className) {
+		tracedClass.add(className);
+	}
+
+	public void addTracedClass(Collection<String> className) {
+		tracedClass.addAll(className);
+	}
+
+	public boolean isTraced(String className) {
+		return true;// FIXME
+		// return tracedClass.contains(className);
 	}
 
 	public List<FactorNode> factornodes;
@@ -121,36 +136,35 @@ public class ByteCodeGraph {
 		this.predstack.pop();
 	}
 
-	public void pushPredStack(Node newpred){
+	public void pushPredStack(Node newpred) {
 		this.predstack.push(newpred);
 	}
 
-	public Node getPredStack(){
+	public Node getPredStack() {
 		return this.predstack.peek();
 	}
-	
-	public List<Node> reversePredStack(){
+
+	public List<Node> reversePredStack() {
 		List<Node> newlist = new ArrayList<>();
 		newlist.addAll(predstack);
 		Collections.reverse(newlist);
 		return newlist;
 	}
 
-	public void killPredStack(String thisinst){
+	public void killPredStack(String thisinst) {
 		boolean willcontinue = true;
-		while(willcontinue){
+		while (willcontinue) {
 			willcontinue = false;
-			if(this.predstack.peek() != null){
-				String  stmtName = this.predstack.peek().getStmtName();
+			if (this.predstack.peek() != null) {
+				String stmtName = this.predstack.peek().getStmtName();
 				// System.out.println("in kill "+stmtName);
-				if(post_idom.get(stmtName).equals(thisinst)){
+				if (post_idom.get(stmtName).equals(thisinst)) {
 					this.predstack.pop();
 					willcontinue = true;
 				}
 			}
 		}
 	}
-
 
 	public ByteCodeGraph() {
 		factornodes = new ArrayList<>();
@@ -306,7 +320,7 @@ public class ByteCodeGraph {
 		instset.addAll(_instset);
 	}
 
-	public void dataflow(){
+	public void dataflow() {
 		// init the dataflow set
 		Set<String> changedset = new HashSet<>();
 		for (String instname : postdataflowmap.keySet()) {
@@ -353,55 +367,54 @@ public class ByteCodeGraph {
 		}
 		// boolean printdataflow = true;
 		// if (printdataflow) {
-		// 	// System.out.println("size =" + dataflowsets.size());
-        //     // for(String key : dataflowsets.keySet()){
-        //     //     System.out.println("key_"+key);
-        //     //     System.out.println(dataflowsets.get(key));
-        //     // }
-		// 	debugLogger.info("size ={}", dataflowsets.size());
-		// 	for (Entry<String, Set<String>> entry : dataflowsets.entrySet()) {
-		// 		debugLogger.info("key_{}", entry);
-		// 		debugLogger.info("value_{}", entry.getValue());
-		// 	}
+		// // System.out.println("size =" + dataflowsets.size());
+		// // for(String key : dataflowsets.keySet()){
+		// // System.out.println("key_"+key);
+		// // System.out.println(dataflowsets.get(key));
+		// // }
+		// debugLogger.info("size ={}", dataflowsets.size());
+		// for (Entry<String, Set<String>> entry : dataflowsets.entrySet()) {
+		// debugLogger.info("key_{}", entry);
+		// debugLogger.info("value_{}", entry.getValue());
+		// }
 		// }
 
-		//get the post_idom
+		// get the post_idom
 		List<String> allkeys = new ArrayList<>();
 		allkeys.addAll(instset);
-		Comparator<String> comp = (arg0, arg1) -> Integer.compare(dataflowsets.get(arg0).size(), 
+		Comparator<String> comp = (arg0, arg1) -> Integer.compare(dataflowsets.get(arg0).size(),
 				dataflowsets.get(arg1).size());
 		allkeys.sort(comp);
 		Set<String> oldvset = new HashSet<>();
 		Set<String> newvset = new HashSet<>();
 		int nowsize = 2;
-		for(String thekey : allkeys){
+		for (String thekey : allkeys) {
 			Set<String> thevalue = dataflowsets.get(thekey);
 			int thesize = thevalue.size();
-			if(thesize == 1){
+			if (thesize == 1) {
 				oldvset.add(thekey); // OUT_xxx
 				continue;
 			}
-			if(thesize > nowsize){
-				nowsize ++;
+			if (thesize > nowsize) {
+				nowsize++;
 				oldvset.clear();
 				oldvset.addAll(newvset);
 				newvset.clear();
 			}
 			newvset.add(thekey);
-			for(String dominst : thevalue){
-				if(oldvset.contains(dominst))
-				{
+			for (String dominst : thevalue) {
+				if (oldvset.contains(dominst)) {
 					post_idom.put(thekey, dominst);
 					break;
 				}
 			}
 		}
 		// if (printdataflow) {
-		// 	System.out.println("size =" + post_idom.size());
-        //     for(String key : post_idom.keySet()){
-        //         System.out.println("key_"+key);
-        //         System.out.println("post_idom = " + post_idom.get(key));
-        //     }
+		// System.out.println("size =" + post_idom.size());
+		// for(String key : post_idom.keySet()){
+		// System.out.println("key_"+key);
+		// System.out.println("post_idom = " + post_idom.get(key));
+		// }
 		// }
 	}
 
@@ -420,7 +433,8 @@ public class ByteCodeGraph {
 				killPredStack(this.parseinfo.getvalue("lineinfo"));
 				// debugLogger.info(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
-				// System.out.println("After "+this.parseinfo.getvalue("lineinfo")+" preds "+ predstack);
+				// System.out.println("After "+this.parseinfo.getvalue("lineinfo")+" preds "+
+				// predstack);
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
 			// with test state(pass = true,fail = false)
