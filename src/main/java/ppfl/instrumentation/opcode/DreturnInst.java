@@ -1,13 +1,9 @@
 package ppfl.instrumentation.opcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
-import ppfl.StmtNode;
 
 //175
 public class DreturnInst extends OpcodeInst {

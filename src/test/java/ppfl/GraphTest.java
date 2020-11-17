@@ -9,7 +9,6 @@ import java.io.IOException;
 
 import org.graphstream.ui.view.Viewer;
 import org.junit.jupiter.api.Test;
-import org.slf4j.MDC;
 
 class GraphTest {
 
