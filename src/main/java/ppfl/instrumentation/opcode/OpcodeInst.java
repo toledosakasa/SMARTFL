@@ -24,6 +24,13 @@ public class OpcodeInst {
 	int form;
 	String opcode;
 
+	// buildtrace
+	protected StmtNode stmt;
+	protected ParseInfo info;
+	protected List<Node> prednodes;
+	protected List<Node> usenodes;
+	protected Node defnode;
+
 	public enum paratype {
 		VAR, CONST, PARAVAR, PARACONST, STATIC, FIELD, NONE, POOL;
 	}
@@ -160,14 +167,13 @@ public class OpcodeInst {
 		// }
 	}
 
-	public StmtNode buildstmt(ByteCodeGraph graph) {
-		ParseInfo info = graph.parseinfo;
+	public void buildstmt(ByteCodeGraph graph) {
+		this.info = graph.parseinfo;
 		String traceclass = info.traceclass;
 		String tracemethod = info.tracemethod;
 		int linenumber = info.linenumber;
 		int byteindex = info.byteindex;
 
-		StmtNode stmt = null;
 		String stmtname = traceclass + ":" + tracemethod + "#" + linenumber;
 		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + byteindex;
@@ -179,7 +185,7 @@ public class OpcodeInst {
 		// stmt = (StmtNode) graph.getNode(stmtname);
 		// assert (stmt.isStmt());
 		// }
-		stmt = graph.getStmt(stmtname);
+		this.stmt = graph.getStmt(stmtname);
 
 		// count how many times this statment has been executed
 		if (graph.stmtcountmap.containsKey(stmtname)) {
@@ -189,7 +195,7 @@ public class OpcodeInst {
 		}
 
 		if (graph.max_loop > 0 && graph.stmtcountmap.get(stmtname) > graph.max_loop) {
-			return null;
+			return;
 		}
 
 		// auto-assigned observation: test function always true
@@ -200,21 +206,20 @@ public class OpcodeInst {
 			}
 		}
 
-		return stmt;
 	}
 
 	// override needed.
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)
-		StmtNode stmt = buildstmt(graph);
+		buildstmt(graph);
 
-		ParseInfo info = graph.parseinfo;
+		this.info = graph.parseinfo;
 		// info.print();
 		// uses
-		List<Node> prednodes = new ArrayList<>();
+		this.prednodes = new ArrayList<>();
 		// prednodes.addAll(graph.predicates);
-		List<Node> usenodes = new ArrayList<>();
-		Node defnode = null;
+		this.usenodes = new ArrayList<>();
+		this.defnode = null;
 		if (info.getintvalue("load") != null) {
 			int loadvar = info.getintvalue("load");
 			Node node = graph.getLoadNodeAsUse(loadvar);

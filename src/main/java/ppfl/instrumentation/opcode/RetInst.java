@@ -21,7 +21,7 @@ public class RetInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)
-		StmtNode stmt = buildstmt(graph);
+		buildstmt(graph);
 		graph.popStackFrame();
 		graph.killPredStack("OUT_" + stmt.getClassMethod());
 	}

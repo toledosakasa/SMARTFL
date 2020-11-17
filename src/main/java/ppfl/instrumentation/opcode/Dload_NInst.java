@@ -40,7 +40,7 @@ public class Dload_NInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)
-		StmtNode stmt = buildstmt(graph);
+		buildstmt(graph);
 		ParseInfo info = graph.parseinfo;
 		List<Node> prednodes = new ArrayList<Node>();
 		List<Node> usenodes = new ArrayList<Node>();

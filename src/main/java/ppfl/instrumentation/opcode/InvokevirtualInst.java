@@ -28,7 +28,7 @@ public class InvokevirtualInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)
-		StmtNode stmt = buildstmt(graph);
+		buildstmt(graph);
 
 		ParseInfo info = graph.parseinfo;
 		String traceclass = info.getvalue("callclass");
