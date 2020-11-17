@@ -31,6 +31,14 @@ public class OpcodeInst {
 	protected List<Node> usenodes;
 	protected Node defnode;
 
+	// buildtrace actions
+	protected boolean doPush = true;
+	protected boolean doPop = true;
+	protected boolean doLoad = true;
+	protected boolean doStore = true;
+	protected boolean doPred = true;
+	protected boolean doBuild = true;
+
 	public enum paratype {
 		VAR, CONST, PARAVAR, PARACONST, STATIC, FIELD, NONE, POOL;
 	}
@@ -212,20 +220,21 @@ public class OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)
 		buildstmt(graph);
-
-		this.info = graph.parseinfo;
-		// info.print();
-		// uses
 		this.prednodes = new ArrayList<>();
-		// prednodes.addAll(graph.predicates);
 		this.usenodes = new ArrayList<>();
 		this.defnode = null;
-		if (info.getintvalue("load") != null) {
+
+		if (this.doPred) {
+			// FIXME
+			// prednodes = something;
+		}
+
+		if (this.doLoad && info.getintvalue("load") != null) {
 			int loadvar = info.getintvalue("load");
 			Node node = graph.getLoadNodeAsUse(loadvar);
 			usenodes.add(node);
 		}
-		if (info.getintvalue("popnum") != null) {
+		if (this.doPop && info.getintvalue("popnum") != null) {
 			int instpopnum = info.getintvalue("popnum");
 			for (int i = 0; i < instpopnum; i++) {
 				usenodes.add(graph.getRuntimeStack().pop());
@@ -233,19 +242,19 @@ public class OpcodeInst {
 		}
 		// defs
 		// stack
-		if (info.getintvalue("pushnum") != null) {
+		if (this.doPush && info.getintvalue("pushnum") != null) {
 			int instpushnum = info.getintvalue("pushnum");
 			// push must not be more than 1
 			assert (instpushnum == 1);
 			defnode = graph.addNewStackNode(stmt);
 		}
-		if (info.getintvalue("store") != null) {
+		if (this.doStore && info.getintvalue("store") != null) {
 			int storevar = info.getintvalue("store");
 			defnode = graph.addNewVarNode(storevar, stmt);
 		}
 
 		// build factor.
-		if (defnode != null) {
+		if (this.doBuild && defnode != null) {
 			// TODO should consider ops.
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
