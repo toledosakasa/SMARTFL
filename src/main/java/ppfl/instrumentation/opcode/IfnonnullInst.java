@@ -1,20 +1,19 @@
 package ppfl.instrumentation.opcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
-import ppfl.Node;
-import ppfl.ParseInfo;
-import ppfl.StmtNode;
 
 //199
 public class IfnonnullInst extends OpcodeInst {
 
 	public IfnonnullInst(int _form) {
 		super(_form, 0, 1);
+		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -25,12 +24,7 @@ public class IfnonnullInst extends OpcodeInst {
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
-		// build the stmtnode(common)
-		buildstmt(graph);
-		ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<>();
-		List<Node> usenodes = new ArrayList<>();
-		Node defnode = null;
+		super.buildtrace(graph);
 		if (info.getintvalue("popnum") != null) {
 			int instpopnum = info.getintvalue("popnum");
 			for (int i = 0; i < instpopnum; i++) {

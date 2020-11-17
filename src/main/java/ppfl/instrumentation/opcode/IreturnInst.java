@@ -1,19 +1,20 @@
 package ppfl.instrumentation.opcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
-import ppfl.StmtNode;
 
 //172
 public class IreturnInst extends OpcodeInst {
 
 	public IreturnInst(int form) {
 		super(form, 0, -1);
+		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -24,12 +25,7 @@ public class IreturnInst extends OpcodeInst {
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
-		// build the stmtnode(common)
-		buildstmt(graph);
-
-		//ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<>();
-		List<Node> usenodes = new ArrayList<>();
+		super.buildtrace(graph);
 		// uses
 		usenodes.add(graph.getRuntimeStack().pop());
 		// switch stack frame

@@ -2,20 +2,22 @@ package ppfl.instrumentation.opcode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
-import ppfl.ParseInfo;
-import ppfl.StmtNode;
 
 //184
 public class InvokestaticInst extends OpcodeInst {
 
 	public InvokestaticInst(int _form) {
 		super(_form, 0, 0);
+		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -28,24 +30,17 @@ public class InvokestaticInst extends OpcodeInst {
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
-		// build the stmtnode(common)
-		buildstmt(graph);
-
-		ParseInfo info = graph.parseinfo;
+		super.buildtrace(graph);
 		String traceclass = info.getvalue("callclass");
 		String tracemethod = info.getvalue("callname");
 		// defs
 		int argcnt = OpcodeInst.getArgNumByDesc(info.getvalue("calltype"));
-		List<Node> prednodes = new ArrayList<>();
-
-		Vector<Node> usenodes = new Vector<>();
-		//Vector<Integer> argindex = new Vector<>();
 		// collect arguments
 		for (int i = 0; i < argcnt; i++) {
 			Node node = graph.getRuntimeStack().pop();
 			usenodes.add(node);
 		}
-		
+
 		// switch stack frame
 		graph.pushStackFrame(traceclass, tracemethod);
 
@@ -55,14 +50,12 @@ public class InvokestaticInst extends OpcodeInst {
 		// paravarindex = 1;
 		for (int i = 0; i < argcnt; i++) {
 
-			List<Node> adduse = new ArrayList<>(); 
-			Node curArgument =usenodes.get(argcnt - i - 1);
+			List<Node> adduse = new ArrayList<>();
+			Node curArgument = usenodes.get(argcnt - i - 1);
 			adduse.add(curArgument);
 
 			Node defnode = graph.addNewVarNode(paravarindex, stmt, traceclass, tracemethod);
-			
 			graph.buildFactor(defnode, prednodes, adduse, null, stmt);
-			
 			paravarindex += curArgument.getSize();
 		}
 	}

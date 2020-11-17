@@ -1,20 +1,19 @@
 package ppfl.instrumentation.opcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
-import ppfl.Node;
-import ppfl.ParseInfo;
-import ppfl.StmtNode;
 
 //165-166, type reference is object?
 public class If_acmpInst extends OpcodeInst {
 
 	public If_acmpInst(int _form) {
 		super(_form, 0, 2);
+		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -25,12 +24,7 @@ public class If_acmpInst extends OpcodeInst {
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
-		// build the stmtnode(common)
-		buildstmt(graph);
-		ParseInfo info = graph.parseinfo;
-		List<Node> prednodes = new ArrayList<Node>();
-		List<Node> usenodes = new ArrayList<Node>();
-		Node defnode = null;
+		super.buildtrace(graph);
 		if (info.getintvalue("popnum") != null) {
 			int instpopnum = info.getintvalue("popnum");
 			for (int i = 0; i < instpopnum; i++) {

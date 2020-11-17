@@ -3,6 +3,7 @@ package ppfl.instrumentation.opcode;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //97,101,105,109,113,121,123,125
@@ -21,11 +22,15 @@ public class LarithInst extends OpcodeInst {
 	}
 
 	@Override
-	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
-			throws BadBytecode {
+	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(cbi.tsindex_long, instpos + 1);
 	}
 
+	@Override
+	public void buildtrace(ByteCodeGraph graph) {
+		super.buildtrace(graph);
+		defnode.setSize(2);
+	}
 }

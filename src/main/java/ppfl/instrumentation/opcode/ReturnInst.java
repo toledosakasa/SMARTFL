@@ -9,6 +9,11 @@ public class ReturnInst extends OpcodeInst {
 
 	public ReturnInst(int _form) {
 		super(_form, 0, -1);
+		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -19,7 +24,9 @@ public class ReturnInst extends OpcodeInst {
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
+		super.buildtrace(graph);
 		// switch stack frame
 		graph.popStackFrame();
+		graph.killPredStack("OUT_" + stmt.getClassMethod());
 	}
 }
