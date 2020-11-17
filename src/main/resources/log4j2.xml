@@ -38,16 +38,43 @@
       <!-- Created appender TTL -->
       <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
     </Routing>
-    <!--
-	<File name="SourceAppender" fileName="trace/logs/mytrace/1.source.txt" Append="false">
-		<PatternLayout pattern="%msg"/>
-	</File>
-	-->
+    <Routing name="ResultAppender" ignoreExceptions="false">
+      <Routes pattern="${ctx:resultfile}">
+        <Route>
+          <File name="File" fileName="trace/logs/mytrace/${ctx:resultfile}.result.log" Append="false">
+            <PatternLayout>
+              <pattern>%msg</pattern>
+            </PatternLayout>
+          </File>
+        </Route>
+      </Routes>
+      <!-- Created appender TTL -->
+      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
+    </Routing>
+    <Routing name="GraphAppender" ignoreExceptions="false">
+      <Routes pattern="${ctx:graphfile}">
+        <Route>
+          <File name="File" fileName="trace/logs/mytrace/${ctx:graphfile}.graph.log" Append="false">
+            <PatternLayout>
+              <pattern>%msg</pattern>
+            </PatternLayout>
+          </File>
+        </Route>
+      </Routes>
+      <!-- Created appender TTL -->
+      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
+    </Routing>
   </Appenders>
   <Loggers>
     <Root level="trace">
       <!-- AppenderRef ref="Console" /!-->
     </Root>
+    <Logger name="ResultLogger" level="trace" additivity="false">
+      <AppenderRef ref="ResultAppender" />
+    </Logger>
+    <Logger name="GraphLogger" level="trace" additivity="false">
+      <AppenderRef ref="GraphAppender" />
+    </Logger>
     <Logger name="Debugger" level="trace" additivity="false">
       <AppenderRef ref="DebugConsole" />
     </Logger>

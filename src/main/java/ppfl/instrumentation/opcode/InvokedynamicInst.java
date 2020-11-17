@@ -21,7 +21,7 @@ public class InvokedynamicInst extends OpcodeInst {
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
-		// TODO
+		// FIXME
 	}
 
 }

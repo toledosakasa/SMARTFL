@@ -1,10 +1,6 @@
 package ppfl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class StmtNode extends Node {
-	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 
 	public StmtNode(String sname) {
 		super(sname);
@@ -14,18 +10,18 @@ public class StmtNode extends Node {
 	@Override
 	public void print(String prefix) {
 		if (this.obs) {
-			debugLogger.info(prefix + this.name + "(Statement) observed = " + this.obsvalue);
+			printLogger.info("{}{}(Statement) observed = {}", prefix, this.name, this.obsvalue);
 		} else {
-			debugLogger.info(prefix + this.name + "(Statement)");
+			printLogger.info("{}{}(Statement)", prefix, this.name);
 		}
 	}
 
 	@Override
 	public void print() {
 		if (this.obs) {
-			debugLogger.info(this.name + "(Statement) observed = " + this.obsvalue);
+			printLogger.info("{}(Statement) observed = {}", this.name, this.obsvalue);
 		} else {
-			debugLogger.info(this.name + "(Statement)");
+			printLogger.info("{}(Statement)", this.name);
 		}
 	}
 

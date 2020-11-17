@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 public class Node {
 
 	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	protected static Logger printLogger = debugLogger;
 
 	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from
 	// inference procedure.
@@ -66,7 +67,7 @@ public class Node {
 	}
 
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return this.name.hashCode();
 	}
 
@@ -188,32 +189,35 @@ public class Node {
 		return p;
 	}
 
-	public void print(String prefix){
+	public static void setLogger(Logger lgr) {
+		printLogger = lgr;
+	}
+
+	public void print(String prefix) {
 		if (this.obs) {
-			debugLogger.info(prefix + this.getPrintName() + " observed = " + this.obsvalue);
+			printLogger.info("{}{} observed = {}", prefix, this.getPrintName(), this.obsvalue);
 		} else {
-			debugLogger.info(prefix + this.getPrintName());
+			printLogger.info("{}{}", prefix, this.getPrintName());
 		}
 	}
 
 	public void print() {
 		if (this.obs) {
-			debugLogger.info(this.getPrintName() + " observed = " + this.obsvalue);
+			printLogger.info("{} observed = {}", this.getPrintName(), this.obsvalue);
 		} else {
-			debugLogger.info(this.getPrintName());
+			printLogger.info(this.getPrintName());
 		}
 	}
 
 	public void printprob() {
 		if (this.obs) {
-			debugLogger
-					.info(this.getPrintName() + "obs prob = " + (this.obsvalue ? String.valueOf(1.0) : String.valueOf(0.0)));
+			printLogger.info("{}obs prob = {}", this.getPrintName(), (this.obsvalue ? 1.0 : 0.0));
 		} else
-			debugLogger.info(this.getPrintName() + " prob = " + getprob());
+			printLogger.info("{} prob = {}", this.getPrintName(), getprob());
 	}
 
 	public void bpPrintProb() {
-		debugLogger.info(this.getPrintName() + " prob_bp = " + bp_getprob());
+		printLogger.info("{} prob_bp = {}", this.getPrintName(), bp_getprob());
 	}
 
 }

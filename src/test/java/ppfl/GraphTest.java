@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.graphstream.ui.view.Viewer;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 class GraphTest {
 
@@ -101,7 +102,7 @@ class GraphTest {
 
 	ByteCodeGraph dominit_bytecode() {
 		String ppflroot = ".";
-		//String filepatht = ppflroot + "\\test\\trace\\DomainTest.java";
+		// String filepatht = ppflroot + "\\test\\trace\\DomainTest.java";
 		String tracepatht = ppflroot + "\\test\\trace\\logs\\mytrace\\DomainTest.test.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
@@ -204,7 +205,7 @@ class GraphTest {
 	ByteCodeGraph gcdinit_bc() {
 		String ppflroot = ".";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\gcdtest.test.log";
-		String sourcetrace = ppflroot+ "\\trace\\logs\\mytrace\\trace.gcdtest.source.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.gcdtest.source.log";
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		// pgraph.parsesource(passpath);
@@ -220,13 +221,43 @@ class GraphTest {
 		ByteCodeGraph pgraph = gcdinit_bc();
 	}
 
+	ByteCodeGraph d4jinit() {
+		String ppflroot = ".";
+		// String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\test.triggertest.log";
+		// String sourcetrace = ppflroot +
+		// "\\trace\\logs\\mytrace\\trace.MergeTest.source.log";
+
+		String graphfile = "ProbGraph";
+		ByteCodeGraph.setGraphLogger(graphfile);
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		// pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsetrace(failtrace, "fail", false);
+		// pgraph.parsesource(sourcetrace);
+
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void d4jTest() {
+
+		String resultfile = "InfResult";
+		ByteCodeGraph.setResultLogger(resultfile);
+
+		ByteCodeGraph bgraph = d4jinit();
+		bgraph.check_bp(true);
+	}
+
 	ByteCodeGraph mergeinit_bc() {
 		String ppflroot = ".";
-		//String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
-		//String failpath = passpath;
+		// String passpath = ppflroot + "\\test\\trace\\MergeTest.java";
+		// String failpath = passpath;
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.fail.log";
-		String sourcetrace = ppflroot+ "\\trace\\logs\\mytrace\\trace.MergeTest.source.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.MergeTest.source.log";
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		// pgraph.parsesource(passpath);
@@ -285,7 +316,7 @@ class GraphTest {
 		String ppflroot = ".";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\ControlTest.fail.log";
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\ControlTest.pass.log";
-		String sourcetrace = ppflroot+ "\\trace\\logs\\mytrace\\trace.ControlTest.source.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.ControlTest.source.log";
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
@@ -494,7 +525,7 @@ class GraphTest {
 	SimpleProbGraph trycatchinit() {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\TrycatchTest.java";
-		//String failpath = passpath;
+		// String failpath = passpath;
 		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\TrycatchTest.pass.log";
 		// String failtrace1 = ppflroot +
 		// "\\test\\trace\\logs\\btrace\\MulcallTest.fail.log";
@@ -611,8 +642,8 @@ class GraphTest {
 
 	ByteCodeGraph parainit_bc() {
 		String ppflroot = ".";
-		//String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
-		//String failpath = passpath;
+		// String passpath = ppflroot + "\\test\\trace\\ParaTest.java";
+		// String failpath = passpath;
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\ParaTest.pass.log";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\ParaTest.fail.log";
 
@@ -658,8 +689,8 @@ class GraphTest {
 
 	ByteCodeGraph modinit_bc() {
 		String ppflroot = ".";
-		//String passpath = ppflroot + "\\test\\trace\\ModTest.java";
-		//String failpath = passpath;
+		// String passpath = ppflroot + "\\test\\trace\\ModTest.java";
+		// String failpath = passpath;
 		String passtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ModTest.pass.log";
 		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\ModTest.fail.log";
 
@@ -723,8 +754,8 @@ class GraphTest {
 
 	ByteCodeGraph simpleflowinit_bc() {
 		String ppflroot = ".";
-		//String passpath = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
-		//String failpath = passpath;
+		// String passpath = ppflroot + "\\test\\trace\\SimpleFlowTest.java";
+		// String failpath = passpath;
 		String failtrace = ppflroot + "\\test\\trace\\logs\\mytrace\\SimpleFlowTest.fail.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();

@@ -2,6 +2,7 @@ package ppfl.instrumentation.opcode;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
 
 //185
 public class InvokeinterfaceInst extends OpcodeInst {
@@ -18,4 +19,8 @@ public class InvokeinterfaceInst extends OpcodeInst {
 		return ret.toString();
 	}
 
+	@Override
+	public void buildtrace(ByteCodeGraph graph) {
+		// FIXME
+	}
 }

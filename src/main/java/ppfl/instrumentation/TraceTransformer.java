@@ -31,8 +31,8 @@ public class TraceTransformer implements ClassFileTransformer {
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
 	// The logger name
-	public static final  String TRACELOGGERNAME = "PPFL_LOGGER";
-	public static final  String SOURCELOGGERNAME = "PPFL_LOGGER_SOURCE";
+	public static final String TRACELOGGERNAME = "PPFL_LOGGER";
+	public static final String SOURCELOGGERNAME = "PPFL_LOGGER_SOURCE";
 	public static final Logger traceLogger = LoggerFactory.getLogger(TRACELOGGERNAME);
 	public static final Logger sourceLogger = LoggerFactory.getLogger(SOURCELOGGERNAME);
 
@@ -53,8 +53,8 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	public void setLogFile(String s) {
-		String logFile= null;
-		logFile = s.replace('\\','.').replace('/','.');
+		String logFile = null;
+		logFile = s.replace('\\', '.').replace('/', '.');
 		MDC.put("logfile", logFile);
 	}
 
@@ -107,8 +107,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			// debugging:line number
 			String getinst = getInstMap(tempci, index, constp);
-			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index
-					+ ",nextinst=";
+			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index + ",nextinst=";
 			if (ln != lastln) {
 				lastln = ln;
 				debugLogger.info(String.valueOf(ln));
@@ -167,7 +166,8 @@ public class TraceTransformer implements ClassFileTransformer {
 				return byteCode;
 			}
 			return transformBody(classfileBuffer);
-			//return transformBody(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
+			// return transformBody(loader, className, classBeingRedefined,
+			// protectionDomain, classfileBuffer);
 		} catch (Exception e) {
 			debugLogger.error("[Bug]Exception", e);
 			e.printStackTrace();
@@ -185,7 +185,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		String opc = Mnemonic.OPCODE[op];
 		OpcodeInst oi = Interpreter.map[op];
 		if (oi == null) {
-			debugLogger.warn("unsupported opcode: " + opc);
+			debugLogger.warn("unsupported opcode: {}", opc);
 			return "";
 		}
 		inst = oi.getinst(ci, index, constp);
