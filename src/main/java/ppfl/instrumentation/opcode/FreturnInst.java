@@ -37,7 +37,7 @@ public class FreturnInst extends OpcodeInst {
 		// def in caller frame
 		Node defnode = graph.addNewStackNode(stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-
+		graph.killPredStack("OUT_" + stmt.getClassMethod());
 	}
 
 }

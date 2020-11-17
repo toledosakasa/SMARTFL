@@ -86,6 +86,13 @@ public class Node {
 		return this.testname + "#" + this.name;
 	}
 
+	//not override ok?
+	public String getStmtName(){
+		String[] lineinfos = this.stmt.getName().split(":");
+		String stmtname = lineinfos[0] + "#" + lineinfos[1];
+		return stmtname;
+	}
+
 	public String getPrintName() {
 		return this.testname + "#" + this.name + "@" + this.stmt.getName();
 	}

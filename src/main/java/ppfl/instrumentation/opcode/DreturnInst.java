@@ -38,7 +38,7 @@ public class DreturnInst extends OpcodeInst {
 		Node defnode = graph.addNewStackNode(stmt);
 		defnode.setSize(2);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-
+		graph.killPredStack("OUT_" + stmt.getClassMethod());
 	}
 
 }

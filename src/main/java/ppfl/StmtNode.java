@@ -40,4 +40,10 @@ public class StmtNode extends Node {
 		return this.name;
 	}
 
+	public String getClassMethod(){
+		String[] lineinfos = this.name.split(":");
+		String classandmethod = lineinfos[0] + "#" + lineinfos[1].split("#")[0];
+		return classandmethod;
+	}
+
 }

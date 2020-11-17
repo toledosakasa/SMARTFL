@@ -208,9 +208,10 @@ class GraphTest {
 		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.gcdtest.source.log";
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.dataflow();
 		// pgraph.parsesource(passpath);
 		pgraph.parsetrace(failtrace, "test", false);
-		pgraph.parsesource(sourcetrace);
 		pgraph.printgraph();
 
 		return pgraph;
@@ -261,6 +262,8 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		// pgraph.parsesource(passpath);
+		pgraph.parsesource(sourcetrace);
+		pgraph.dataflow();
 		pgraph.parsetrace(passtrace, "pass", true);
 		// pgraph.observe("trace.MergeTest.pass#18", true);
 		// pgraph.observe("a#9#2", true);
@@ -268,7 +271,6 @@ class GraphTest {
 		pgraph.parsetrace(failtrace, "fail", false);
 		// pgraph.observe("trace.MergeTest.fail#23", true);
 		// pgraph.observe("a#9#3", false);
-		pgraph.parsesource(sourcetrace);
 		pgraph.printgraph();
 
 		return pgraph;
@@ -320,6 +322,8 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
+		// pgraph.parsesource(tt);
+		pgraph.dataflow();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
 		pgraph.printgraph();

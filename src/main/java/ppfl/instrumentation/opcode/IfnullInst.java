@@ -38,6 +38,7 @@ public class IfnullInst extends OpcodeInst {
 			}
 		}
 		defnode = graph.addNewPredNode(stmt);
+		graph.pushPredStack(defnode);
 		// build factor.
 		if (defnode != null) {
 			// TODO should consider ops.
