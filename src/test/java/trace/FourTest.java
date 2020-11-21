@@ -10,7 +10,7 @@ class FourTest {
 		if (x > 0)// should be (x>1)
 		{
 			x = x - 1;
-			y = y - 1; // if delete this, an error while parse£¬repaired£¿
+			y = y - 1; // if delete this, an error while parseï¿½ï¿½repairedï¿½ï¿½
 			if (y > 0)
 				tmp = x / y;
 			else
@@ -18,7 +18,7 @@ class FourTest {
 		} else if (x < 0)// should be (x<-1)
 		{
 			x = x + 1;
-			y = y + 1; // if delete this, an error while parse£¬repaired£¿
+			y = y + 1; // if delete this, an error while parseï¿½ï¿½repairedï¿½ï¿½
 			if (y > 0)
 				tmp = x / y;
 			else
@@ -39,7 +39,7 @@ class FourTest {
 	}
 
 	@Test
-	void fail() {
+	void fail1() {
 		assertEquals(devi(0.5, 0.5), 0);
 	}
 

@@ -334,6 +334,32 @@ class GraphTest {
 		ByteCodeGraph pgraph = controlinit_bc();
 	}
 
+	ByteCodeGraph fourinit_bc() {
+		String ppflroot = ".";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.FourTest.source.log";
+		String passtrace1 = ppflroot + "\\trace\\logs\\mytrace\\FourTest.pass1.log";
+		String passtrace2 = ppflroot + "\\trace\\logs\\mytrace\\FourTest.pass2.log";
+		String failtrace1 = ppflroot + "\\trace\\logs\\mytrace\\FourTest.fail1.log";
+		String failtrace2 = ppflroot + "\\trace\\logs\\mytrace\\FourTest.fail2.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.dataflow();
+		pgraph.parsetrace(passtrace1, "pass1", true);
+		pgraph.parsetrace(passtrace2, "pass2", true);
+		pgraph.parsetrace(failtrace1, "fail1", false);
+		pgraph.parsetrace(failtrace2, "fail2", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	public void fourtest_bc() {
+		ByteCodeGraph pgraph = fourinit_bc();
+	}
+
 	SimpleProbGraph sqrtinit() {
 		String ppflroot = ".";
 		// String filepatht = ppflroot + "\\simpletests\\domaintest.java";
