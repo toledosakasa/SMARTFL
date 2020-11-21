@@ -225,8 +225,9 @@ public class OpcodeInst {
 		this.defnode = null;
 
 		if (this.doPred) {
-			// FIXME
-			// prednodes = something;
+			Node thepred = graph.getPredStack();
+			if(thepred != null)
+				prednodes.add(thepred);
 		}
 
 		if (this.doLoad && info.getintvalue("load") != null) {
