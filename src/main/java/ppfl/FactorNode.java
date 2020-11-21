@@ -15,7 +15,7 @@ public class FactorNode {
 	private Node stmt;
 	private List<Node> uses;
 	private List<String> ops;// TODO consider operators
-	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==" };
+	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==", "!="};
 	private double HIGH = 0.99;
 	private double MEDIUM = 0.5;
 	private double LOW = 0.01;

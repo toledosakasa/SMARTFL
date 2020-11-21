@@ -1,5 +1,7 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+import java.util.List;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -13,6 +15,8 @@ public class DarithInst extends OpcodeInst {
 
 	public DarithInst(int form) {
 		super(form, 1, 2);
+		if(this.form == 115)
+			this.doBuild = false;
 	}
 
 	@Override
@@ -32,5 +36,10 @@ public class DarithInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		defnode.setSize(2);
+		if(this.form == 115){
+			List<String> ops = new ArrayList<>();
+			ops.add("%");
+			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
+		}
 	}
 }
