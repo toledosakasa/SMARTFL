@@ -61,7 +61,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	private byte[] transformBody(byte[] classfileBuffer) {
 		byte[] byteCode = classfileBuffer;
 		this.setLogger(this.targetClassName);
-		debugLogger.info("[Agent] Transforming class " + this.targetClassName);
+		debugLogger.info("[Agent] Transforming class {}", this.targetClassName);
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(targetClassName);
@@ -80,7 +80,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	private void transformBehavior(CtBehavior m, CtClass cc) throws NotFoundException, BadBytecode {
 		// hello in console
-		debugLogger.info("[Agent] Transforming method " + m.getName());
+		debugLogger.info("[Agent] Transforming method {}", m.getName());
 
 		if (!(m instanceof CtMethod)) {
 			return;
@@ -110,7 +110,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index + ",nextinst=";
 			if (ln != lastln) {
 				lastln = ln;
-				debugLogger.info(String.valueOf(ln));
+				debugLogger.info("{}", ln);
 				// System.out.println(ln);
 			}
 
