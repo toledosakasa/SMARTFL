@@ -2,14 +2,19 @@ package ppfl.instrumentation.opcode;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
+import ppfl.Node;
 
 //88
 public class Pop2Inst extends OpcodeInst {
 
-	boolean ifPush = false;
-
 	public Pop2Inst(int _form) {
 		super(_form, 0, 2);
+		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -18,4 +23,10 @@ public class Pop2Inst extends OpcodeInst {
 		return ret.toString();
 	}
 
+	@Override
+	public void buildtrace(ByteCodeGraph graph) {
+		Node poped1 = graph.getRuntimeStack().pop();
+		if (poped1.getSize() == 1)
+			graph.getRuntimeStack().pop();
+	}
 }
