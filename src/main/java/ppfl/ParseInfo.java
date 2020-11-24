@@ -22,7 +22,7 @@ public class ParseInfo {
 	}
 
 	public ParseInfo(String trace) {
-		tracemap = new HashMap<String, String>();
+		tracemap = new HashMap<>();
 
 		String[] split = trace.split(",");
 		for (String instinfo : split) {

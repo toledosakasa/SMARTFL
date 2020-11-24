@@ -223,19 +223,14 @@ class GraphTest {
 
 	ByteCodeGraph d4jinit() {
 		String ppflroot = ".";
-		// String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MergeTest.pass.log";
-		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\test.triggertest.log";
-		// String sourcetrace = ppflroot +
-		// "\\trace\\logs\\mytrace\\trace.MergeTest.source.log";
-
-		String graphfile = "ProbGraph";
-		ByteCodeGraph.setGraphLogger(graphfile);
+		String traceBaseDir = ppflroot + "\\trace\\logs\\mytrace\\";
+		String configpath = traceBaseDir + "d4jtrace.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
-		// pgraph.parsetrace(passtrace, "pass", true);
-		pgraph.parsetrace(failtrace, "fail", false);
-		// pgraph.parsesource(sourcetrace);
+		pgraph.setTraceAllClassed(false);
+
+		pgraph.initFromConfigFile(traceBaseDir, configpath);
 
 		pgraph.printgraph();
 		return pgraph;
@@ -246,6 +241,8 @@ class GraphTest {
 
 		String resultfile = "InfResult";
 		ByteCodeGraph.setResultLogger(resultfile);
+		String graphfile = "ProbGraph";
+		ByteCodeGraph.setGraphLogger(graphfile);
 
 		ByteCodeGraph bgraph = d4jinit();
 		bgraph.check_bp(true);

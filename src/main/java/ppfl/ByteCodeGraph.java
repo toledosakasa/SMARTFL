@@ -41,6 +41,11 @@ public class ByteCodeGraph {
 	}
 
 	private static Set<String> tracedClass = new HashSet<>();
+	private boolean traceAllClasses = true;
+
+	public void setTraceAllClassed(boolean value) {
+		this.traceAllClasses = value;
+	}
 
 	public void addTracedClass(String className) {
 		tracedClass.add(className);
@@ -51,8 +56,10 @@ public class ByteCodeGraph {
 	}
 
 	public boolean isTraced(String className) {
-		return true;// FIXME
-		// return tracedClass.contains(className);
+		if (this.traceAllClasses)
+			return true;
+		return tracedClass.contains(className);
+
 	}
 
 	public List<FactorNode> factornodes;
@@ -1011,6 +1018,49 @@ public class ByteCodeGraph {
 		}
 
 		return fileData.toString();
+	}
+
+	public void initFromConfigFile(String baseDir, String configpath) {
+		String sourcepath = null;
+		String tracepath = null;
+		String traceclass = null;
+		try (BufferedReader reader = new BufferedReader(new FileReader(configpath));) {
+			String tmp;
+			while ((tmp = reader.readLine()) != null) {
+				String[] splt = tmp.split("=");
+				if (splt[0].equals("tracepath")) {
+					tracepath = splt[1];
+				}
+				if (splt[0].equals("sourcepath")) {
+					sourcepath = splt[1];
+				}
+				if (splt[0].equals("tracedclass")) {
+					traceclass = splt[1];
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (traceclass != null) {
+			for (String s : traceclass.split(";")) {
+				this.addTracedClass(s);
+			}
+		}
+
+		if (sourcepath != null)
+			for (String s : sourcepath.split(";")) {
+				this.parsesource(baseDir + s);
+			}
+		if (tracepath != null)
+			for (String s : tracepath.split(";")) {
+				String[] tmp = s.split(":");
+				String testpath = tmp[0];
+				String uniquetestname = testpath.substring(0, testpath.lastIndexOf('.'));
+				boolean testpass = tmp[1].equals("1");
+				this.parsetrace(baseDir + tmp[0], uniquetestname, testpass);
+			}
+
 	}
 
 }
