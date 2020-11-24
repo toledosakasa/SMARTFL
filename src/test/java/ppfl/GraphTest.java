@@ -331,6 +331,29 @@ class GraphTest {
 		ByteCodeGraph pgraph = controlinit_bc();
 	}
 
+	ByteCodeGraph conditioninit_bc() {
+		String ppflroot = ".";
+		String fail1trace = ppflroot + "\\trace\\logs\\mytrace\\ConditionTest.fail1.log";
+		String pass1trace = ppflroot + "\\trace\\logs\\mytrace\\ConditionTest.pass1.log";
+		String pass2trace = ppflroot + "\\trace\\logs\\mytrace\\ConditionTest.pass2.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.ConditionTest.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		// pgraph.parsesource(tt);
+		pgraph.dataflow();
+		pgraph.parsetrace(fail1trace, "fail1", false);
+		pgraph.parsetrace(pass1trace, "pass1", true);
+		pgraph.parsetrace(pass2trace, "pass2", true);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void conditiontest_bc() {
+		ByteCodeGraph pgraph = conditioninit_bc();
+	}
+
 	ByteCodeGraph fourinit_bc() {
 		String ppflroot = ".";
 		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.FourTest.source.log";
