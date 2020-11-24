@@ -1,8 +1,11 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+import java.util.List;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //96,100,104,108,112,120,122,124
@@ -12,6 +15,8 @@ public class IarithInst extends OpcodeInst {
 
 	public IarithInst(int _form) {
 		super(_form, 1, 2);
+		if(this.form == 112)
+			this.doBuild = false;
 	}
 
 	@Override
@@ -26,5 +31,16 @@ public class IarithInst extends OpcodeInst {
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(cbi.tsindex_int, instpos + 1);
 	}
+
+	@Override
+	public void buildtrace(ByteCodeGraph graph) {
+		super.buildtrace(graph);
+		if(this.form == 112){
+			List<String> ops = new ArrayList<>();
+			ops.add("%");
+			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
+		}
+	}
+
 
 }

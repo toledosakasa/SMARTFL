@@ -1,5 +1,7 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+import java.util.List;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
@@ -35,7 +37,8 @@ public class IfnonnullInst extends OpcodeInst {
 		graph.pushPredStack(defnode);
 		// build factor.
 		if (defnode != null) {
-			// TODO should consider ops.
+			List<String> ops = new ArrayList<>();
+			ops.add("!=");
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
 	}
