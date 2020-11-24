@@ -27,6 +27,9 @@ public class ParseInfo {
 		String[] split = trace.split(",");
 		for (String instinfo : split) {
 			String[] splitinstinfo = instinfo.split("=");
+			if (splitinstinfo.length < 2) {
+				System.err.println(trace);
+			}
 			String infotype = splitinstinfo[0];
 			String infovalue = splitinstinfo[1];
 			tracemap.put(infotype, infovalue);

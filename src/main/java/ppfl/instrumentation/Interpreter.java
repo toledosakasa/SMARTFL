@@ -147,6 +147,8 @@ public class Interpreter {
 		map[168] = new JsrInst(168);
 		map[169] = new RetInst(169);
 
+		map[171] = new LookupSwitchInst(171);
+
 		map[172] = new IreturnInst(172);
 		map[173] = new LreturnInst(173);
 		map[174] = new FreturnInst(174);
@@ -160,6 +162,13 @@ public class Interpreter {
 		map[184] = new InvokestaticInst(184);
 		map[185] = new InvokeinterfaceInst(185);
 		map[186] = new InvokedynamicInst(186);
+		map[187] = new NewInst(187);
+		map[188] = new NewArrayInst(188);
+		map[189] = new AnewArrayInst(189);
+		map[190] = new ArrayLengthInst(190);
+		map[191] = new AthrowInst(191);
+		map[192] = new CheckCastInst(192);
+		map[193] = new InstanceOfInst(193);
 
 		map[198] = new IfnullInst(198);
 		map[199] = new IfnonnullInst(199);
