@@ -6,10 +6,10 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 
-//171
-public class LookupSwitchInst extends OpcodeInst {
+//170
+public class TableSwitchInst extends OpcodeInst {
 
-	public LookupSwitchInst(int _form) {
+	public TableSwitchInst(int _form) {
 		super(_form, 0, 1);
 		this.doBuild = false;
 		this.doPop = false;
