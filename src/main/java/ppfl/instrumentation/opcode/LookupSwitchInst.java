@@ -24,14 +24,16 @@ public class LookupSwitchInst extends OpcodeInst {
 		ret.append(",default=" + this.gets32bitpara(ci, index));
 		index += 4;
 		int npairs = this.gets32bitpara(ci, index);
-		ret.append(",switch=");
-		for (int i = 0; i < npairs; i++) {
-			index += 4;
-			ret.append(this.gets32bitpara(ci, index));
-			ret.append(",");
-			index += 4;
-			ret.append(this.gets32bitpara(ci, index));
-			ret.append(";");
+		if (npairs > 0) {
+			ret.append(",switch=");
+			for (int i = 0; i < npairs; i++) {
+				index += 4;
+				ret.append(this.gets32bitpara(ci, index));
+				ret.append(",");
+				index += 4;
+				ret.append(this.gets32bitpara(ci, index));
+				ret.append(";");
+			}
 		}
 		return ret.toString();
 	}
