@@ -21,6 +21,7 @@ public class If_acmpInst extends OpcodeInst {
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		ret.append(",branchbyte=" + this.gets16bitpara(ci, index));
 		return ret.toString();
 	}
 
@@ -38,9 +39,9 @@ public class If_acmpInst extends OpcodeInst {
 		// build factor.
 		if (defnode != null) {
 			List<String> ops = new ArrayList<>();
-			if(this.form == 165)
+			if (this.form == 165)
 				ops.add("==");
-			else 
+			else
 				ops.add("!=");
 			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 		}
