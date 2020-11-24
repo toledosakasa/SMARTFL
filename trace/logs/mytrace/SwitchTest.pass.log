@@ -1,0 +1,14 @@
+
+opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=trace.SwitchTest#pass#27#0,nextinst=1,pushtype=object,pushvalue=1992550266
+opcode=5(iconst_2)	,pushnum=1,lineinfo=trace.SwitchTest#pass#27#1,nextinst=2,pushtype=int,pushvalue=2
+opcode=182(invokevirtual)	,calltype=(I)I,callclass=trace.SwitchTest,callname=f,lineinfo=trace.SwitchTest#pass#27#2,nextinst=5
+opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=trace.SwitchTest#f#9#0,nextinst=1,pushtype=int,pushvalue=2
+opcode=171(lookupswitch)	,popnum=1,default=58,switch=0:43;1:46;2:49;783:52;,lineinfo=trace.SwitchTest#f#9#1,nextinst=44
+opcode=132(iinc)	,VAR=1,CONST=3,lineinfo=trace.SwitchTest#f#15#50,nextinst=53
+opcode=132(iinc)	,VAR=1,CONST=4,lineinfo=trace.SwitchTest#f#17#53,nextinst=56
+opcode=167(goto)	,branchbyte=14,lineinfo=trace.SwitchTest#f#18#56,nextinst=59
+opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=trace.SwitchTest#f#22#70,nextinst=71,pushtype=int,pushvalue=9
+opcode=172(ireturn)	,popnum=-1,lineinfo=trace.SwitchTest#f#22#71,nextinst=-1
+opcode=16(bipush)	,pushnum=1,lineinfo=trace.SwitchTest#pass#27#5,nextinst=7,pushtype=byte,pushvalue=9
+opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.SwitchTest#pass#27#7,nextinst=10
+opcode=177(return)	,popnum=-1,lineinfo=trace.SwitchTest#pass#29#10,nextinst=-1

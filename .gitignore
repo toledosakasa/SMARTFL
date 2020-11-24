@@ -1,10 +1,9 @@
 bin/
 *.class
+*.png
 test/trace/patterns/
 test/trace/logs
 configs/*.launch
-*.log
 /refs/
-trace/logs/
 target/
 /.vscode/

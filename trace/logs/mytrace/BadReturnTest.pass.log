@@ -1,0 +1,12 @@
+INFO:trace.BadReturnTest:pass:20
+INFO:opcode=aload_0,pushnum=1,pushtype=VAR,pushvalue=0
+INFO:opcode=iconst_0,pushnum=1,pushtype=CONST,pushvalue=0
+INFO:opcode=invokevirtual
+INFO:opcode=iconst_0,pushnum=1,pushtype=CONST,pushvalue=0
+INFO:opcode=invokestatic
+INFO:trace.BadReturnTest:fact:10
+INFO:opcode=iload_1,pushnum=1,pushtype=VAR,pushvalue=1
+INFO:opcode=ifgt,popnum=1
+INFO:trace.BadReturnTest:fact:11
+INFO:opcode=iconst_1,pushnum=1,pushtype=CONST,pushvalue=1
+INFO:opcode=ireturn,popnum=-1,pushnum=1

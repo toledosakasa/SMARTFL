@@ -1,0 +1,12 @@
+
+opcode=4(iconst_1)	,pushnum=1,lineinfo=trace.MergeTest#pass#18#0,nextinst=1,pushtype=int,pushvalue=1
+opcode=184(invokestatic)	,calltype=(I)I,callclass=trace.MergeTest,callname=f,lineinfo=trace.MergeTest#pass#18#1,nextinst=4
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.MergeTest#f#10#0,nextinst=1,pushtype=int,pushvalue=1
+opcode=4(iconst_1)	,pushnum=1,lineinfo=trace.MergeTest#f#10#1,nextinst=2,pushtype=int,pushvalue=1
+opcode=164(if_icmple)	,popnum=2,branchbyte=6,lineinfo=trace.MergeTest#f#10#2,nextinst=5
+opcode=132(iinc)	,VAR=0,CONST=2,lineinfo=trace.MergeTest#f#12#8,nextinst=11
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.MergeTest#f#13#11,nextinst=12,pushtype=int,pushvalue=3
+opcode=172(ireturn)	,popnum=-1,lineinfo=trace.MergeTest#f#13#12,nextinst=-1
+opcode=6(iconst_3)	,pushnum=1,lineinfo=trace.MergeTest#pass#18#4,nextinst=5,pushtype=int,pushvalue=3
+opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.MergeTest#pass#18#5,nextinst=8
+opcode=177(return)	,popnum=-1,lineinfo=trace.MergeTest#pass#19#8,nextinst=-1
