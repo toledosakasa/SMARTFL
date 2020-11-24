@@ -432,6 +432,7 @@ public class ByteCodeGraph {
 		try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
 			String t;
 			while ((t = reader.readLine()) != null) {
+				// System.err.println(t);
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
 				this.parseinfo = new ParseInfo(t);
@@ -578,6 +579,7 @@ public class ByteCodeGraph {
 	}
 
 	private String getFormalStackNameWithIndex() {
+		// FIXME
 		return getVarName(this.getFormalStackName(), this.getRuntimeStack().size());
 	}
 
