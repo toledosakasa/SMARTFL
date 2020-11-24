@@ -120,6 +120,12 @@ public class OpcodeInst {
 		return ci.s16bitAt(index + 1);
 	}
 
+	int gets32bitpara(CodeIterator ci, int index) {
+		if (ci == null)
+			return 0;
+		return ci.s32bitAt(index + 1);
+	}
+
 	String getmethodinfo(CodeIterator ci, int callindex, ConstPool constp) {
 		if (ci == null)
 			return null;
@@ -226,7 +232,7 @@ public class OpcodeInst {
 
 		if (this.doPred) {
 			Node thepred = graph.getPredStack();
-			if(thepred != null)
+			if (thepred != null)
 				prednodes.add(thepred);
 		}
 
