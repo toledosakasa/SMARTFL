@@ -146,9 +146,8 @@ public class Interpreter {
 		map[167] = new GotoInst(167);
 		map[168] = new JsrInst(168);
 		map[169] = new RetInst(169);
-
+		map[170] = new TableSwitchInst(170);
 		map[171] = new LookupSwitchInst(171);
-
 		map[172] = new IreturnInst(172);
 		map[173] = new LreturnInst(173);
 		map[174] = new FreturnInst(174);

@@ -30,7 +30,7 @@ public class LookupSwitchInst extends OpcodeInst {
 			for (int i = 0; i < npairs; i++) {
 				index += 4;
 				ret.append(this.gets32bitpara(ci, index));
-				ret.append(",");
+				ret.append(":");
 				index += 4;
 				ret.append(this.gets32bitpara(ci, index));
 				ret.append(";");

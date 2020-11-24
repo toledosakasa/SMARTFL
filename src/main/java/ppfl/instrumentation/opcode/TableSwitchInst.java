@@ -24,14 +24,16 @@ public class TableSwitchInst extends OpcodeInst {
 		index += (3 - (index % 4));
 		ret.append(",default=" + this.gets32bitpara(ci, index));
 		index += 4;
-		int npairs = this.gets32bitpara(ci, index);
+		int low = this.gets32bitpara(ci, index);
+		index += 4;
+		int high = this.gets32bitpara(ci, index);
+		int npairs = high - low + 1;
 		if (npairs > 0) {
 			ret.append(",switch=");
 			for (int i = 0; i < npairs; i++) {
 				index += 4;
-				ret.append(this.gets32bitpara(ci, index));
-				ret.append(",");
-				index += 4;
+				ret.append(low + i);
+				ret.append(":");
 				ret.append(this.gets32bitpara(ci, index));
 				ret.append(";");
 			}
