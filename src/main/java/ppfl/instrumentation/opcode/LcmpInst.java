@@ -29,7 +29,7 @@ public class LcmpInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		defnode.setSize(2);
+		// defnode.setSize(2);
 	}
 
 }

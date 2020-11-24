@@ -29,6 +29,6 @@ public class DcmpInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		defnode.setSize(2);
+		// defnode.setSize(2);
 	}
 }
