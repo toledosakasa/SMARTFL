@@ -71,6 +71,7 @@ public class ByteCodeGraph {
 	public Map<String, Integer> stmtcountmap;
 	public org.graphstream.graph.Graph viewgraph;
 	public Set<String> instset;
+	public Set<String> outset;
 	public Map<String, List<String>> predataflowmap;
 	public Map<String, List<String>> postdataflowmap;
 	public Map<String, Set<String>> dataflowsets;
@@ -182,6 +183,7 @@ public class ByteCodeGraph {
 		varcountmap = new HashMap<>();
 		stmtcountmap = new HashMap<>();
 		instset = new HashSet<>();
+		outset = new HashSet<>();
 		predataflowmap = new HashMap<>();
 		postdataflowmap = new HashMap<>();
 		dataflowsets = new TreeMap<>();
@@ -199,8 +201,8 @@ public class ByteCodeGraph {
 		shouldview = true;
 		String styleSheet = "node {" +
 		// " text-background-mode: rounded-box;"+
-				"\ttext-alignment: at-right;" + "\ttext-offset: 5px, 0px;" + "\ttext-style: italic;" + "\tsize: 15px, 15px;"
-				+ "}" +
+				"\ttext-alignment: at-right;" + "\ttext-offset: 5px, 0px;" + "\ttext-style: italic;"
+				+ "\tsize: 15px, 15px;" + "}" +
 				// "node.thenode {" +
 				// // " shape: box;"+
 				// " size: 15px, 15px;"+
@@ -215,8 +217,8 @@ public class ByteCodeGraph {
 				// " shape: box;"+
 				"\tsize: 10px, 10px;" + "\tfill-color: brown;" + "}" + "edge {" + "\tfill-color: red;" +
 				// " layout.weight: 10;"+
-				"}" + "edge.def {" + "\tfill-color: green;" + "}" + "edge.use {" + "\tfill-color: blue;" + "}" + "edge.pred {"
-				+ "\tfill-color: yellow;" + "edge.stmt {" + "\tfill-color: black;" + "}";
+				"}" + "edge.def {" + "\tfill-color: green;" + "}" + "edge.use {" + "\tfill-color: blue;" + "}"
+				+ "edge.pred {" + "\tfill-color: yellow;" + "edge.stmt {" + "\tfill-color: black;" + "}";
 		viewgraph.setAttribute("ui.stylesheet", styleSheet);
 		viewgraph.setAttribute("ui.quality");
 		viewgraph.setAttribute("ui.antialias");
@@ -288,8 +290,10 @@ public class ByteCodeGraph {
 					theedges.add(branchinst);
 				}
 				if (theedges.isEmpty()) {
-					theedges.add("OUT_" + classandmethod);
-					_instset.add("OUT_" + classandmethod);
+					String outname = "OUT_" + classandmethod;
+					theedges.add(outname);
+					_instset.add(outname);
+					outset.add(outname);
 				}
 				_predataflowmap.put(thisinst, theedges);
 				_instset.add(thisinst);
@@ -325,6 +329,89 @@ public class ByteCodeGraph {
 		predataflowmap.putAll(_predataflowmap);
 		postdataflowmap.putAll(_postdataflowmap);
 		instset.addAll(_instset);
+	}
+
+	private Deque<String> reverse_postorder = new ArrayDeque<>();
+	private Set<String> visited = new HashSet<>();
+	private Map<String, Integer> postorder = new HashMap<>();
+	private int cnt;
+
+	private void dfssearch(String inst) {
+		visited.add(inst);
+		List<String> thesuccs = postdataflowmap.get(inst);
+		for (String succ : thesuccs) {
+			if (!visited.contains(succ)) {
+				dfssearch(succ);
+			}
+		}
+		reverse_postorder.addFirst(inst);
+		postorder.put(inst, new Integer(cnt));
+		cnt++;
+	}
+
+	private String intersect(String b1, String b2) {
+		String finger1 = b1;
+		String finger2 = b2;
+		while (!finger1.equals(finger2)) {
+			while (postorder.get(finger1).intValue() < postorder.get(finger2).intValue()) {
+				finger1 = post_idom.get(finger1);
+			}
+			while (postorder.get(finger1).intValue() > postorder.get(finger2).intValue()) {
+				finger2 = post_idom.get(finger2);
+			}
+		}
+		return finger1;
+	}
+
+	// Keith D. Cooper algorithm
+	public void get_idom() {
+		cnt = 1;
+		for (String outname : outset) {
+			dfssearch(outname);
+		}
+		for (String inst : reverse_postorder) {
+			post_idom.put(inst, "Undefined");
+		}
+		for (String outname : outset) {
+			post_idom.put(outname, outname);
+		}
+		boolean changed = true;
+		while (changed) {
+			changed = false;
+			for (String inst : reverse_postorder) {
+				if (outset.contains(inst))
+					continue;
+				List<String> thepreds = predataflowmap.get(inst);
+				int predsnum = thepreds.size();
+				int tmpmax = -1;
+				int tmpindex = 0;
+				// seems should get the pred with the max postorder
+				for (int i = 0; i < predsnum; i++) {
+					if(tmpmax< postorder.get(thepreds.get(i)).intValue()){
+						tmpmax = postorder.get(thepreds.get(i)).intValue();
+						tmpindex = i;
+					}
+				}
+				String new_idom = thepreds.get(tmpindex);
+				for (int i = 0; i < predsnum; i++) {
+					if(i == tmpindex)
+						continue;
+					String otherpred = thepreds.get(i);
+					if (!post_idom.get(otherpred).equals("Undefined")) {
+						new_idom = intersect(otherpred, new_idom);
+					}
+				}
+				if (!post_idom.get(inst).equals(new_idom)) {
+					post_idom.put(inst, new_idom);
+					changed = true;
+				}
+			}
+		}
+		// System.out.println("size =" + post_idom.size());
+		// for (String key : post_idom.keySet()) {
+		// 	System.out.println("key_" + key);
+		// 	System.out.println("post_idom = " + post_idom.get(key));
+		// }
 	}
 
 	public void dataflow() {
@@ -1050,10 +1137,17 @@ public class ByteCodeGraph {
 			}
 		}
 
-		if (sourcepath != null)
+		if (sourcepath != null){
 			for (String s : sourcepath.split(";")) {
 				this.parsesource(baseDir + s);
 			}
+			// long startTime = System.currentTimeMillis();
+			this.get_idom();
+			// long endTime = System.currentTimeMillis();
+			// long thetime = endTime-startTime;
+			// System.out.println("idom time is "+ thetime);
+
+		}
 		if (tracepath != null)
 			for (String s : tracepath.split(";")) {
 				String[] tmp = s.split(":");

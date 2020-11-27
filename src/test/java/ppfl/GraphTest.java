@@ -259,7 +259,8 @@ class GraphTest {
 		pgraph.setAutoOracle(true);
 		// pgraph.parsesource(passpath);
 		pgraph.parsesource(sourcetrace);
-		pgraph.dataflow();
+		// pgraph.dataflow();
+		pgraph.get_idom();
 		pgraph.parsetrace(passtrace, "pass", true);
 		// pgraph.observe("trace.MergeTest.pass#18", true);
 		// pgraph.observe("a#9#2", true);
@@ -319,7 +320,8 @@ class GraphTest {
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
 		// pgraph.parsesource(tt);
-		pgraph.dataflow();
+		// pgraph.dataflow();
+		pgraph.get_idom();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
 		pgraph.printgraph();
