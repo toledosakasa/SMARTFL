@@ -1,5 +1,7 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+import java.util.List;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -11,6 +13,7 @@ public class DcmpInst extends OpcodeInst {
 
 	public DcmpInst(int _form) {
 		super(_form, 1, 2);
+		this.doBuild = false;
 	}
 
 	@Override
@@ -29,6 +32,8 @@ public class DcmpInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		// defnode.setSize(2);
+		List<String> ops = new ArrayList<>();
+		ops.add("<"); // treat as <
+		graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 	}
 }

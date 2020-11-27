@@ -1,8 +1,11 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+import java.util.List;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //149,150
@@ -10,6 +13,7 @@ public class FcmpInst extends OpcodeInst {
 
 	public FcmpInst(int _form) {
 		super(_form, 1, 2);
+		this.doBuild = false;
 	}
 
 	@Override
@@ -26,4 +30,11 @@ public class FcmpInst extends OpcodeInst {
 		ci.write16bit(cbi.tsindex_int, instpos + 1);
 	}
 
+	@Override
+	public void buildtrace(ByteCodeGraph graph) {
+		super.buildtrace(graph);
+		List<String> ops = new ArrayList<>();
+		ops.add("<"); // treat as <
+		graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
+	}
 }
