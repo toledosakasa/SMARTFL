@@ -37,13 +37,13 @@ public class SwitchTest {
 
 	@Test
 	void pass() {
-		assertEquals(f(2), 9);
+		assertEquals(-9, f(2));
 		// assertEquals(f(2), 8);
 	}
 
 	@Test
 	void fail() {
-		assertEquals(f(0), 3);
+		assertEquals(3, f(0));
 		// assertEquals(f(1), 7);
 	}
 }
