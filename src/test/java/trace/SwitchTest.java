@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class SwitchTest {
 	public int f(int a) {
-		switch (a) {
+		switch (a) {// tableswitch
 			case 0:
 				a = a + 1;
 			case 1:
@@ -14,6 +14,19 @@ public class SwitchTest {
 			case 2:
 				a = a + 3;
 			case 3:
+				a = a + 4;
+				break;
+			default:
+				a = a < 0 ? a : -a;
+		}
+		switch (a) {// lookupswitch
+			case 2:
+				a = a + 1;
+			case 3:
+				a = a + 2;// break;
+			case 5:
+				a = a + 3;
+			case 7:
 				a = a + 4;
 				break;
 			default:
