@@ -22,11 +22,11 @@ public class SwitchTest {
 		switch (a) {// lookupswitch
 			case 2:
 				a = a + 1;
-			case 3:
+			case 34:
 				a = a + 2;// break;
-			case 5:
+			case 56:
 				a = a + 3;
-			case 7:
+			case 78:
 				a = a + 4;
 				break;
 			default:
