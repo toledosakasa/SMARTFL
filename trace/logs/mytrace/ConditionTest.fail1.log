@@ -1,12 +1,12 @@
 
-opcode=16(bipush)	,pushnum=1,lineinfo=trace.ConditionTest#fail1#35#0,nextinst=2,pushtype=byte,pushvalue=-2
-opcode=7(iconst_4)	,pushnum=1,lineinfo=trace.ConditionTest#fail1#35#2,nextinst=3,pushtype=int,pushvalue=4
-opcode=184(invokestatic)	,calltype=(II)I,callclass=trace.ConditionTest,callname=foo,lineinfo=trace.ConditionTest#fail1#35#3,nextinst=6
-opcode=3(iconst_0)	,pushnum=1,lineinfo=trace.ConditionTest#foo#7#0,nextinst=1,pushtype=int,pushvalue=0
-opcode=61(istore_2)	,popnum=1,store=2,lineinfo=trace.ConditionTest#foo#7#1,nextinst=2
-opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.ConditionTest#foo#8#2,nextinst=3,pushtype=int,pushvalue=-2
-opcode=5(iconst_2)	,pushnum=1,lineinfo=trace.ConditionTest#foo#8#3,nextinst=4,pushtype=int,pushvalue=2
-opcode=164(if_icmple)	,popnum=2,branchbyte=9,lineinfo=trace.ConditionTest#foo#8#4,nextinst=7
+opcode=16(bipush)	,pushnum=1,lineinfo=trace.ConditionTest#fail1#34#0,nextinst=2,pushtype=byte,pushvalue=-2
+opcode=7(iconst_4)	,pushnum=1,lineinfo=trace.ConditionTest#fail1#34#2,nextinst=3,pushtype=int,pushvalue=4
+opcode=184(invokestatic)	,calltype=(II)I,callclass=trace.ConditionTest,callname=foo,lineinfo=trace.ConditionTest#fail1#34#3,nextinst=6
+opcode=3(iconst_0)	,pushnum=1,lineinfo=trace.ConditionTest#foo#8#0,nextinst=1,pushtype=int,pushvalue=0
+opcode=61(istore_2)	,popnum=1,store=2,lineinfo=trace.ConditionTest#foo#8#1,nextinst=2
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.ConditionTest#foo#9#2,nextinst=3,pushtype=int,pushvalue=-2
+opcode=5(iconst_2)	,pushnum=1,lineinfo=trace.ConditionTest#foo#9#3,nextinst=4,pushtype=int,pushvalue=2
+opcode=164(if_icmple)	,popnum=2,branchbyte=9,lineinfo=trace.ConditionTest#foo#9#4,nextinst=7
 opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.ConditionTest#foo#11#13,nextinst=14,pushtype=int,pushvalue=-2
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=trace.ConditionTest#foo#11#14,nextinst=15,pushtype=int,pushvalue=-1
 opcode=162(if_icmpge)	,popnum=2,branchbyte=6,lineinfo=trace.ConditionTest#foo#11#15,nextinst=18
@@ -16,7 +16,7 @@ opcode=6(iconst_3)	,pushnum=1,lineinfo=trace.ConditionTest#foo#14#22,nextinst=23
 opcode=164(if_icmple)	,popnum=2,branchbyte=9,lineinfo=trace.ConditionTest#foo#14#23,nextinst=26
 opcode=132(iinc)	,VAR=2,CONST=100,lineinfo=trace.ConditionTest#foo#15#26,nextinst=29
 opcode=167(goto)	,branchbyte=15,lineinfo=trace.ConditionTest#foo#15#29,nextinst=32
-opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=trace.ConditionTest#foo#20#44,nextinst=45,pushtype=int,pushvalue=90
-opcode=172(ireturn)	,popnum=-1,lineinfo=trace.ConditionTest#foo#20#45,nextinst=-1
-opcode=16(bipush)	,pushnum=1,lineinfo=trace.ConditionTest#fail1#35#6,nextinst=8,pushtype=byte,pushvalue=100
-opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.ConditionTest#fail1#35#8,nextinst=11
+opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=trace.ConditionTest#foo#19#44,nextinst=45,pushtype=int,pushvalue=90
+opcode=172(ireturn)	,popnum=-1,lineinfo=trace.ConditionTest#foo#19#45,nextinst=-1
+opcode=16(bipush)	,pushnum=1,lineinfo=trace.ConditionTest#fail1#34#6,nextinst=8,pushtype=byte,pushvalue=100
+opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.ConditionTest#fail1#34#8,nextinst=11
