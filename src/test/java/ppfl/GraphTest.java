@@ -245,7 +245,9 @@ class GraphTest {
 		ByteCodeGraph.setGraphLogger(graphfile);
 
 		ByteCodeGraph bgraph = d4jinit();
-		bgraph.check_bp(true);
+		// System.err.println("starting bp");
+		// bgraph.check_bp(true);
+		// System.err.println("end bp");
 	}
 
 	ByteCodeGraph mergeinit_bc() {

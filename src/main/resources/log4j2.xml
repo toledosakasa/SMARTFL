@@ -43,7 +43,7 @@
         <Route>
           <File name="File" fileName="trace/logs/mytrace/${ctx:resultfile}.result.log" Append="false">
             <PatternLayout>
-              <pattern>%msg</pattern>
+              <pattern>%msg%n</pattern>
             </PatternLayout>
           </File>
         </Route>
@@ -56,7 +56,7 @@
         <Route>
           <File name="File" fileName="trace/logs/mytrace/${ctx:graphfile}.graph.log" Append="false">
             <PatternLayout>
-              <pattern>%msg</pattern>
+              <pattern>%msg%n</pattern>
             </PatternLayout>
           </File>
         </Route>

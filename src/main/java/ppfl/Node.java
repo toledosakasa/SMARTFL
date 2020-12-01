@@ -86,8 +86,8 @@ public class Node {
 		return this.testname + "#" + this.name;
 	}
 
-	//not override ok?
-	public String getStmtName(){
+	// not override ok?
+	public String getStmtName() {
 		String[] lineinfos = this.stmt.getName().split(":");
 		String stmtname = lineinfos[0] + "#" + lineinfos[1];
 		return stmtname;
@@ -200,11 +200,27 @@ public class Node {
 		printLogger = lgr;
 	}
 
+	public void print(Logger lgr, String prefix) {
+		if (this.obs) {
+			lgr.info("{}{} observed = {}", prefix, this.getPrintName(), this.obsvalue);
+		} else {
+			lgr.info("{}{}", prefix, this.getPrintName());
+		}
+	}
+
 	public void print(String prefix) {
 		if (this.obs) {
 			printLogger.info("{}{} observed = {}", prefix, this.getPrintName(), this.obsvalue);
 		} else {
 			printLogger.info("{}{}", prefix, this.getPrintName());
+		}
+	}
+
+	public void print(Logger lgr) {
+		if (this.obs) {
+			lgr.info("{} observed = {}", this.getPrintName(), this.obsvalue);
+		} else {
+			lgr.info(this.getPrintName());
 		}
 	}
 
@@ -225,6 +241,10 @@ public class Node {
 
 	public void bpPrintProb() {
 		printLogger.info("{} prob_bp = {}", this.getPrintName(), bp_getprob());
+	}
+
+	public void bpPrintProb(Logger lgr) {
+		lgr.info("{} prob_bp = {}", this.getPrintName(), bp_getprob());
 	}
 
 }

@@ -37,7 +37,7 @@ public class ByteCodeGraph {
 
 	public static void setResultLogger(String resultfile) {
 		MDC.put("resultfile", resultfile);
-		graphLogger = LoggerFactory.getLogger("ResultLogger");
+		resultLogger = LoggerFactory.getLogger("ResultLogger");
 	}
 
 	private static Set<String> tracedClass = new HashSet<>();
@@ -985,16 +985,16 @@ public class ByteCodeGraph {
 	}
 
 	public void printgraph() {
-		graphLogger.info("\nNodes: ");
+		graphLogger.info("\nNodes: stmt={},node={}", stmts.size(), nodes.size());
 		for (Node n : stmts) {
-			n.print();
+			n.print(graphLogger);
 		}
 		for (Node n : nodes) {
-			n.print();
+			n.print(graphLogger);
 		}
-		graphLogger.info("Factors:");
+		graphLogger.info("Factors: {}", factornodes.size());
 		for (FactorNode n : factornodes) {
-			n.print();
+			n.print(graphLogger);
 		}
 	}
 
@@ -1032,7 +1032,7 @@ public class ByteCodeGraph {
 
 		resultLogger.info("\nProbabilities: ");
 		resultLogger.info("Vars:{}", nodes.size());
-		Node.setLogger(resultLogger);
+		// Node.setLogger(resultLogger);
 
 		int cnt = 0;
 		for (Node n : nodes) {
@@ -1045,7 +1045,7 @@ public class ByteCodeGraph {
 		}
 		resultLogger.info("Stmts:{}", stmts.size());
 		for (StmtNode n : stmts) {
-			n.bpPrintProb();
+			n.bpPrintProb(resultLogger);
 		}
 		resultLogger.info("Belief propagation time : {}s", bptime / 1000.0);
 	}

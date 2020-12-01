@@ -1,10 +1,30 @@
 package ppfl;
 
+import org.slf4j.Logger;
+
 public class StmtNode extends Node {
 
 	public StmtNode(String sname) {
 		super(sname);
 		this.isStmt = true;
+	}
+
+	@Override
+	public void print(Logger lgr, String prefix) {
+		if (this.obs) {
+			lgr.info("{}{}(Statement) observed = {}", prefix, this.name, this.obsvalue);
+		} else {
+			lgr.info("{}{}(Statement)", prefix, this.name);
+		}
+	}
+
+	@Override
+	public void print(Logger lgr) {
+		if (this.obs) {
+			lgr.info("{}(Statement) observed = {}", this.name, this.obsvalue);
+		} else {
+			lgr.info("{}(Statement)", this.name);
+		}
 	}
 
 	@Override
@@ -40,7 +60,7 @@ public class StmtNode extends Node {
 		return this.name;
 	}
 
-	public String getClassMethod(){
+	public String getClassMethod() {
 		String[] lineinfos = this.name.split(":");
 		String classandmethod = lineinfos[0] + "#" + lineinfos[1].split("#")[0];
 		return classandmethod;
