@@ -1,7 +1,7 @@
 
-opcode=20(ldc2_w)	,pushnum=1,lineinfo=trace.FourTest#pass2#39#0,nextinst=3,pushtype=double,pushvalue=1.5
-opcode=20(ldc2_w)	,pushnum=1,lineinfo=trace.FourTest#pass2#39#3,nextinst=6,pushtype=double,pushvalue=2.0
-opcode=184(invokestatic)	,calltype=(DD)D,callclass=trace.FourTest,callname=devi,lineinfo=trace.FourTest#pass2#39#6,nextinst=9
+opcode=20(ldc2_w)	,pushnum=1,lineinfo=trace.FourTest#pass2#38#0,nextinst=3,pushtype=double,pushvalue=1.5
+opcode=20(ldc2_w)	,pushnum=1,lineinfo=trace.FourTest#pass2#38#3,nextinst=6,pushtype=double,pushvalue=2.0
+opcode=184(invokestatic)	,calltype=(DD)D,callclass=trace.FourTest,callname=devi,lineinfo=trace.FourTest#pass2#38#6,nextinst=9
 opcode=14(dconst_0)	,pushnum=1,lineinfo=trace.FourTest#devi#9#0,nextinst=1,pushtype=double,pushvalue=0.0
 opcode=57(dstore)	,popnum=1,store=4,lineinfo=trace.FourTest#devi#9#1,nextinst=3
 opcode=38(dload_0)	,pushnum=1,load=0,lineinfo=trace.FourTest#devi#10#3,nextinst=4,pushtype=double,pushvalue=1.5
@@ -27,5 +27,7 @@ opcode=57(dstore)	,popnum=1,store=4,lineinfo=trace.FourTest#devi#15#26,nextinst=
 opcode=167(goto)	,branchbyte=49,lineinfo=trace.FourTest#devi#15#28,nextinst=31
 opcode=24(dload)	,pushnum=1,load=4,lineinfo=trace.FourTest#devi#28#77,nextinst=79,pushtype=double,pushvalue=0.5
 opcode=175(dreturn)	,popnum=-1,lineinfo=trace.FourTest#devi#28#79,nextinst=-1
-opcode=88(pop2)	,popnum=2,lineinfo=trace.FourTest#pass2#39#9,nextinst=10
-opcode=177(return)	,popnum=-1,lineinfo=trace.FourTest#pass2#41#10,nextinst=-1
+opcode=20(ldc2_w)	,pushnum=1,lineinfo=trace.FourTest#pass2#38#9,nextinst=12,pushtype=double,pushvalue=0.5
+opcode=20(ldc2_w)	,pushnum=1,lineinfo=trace.FourTest#pass2#38#12,nextinst=15,pushtype=double,pushvalue=0.001
+opcode=184(invokestatic)	,calltype=(DDD)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.FourTest#pass2#38#15,nextinst=18
+opcode=177(return)	,popnum=-1,lineinfo=trace.FourTest#pass2#39#18,nextinst=-1

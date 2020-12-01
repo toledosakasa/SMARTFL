@@ -270,7 +270,9 @@ public class ByteCodeGraph {
 			nonextinsts.add("ireturn");
 			nonextinsts.add("lreturn");
 			// TODO consider throw
-
+			Set<String> switchinsts = new HashSet<>();
+			switchinsts.add("tableswitch");
+			switchinsts.add("lookupswitch");
 			while ((t = reader.readLine()) != null) {
 				if (t.isEmpty() || t.startsWith("###"))
 					continue;
@@ -280,6 +282,26 @@ public class ByteCodeGraph {
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
 				List<String> theedges = new ArrayList<>();
+				//deal with switch
+				if(switchinsts.contains(info.opcode)){
+					Integer defaultbyte = info.getintvalue("default");
+					if(defaultbyte != null){
+						String defaultinst = classandmethod + (defaultbyte.intValue() + info.byteindex);
+						theedges.add(defaultinst);
+					}
+					String switchlist = info.getvalue("switch");
+					if(switchlist != null){
+						String[] switchterms = switchlist.split(";");
+						for(String switchterm : switchterms){
+							String jumpinst = classandmethod + 
+								(Integer.valueOf(switchterm.split(":")[1]).intValue() + info.byteindex);
+							theedges.add(jumpinst);
+						}
+					}
+					_predataflowmap.put(thisinst, theedges);
+					_instset.add(thisinst);
+					continue;
+				}
 				if (!(nonextinsts.contains(info.opcode))) {
 					String nextinst = classandmethod + info.getvalue("nextinst");
 					theedges.add(nextinst);
@@ -329,6 +351,11 @@ public class ByteCodeGraph {
 		predataflowmap.putAll(_predataflowmap);
 		postdataflowmap.putAll(_postdataflowmap);
 		instset.addAll(_instset);
+		// System.out.println("size =" + postdataflowmap.size());
+		// for(String key : postdataflowmap.keySet()){
+		// 	System.out.println("key_"+key);
+		// 	System.out.println(predataflowmap.get(key));
+		// }
 	}
 
 	private Deque<String> reverse_postorder = new ArrayDeque<>();

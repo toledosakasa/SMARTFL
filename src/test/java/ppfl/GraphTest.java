@@ -343,7 +343,6 @@ class GraphTest {
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
 		// pgraph.parsesource(tt);
-		//pgraph.dataflow();
 		pgraph.get_idom();
 		pgraph.parsetrace(fail1trace, "fail1", false);
 		pgraph.parsetrace(pass1trace, "pass1", true);
@@ -357,6 +356,26 @@ class GraphTest {
 		ByteCodeGraph pgraph = conditioninit_bc();
 	}
 
+	ByteCodeGraph switchinit_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\SwitchTest.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\SwitchTest.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.SwitchTest.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.get_idom();
+		pgraph.parsetrace(failtrace, "fail1", false);
+		pgraph.parsetrace(passtrace, "pass1", true);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void switchtest_bc() {
+		ByteCodeGraph pgraph = switchinit_bc();
+	}
+
 	ByteCodeGraph fourinit_bc() {
 		String ppflroot = ".";
 		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.FourTest.source.log";
@@ -368,7 +387,7 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
-		pgraph.dataflow();
+		pgraph.get_idom();
 		pgraph.parsetrace(passtrace1, "pass1", true);
 		pgraph.parsetrace(passtrace2, "pass2", true);
 		pgraph.parsetrace(failtrace1, "fail1", false);
@@ -381,6 +400,7 @@ class GraphTest {
 	@Test
 	public void fourtest_bc() {
 		ByteCodeGraph pgraph = fourinit_bc();
+		pgraph.check_bp(true);
 	}
 
 	SimpleProbGraph sqrtinit() {
@@ -665,6 +685,68 @@ class GraphTest {
 	@Test
 	public void fulltest() {
 		SimpleProbGraph pgraph = fullinit();
+		pgraph.check_bp(true);
+	}
+
+	ByteCodeGraph fullinit_bc() {
+		String ppflroot = ".";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.FullTest.source.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\FullTest.pass.log";
+		String passtrace1 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.pass1.log";
+		String passtrace2 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.pass2.log";
+		String passtrace3 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.pass3.log";
+		String passtrace4 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.pass4.log";
+		String failtrace1 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.fail1.log";
+		String failtrace2 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.fail2.log";
+		String failtrace3 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.fail3.log";
+		String failtrace4 = ppflroot + "\\trace\\logs\\mytrace\\FullTest.fail4.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.get_idom();
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.parsetrace(passtrace1, "pass1", true);
+		pgraph.parsetrace(passtrace2, "pass2", true);
+		pgraph.parsetrace(passtrace3, "pass3", true);
+		pgraph.parsetrace(passtrace4, "pass4", true);
+		pgraph.parsetrace(failtrace1, "fail1", false);
+		pgraph.parsetrace(failtrace2, "fail2", false);
+		pgraph.parsetrace(failtrace3, "fail3", false);
+		pgraph.parsetrace(failtrace4, "fail4", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	public void fulltest_bc() {
+		ByteCodeGraph pgraph = fullinit_bc();
+		pgraph.check_bp(true);
+	}
+
+	ByteCodeGraph easyifinit_bc() {
+		String ppflroot = ".";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.EasyIfTest.source.log";
+		String passtrace1 = ppflroot + "\\trace\\logs\\mytrace\\EasyIfTest.pass1.log";
+		//String passtrace2 = ppflroot + "\\trace\\logs\\mytrace\\EasyIfTest.pass2.log";
+		String failtrace1 = ppflroot + "\\trace\\logs\\mytrace\\EasyIfTest.fail1.log";
+
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.get_idom();
+		pgraph.parsetrace(passtrace1, "pass1", true);
+		//pgraph.parsetrace(passtrace2, "pass2", true);
+		pgraph.parsetrace(failtrace1, "fail1", false);
+		pgraph.printgraph();
+
+		return pgraph;
+	}
+
+	@Test
+	public void easyiftest_bc() {
+		ByteCodeGraph pgraph = easyifinit_bc();
 		pgraph.check_bp(true);
 	}
 

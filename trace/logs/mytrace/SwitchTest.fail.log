@@ -1,6 +1,6 @@
 
 opcode=6(iconst_3)	,pushnum=1,lineinfo=trace.SwitchTest#fail#46#0,nextinst=1,pushtype=int,pushvalue=3
-opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=trace.SwitchTest#fail#46#1,nextinst=2,pushtype=object,pushvalue=308889081
+opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=trace.SwitchTest#fail#46#1,nextinst=2,pushtype=object,pushvalue=1992550266
 opcode=3(iconst_0)	,pushnum=1,lineinfo=trace.SwitchTest#fail#46#2,nextinst=3,pushtype=int,pushvalue=0
 opcode=182(invokevirtual)	,calltype=(I)I,callclass=trace.SwitchTest,callname=f,lineinfo=trace.SwitchTest#fail#46#3,nextinst=6
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=trace.SwitchTest#f#9#0,nextinst=1,pushtype=int,pushvalue=0
