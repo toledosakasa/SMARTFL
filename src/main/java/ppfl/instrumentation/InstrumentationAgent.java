@@ -66,7 +66,7 @@ public class InstrumentationAgent {
 		for (String classname : className) {
 			// see if we can get the class using forName
 			try {
-				debugLogger.info("className:" + classname);
+				debugLogger.info("className:{}", classname);
 				targetCls = Class.forName(classname);
 				targetClassLoader = targetCls.getClassLoader();
 				transform(targetCls, targetClassLoader, instrumentation);
