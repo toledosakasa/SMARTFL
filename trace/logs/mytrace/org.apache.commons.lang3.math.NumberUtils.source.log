@@ -319,7 +319,7 @@ opcode=167(goto)	,branchbyte=4,lineinfo=org.apache.commons.lang3.math.NumberUtil
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#517#430,nextinst=431
 opcode=54(istore)	,popnum=1,store=11,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#517#431,nextinst=433
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#518#433,nextinst=434
-opcode=171(lookupswitch)	,popnum=1,default=0,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#518#434,nextinst=492
+opcode=171(lookupswitch)	,popnum=1,default=225,switch=68:178;70:140;76:58;100:178;102:140;108:58;,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#518#434,nextinst=492
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#521#492,nextinst=494
 opcode=199(ifnonnull)	,popnum=1,branchbyte=53,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#521#494,nextinst=497
 opcode=25(aload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#521#497,nextinst=499
