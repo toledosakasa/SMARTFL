@@ -343,7 +343,7 @@ class GraphTest {
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
 		// pgraph.parsesource(tt);
-		pgraph.dataflow();
+		pgraph.get_idom();
 		pgraph.parsetrace(fail1trace, "fail1", false);
 		pgraph.parsetrace(pass1trace, "pass1", true);
 		pgraph.parsetrace(pass2trace, "pass2", true);
@@ -354,6 +354,26 @@ class GraphTest {
 	@Test
 	public void conditiontest_bc() {
 		ByteCodeGraph pgraph = conditioninit_bc();
+	}
+
+	ByteCodeGraph switchinit_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\SwitchTest.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\SwitchTest.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.SwitchTest.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.get_idom();
+		pgraph.parsetrace(failtrace, "fail1", false);
+		pgraph.parsetrace(passtrace, "pass1", true);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void switchtest_bc() {
+		ByteCodeGraph pgraph = switchinit_bc();
 	}
 
 	ByteCodeGraph fourinit_bc() {
@@ -367,7 +387,7 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
-		pgraph.dataflow();
+		pgraph.get_idom();
 		pgraph.parsetrace(passtrace1, "pass1", true);
 		pgraph.parsetrace(passtrace2, "pass2", true);
 		pgraph.parsetrace(failtrace1, "fail1", false);

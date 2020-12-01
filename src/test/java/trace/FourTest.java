@@ -30,22 +30,22 @@ class FourTest {
 
 	@Test
 	void pass1() {
-		assertEquals(devi(0, 0), 0);
+		assertEquals(devi(0, 0), 0, 1e-3);
 	}
 
 	@Test
 	void pass2() {
-		assertEquals(devi(1.5, 2), 0.5);
+		assertEquals(devi(1.5, 2), 0.5, 1e-3);
 	}
 
 	@Test
 	void fail1() {
-		assertEquals(devi(0.5, 0.5), 0);
+		assertEquals(devi(0.5, 0.5), 0, 1e-3);
 	}
 
 	@Test
 	void fail2() {
-		assertEquals(devi(-0.5, -0.5), 0);
+		assertEquals(devi(-0.5, -0.5), 0, 1e-3);
 	}
 
 }
