@@ -239,7 +239,8 @@ public class OpcodeInst {
 		if (this.doLoad && info.getintvalue("load") != null) {
 			int loadvar = info.getintvalue("load");
 			Node node = graph.getLoadNodeAsUse(loadvar);
-			usenodes.add(node);
+			if (node != null)
+				usenodes.add(node);
 		}
 		if (this.doPop && info.getintvalue("popnum") != null) {
 			int instpopnum = info.getintvalue("popnum");

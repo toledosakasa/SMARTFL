@@ -282,19 +282,19 @@ public class ByteCodeGraph {
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
 				List<String> theedges = new ArrayList<>();
-				//deal with switch
-				if(switchinsts.contains(info.opcode)){
+				// deal with switch
+				if (switchinsts.contains(info.opcode)) {
 					Integer defaultbyte = info.getintvalue("default");
-					if(defaultbyte != null){
+					if (defaultbyte != null) {
 						String defaultinst = classandmethod + (defaultbyte.intValue() + info.byteindex);
 						theedges.add(defaultinst);
 					}
 					String switchlist = info.getvalue("switch");
-					if(switchlist != null){
+					if (switchlist != null) {
 						String[] switchterms = switchlist.split(";");
-						for(String switchterm : switchterms){
-							String jumpinst = classandmethod + 
-								(Integer.valueOf(switchterm.split(":")[1]).intValue() + info.byteindex);
+						for (String switchterm : switchterms) {
+							String jumpinst = classandmethod
+									+ (Integer.valueOf(switchterm.split(":")[1]).intValue() + info.byteindex);
 							theedges.add(jumpinst);
 						}
 					}
@@ -353,8 +353,8 @@ public class ByteCodeGraph {
 		instset.addAll(_instset);
 		// System.out.println("size =" + postdataflowmap.size());
 		// for(String key : postdataflowmap.keySet()){
-		// 	System.out.println("key_"+key);
-		// 	System.out.println(predataflowmap.get(key));
+		// System.out.println("key_"+key);
+		// System.out.println(predataflowmap.get(key));
 		// }
 	}
 
@@ -727,16 +727,18 @@ public class ByteCodeGraph {
 		return getVarName(getFormalVarName(varindex), this.varcountmap);
 	}
 
-	private String getVarName(String name, int count) {
+	private String getVarName(String name, Integer count) {
+		if (count == null) {
+			count = 0;
+		}
 		return name + "#" + count;
 	}
 
 	private String getVarName(String name, Map<String, Integer> map) {
 		if (!map.containsKey(name)) {
-			graphLogger.info(name);
-			graphLogger.info(map.toString());
+			graphLogger.info("varmap does not contains {}", name);
+			graphLogger.info("map entries are {}", map);
 		}
-
 		return getVarName(name, map.get(name));
 	}
 
