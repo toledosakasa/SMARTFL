@@ -343,7 +343,8 @@ class GraphTest {
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
 		// pgraph.parsesource(tt);
-		pgraph.dataflow();
+		//pgraph.dataflow();
+		pgraph.get_idom();
 		pgraph.parsetrace(fail1trace, "fail1", false);
 		pgraph.parsetrace(pass1trace, "pass1", true);
 		pgraph.parsetrace(pass2trace, "pass2", true);
