@@ -935,8 +935,8 @@ public class ByteCodeGraph {
 
 	public long bp_inference() {
 		long startTime = System.currentTimeMillis();
-		path_reduce();
-		boolean outreduced = true;
+		// path_reduce();
+		boolean outreduced = false;
 		if (outreduced) {
 			graphLogger.info("\nreduced Nodes: ");
 			for (Node n : stmts) {
@@ -1029,7 +1029,6 @@ public class ByteCodeGraph {
 
 	public void check_bp(boolean verbose) {
 		long bptime = this.bp_inference();
-
 		resultLogger.info("\nProbabilities: ");
 		resultLogger.info("Vars:{}", nodes.size());
 		// Node.setLogger(resultLogger);
