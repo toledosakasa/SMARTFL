@@ -245,7 +245,9 @@ class GraphTest {
 		ByteCodeGraph.setGraphLogger(graphfile);
 
 		ByteCodeGraph bgraph = d4jinit();
-		bgraph.check_bp(true);
+		// System.err.println("starting bp");
+		// bgraph.check_bp(true);
+		// System.err.println("end bp");
 	}
 
 	ByteCodeGraph mergeinit_bc() {
@@ -623,8 +625,8 @@ class GraphTest {
 		String ppflroot = ".";
 		String passpath = ppflroot + "\\test\\trace\\SwitchTest.java";
 		String failpath = passpath;
-		String passtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.pass.log";
-		String failtrace1 = ppflroot + "\\test\\trace\\logs\\btrace\\SwitchTest.fail.log";
+		String passtrace1 = ppflroot + "\\test\\trace\\logs\\mytrace\\SwitchTest.pass.log";
+		String failtrace1 = ppflroot + "\\test\\trace\\logs\\mytrace\\SwitchTest.fail.log";
 
 		SimpleProbGraph pgraph = new SimpleProbGraph();
 		pgraph.setAutoOracle(true);

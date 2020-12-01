@@ -9,13 +9,14 @@ import org.slf4j.LoggerFactory;
 public class FactorNode {
 
 	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	protected static Logger printLogger = LoggerFactory.getLogger("GraphLogger");
 
 	private List<Node> preds;
 	private Node def;
 	private Node stmt;
 	private List<Node> uses;
 	private List<String> ops;// TODO consider operators
-	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==", "!="};
+	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==", "!=" };
 	private double HIGH = 0.99;
 	private double MEDIUM = 0.5;
 	private double LOW = 0.01;
@@ -210,6 +211,32 @@ public class FactorNode {
 		return MEDIUM;
 	}
 
+	public void print(Logger lgr) {
+
+		stmt.print(lgr, "Statement: ");
+		lgr.info("\tdef:");
+		def.print(lgr, "\t\t");
+
+		if (uses != null) {
+			lgr.info("\tuses:");
+			for (Node n : uses) {
+				n.print(lgr, "\t\t");
+			}
+		}
+		if (preds != null) {
+			lgr.info("\tpreds:");
+			for (Node n : preds) {
+				n.print(lgr, "\t\t");
+			}
+		}
+		if (ops != null) {
+			lgr.info("\tops:");
+			for (String eachop : ops) {
+				lgr.info("\t\t{}", eachop);
+			}
+		}
+	}
+
 	public void print() {
 		stmt.print("Statement: ");
 		debugLogger.info("\tdef:");
@@ -230,9 +257,8 @@ public class FactorNode {
 		if (ops != null) {
 			debugLogger.info("\tops:");
 			for (String eachop : ops) {
-				debugLogger.info("\t\t{}" , eachop);
+				debugLogger.info("\t\t{}", eachop);
 			}
-
 		}
 	}
 }

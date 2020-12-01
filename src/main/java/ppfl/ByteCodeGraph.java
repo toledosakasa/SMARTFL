@@ -37,7 +37,7 @@ public class ByteCodeGraph {
 
 	public static void setResultLogger(String resultfile) {
 		MDC.put("resultfile", resultfile);
-		graphLogger = LoggerFactory.getLogger("ResultLogger");
+		resultLogger = LoggerFactory.getLogger("ResultLogger");
 	}
 
 	private static Set<String> tracedClass = new HashSet<>();
@@ -201,8 +201,8 @@ public class ByteCodeGraph {
 		shouldview = true;
 		String styleSheet = "node {" +
 		// " text-background-mode: rounded-box;"+
-				"\ttext-alignment: at-right;" + "\ttext-offset: 5px, 0px;" + "\ttext-style: italic;"
-				+ "\tsize: 15px, 15px;" + "}" +
+				"\ttext-alignment: at-right;" + "\ttext-offset: 5px, 0px;" + "\ttext-style: italic;" + "\tsize: 15px, 15px;"
+				+ "}" +
 				// "node.thenode {" +
 				// // " shape: box;"+
 				// " size: 15px, 15px;"+
@@ -217,8 +217,8 @@ public class ByteCodeGraph {
 				// " shape: box;"+
 				"\tsize: 10px, 10px;" + "\tfill-color: brown;" + "}" + "edge {" + "\tfill-color: red;" +
 				// " layout.weight: 10;"+
-				"}" + "edge.def {" + "\tfill-color: green;" + "}" + "edge.use {" + "\tfill-color: blue;" + "}"
-				+ "edge.pred {" + "\tfill-color: yellow;" + "edge.stmt {" + "\tfill-color: black;" + "}";
+				"}" + "edge.def {" + "\tfill-color: green;" + "}" + "edge.use {" + "\tfill-color: blue;" + "}" + "edge.pred {"
+				+ "\tfill-color: yellow;" + "edge.stmt {" + "\tfill-color: black;" + "}";
 		viewgraph.setAttribute("ui.stylesheet", styleSheet);
 		viewgraph.setAttribute("ui.quality");
 		viewgraph.setAttribute("ui.antialias");
@@ -282,19 +282,19 @@ public class ByteCodeGraph {
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
 				List<String> theedges = new ArrayList<>();
-				//deal with switch
-				if(switchinsts.contains(info.opcode)){
+				// deal with switch
+				if (switchinsts.contains(info.opcode)) {
 					Integer defaultbyte = info.getintvalue("default");
-					if(defaultbyte != null){
+					if (defaultbyte != null) {
 						String defaultinst = classandmethod + (defaultbyte.intValue() + info.byteindex);
 						theedges.add(defaultinst);
 					}
 					String switchlist = info.getvalue("switch");
-					if(switchlist != null){
+					if (switchlist != null) {
 						String[] switchterms = switchlist.split(";");
-						for(String switchterm : switchterms){
-							String jumpinst = classandmethod + 
-								(Integer.valueOf(switchterm.split(":")[1]).intValue() + info.byteindex);
+						for (String switchterm : switchterms) {
+							String jumpinst = classandmethod
+									+ (Integer.valueOf(switchterm.split(":")[1]).intValue() + info.byteindex);
 							theedges.add(jumpinst);
 						}
 					}
@@ -353,8 +353,8 @@ public class ByteCodeGraph {
 		instset.addAll(_instset);
 		// System.out.println("size =" + postdataflowmap.size());
 		// for(String key : postdataflowmap.keySet()){
-		// 	System.out.println("key_"+key);
-		// 	System.out.println(predataflowmap.get(key));
+		// System.out.println("key_"+key);
+		// System.out.println(predataflowmap.get(key));
 		// }
 	}
 
@@ -414,14 +414,14 @@ public class ByteCodeGraph {
 				int tmpindex = 0;
 				// seems should get the pred with the max postorder
 				for (int i = 0; i < predsnum; i++) {
-					if(tmpmax< postorder.get(thepreds.get(i)).intValue()){
+					if (tmpmax < postorder.get(thepreds.get(i)).intValue()) {
 						tmpmax = postorder.get(thepreds.get(i)).intValue();
 						tmpindex = i;
 					}
 				}
 				String new_idom = thepreds.get(tmpindex);
 				for (int i = 0; i < predsnum; i++) {
-					if(i == tmpindex)
+					if (i == tmpindex)
 						continue;
 					String otherpred = thepreds.get(i);
 					if (!post_idom.get(otherpred).equals("Undefined")) {
@@ -436,8 +436,8 @@ public class ByteCodeGraph {
 		}
 		// System.out.println("size =" + post_idom.size());
 		// for (String key : post_idom.keySet()) {
-		// 	System.out.println("key_" + key);
-		// 	System.out.println("post_idom = " + post_idom.get(key));
+		// System.out.println("key_" + key);
+		// System.out.println("post_idom = " + post_idom.get(key));
 		// }
 	}
 
@@ -727,13 +727,18 @@ public class ByteCodeGraph {
 		return getVarName(getFormalVarName(varindex), this.varcountmap);
 	}
 
-	private String getVarName(String name, int count) {
+	private String getVarName(String name, Integer count) {
+		if (count == null) {
+			count = 0;
+		}
 		return name + "#" + count;
 	}
 
 	private String getVarName(String name, Map<String, Integer> map) {
-		if (!map.containsKey(name))
-			graphLogger.info(name);
+		if (!map.containsKey(name)) {
+			graphLogger.info("varmap does not contains {}", name);
+			graphLogger.info("map entries are {}", map);
+		}
 		return getVarName(name, map.get(name));
 	}
 
@@ -980,16 +985,16 @@ public class ByteCodeGraph {
 	}
 
 	public void printgraph() {
-		graphLogger.info("\nNodes: ");
+		graphLogger.info("\nNodes: stmt={},node={}", stmts.size(), nodes.size());
 		for (Node n : stmts) {
-			n.print();
+			n.print(graphLogger);
 		}
 		for (Node n : nodes) {
-			n.print();
+			n.print(graphLogger);
 		}
-		graphLogger.info("Factors:");
+		graphLogger.info("Factors: {}", factornodes.size());
 		for (FactorNode n : factornodes) {
-			n.print();
+			n.print(graphLogger);
 		}
 	}
 
@@ -1027,7 +1032,7 @@ public class ByteCodeGraph {
 
 		resultLogger.info("\nProbabilities: ");
 		resultLogger.info("Vars:{}", nodes.size());
-		Node.setLogger(resultLogger);
+		// Node.setLogger(resultLogger);
 
 		int cnt = 0;
 		for (Node n : nodes) {
@@ -1040,7 +1045,7 @@ public class ByteCodeGraph {
 		}
 		resultLogger.info("Stmts:{}", stmts.size());
 		for (StmtNode n : stmts) {
-			n.bpPrintProb();
+			n.bpPrintProb(resultLogger);
 		}
 		resultLogger.info("Belief propagation time : {}s", bptime / 1000.0);
 	}
@@ -1164,7 +1169,7 @@ public class ByteCodeGraph {
 			}
 		}
 
-		if (sourcepath != null){
+		if (sourcepath != null) {
 			for (String s : sourcepath.split(";")) {
 				this.parsesource(baseDir + s);
 			}
