@@ -200,25 +200,46 @@ public class ByteCodeGraph {
 		viewgraph.setAttribute("layout.force");
 		shouldview = true;
 		String styleSheet = "node {" +
-		// " text-background-mode: rounded-box;"+
-				"\ttext-alignment: at-right;" + "\ttext-offset: 5px, 0px;" + "\ttext-style: italic;" + "\tsize: 15px, 15px;"
-				+ "}" +
+				// "	text-background-mode: rounded-box;"+
+				"	text-alignment: at-right;"+
+				"	text-offset: 5px, 0px;"+
+				"	text-style: italic;"+
+				"	size: 15px, 15px;"+
+				"}" +
 				// "node.thenode {" +
-				// // " shape: box;"+
-				// " size: 15px, 15px;"+
-				// // " fill-color: green;" +
+				// // "	shape: box;"+
+				// "	size: 15px, 15px;"+
+				// // "	fill-color: green;" +
 				// "}" +
-				"node.factor {" + "\tshape: box;" + "\ttext-mode: hidden;" +
-				// " size: 15px, 15px;"+
-				"\tfill-color: red;" +
-				// " stroke-mode: plain; /* Default is none. */"+
-				// " stroke-color: blue; /* Default is black. */"+
-				"}" + "node.stmt {" +
-				// " shape: box;"+
-				"\tsize: 10px, 10px;" + "\tfill-color: brown;" + "}" + "edge {" + "\tfill-color: red;" +
-				// " layout.weight: 10;"+
-				"}" + "edge.def {" + "\tfill-color: green;" + "}" + "edge.use {" + "\tfill-color: blue;" + "}" + "edge.pred {"
-				+ "\tfill-color: yellow;" + "edge.stmt {" + "\tfill-color: black;" + "}";
+				"node.factor {" +
+				"	shape: box;"+
+				"	text-mode: hidden;"+
+				// "	size: 15px, 15px;"+
+				"	fill-color: red;" +
+				// "	stroke-mode: plain; /* Default is none.  */"+
+				// "	stroke-color: blue; /* Default is black. */"+
+				"}" +
+				"node.stmt {" +
+				// "	shape: box;"+
+				"	size: 10px, 10px;"+
+				"	fill-color: brown;" +
+				"}" +
+				"edge {" +
+				"	fill-color: red;" +
+				// "	layout.weight: 10;"+
+				"}" +
+				"edge.def {" +
+				"	fill-color: green;" +
+				"}" +
+				"edge.use {" +
+				"	fill-color: blue;" +
+				"}" +
+				"edge.pred {" +
+				"	fill-color: yellow;" +
+				"}"+
+				"edge.stmt {" +
+				"	fill-color: black;" +
+				"}";
 		viewgraph.setAttribute("ui.stylesheet", styleSheet);
 		viewgraph.setAttribute("ui.quality");
 		viewgraph.setAttribute("ui.antialias");
@@ -229,12 +250,14 @@ public class ByteCodeGraph {
 		for (Node n : nodes) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
+				thenode.setAttribute("ui.label", " prob_bp = " + (double)Math.round(n.bp_getprob()*1000)/1000);
+				// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
 		}
 		for (StmtNode n : stmts) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
+				thenode.setAttribute("ui.label", " prob_bp = " + (double)Math.round(n.bp_getprob()*1000)/1000);
+				// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
 		}
 	}
 

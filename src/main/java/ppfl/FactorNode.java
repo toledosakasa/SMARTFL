@@ -17,9 +17,10 @@ public class FactorNode {
 	private List<Node> uses;
 	private List<String> ops;// TODO consider operators
 	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==", "!=" };
-	private double HIGH = 0.99;
+	private double HIGH = 1-1e-10;
+	private double VHIGH = 0.99999;
 	private double MEDIUM = 0.5;
-	private double LOW = 0.01;
+	private double LOW = 1e-10;
 	private List<Double> tensor;
 	private List<Node> allnodes;
 	private List<Edge> alledges;
