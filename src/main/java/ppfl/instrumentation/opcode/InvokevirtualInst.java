@@ -51,6 +51,7 @@ public class InvokevirtualInst extends OpcodeInst {
 			return;
 		}
 
+		// System.err.println(graph.getRuntimeStack().size());
 		// switch stack frame
 		graph.pushStackFrame(traceclass, tracemethod);
 

@@ -99,7 +99,9 @@ public class ByteCodeGraph {
 	// should be called while returning.
 	// e.g. return ireturn
 	public void popStackFrame() {
-		this.stackframe.pop().runtimestack.clear();
+		this.stackframe.pop();
+		// buggy.
+		// .runtimestack.clear();
 	}
 
 	// should be called while invoking.
@@ -200,46 +202,25 @@ public class ByteCodeGraph {
 		viewgraph.setAttribute("layout.force");
 		shouldview = true;
 		String styleSheet = "node {" +
-				// "	text-background-mode: rounded-box;"+
-				"	text-alignment: at-right;"+
-				"	text-offset: 5px, 0px;"+
-				"	text-style: italic;"+
-				"	size: 15px, 15px;"+
-				"}" +
+		// " text-background-mode: rounded-box;"+
+				"	text-alignment: at-right;" + "	text-offset: 5px, 0px;" + "	text-style: italic;" + "	size: 15px, 15px;" + "}"
+				+
 				// "node.thenode {" +
-				// // "	shape: box;"+
-				// "	size: 15px, 15px;"+
-				// // "	fill-color: green;" +
+				// // " shape: box;"+
+				// " size: 15px, 15px;"+
+				// // " fill-color: green;" +
 				// "}" +
-				"node.factor {" +
-				"	shape: box;"+
-				"	text-mode: hidden;"+
-				// "	size: 15px, 15px;"+
+				"node.factor {" + "	shape: box;" + "	text-mode: hidden;" +
+				// " size: 15px, 15px;"+
 				"	fill-color: red;" +
-				// "	stroke-mode: plain; /* Default is none.  */"+
-				// "	stroke-color: blue; /* Default is black. */"+
-				"}" +
-				"node.stmt {" +
-				// "	shape: box;"+
-				"	size: 10px, 10px;"+
-				"	fill-color: brown;" +
-				"}" +
-				"edge {" +
-				"	fill-color: red;" +
-				// "	layout.weight: 10;"+
-				"}" +
-				"edge.def {" +
-				"	fill-color: green;" +
-				"}" +
-				"edge.use {" +
-				"	fill-color: blue;" +
-				"}" +
-				"edge.pred {" +
-				"	fill-color: yellow;" +
-				"}"+
-				"edge.stmt {" +
-				"	fill-color: black;" +
-				"}";
+				// " stroke-mode: plain; /* Default is none. */"+
+				// " stroke-color: blue; /* Default is black. */"+
+				"}" + "node.stmt {" +
+				// " shape: box;"+
+				"	size: 10px, 10px;" + "	fill-color: brown;" + "}" + "edge {" + "	fill-color: red;" +
+				// " layout.weight: 10;"+
+				"}" + "edge.def {" + "	fill-color: green;" + "}" + "edge.use {" + "	fill-color: blue;" + "}" + "edge.pred {"
+				+ "	fill-color: yellow;" + "}" + "edge.stmt {" + "	fill-color: black;" + "}";
 		viewgraph.setAttribute("ui.stylesheet", styleSheet);
 		viewgraph.setAttribute("ui.quality");
 		viewgraph.setAttribute("ui.antialias");
@@ -250,14 +231,16 @@ public class ByteCodeGraph {
 		for (Node n : nodes) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", " prob_bp = " + (double)Math.round(n.bp_getprob()*1000)/1000);
-				// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
+				thenode.setAttribute("ui.label", " prob_bp = " + (double) Math.round(n.bp_getprob() * 1000) / 1000);
+			// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " +
+			// n.bp_getprob());
 		}
 		for (StmtNode n : stmts) {
 			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
 			if (thenode != null)
-				thenode.setAttribute("ui.label", " prob_bp = " + (double)Math.round(n.bp_getprob()*1000)/1000);
-				// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " + n.bp_getprob());
+				thenode.setAttribute("ui.label", " prob_bp = " + (double) Math.round(n.bp_getprob() * 1000) / 1000);
+			// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " +
+			// n.bp_getprob());
 		}
 	}
 
