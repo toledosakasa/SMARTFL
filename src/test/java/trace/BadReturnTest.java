@@ -17,8 +17,13 @@ class BadReturnTest {
 	}
 
 	@Test
-	void pass() {
+	void pass1() {
 		assertEquals(fact(0), 1);
+	}
+
+	@Test
+	void pass2() {
+		assertEquals(fact(1), 1);
 	}
 
 	@Test
