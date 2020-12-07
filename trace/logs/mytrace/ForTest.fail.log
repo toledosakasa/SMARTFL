@@ -1,0 +1,25 @@
+
+opcode=4(iconst_1)	,pushnum=1,lineinfo=trace.ForTest#fail#23#0,nextinst=1,pushtype=int,pushvalue=1
+opcode=184(invokestatic)	,calltype=(I)I,callclass=trace.ForTest,callname=foo,lineinfo=trace.ForTest#fail#23#1,nextinst=4
+opcode=3(iconst_0)	,pushnum=1,lineinfo=trace.ForTest#foo#7#0,nextinst=1,pushtype=int,pushvalue=0
+opcode=60(istore_1)	,popnum=1,store=1,lineinfo=trace.ForTest#foo#7#1,nextinst=2
+opcode=3(iconst_0)	,pushnum=1,lineinfo=trace.ForTest#foo#8#2,nextinst=3,pushtype=int,pushvalue=0
+opcode=61(istore_2)	,popnum=1,store=2,lineinfo=trace.ForTest#foo#8#3,nextinst=4
+opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=trace.ForTest#foo#9#4,nextinst=5,pushtype=int,pushvalue=0
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.ForTest#foo#9#5,nextinst=6,pushtype=int,pushvalue=1
+opcode=162(if_icmpge)	,popnum=2,branchbyte=15,lineinfo=trace.ForTest#foo#9#6,nextinst=9
+opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=trace.ForTest#foo#11#9,nextinst=10,pushtype=int,pushvalue=0
+opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=trace.ForTest#foo#11#10,nextinst=11,pushtype=int,pushvalue=0
+opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=trace.ForTest#foo#11#11,nextinst=12,pushtype=int,pushvalue=0
+opcode=104(imul)	,popnum=2,pushnum=1,lineinfo=trace.ForTest#foo#11#12,nextinst=13,pushtype=int,pushvalue=0
+opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=trace.ForTest#foo#11#13,nextinst=14,pushtype=int,pushvalue=0
+opcode=60(istore_1)	,popnum=1,store=1,lineinfo=trace.ForTest#foo#11#14,nextinst=15
+opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=trace.ForTest#foo#10#15,nextinst=18
+opcode=167(goto)	,branchbyte=-14,lineinfo=trace.ForTest#foo#10#18,nextinst=21
+opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=trace.ForTest#foo#9#4,nextinst=5,pushtype=int,pushvalue=1
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.ForTest#foo#9#5,nextinst=6,pushtype=int,pushvalue=1
+opcode=162(if_icmpge)	,popnum=2,branchbyte=15,lineinfo=trace.ForTest#foo#9#6,nextinst=9
+opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=trace.ForTest#foo#13#21,nextinst=22,pushtype=int,pushvalue=0
+opcode=172(ireturn)	,popnum=-1,lineinfo=trace.ForTest#foo#13#22,nextinst=-1
+opcode=4(iconst_1)	,pushnum=1,lineinfo=trace.ForTest#fail#23#4,nextinst=5,pushtype=int,pushvalue=1
+opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.ForTest#fail#23#5,nextinst=8

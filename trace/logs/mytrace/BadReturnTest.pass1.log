@@ -1,5 +1,5 @@
 
-opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=trace.BadReturnTest#pass1#21#0,nextinst=1,pushtype=object,pushvalue=1740846921
+opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=trace.BadReturnTest#pass1#21#0,nextinst=1,pushtype=object,pushvalue=1714113641
 opcode=3(iconst_0)	,pushnum=1,lineinfo=trace.BadReturnTest#pass1#21#1,nextinst=2,pushtype=int,pushvalue=0
 opcode=182(invokevirtual)	,calltype=(I)I,callclass=trace.BadReturnTest,callname=fact,lineinfo=trace.BadReturnTest#pass1#21#2,nextinst=5
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=trace.BadReturnTest#fact#10#0,nextinst=1,pushtype=int,pushvalue=0

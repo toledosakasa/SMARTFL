@@ -1,0 +1,16 @@
+
+opcode=4(iconst_1)	,pushnum=1,lineinfo=trace.PredTest6#pass#18#0,nextinst=1,pushtype=int,pushvalue=1
+opcode=184(invokestatic)	,calltype=(I)I,callclass=trace.PredTest6,callname=foo,lineinfo=trace.PredTest6#pass#18#1,nextinst=4
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.PredTest6#foo#7#0,nextinst=1,pushtype=int,pushvalue=1
+opcode=6(iconst_3)	,pushnum=1,lineinfo=trace.PredTest6#foo#7#1,nextinst=2,pushtype=int,pushvalue=3
+opcode=162(if_icmpge)	,popnum=2,branchbyte=11,lineinfo=trace.PredTest6#foo#7#2,nextinst=5
+opcode=16(bipush)	,pushnum=1,lineinfo=trace.PredTest6#foo#8#5,nextinst=7,pushtype=byte,pushvalue=10
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.PredTest6#foo#8#7,nextinst=8,pushtype=int,pushvalue=1
+opcode=104(imul)	,popnum=2,pushnum=1,lineinfo=trace.PredTest6#foo#8#8,nextinst=9,pushtype=int,pushvalue=10
+opcode=59(istore_0)	,popnum=1,store=0,lineinfo=trace.PredTest6#foo#8#9,nextinst=10
+opcode=167(goto)	,branchbyte=7,lineinfo=trace.PredTest6#foo#8#10,nextinst=13
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.PredTest6#foo#13#17,nextinst=18,pushtype=int,pushvalue=10
+opcode=172(ireturn)	,popnum=-1,lineinfo=trace.PredTest6#foo#13#18,nextinst=-1
+opcode=16(bipush)	,pushnum=1,lineinfo=trace.PredTest6#pass#18#4,nextinst=6,pushtype=byte,pushvalue=10
+opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.PredTest6#pass#18#6,nextinst=9
+opcode=177(return)	,popnum=-1,lineinfo=trace.PredTest6#pass#19#9,nextinst=-1
