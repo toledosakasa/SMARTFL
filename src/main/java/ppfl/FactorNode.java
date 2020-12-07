@@ -236,7 +236,7 @@ public class FactorNode {
 			def.print(lgr, "\t\t");
 		}
 		else{
-			lgr.info("\tstmtvalue"+this.stmtvalue);
+			lgr.info("\tstmtvalue = "+this.stmtvalue);
 		}
 
 		if (uses != null) {
@@ -266,7 +266,7 @@ public class FactorNode {
 			def.print("\t\t");
 		}
 		else{
-			debugLogger.info("\tstmtvalue"+this.stmtvalue);
+			debugLogger.info("\tstmtvalue = "+this.stmtvalue);
 		}
 
 		if (uses != null) {
