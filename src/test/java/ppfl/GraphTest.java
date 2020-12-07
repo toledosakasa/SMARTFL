@@ -531,6 +531,11 @@ class GraphTest {
 		pgraph.get_idom();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
+		for(StmtNode stmt: pgraph.stmts){
+			if(stmt.getLineNumber() == 11){
+				pgraph.buildStmtFactor(stmt, 0.9);
+			}
+		}
 		pgraph.printgraph();
 		return pgraph;
 	}
