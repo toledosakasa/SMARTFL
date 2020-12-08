@@ -51,7 +51,7 @@ public class IfInst extends OpcodeInst {
 				ops.add(">");
 			else
 				ops.add("<=");
-			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 		}
 	}
 

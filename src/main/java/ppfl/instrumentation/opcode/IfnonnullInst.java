@@ -40,7 +40,7 @@ public class IfnonnullInst extends OpcodeInst {
 		if (defnode != null) {
 			List<String> ops = new ArrayList<>();
 			ops.add("!=");
-			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 		}
 	}
 
