@@ -8,11 +8,11 @@ import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
 //24
-public class DupInst extends OpcodeInst {
+public class Dup2Inst extends OpcodeInst {
 
 	int loadindex;
 
-	public DupInst(int _form) {
+	public Dup2Inst(int _form) {
 		super(_form, 1, 0);
 		this.doBuild = false;
 		this.doPop = false;
@@ -32,7 +32,7 @@ public class DupInst extends OpcodeInst {
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.tsindex_int, instpos + 1);
+		ci.write16bit(cbi.tsindex_long, instpos + 1);
 	}
 
 	@Override
@@ -41,10 +41,27 @@ public class DupInst extends OpcodeInst {
 		super.buildtrace(graph);
 
 		Node top = graph.getRuntimeStack().peek();
-		assert (top.getSize() == 1);
-		usenodes.add(top);
-		defnode = graph.addNewStackNode(stmt);
-		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		if (top.getSize() == 2) {
+			usenodes.add(top);
+			defnode = graph.addNewStackNode(stmt);
+			defnode.setSize(usenodes.get(0).getSize());
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		} else if (top.getSize() == 1) {
+			top = graph.getRuntimeStack().pop();
+			Node nextTop = graph.getRuntimeStack().peek();
+			assert (nextTop.getSize() == 1);
+			graph.getRuntimeStack().push(top);
+
+			usenodes.add(nextTop);
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+
+			usenodes.clear();
+			usenodes.add(top);
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		}
+
 	}
 
 }
