@@ -25,11 +25,27 @@ public class FactorNode {
 	private List<Node> allnodes;
 	private List<Edge> alledges;
 	private int nnodes;
+	private double stmtvalue;
 
 	private Edge dedge;
 	private Edge sedge;
 	private List<Edge> pedges;
 	private List<Edge> uedges;
+
+	//factor with only a stmt node
+	public FactorNode(Node stmt, Edge sedge, double value) {
+		this.stmt = stmt;
+		this.def = null;
+		this.dedge = null;
+		this.sedge = sedge;
+		this.tensor = new ArrayList<>();
+		this.nnodes = 1;
+		this.stmtvalue = value;
+		this.alledges = new ArrayList<>();
+		alledges.add(sedge);
+		tensor.add(1-value);
+		tensor.add(value);
+	}
 
 	public FactorNode(Node def, Node stmt, List<Node> preds, List<Node> uses, List<String> ops, Edge dedge, Edge sedge,
 			List<Edge> pedges, List<Edge> uedges) {
@@ -215,8 +231,13 @@ public class FactorNode {
 	public void print(Logger lgr) {
 
 		stmt.print(lgr, "Statement: ");
-		lgr.info("\tdef:");
-		def.print(lgr, "\t\t");
+		if(def != null){
+			lgr.info("\tdef:");
+			def.print(lgr, "\t\t");
+		}
+		else{
+			lgr.info("\tstmtvalue = "+this.stmtvalue);
+		}
 
 		if (uses != null) {
 			lgr.info("\tuses:");
@@ -240,8 +261,13 @@ public class FactorNode {
 
 	public void print() {
 		stmt.print("Statement: ");
-		debugLogger.info("\tdef:");
-		def.print("\t\t");
+		if(def != null){
+			debugLogger.info("\tdef:");
+			def.print("\t\t");
+		}
+		else{
+			debugLogger.info("\tstmtvalue = "+this.stmtvalue);
+		}
 
 		if (uses != null) {
 			debugLogger.info("\tuses:");

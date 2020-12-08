@@ -577,6 +577,27 @@ public class ByteCodeGraph {
 		}
 	}
 
+	public FactorNode buildStmtFactor(StmtNode stmt, double value){
+		Edge sedge = new Edge();
+		sedge.setnode(stmt);
+		stmt.add_edge(sedge);
+		FactorNode ret = new FactorNode(stmt, sedge, value);
+		factornodes.add(ret);
+		sedge.setfactor(ret);
+		if (!shouldview)
+			return ret;
+		String factorname = "Factor" + factornodes.size();
+		viewgraph.addEdge(factorname + stmt.getPrintName(), factorname, stmt.getPrintName());
+		org.graphstream.graph.Node outfactor = viewgraph.getNode(factorname);
+		outfactor.setAttribute("ui.class", "factor");
+		org.graphstream.graph.Node outstmt = viewgraph.getNode(stmt.getPrintName());
+		outstmt.setAttribute("ui.class", "stmt");
+		org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname + stmt.getPrintName());
+		outedge.setAttribute("ui.class", "stmt");
+		outedge.setAttribute("layout.weight", 3);
+		return ret;
+	}
+
 	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
 			StmtNode stmt) {
 
