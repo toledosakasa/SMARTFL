@@ -80,6 +80,7 @@ public class Interpreter {
 		map[87] = new PopInst(87);
 		map[88] = new Pop2Inst(88);
 		map[89] = new DupInst(89);
+		map[92] = new Dup2Inst(92);
 		for (int i = 96; i <= 112; i += 4) {
 			map[i] = new IarithInst(i);
 		}
