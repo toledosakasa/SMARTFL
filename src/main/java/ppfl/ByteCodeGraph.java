@@ -580,7 +580,7 @@ public class ByteCodeGraph {
 	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
 			StmtNode stmt) {
 
-		if (auto_oracle) {
+		if (auto_oracle && !stmt.getMethod().contentEquals(this.testname)) {
 			int ln = stmt.getLineNumber();
 			if (this.lastDefinedLine != ln) {
 				this.lastDefinedLine = ln;
@@ -1189,9 +1189,11 @@ public class ByteCodeGraph {
 			for (String s : tracepath.split(";")) {
 				String[] tmp = s.split(":");
 				String testpath = tmp[0];
-				String uniquetestname = testpath.substring(0, testpath.lastIndexOf('.'));
+				String testClassAndMethod = testpath.substring(0, testpath.lastIndexOf('.'));
+				String testMethod = testClassAndMethod.substring(testClassAndMethod.lastIndexOf('.') + 1,
+						testClassAndMethod.length());
 				boolean testpass = tmp[1].equals("1");
-				this.parsetrace(baseDir + tmp[0], uniquetestname, testpass);
+				this.parsetrace(baseDir + tmp[0], testMethod, testpass);
 			}
 
 	}

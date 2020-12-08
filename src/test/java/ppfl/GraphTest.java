@@ -245,9 +245,7 @@ class GraphTest {
 		ByteCodeGraph.setGraphLogger(graphfile);
 
 		ByteCodeGraph bgraph = d4jinit();
-		System.err.println("starting bp");
 		bgraph.check_bp(true);
-		System.err.println("end bp");
 	}
 
 	ByteCodeGraph mergeinit_bc() {
@@ -584,7 +582,6 @@ class GraphTest {
 		ByteCodeGraph pgraph = badreturninit_bc();
 		pgraph.check_bp(true);
 	}
-
 
 	ByteCodeGraph fourinit_bc() {
 		String ppflroot = ".";
@@ -939,7 +936,8 @@ class GraphTest {
 		String ppflroot = ".";
 		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.EasyIfTest.source.log";
 		String passtrace1 = ppflroot + "\\trace\\logs\\mytrace\\EasyIfTest.pass1.log";
-		//String passtrace2 = ppflroot + "\\trace\\logs\\mytrace\\EasyIfTest.pass2.log";
+		// String passtrace2 = ppflroot +
+		// "\\trace\\logs\\mytrace\\EasyIfTest.pass2.log";
 		String failtrace1 = ppflroot + "\\trace\\logs\\mytrace\\EasyIfTest.fail1.log";
 
 		ByteCodeGraph pgraph = new ByteCodeGraph();
@@ -947,7 +945,7 @@ class GraphTest {
 		pgraph.parsesource(sourcetrace);
 		pgraph.get_idom();
 		pgraph.parsetrace(passtrace1, "pass1", true);
-		//pgraph.parsetrace(passtrace2, "pass2", true);
+		// pgraph.parsetrace(passtrace2, "pass2", true);
 		pgraph.parsetrace(failtrace1, "fail1", false);
 		pgraph.printgraph();
 

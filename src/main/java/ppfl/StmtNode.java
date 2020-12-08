@@ -66,4 +66,9 @@ public class StmtNode extends Node {
 		return classandmethod;
 	}
 
+	public String getMethod() {
+		String[] lineinfos = this.name.split(":");
+		return lineinfos[1].split("#")[0];
+	}
+
 }
