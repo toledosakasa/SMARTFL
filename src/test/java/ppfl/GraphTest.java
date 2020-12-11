@@ -565,6 +565,48 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 
+	ByteCodeGraph callinit_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\CallTest.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\CallTest.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.CallTest.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.get_idom();
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void calltest_bc() {
+		ByteCodeGraph pgraph = callinit_bc();
+		pgraph.check_bp(true);
+	}
+
+	ByteCodeGraph call2init_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\CallTest2.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\CallTest2.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.CallTest2.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.get_idom();
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void call2test_bc() {
+		ByteCodeGraph pgraph = call2init_bc();
+		pgraph.check_bp(true);
+	}
+
 	ByteCodeGraph badreturninit_bc() {
 		String ppflroot = ".";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\BadReturnTest.fail.log";
