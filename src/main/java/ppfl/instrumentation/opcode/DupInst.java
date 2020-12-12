@@ -32,7 +32,8 @@ public class DupInst extends OpcodeInst {
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.tsindex_int, instpos + 1);
+		// FIXME why long?
+		ci.write16bit(cbi.tsindex_long, instpos + 1);
 	}
 
 	@Override
