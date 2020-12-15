@@ -678,7 +678,23 @@ public class ByteCodeGraph {
 			outedge.setAttribute("layout.weight", 3);
 		}
 		return ret;
-	}
+    }
+    
+    public NWrongFactorNode buildNWrongFactor(){
+        List<Edge> stmtedges = new ArrayList<>();
+        for (Node n : stmts) {
+			Edge theedge = new Edge();
+			theedge.setnode(n);
+			stmtedges.add(theedge);
+			n.add_edge(theedge);
+		}
+        NWrongFactorNode ret = new NWrongFactorNode(stmtedges,1);
+        factornodes.add(ret);
+        for (Edge e : stmtedges)
+            e.setfactor(ret);
+            
+        return ret;
+    } 
 
 	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
 		assert (traceclass.equals(this.getFrame().traceclass));

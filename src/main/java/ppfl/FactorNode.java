@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class FactorNode {
 
-	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	protected static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 	protected static Logger printLogger = LoggerFactory.getLogger("GraphLogger");
 
 	private List<Node> preds;
@@ -31,6 +31,12 @@ public class FactorNode {
 	private Edge sedge;
 	private List<Edge> pedges;
 	private List<Edge> uedges;
+
+    public FactorNode(){
+        this.stmt = null;
+        this.def = null;
+		this.dedge = null;
+    }
 
 	//factor with only a stmt node
 	public FactorNode(Node stmt, Edge sedge, double value) {

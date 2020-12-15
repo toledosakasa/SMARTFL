@@ -231,7 +231,7 @@ class GraphTest {
 		pgraph.setTraceAllClassed(false);
 
 		pgraph.initFromConfigFile(traceBaseDir, configpath);
-
+        // pgraph.buildNWrongFactor();
 		pgraph.printgraph();
 		return pgraph;
 	}
@@ -529,11 +529,12 @@ class GraphTest {
 		pgraph.get_idom();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
-		for(StmtNode stmt: pgraph.stmts){
-			if(stmt.getLineNumber() == 11){
-				pgraph.buildStmtFactor(stmt, 0.9);
-			}
-		}
+		// for(StmtNode stmt: pgraph.stmts){
+		// 	if(stmt.getLineNumber() == 7){
+		// 		pgraph.buildStmtFactor(stmt, 3e-5);
+		// 	}
+        // }
+        // pgraph.buildNWrongFactor();
 		pgraph.printgraph();
 		return pgraph;
 	}
