@@ -577,6 +577,8 @@ public class ByteCodeGraph {
 		}
 	}
 
+	//TODO define variables analysis and unexecuted complement
+
 	public FactorNode buildStmtFactor(StmtNode stmt, double value){
 		Edge sedge = new Edge();
 		sedge.setnode(stmt);
