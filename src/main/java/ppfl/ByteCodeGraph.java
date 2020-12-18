@@ -986,11 +986,11 @@ public class ByteCodeGraph {
 			graphLogger.info("\nReduced Nodes: ");
 			for (Node n : stmts) {
 				if (n.getreduced())
-					n.print();
+					n.print(graphLogger);
 			}
 			for (Node n : nodes) {
 				if (n.getreduced())
-					n.print();
+					n.print(graphLogger);
 			}
 			graphLogger.info("\n");
 		}
