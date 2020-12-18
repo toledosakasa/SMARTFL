@@ -945,6 +945,8 @@ public class ByteCodeGraph {
 	}
 
 	public void mark_reduce(Node node) {
+		if(node.getreduced() == false)
+			return;
 		node.setreduced();
 		if (node.isStmt)
 			return;
@@ -978,10 +980,10 @@ public class ByteCodeGraph {
 
 	public long bp_inference() {
 		long startTime = System.currentTimeMillis();
-		// path_reduce();
-		boolean outreduced = false;
+		path_reduce();
+		boolean outreduced = true;
 		if (outreduced) {
-			graphLogger.info("\nreduced Nodes: ");
+			graphLogger.info("\nReduced Nodes: ");
 			for (Node n : stmts) {
 				if (n.getreduced())
 					n.print();
