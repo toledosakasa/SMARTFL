@@ -518,6 +518,27 @@ class GraphTest {
 		pgraph.check_bp(true);
 	}
 
+	ByteCodeGraph pred7init_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\PredTest7.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\PredTest7.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.PredTest7.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+		pgraph.get_idom();
+		pgraph.get_stores();
+		// pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.parsetrace(passtrace, "pass", true);
+		// pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void pred7test_bc() {
+		ByteCodeGraph pgraph = pred7init_bc();
+	}
+
 	ByteCodeGraph forinit_bc() {
 		String ppflroot = ".";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\ForTest.fail.log";
