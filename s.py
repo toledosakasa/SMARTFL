@@ -4,6 +4,8 @@ import sys
 dirs2make = ["./configs", "./test/trace/patterns", "./test/trace/logs",
              "./test/trace/logs/btrace", "./test/trace/logs/mytrace"]
 bindir = os.path.abspath("./target")
+alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
+               "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 for dir in dirs2make:
     if not(os.path.exists(dir)):
         os.makedirs(dir)
@@ -27,13 +29,19 @@ def runtest(cmdarg):
     os.system(cmdstr)
 
 
+def getd4jprojinfo():
+    for proj in alld4jprojs:
+        getinstclassinfo(proj)
+
+
 def getinstclassinfo(proj):
     str = "defects4j query -p " + proj + \
-        " -q \"bug.id,classes.relevant.src,classes.relevant.test\"  -o " + proj + ".csv"
+        " -q \"bug.id,classes.relevant.src,classes.relevant.test\"  -o ./d4j_resources/" + proj + ".csv"
     os.system(str)
 
 
 def loadinstclass(proj, id):
+    infofile = utf8open("./d4j_resources"+proj)
 
 
 def getd4jcmdline(proj, id, testname):
@@ -65,3 +73,6 @@ if args[1] == 'trace':
 
 if args[1] == 'test':
     runtest(args[2])
+
+if args[1] == 'd4jinit':
+    getd4jprojinfo()
