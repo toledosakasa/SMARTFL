@@ -76,6 +76,8 @@ public class ByteCodeGraph {
 	public Map<String, List<String>> postdataflowmap;
 	public Map<String, Set<String>> dataflowsets;
 	public Map<String, String> post_idom;
+	public Map<String, Integer> store_num;
+	public Map<String, Set<Integer>> branch_stores;
 	private boolean shouldview;
 
 	public void stopview() {
@@ -161,6 +163,9 @@ public class ByteCodeGraph {
 		return newlist;
 	}
 
+	//the stack for stores in branchs
+	private Deque<Set<Integer>> store_stack;
+
 	public void killPredStack(String thisinst) {
 		boolean willcontinue = true;
 		while (willcontinue) {
@@ -170,6 +175,9 @@ public class ByteCodeGraph {
 				// System.out.println("in kill "+stmtName);
 				if (post_idom.get(stmtName).equals(thisinst)) {
 					this.predstack.pop();
+					Set<Integer> stores = this.store_stack.pop();
+					// System.out.println("kill "+stores);
+					//TODO make unexecuted complement
 					willcontinue = true;
 				}
 			}
@@ -190,11 +198,14 @@ public class ByteCodeGraph {
 		postdataflowmap = new HashMap<>();
 		dataflowsets = new TreeMap<>();
 		post_idom = new TreeMap<>();
+		branch_stores = new TreeMap<>();
+		store_num = new HashMap<>();
 		max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
 		stackframe = new ArrayDeque<>();
 		predstack = new ArrayDeque<>();
+		store_stack = new ArrayDeque<>();
 		viewgraph = new SingleGraph("Outgraph");
 		viewgraph.setStrict(false);
 		viewgraph.setAutoCreate(true);
@@ -284,6 +295,9 @@ public class ByteCodeGraph {
 					continue;
 				ParseInfo info = new ParseInfo(t);
 				String thisinst = info.getvalue("lineinfo");
+				Integer storen = info.getintvalue("store");
+				if(storen != null)
+					store_num.put(thisinst,storen);
 				String classandmethod = info.traceclass + "#" + info.tracemethod;
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
@@ -558,7 +572,13 @@ public class ByteCodeGraph {
 				this.parseinfo = new ParseInfo(t);
 				// System.out.println(t);
 				// System.out.println(this.parseinfo.getvalue("lineinfo"));
-				killPredStack(this.parseinfo.getvalue("lineinfo"));
+				String instname = this.parseinfo.getvalue("lineinfo");
+				// System.out.println(instname);
+				killPredStack(instname);
+				if(predataflowmap.get(instname).size()>1){
+					// System.out.println("add set" + branch_stores.get(instname));
+					store_stack.push(branch_stores.get(instname));
+				}
 				// debugLogger.info(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
 				// System.out.println("After "+this.parseinfo.getvalue("lineinfo")+" preds "+
@@ -575,6 +595,41 @@ public class ByteCodeGraph {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+
+
+	private Set<String> visited_for_stores = new HashSet<>();
+	String theidom_for_stores;
+	Set<Integer> thestores;
+	private void dfs_for_stores(String inst){
+		if(inst.equals(theidom_for_stores))
+			return;
+		visited_for_stores.add(inst);
+		Integer storen = store_num.get(inst);
+		if(storen != null)
+			thestores.add(storen);
+		List<String> thenexts = predataflowmap.get(inst);
+		for(String next : thenexts){
+			if(!visited_for_stores.contains(next))
+				dfs_for_stores(next);
+		}
+	}
+
+	public void get_stores(){
+		// System.out.println(store_num);
+		for(String inst: instset){
+			List<String> nextlist = predataflowmap.get(inst);
+			//nextinst might be OUT_xx and there is no term in predataflowmap
+			if(nextlist!=null && nextlist.size()>1){
+				theidom_for_stores = post_idom.get(inst);
+				thestores = new HashSet<>();
+				visited_for_stores.clear();
+				dfs_for_stores(inst);
+				branch_stores.put(inst, thestores);
+			}
+		}
+		// System.out.println(branch_stores);
 	}
 
 	public FactorNode buildStmtFactor(StmtNode stmt, double value){
@@ -678,7 +733,23 @@ public class ByteCodeGraph {
 			outedge.setAttribute("layout.weight", 3);
 		}
 		return ret;
-	}
+    }
+    
+    public NWrongFactorNode buildNWrongFactor(){
+        List<Edge> stmtedges = new ArrayList<>();
+        for (Node n : stmts) {
+			Edge theedge = new Edge();
+			theedge.setnode(n);
+			stmtedges.add(theedge);
+			n.add_edge(theedge);
+		}
+        NWrongFactorNode ret = new NWrongFactorNode(stmtedges,1);
+        factornodes.add(ret);
+        for (Edge e : stmtedges)
+            e.setfactor(ret);
+            
+        return ret;
+    } 
 
 	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
 		assert (traceclass.equals(this.getFrame().traceclass));
@@ -929,6 +1000,8 @@ public class ByteCodeGraph {
 	}
 
 	public void mark_reduce(Node node) {
+		if(node.getreduced() == false)
+			return;
 		node.setreduced();
 		if (node.isStmt)
 			return;
@@ -962,17 +1035,17 @@ public class ByteCodeGraph {
 
 	public long bp_inference() {
 		long startTime = System.currentTimeMillis();
-		// path_reduce();
-		boolean outreduced = false;
+		path_reduce();
+		boolean outreduced = true;
 		if (outreduced) {
-			graphLogger.info("\nreduced Nodes: ");
+			graphLogger.info("\nReduced Nodes: ");
 			for (Node n : stmts) {
 				if (n.getreduced())
-					n.print();
+					n.print(graphLogger);
 			}
 			for (Node n : nodes) {
 				if (n.getreduced())
-					n.print();
+					n.print(graphLogger);
 			}
 			graphLogger.info("\n");
 		}

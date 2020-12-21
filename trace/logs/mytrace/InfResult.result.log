@@ -250,4 +250,4 @@ org.apache.commons.lang3.math.NumberUtilsTest:testStringCreateNumberEnsureNoPrec
 org.apache.commons.lang3.math.NumberUtilsTest:testStringCreateNumberEnsureNoPrecisionLoss3#154#10 prob_bp = 1.0
 org.apache.commons.lang3.math.NumberUtilsTest:testStringCreateNumberEnsureNoPrecisionLoss3#154#13 prob_bp = 1.0
 org.apache.commons.lang3.math.NumberUtilsTest:testStringCreateNumberEnsureNoPrecisionLoss3#154#16 prob_bp = 1.0
-Belief propagation time : 0.103s
+Belief propagation time : 0.144s
