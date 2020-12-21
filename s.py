@@ -36,12 +36,18 @@ def getd4jprojinfo():
 
 def getinstclassinfo(proj):
     str = "defects4j query -p " + proj + \
-        " -q \"bug.id,classes.relevant.src,classes.relevant.test\"  -o ./d4j_resources/" + proj + ".csv"
+        " -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger\"  -o ./d4j_resources/" + proj + ".csv"
     os.system(str)
 
 
 def loadinstclass(proj, id):
     infofile = utf8open("./d4j_resources"+proj)
+    lines = infofile.readlines()
+    for line in lines:
+        splits = line.split(',')
+        if splits[0] == str(id):
+            return splits[1].strip('\"') + ';' + splits[2].strip('\"')
+    return ""
 
 
 def getd4jcmdline(proj, id, testname):
