@@ -62,7 +62,7 @@ def getd4jcmdline(proj, id, testname):
 
 
 args = sys.argv
-if len(args) <= 2:
+if len(args) <= 1:
     print('''usage:
 	s.py btrace preprocessing for btrace tracing
 	s.py mytrace preprocessing for built-in tracing''')
