@@ -1268,16 +1268,18 @@ public class ByteCodeGraph {
 
 		if (traceclass != null) {
 			for (String s : traceclass.split(";")) {
+                if(!s.isEmpty())
 				this.addTracedClass(s);
 			}
 		}
-
 		if (sourcepath != null) {
 			for (String s : sourcepath.split(";")) {
+                if(!s.isEmpty())
 				this.parsesource(baseDir + s);
 			}
 			// long startTime = System.currentTimeMillis();
-			this.get_idom();
+            this.get_idom();
+            this.get_stores();
 			// long endTime = System.currentTimeMillis();
 			// long thetime = endTime-startTime;
 			// System.out.println("idom time is "+ thetime);
@@ -1285,7 +1287,9 @@ public class ByteCodeGraph {
 		}
 		if (tracepath != null)
 			for (String s : tracepath.split(";")) {
-				String[] tmp = s.split(":");
+                if(s.isEmpty())
+                    continue;
+                String[] tmp = s.split(":");
 				String testpath = tmp[0];
 				String testClassAndMethod = testpath.substring(0, testpath.lastIndexOf('.'));
 				String testMethod = testClassAndMethod.substring(testClassAndMethod.lastIndexOf('.') + 1,
