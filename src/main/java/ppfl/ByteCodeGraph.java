@@ -176,16 +176,19 @@ public class ByteCodeGraph {
 				if (post_idom.get(stmtName).equals(thisinst)) {
 					Node curPred = this.predstack.pop();
 					Set<Integer> stores = null;
-					if (!this.store_stack.isEmpty())
-						stores = this.store_stack.pop();
-					// System.out.println("kill "+stores);
-					if (stores != null) {
-						StmtNode curStmt = curPred.stmt;
-						for (Integer i : stores) {
-							Node defnode = addNewVarNode(i, curStmt);
-							buildFactor(defnode, curPred, getLoadNodeAsUse(i), null, curStmt);
-						}
-					}
+					// if (!this.store_stack.isEmpty())
+					stores = this.store_stack.pop();
+                    // System.out.println("kill "+stores);
+                    boolean unexcuted_complement = true;
+                    if(unexcuted_complement){
+                        if (stores != null) {
+                            StmtNode curStmt = curPred.stmt;
+                            for (Integer i : stores) {
+                                Node defnode = addNewVarNode(i, curStmt);
+                                buildFactor(defnode, curPred, getLoadNodeAsUse(i), null, curStmt);
+                            }
+                        }
+                    }
 					willcontinue = true;
 				}
 			}
@@ -586,7 +589,7 @@ public class ByteCodeGraph {
 				if (predataflowmap.get(instname).size() > 1) {
 					// System.out.println("add set" + branch_stores.get(instname));
 					Set<Integer> stores = branch_stores.get(instname);
-					if (stores != null)
+					// if (stores != null)
 						store_stack.push(stores);
 				}
 				// debugLogger.info(this.parseinfo.form);

@@ -4,14 +4,20 @@ import org.junit.jupiter.api.Test;
 
 public class Unexcuted {
     public static int foo(int a, int b) {
+        int c = 0;
+        int d = 0;
         if(a<5)
         {
             a+=10;
+            b=b;
+            // c++;
             //b+=100;
         }
         else
         {
             b+=10;
+            a=a;
+            // d++;
         }
         int r = b*b;
         return r;
