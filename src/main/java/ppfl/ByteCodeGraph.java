@@ -175,7 +175,9 @@ public class ByteCodeGraph {
 				// System.out.println("in kill "+stmtName);
 				if (post_idom.get(stmtName).equals(thisinst)) {
 					this.predstack.pop();
-					Set<Integer> stores = this.store_stack.pop();
+					Set<Integer> stores;
+					if(!this.store_stack.isEmpty())
+						stores = this.store_stack.pop();
 					// System.out.println("kill "+stores);
 					//TODO make unexecuted complement
 					willcontinue = true;
@@ -577,7 +579,9 @@ public class ByteCodeGraph {
 				killPredStack(instname);
 				if(predataflowmap.get(instname).size()>1){
 					// System.out.println("add set" + branch_stores.get(instname));
-					store_stack.push(branch_stores.get(instname));
+					Set<Integer> stores = branch_stores.get(instname);
+					if(stores != null)
+						store_stack.push(stores);
 				}
 				// debugLogger.info(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
