@@ -24,7 +24,7 @@ public class IincInst extends OpcodeInst {
 		// build the stmtnode(common)
 		super.buildtrace(graph);
 
-		int varindex = info.getintvalue("VAR");
+		int varindex = info.getintvalue("store");
 		// int incconst = info.getintvalue("CONST");
 
 		usenodes.add(graph.getLoadNodeAsUse(varindex));
@@ -39,7 +39,8 @@ public class IincInst extends OpcodeInst {
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
-		ret.append(",VAR=" + getpara(ci, index, 1));
+		String incVar = getpara(ci, index, 1);
+		ret.append(",store=" + incVar);
 		ret.append(",CONST=" + getpara(ci, index, 2));
 		return ret.toString();
 	}
