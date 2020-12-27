@@ -35,7 +35,7 @@ public class InstrumentationAgent {
 		debugLogger.info("[Agent] In main method");
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("instrumentingclass=")) {
-				className = s.split("=")[1].split(";");
+				className = s.split("=")[1].split(":");
 			}
 			if (s.startsWith("logfile=")) {
 				logFile = s.split("=")[1];
