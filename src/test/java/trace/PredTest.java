@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class PredTest {
 	public static int foo(int a) {
-		if (a < 3) { // a<2
+		if (a < 3) { // should be a<2
 			a++;
 		}
 		return a;
@@ -13,11 +13,11 @@ public class PredTest {
 
 	@Test
 	void pass() {
-		assertEquals(foo(1), 2);
+		assertEquals(2, foo(1));
 	}
 
 	@Test
 	void fail() {
-		assertEquals(foo(2), 2);
+		assertEquals(2, foo(2));
 	}
 }
