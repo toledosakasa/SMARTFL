@@ -35,36 +35,68 @@ def getd4jprojinfo():
 
 
 def getinstclassinfo(proj):
-    str = "defects4j query -p " + proj + \
-        " -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger\"  -o ./d4j_resources/" + proj + ".csv"
-    os.system(str)
+    cmdline = "defects4j query -p {projname} -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger\"  -o ./d4j_resources/{projname}.csv".format(
+        projname=proj)
+    os.system(cmdline)
 
 
-def loadinstclass(proj, id):
-    infofile = utf8open("./d4j_resources"+proj)
-    lines = infofile.readlines()
-    for line in lines:
-        splits = line.split(',')
-        if splits[0] == str(id):
-            return splits[1].strip('\"') + ';' + splits[2].strip('\"')
-    return ""
+def getmetainfo(proj, id):
+    ret = {}
+    # caching
+    cachepath = os.path.abspath(
+        './d4j_resources/metadata_cached/{proj}{id}.log'.format(proj=proj, id=id))
+    if os.path.exists(cachepath):
+        lines = utf8open(cachepath).readlines()
+        for line in lines:
+            splits = line.split('=')
+            ret[splits[0]] = splits[1]
+        return ret
+
+    # if not cached, generate metadata
+    workdir = os.path.abspath(
+        './tmp_checkout/{proj}{id}'.format(proj=proj, id=id))
+    if not os.path.exists(workdir):
+        checkout(proj, id)
+    fields = ['tests.all', 'classes.relevant.src', 'tests.trigger']
+    for field in fields:
+        ret[field] = os.popen(
+            'defects4j export -p {field} -w {workdir}'.format(field=field, workdir=workdir))
+    cmdline_getallmethods = 'mvn -q exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj}{id}"'.format(
+        proj=proj, id=id)
+    os.system(cmdline_getallmethods)
+    # FIXME
+    ret['methods.test.all'] = utf8open(
+        './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(proj=proj, id=id)).readlines
+
+    # write to cache
+    cachedir = os.path.abspath('./d4j_resources/metadata_cached')
+    if not os.path.exists(cachedir):
+        os.mkdir(cachedir)
+    cachefile = utf8open(cachepath)
+    for k in ret:
+        cachefile.write('{key}={value}'.format(key=k, value=ret[k]))
+    # cleanup
+    os.system('rm -rf {workdir}'.format(workdir=workdir))
+    return ret
 
 
 def getd4jcmdline(proj, id, testname):
-    instclass = loadinstclass(proj, id)
-    ret = ""
-    ret += "defects4j test -t "
-    ret += testname  # org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss3
-    ret += "-a \"-Djvmargs=-noverify -Djvmargs="
+    metadata = getmetainfo(proj, id)
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
-    # /mnt/e/My_files/eclipse-workspace/ppfl/target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar
-    ret = ret + "-javaagent:" + jarpath + "="
-    # org.apache.commons.lang3.math.NumberUtilsTest.testStringCreateNumberEnsureNoPrecisionLoss3,
-    ret = ret + "logfile=" + testname.replace("::", ".") + ","
-    # org.apache.commons.lang3.StringUtils:org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.math.NumberUtilsTest"
-    ret = ret + "instrumentingclass=" + instclass
+    instclasses = metadata['classes.relevant.src'] + \
+        ';' + metadata['tests.all']
+    testnames = metadata['methods']
+    ret = "defects4j test -t {testname} \
+        -a \"-Djvmargs=-noverify \
+            -Djvmargs=-javaagent:{jarpath}=logfile={dottestname},\
+                instrumentingclass={instclass}\"".format(testname=testname, jarpath=jarpath, dottestname=testname.replace("::", "."), instclass=instclasses)
     return ret
+
+
+def checkout(proj, id):
+    os.system(
+        'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}{id}'.format(proj=proj, id=id))
 
 
 args = sys.argv
