@@ -86,6 +86,7 @@ def getd4jcmdline(proj, id, testname):
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     instclasses = metadata['classes.relevant.src'] + \
         ';' + metadata['tests.all']
+    instclasses = instclasses.replace(";", ":")
     testnames = metadata['methods']
     ret = "defects4j test -t {testname} \
         -a \"-Djvmargs=-noverify \
