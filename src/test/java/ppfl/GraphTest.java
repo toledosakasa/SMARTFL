@@ -537,6 +537,43 @@ class GraphTest {
 	@Test
 	public void pred7test_bc() {
 		ByteCodeGraph pgraph = pred7init_bc();
+    }
+    
+    // ByteCodeGraph unexcutedinit_bc() {
+	// 	String ppflroot = ".";
+	// 	String traceBaseDir = ppflroot + "\\trace\\logs\\mytrace\\";
+	// 	String configpath = traceBaseDir + "unexcuted.log";
+
+	// 	ByteCodeGraph pgraph = new ByteCodeGraph();
+	// 	pgraph.setAutoOracle(true);
+	// 	pgraph.setTraceAllClassed(false);
+
+	// 	pgraph.initFromConfigFile(traceBaseDir, configpath);
+    //     // pgraph.buildNWrongFactor();
+	// 	pgraph.printgraph();
+	// 	return pgraph;
+	// }
+
+    ByteCodeGraph unexcutedinit_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexcuted.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexcuted.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.Unexcuted.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+        pgraph.get_idom();
+        pgraph.get_stores();
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void unexcutedtest_bc() {
+		ByteCodeGraph pgraph = unexcutedinit_bc();
+		pgraph.check_bp(true);
 	}
 
 	ByteCodeGraph forinit_bc() {
@@ -547,7 +584,8 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
-		pgraph.get_idom();
+        pgraph.get_idom();
+        pgraph.get_stores();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
 		// for(StmtNode stmt: pgraph.stmts){

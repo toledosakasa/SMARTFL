@@ -176,16 +176,19 @@ public class ByteCodeGraph {
 				if (post_idom.get(stmtName).equals(thisinst)) {
 					Node curPred = this.predstack.pop();
 					Set<Integer> stores = null;
-					if (!this.store_stack.isEmpty())
-						stores = this.store_stack.pop();
-					// System.out.println("kill "+stores);
-					if (stores != null) {
-						StmtNode curStmt = curPred.stmt;
-						for (Integer i : stores) {
-							Node defnode = addNewVarNode(i, curStmt);
-							buildFactor(defnode, curPred, getLoadNodeAsUse(i), null, curStmt);
-						}
-					}
+					// if (!this.store_stack.isEmpty())
+					stores = this.store_stack.pop();
+                    // System.out.println("kill "+stores);
+                    boolean unexcuted_complement = true;
+                    if(unexcuted_complement){
+                        if (stores != null) {
+                            StmtNode curStmt = curPred.stmt;
+                            for (Integer i : stores) {
+                                Node defnode = addNewVarNode(i, curStmt);
+                                buildFactor(defnode, curPred, getLoadNodeAsUse(i), null, curStmt);
+                            }
+                        }
+                    }
 					willcontinue = true;
 				}
 			}
@@ -586,7 +589,7 @@ public class ByteCodeGraph {
 				if (predataflowmap.get(instname).size() > 1) {
 					// System.out.println("add set" + branch_stores.get(instname));
 					Set<Integer> stores = branch_stores.get(instname);
-					if (stores != null)
+					// if (stores != null)
 						store_stack.push(stores);
 				}
 				// debugLogger.info(this.parseinfo.form);
@@ -1281,16 +1284,18 @@ public class ByteCodeGraph {
 
 		if (traceclass != null) {
 			for (String s : traceclass.split(";")) {
+                if(!s.isEmpty())
 				this.addTracedClass(s);
 			}
 		}
-
 		if (sourcepath != null) {
 			for (String s : sourcepath.split(";")) {
+                if(!s.isEmpty())
 				this.parsesource(baseDir + s);
 			}
 			// long startTime = System.currentTimeMillis();
-			this.get_idom();
+            this.get_idom();
+            this.get_stores();
 			// long endTime = System.currentTimeMillis();
 			// long thetime = endTime-startTime;
 			// System.out.println("idom time is "+ thetime);
@@ -1298,7 +1303,9 @@ public class ByteCodeGraph {
 		}
 		if (tracepath != null)
 			for (String s : tracepath.split(";")) {
-				String[] tmp = s.split(":");
+                if(s.isEmpty())
+                    continue;
+                String[] tmp = s.split(":");
 				String testpath = tmp[0];
 				String testClassAndMethod = testpath.substring(0, testpath.lastIndexOf('.'));
 				String testMethod = testClassAndMethod.substring(testClassAndMethod.lastIndexOf('.') + 1,
