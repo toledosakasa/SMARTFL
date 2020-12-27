@@ -8,7 +8,7 @@ public class ConditionTest {
         int rst = 0;
         if (a > 2) {
             rst++;
-        } else if (a < -1) { // should be a<-2
+        } else if (a < -1) { // should be a < -2
             rst -= 10;
         }
         if (b > 3) {
