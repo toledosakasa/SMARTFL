@@ -36,7 +36,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#261#34,nextinst=37
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#262#37,nextinst=38
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#262#38,nextinst=39
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#260#39,nextinst=42
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#260#39,nextinst=42
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#260#42,nextinst=45
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#265#45,nextinst=46
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isBlank#265#46,nextinst=-1
@@ -132,7 +132,7 @@ opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUti
 opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#520#28,nextinst=31
 opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=isWhitespace,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#520#31,nextinst=34
 opcode=153(ifeq)	,popnum=1,branchbyte=42,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#520#34,nextinst=37
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#521#37,nextinst=40
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#521#37,nextinst=40
 opcode=167(goto)	,branchbyte=-19,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#521#40,nextinst=43
 opcode=43(aload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#523#43,nextinst=44
 opcode=182(invokevirtual)	,calltype=()I,callclass=java.lang.String,callname=length,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#523#44,nextinst=47
@@ -149,7 +149,7 @@ opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=cha
 opcode=182(invokevirtual)	,calltype=(I)I,callclass=java.lang.String,callname=indexOf,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#526#63,nextinst=66
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#526#66,nextinst=67
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=9,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#526#67,nextinst=70
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#527#70,nextinst=73
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#527#70,nextinst=73
 opcode=167(goto)	,branchbyte=-21,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#527#73,nextinst=76
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#530#76,nextinst=77
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#stripStart#530#77,nextinst=78
@@ -175,7 +175,7 @@ opcode=100(isub)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUti
 opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#565#27,nextinst=30
 opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=isWhitespace,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#565#30,nextinst=33
 opcode=153(ifeq)	,popnum=1,branchbyte=43,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#565#33,nextinst=36
-opcode=132(iinc)	,VAR=2,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#566#36,nextinst=39
+opcode=132(iinc)	,store=2,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#566#36,nextinst=39
 opcode=167(goto)	,branchbyte=-20,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#566#39,nextinst=42
 opcode=43(aload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#568#42,nextinst=43
 opcode=182(invokevirtual)	,calltype=()I,callclass=java.lang.String,callname=length,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#568#43,nextinst=46
@@ -193,7 +193,7 @@ opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=cha
 opcode=182(invokevirtual)	,calltype=(I)I,callclass=java.lang.String,callname=indexOf,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#571#63,nextinst=66
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#571#66,nextinst=67
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=9,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#571#67,nextinst=70
-opcode=132(iinc)	,VAR=2,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#572#70,nextinst=73
+opcode=132(iinc)	,store=2,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#572#70,nextinst=73
 opcode=167(goto)	,branchbyte=-22,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#572#73,nextinst=76
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#575#76,nextinst=77
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#stripEnd#575#77,nextinst=78
@@ -229,7 +229,7 @@ opcode=50(aaload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUt
 opcode=43(aload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#635#34,nextinst=35
 opcode=184(invokestatic)	,calltype=(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;,callclass=org.apache.commons.lang3.StringUtils,callname=strip,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#635#35,nextinst=38
 opcode=83(aastore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#635#38,nextinst=39
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#634#39,nextinst=42
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#634#39,nextinst=42
 opcode=167(goto)	,branchbyte=-21,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#634#42,nextinst=45
 opcode=45(aload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#637#45,nextinst=46
 opcode=176(areturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#stripAll#637#46,nextinst=-1
@@ -411,7 +411,7 @@ opcode=21(iload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=156(ifge)	,popnum=1,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#937#88,nextinst=91
 opcode=21(iload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#938#91,nextinst=93
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#938#93,nextinst=94
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#940#94,nextinst=97
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#940#94,nextinst=97
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#941#97,nextinst=99
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#941#99,nextinst=100
 opcode=161(if_icmplt)	,popnum=2,branchbyte=-43,lineinfo=org.apache.commons.lang3.StringUtils#ordinalIndexOf#941#100,nextinst=103
@@ -466,7 +466,7 @@ opcode=184(invokestatic)	,calltype=(Ljava/lang/CharSequence;ZILjava/lang/CharSeq
 opcode=153(ifeq)	,popnum=1,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1021#74,nextinst=77
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1022#77,nextinst=79
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1022#79,nextinst=80
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1020#80,nextinst=83
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1020#80,nextinst=83
 opcode=167(goto)	,branchbyte=-30,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1020#83,nextinst=86
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1025#86,nextinst=87
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfIgnoreCase#1025#87,nextinst=-1
@@ -575,7 +575,7 @@ opcode=184(invokestatic)	,calltype=(Ljava/lang/CharSequence;ZILjava/lang/CharSeq
 opcode=153(ifeq)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1270#78,nextinst=81
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1271#81,nextinst=82
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1271#82,nextinst=83
-opcode=132(iinc)	,VAR=3,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1269#83,nextinst=86
+opcode=132(iinc)	,store=3,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1269#83,nextinst=86
 opcode=167(goto)	,branchbyte=-26,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1269#86,nextinst=89
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1274#89,nextinst=90
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfIgnoreCase#1274#90,nextinst=-1
@@ -637,7 +637,7 @@ opcode=184(invokestatic)	,calltype=(Ljava/lang/CharSequence;ZILjava/lang/CharSeq
 opcode=153(ifeq)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1366#45,nextinst=48
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1367#48,nextinst=49
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1367#49,nextinst=50
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1365#50,nextinst=53
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1365#50,nextinst=53
 opcode=167(goto)	,branchbyte=-24,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1365#53,nextinst=56
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1370#56,nextinst=57
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsIgnoreCase#1370#57,nextinst=-1
@@ -661,7 +661,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=153(ifeq)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1388#33,nextinst=36
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1389#36,nextinst=37
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1389#37,nextinst=38
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1387#38,nextinst=41
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1387#38,nextinst=41
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1387#41,nextinst=44
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1392#44,nextinst=45
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsWhitespace#1392#45,nextinst=-1
@@ -730,9 +730,9 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1435#117,nextinst=118
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1438#118,nextinst=120
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1438#120,nextinst=121
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1430#121,nextinst=124
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1430#121,nextinst=124
 opcode=167(goto)	,branchbyte=-65,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1430#124,nextinst=127
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1428#127,nextinst=130
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1428#127,nextinst=130
 opcode=167(goto)	,branchbyte=-90,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1428#130,nextinst=133
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1443#133,nextinst=134
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1443#134,nextinst=-1
@@ -816,9 +816,9 @@ opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#cont
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1520#117,nextinst=118
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1524#118,nextinst=119
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1524#119,nextinst=120
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1512#120,nextinst=123
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1512#120,nextinst=123
 opcode=167(goto)	,branchbyte=-65,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1512#123,nextinst=126
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1510#126,nextinst=129
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1510#126,nextinst=129
 opcode=167(goto)	,branchbyte=-90,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1510#129,nextinst=132
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1529#132,nextinst=133
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsAny#1529#133,nextinst=-1
@@ -893,11 +893,11 @@ opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=185(invokeinterface)	,calltype=(I)C,callclass=java.lang.CharSequence,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1607#107,nextinst=112
 opcode=160(if_icmpne)	,popnum=2,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1607#112,nextinst=115
 opcode=167(goto)	,branchbyte=12,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1608#115,nextinst=118
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1604#118,nextinst=121
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1604#118,nextinst=121
 opcode=167(goto)	,branchbyte=-62,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1604#121,nextinst=124
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1615#124,nextinst=126
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1615#126,nextinst=127
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1602#127,nextinst=130
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1602#127,nextinst=130
 opcode=167(goto)	,branchbyte=-90,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1602#130,nextinst=133
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1617#133,nextinst=134
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1617#134,nextinst=-1
@@ -958,7 +958,7 @@ opcode=21(iload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1657#104,nextinst=107
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1658#107,nextinst=108
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1658#108,nextinst=109
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1648#109,nextinst=112
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1648#109,nextinst=112
 opcode=167(goto)	,branchbyte=-87,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1648#112,nextinst=115
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1662#115,nextinst=116
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAnyBut#1662#116,nextinst=-1
@@ -1063,9 +1063,9 @@ opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#cont
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1776#112,nextinst=113
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1780#113,nextinst=114
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1780#114,nextinst=115
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1768#115,nextinst=118
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1768#115,nextinst=118
 opcode=167(goto)	,branchbyte=-65,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1768#118,nextinst=121
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1766#121,nextinst=124
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1766#121,nextinst=124
 opcode=167(goto)	,branchbyte=-90,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1766#124,nextinst=127
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1785#127,nextinst=128
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#containsNone#1785#128,nextinst=-1
@@ -1119,7 +1119,7 @@ opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUti
 opcode=162(if_icmpge)	,popnum=2,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1867#63,nextinst=66
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1868#66,nextinst=68
 opcode=62(istore_3)	,popnum=1,store=3,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1868#68,nextinst=69
-opcode=132(iinc)	,VAR=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1857#69,nextinst=72
+opcode=132(iinc)	,store=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1857#69,nextinst=72
 opcode=167(goto)	,branchbyte=-50,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1857#72,nextinst=75
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1872#75,nextinst=76
 opcode=18(ldc)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfAny#1872#76,nextinst=78
@@ -1164,7 +1164,7 @@ opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUti
 opcode=164(if_icmple)	,popnum=2,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1914#58,nextinst=61
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1915#61,nextinst=63
 opcode=62(istore_3)	,popnum=1,store=3,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1915#63,nextinst=64
-opcode=132(iinc)	,VAR=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1908#64,nextinst=67
+opcode=132(iinc)	,store=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1908#64,nextinst=67
 opcode=167(goto)	,branchbyte=-46,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1908#67,nextinst=70
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1918#70,nextinst=71
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#lastIndexOfAny#1918#71,nextinst=-1
@@ -1630,7 +1630,7 @@ opcode=164(if_icmple)	,popnum=2,branchbyte=112,lineinfo=org.apache.commons.lang3
 opcode=21(iload)	,pushnum=1,load=9,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2714#88,nextinst=90
 opcode=21(iload)	,pushnum=1,load=8,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2714#90,nextinst=92
 opcode=164(if_icmple)	,popnum=2,branchbyte=55,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2714#92,nextinst=95
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2715#95,nextinst=98
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2715#95,nextinst=98
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2717#98,nextinst=100
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2717#100,nextinst=101
 opcode=160(if_icmpne)	,popnum=2,branchbyte=22,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2717#101,nextinst=104
@@ -1657,7 +1657,7 @@ opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=167(goto)	,branchbyte=-78,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2728#144,nextinst=147
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2732#147,nextinst=148
 opcode=153(ifeq)	,popnum=1,branchbyte=39,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2732#148,nextinst=151
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2733#151,nextinst=154
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2733#151,nextinst=154
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2734#154,nextinst=156
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2734#156,nextinst=157
 opcode=160(if_icmpne)	,popnum=2,branchbyte=22,lineinfo=org.apache.commons.lang3.StringUtils#splitByWholeSeparatorWorker#2734#157,nextinst=160
@@ -1752,7 +1752,7 @@ opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#spli
 opcode=54(istore)	,popnum=1,store=7,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2848#82,nextinst=84
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2849#84,nextinst=85
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2849#85,nextinst=87
-opcode=132(iinc)	,VAR=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2851#87,nextinst=90
+opcode=132(iinc)	,store=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2851#87,nextinst=90
 opcode=21(iload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2851#90,nextinst=92
 opcode=54(istore)	,popnum=1,store=6,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2851#92,nextinst=94
 opcode=167(goto)	,branchbyte=-54,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2852#94,nextinst=97
@@ -1760,7 +1760,7 @@ opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#spli
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2854#98,nextinst=100
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2855#100,nextinst=101
 opcode=54(istore)	,popnum=1,store=7,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2855#101,nextinst=103
-opcode=132(iinc)	,VAR=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2856#103,nextinst=106
+opcode=132(iinc)	,store=5,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2856#103,nextinst=106
 opcode=167(goto)	,branchbyte=-66,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2856#106,nextinst=109
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2858#109,nextinst=111
 opcode=154(ifne)	,popnum=1,branchbyte=12,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2858#111,nextinst=114
@@ -1836,7 +1836,7 @@ opcode=153(ifeq)	,popnum=1,branchbyte=41,lineinfo=org.apache.commons.lang3.Strin
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2977#77,nextinst=78
 opcode=54(istore)	,popnum=1,store=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2977#78,nextinst=80
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2978#80,nextinst=82
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2978#82,nextinst=85
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2978#82,nextinst=85
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2978#85,nextinst=86
 opcode=160(if_icmpne)	,popnum=2,branchbyte=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2978#86,nextinst=89
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2979#89,nextinst=91
@@ -1852,7 +1852,7 @@ opcode=185(invokeinterface)	,calltype=(Ljava/lang/Object;)Z,callclass=java.util.
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2982#111,nextinst=112
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2983#112,nextinst=113
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2983#113,nextinst=115
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2985#115,nextinst=118
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2985#115,nextinst=118
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2985#118,nextinst=120
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2985#120,nextinst=122
 opcode=167(goto)	,branchbyte=-73,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2986#122,nextinst=125
@@ -1860,7 +1860,7 @@ opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#spli
 opcode=54(istore)	,popnum=1,store=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2988#126,nextinst=128
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2989#128,nextinst=129
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2989#129,nextinst=131
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2990#131,nextinst=134
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2990#131,nextinst=134
 opcode=167(goto)	,branchbyte=-85,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2990#134,nextinst=137
 opcode=43(aload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2992#137,nextinst=138
 opcode=182(invokevirtual)	,calltype=()I,callclass=java.lang.String,callname=length,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2992#138,nextinst=141
@@ -1885,7 +1885,7 @@ opcode=153(ifeq)	,popnum=1,branchbyte=41,lineinfo=org.apache.commons.lang3.Strin
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2998#179,nextinst=180
 opcode=54(istore)	,popnum=1,store=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2998#180,nextinst=182
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2999#182,nextinst=184
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2999#184,nextinst=187
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2999#184,nextinst=187
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2999#187,nextinst=188
 opcode=160(if_icmpne)	,popnum=2,branchbyte=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#2999#188,nextinst=191
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3000#191,nextinst=193
@@ -1901,7 +1901,7 @@ opcode=185(invokeinterface)	,calltype=(Ljava/lang/Object;)Z,callclass=java.util.
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3003#213,nextinst=214
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3004#214,nextinst=215
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3004#215,nextinst=217
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3006#217,nextinst=220
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3006#217,nextinst=220
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3006#220,nextinst=222
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3006#222,nextinst=224
 opcode=167(goto)	,branchbyte=-72,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3007#224,nextinst=227
@@ -1909,7 +1909,7 @@ opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#spli
 opcode=54(istore)	,popnum=1,store=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3009#228,nextinst=230
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3010#230,nextinst=231
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3010#231,nextinst=233
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3011#233,nextinst=236
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3011#233,nextinst=236
 opcode=167(goto)	,branchbyte=-84,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3011#236,nextinst=239
 opcode=167(goto)	,branchbyte=92,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3013#239,nextinst=242
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3015#242,nextinst=244
@@ -1928,7 +1928,7 @@ opcode=153(ifeq)	,popnum=1,branchbyte=41,lineinfo=org.apache.commons.lang3.Strin
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3018#271,nextinst=272
 opcode=54(istore)	,popnum=1,store=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3018#272,nextinst=274
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3019#274,nextinst=276
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3019#276,nextinst=279
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3019#276,nextinst=279
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3019#279,nextinst=280
 opcode=160(if_icmpne)	,popnum=2,branchbyte=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3019#280,nextinst=283
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3020#283,nextinst=285
@@ -1944,7 +1944,7 @@ opcode=185(invokeinterface)	,calltype=(Ljava/lang/Object;)Z,callclass=java.util.
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3023#305,nextinst=306
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3024#306,nextinst=307
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3024#307,nextinst=309
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3026#309,nextinst=312
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3026#309,nextinst=312
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3026#312,nextinst=314
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3026#314,nextinst=316
 opcode=167(goto)	,branchbyte=-74,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3027#316,nextinst=319
@@ -1952,7 +1952,7 @@ opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#spli
 opcode=54(istore)	,popnum=1,store=10,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3029#320,nextinst=322
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3030#322,nextinst=323
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3030#323,nextinst=325
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3031#325,nextinst=328
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3031#325,nextinst=328
 opcode=167(goto)	,branchbyte=-86,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3031#328,nextinst=331
 opcode=21(iload)	,pushnum=1,load=9,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3034#331,nextinst=333
 opcode=154(ifne)	,popnum=1,branchbyte=12,lineinfo=org.apache.commons.lang3.StringUtils#splitWorker#3034#333,nextinst=336
@@ -2066,7 +2066,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=54(istore)	,popnum=1,store=4,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3129#156,nextinst=158
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3131#158,nextinst=160
 opcode=54(istore)	,popnum=1,store=5,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3131#160,nextinst=162
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3116#162,nextinst=165
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3116#162,nextinst=165
 opcode=167(goto)	,branchbyte=-117,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3116#165,nextinst=168
 opcode=45(aload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3133#168,nextinst=169
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#splitByCharacterType#3133#169,nextinst=172
@@ -2220,7 +2220,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=50(aaload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3459#67,nextinst=68
 opcode=182(invokevirtual)	,calltype=(Ljava/lang/Object;)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3459#68,nextinst=71
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3459#71,nextinst=72
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3454#72,nextinst=75
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3454#72,nextinst=75
 opcode=167(goto)	,branchbyte=-39,lineinfo=org.apache.commons.lang3.StringUtils#join#3454#75,nextinst=78
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3462#78,nextinst=80
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3462#80,nextinst=83
@@ -2262,7 +2262,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=47(laload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3509#60,nextinst=61
 opcode=182(invokevirtual)	,calltype=(J)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3509#61,nextinst=64
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3509#64,nextinst=65
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3505#65,nextinst=68
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3505#65,nextinst=68
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#join#3505#68,nextinst=71
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3511#71,nextinst=73
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3511#73,nextinst=76
@@ -2304,7 +2304,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=46(iaload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3558#60,nextinst=61
 opcode=182(invokevirtual)	,calltype=(I)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3558#61,nextinst=64
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3558#64,nextinst=65
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3554#65,nextinst=68
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3554#65,nextinst=68
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#join#3554#68,nextinst=71
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3560#71,nextinst=73
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3560#73,nextinst=76
@@ -2346,7 +2346,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=51(baload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3607#60,nextinst=61
 opcode=182(invokevirtual)	,calltype=(I)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3607#61,nextinst=64
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3607#64,nextinst=65
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3603#65,nextinst=68
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3603#65,nextinst=68
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#join#3603#68,nextinst=71
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3609#71,nextinst=73
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3609#73,nextinst=76
@@ -2388,7 +2388,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=53(saload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3656#60,nextinst=61
 opcode=182(invokevirtual)	,calltype=(I)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3656#61,nextinst=64
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3656#64,nextinst=65
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3652#65,nextinst=68
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3652#65,nextinst=68
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#join#3652#68,nextinst=71
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3658#71,nextinst=73
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3658#73,nextinst=76
@@ -2430,7 +2430,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=52(caload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3705#60,nextinst=61
 opcode=182(invokevirtual)	,calltype=(C)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3705#61,nextinst=64
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3705#64,nextinst=65
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3701#65,nextinst=68
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3701#65,nextinst=68
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#join#3701#68,nextinst=71
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3707#71,nextinst=73
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3707#73,nextinst=76
@@ -2472,7 +2472,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=49(daload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3754#60,nextinst=61
 opcode=182(invokevirtual)	,calltype=(D)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3754#61,nextinst=64
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3754#64,nextinst=65
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3750#65,nextinst=68
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3750#65,nextinst=68
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#join#3750#68,nextinst=71
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3756#71,nextinst=73
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3756#73,nextinst=76
@@ -2514,7 +2514,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=48(faload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3803#60,nextinst=61
 opcode=182(invokevirtual)	,calltype=(F)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3803#61,nextinst=64
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3803#64,nextinst=65
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3799#65,nextinst=68
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3799#65,nextinst=68
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#join#3799#68,nextinst=71
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3805#71,nextinst=73
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3805#73,nextinst=76
@@ -2575,7 +2575,7 @@ opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=50(aaload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3896#74,nextinst=75
 opcode=182(invokevirtual)	,calltype=(Ljava/lang/Object;)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#join#3896#75,nextinst=78
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3896#78,nextinst=79
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3891#79,nextinst=82
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#join#3891#79,nextinst=82
 opcode=167(goto)	,branchbyte=-39,lineinfo=org.apache.commons.lang3.StringUtils#join#3891#82,nextinst=85
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#join#3899#85,nextinst=87
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#join#3899#87,nextinst=90
@@ -2723,12 +2723,12 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=15,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4058#38,nextinst=41
 opcode=44(aload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#41,nextinst=42
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#42,nextinst=43
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#43,nextinst=46
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#43,nextinst=46
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#46,nextinst=47
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#47,nextinst=49
 opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#49,nextinst=52
 opcode=85(castore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4059#52,nextinst=53
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4057#53,nextinst=56
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4057#53,nextinst=56
 opcode=167(goto)	,branchbyte=-33,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4057#56,nextinst=59
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4062#59,nextinst=60
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#deleteWhitespace#4062#60,nextinst=61
@@ -2868,12 +2868,12 @@ opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUti
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=13,lineinfo=org.apache.commons.lang3.StringUtils#remove#4265#40,nextinst=43
 opcode=44(aload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#43,nextinst=44
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#44,nextinst=45
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#45,nextinst=48
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#45,nextinst=48
 opcode=44(aload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#48,nextinst=49
 opcode=21(iload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#49,nextinst=51
 opcode=52(caload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#51,nextinst=52
 opcode=85(castore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#remove#4266#52,nextinst=53
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#remove#4264#53,nextinst=56
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#remove#4264#53,nextinst=56
 opcode=167(goto)	,branchbyte=-28,lineinfo=org.apache.commons.lang3.StringUtils#remove#4264#56,nextinst=59
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#remove#4269#59,nextinst=62
 opcode=89(dup)	,pushnum=1,load=44,lineinfo=org.apache.commons.lang3.StringUtils#remove#4269#62,nextinst=63
@@ -2982,7 +2982,7 @@ opcode=21(iload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#replace#4412#140,nextinst=142
 opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#replace#4412#142,nextinst=143
 opcode=54(istore)	,popnum=1,store=4,lineinfo=org.apache.commons.lang3.StringUtils#replace#4412#143,nextinst=145
-opcode=132(iinc)	,VAR=3,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#replace#4413#145,nextinst=148
+opcode=132(iinc)	,store=3,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#replace#4413#145,nextinst=148
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#replace#4413#148,nextinst=149
 opcode=154(ifne)	,popnum=1,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#replace#4413#149,nextinst=152
 opcode=167(goto)	,branchbyte=15,lineinfo=org.apache.commons.lang3.StringUtils#replace#4414#152,nextinst=155
@@ -3127,7 +3127,7 @@ opcode=21(iload)	,pushnum=1,load=10,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4614#199,nextinst=201
 opcode=21(iload)	,pushnum=1,load=11,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4615#201,nextinst=203
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4615#203,nextinst=205
-opcode=132(iinc)	,VAR=11,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4602#205,nextinst=208
+opcode=132(iinc)	,store=11,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4602#205,nextinst=208
 opcode=167(goto)	,branchbyte=-91,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4602#208,nextinst=211
 opcode=21(iload)	,pushnum=1,load=8,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4622#211,nextinst=213
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4622#213,nextinst=214
@@ -3171,7 +3171,7 @@ opcode=21(iload)	,pushnum=1,load=14,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=104(imul)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4638#279,nextinst=280
 opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4638#280,nextinst=281
 opcode=54(istore)	,popnum=1,store=12,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4638#281,nextinst=283
-opcode=132(iinc)	,VAR=13,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4632#283,nextinst=286
+opcode=132(iinc)	,store=13,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4632#283,nextinst=286
 opcode=167(goto)	,branchbyte=-58,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4632#286,nextinst=289
 opcode=21(iload)	,pushnum=1,load=12,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4642#289,nextinst=291
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4642#291,nextinst=292
@@ -3202,7 +3202,7 @@ opcode=21(iload)	,pushnum=1,load=14,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4649#340,nextinst=343
 opcode=182(invokevirtual)	,calltype=(C)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4649#343,nextinst=346
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4649#346,nextinst=347
-opcode=132(iinc)	,VAR=14,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4648#347,nextinst=350
+opcode=132(iinc)	,store=14,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4648#347,nextinst=350
 opcode=167(goto)	,branchbyte=-22,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4648#350,nextinst=353
 opcode=25(aload)	,pushnum=1,load=13,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4651#353,nextinst=355
 opcode=44(aload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4651#355,nextinst=356
@@ -3271,7 +3271,7 @@ opcode=21(iload)	,pushnum=1,load=10,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4672#471,nextinst=473
 opcode=21(iload)	,pushnum=1,load=14,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4673#473,nextinst=475
 opcode=54(istore)	,popnum=1,store=9,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4673#475,nextinst=477
-opcode=132(iinc)	,VAR=14,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4660#477,nextinst=480
+opcode=132(iinc)	,store=14,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4660#477,nextinst=480
 opcode=167(goto)	,branchbyte=-93,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4660#480,nextinst=483
 opcode=167(goto)	,branchbyte=-165,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4660#483,nextinst=486
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4680#486,nextinst=487
@@ -3288,7 +3288,7 @@ opcode=21(iload)	,pushnum=1,load=15,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4682#508,nextinst=511
 opcode=182(invokevirtual)	,calltype=(C)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4682#511,nextinst=514
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4682#514,nextinst=515
-opcode=132(iinc)	,VAR=15,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4681#515,nextinst=518
+opcode=132(iinc)	,store=15,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4681#515,nextinst=518
 opcode=167(goto)	,branchbyte=-22,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4681#518,nextinst=521
 opcode=25(aload)	,pushnum=1,load=13,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4684#521,nextinst=523
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#replaceEach#4684#523,nextinst=526
@@ -3371,7 +3371,7 @@ opcode=25(aload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=21(iload)	,pushnum=1,load=8,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4777#105,nextinst=107
 opcode=182(invokevirtual)	,calltype=(C)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4777#107,nextinst=110
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4777#110,nextinst=111
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4768#111,nextinst=114
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4768#111,nextinst=114
 opcode=167(goto)	,branchbyte=-63,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4768#114,nextinst=117
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4780#117,nextinst=118
 opcode=153(ifeq)	,popnum=1,branchbyte=9,lineinfo=org.apache.commons.lang3.StringUtils#replaceChars#4780#118,nextinst=121
@@ -3486,12 +3486,12 @@ opcode=100(isub)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUti
 opcode=182(invokevirtual)	,calltype=(I)C,callclass=java.lang.String,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4893#63,nextinst=66
 opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4893#66,nextinst=68
 opcode=160(if_icmpne)	,popnum=2,branchbyte=18,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4893#68,nextinst=71
-opcode=132(iinc)	,VAR=1,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4894#71,nextinst=74
+opcode=132(iinc)	,store=1,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4894#71,nextinst=74
 opcode=167(goto)	,branchbyte=12,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4894#74,nextinst=77
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4896#77,nextinst=78
 opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4896#78,nextinst=80
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4896#80,nextinst=83
-opcode=132(iinc)	,VAR=1,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4897#83,nextinst=86
+opcode=132(iinc)	,store=1,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4897#83,nextinst=86
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4899#86,nextinst=87
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4899#87,nextinst=88
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#chomp#4899#88,nextinst=89
@@ -3616,8 +3616,8 @@ opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#repe
 opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5026#137,nextinst=138
 opcode=21(iload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5026#138,nextinst=140
 opcode=85(castore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5026#140,nextinst=141
-opcode=132(iinc)	,VAR=7,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5024#141,nextinst=144
-opcode=132(iinc)	,VAR=7,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5024#144,nextinst=147
+opcode=132(iinc)	,store=7,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5024#141,nextinst=144
+opcode=132(iinc)	,store=7,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5024#144,nextinst=147
 opcode=167(goto)	,branchbyte=-27,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5024#147,nextinst=150
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5028#150,nextinst=153
 opcode=89(dup)	,pushnum=1,load=25,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5028#153,nextinst=154
@@ -3638,7 +3638,7 @@ opcode=25(aload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5032#181,nextinst=182
 opcode=182(invokevirtual)	,calltype=(Ljava/lang/String;)Ljava/lang/StringBuilder;,callclass=java.lang.StringBuilder,callname=append,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5032#182,nextinst=185
 opcode=87(pop)	,popnum=1,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5032#185,nextinst=186
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5031#186,nextinst=189
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5031#186,nextinst=189
 opcode=167(goto)	,branchbyte=-16,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5031#189,nextinst=192
 opcode=25(aload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5034#192,nextinst=194
 opcode=182(invokevirtual)	,calltype=()Ljava/lang/String;,callclass=java.lang.StringBuilder,callname=toString,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5034#194,nextinst=197
@@ -3679,7 +3679,7 @@ opcode=44(aload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUti
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5093#13,nextinst=14
 opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5093#14,nextinst=15
 opcode=85(castore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5093#15,nextinst=16
-opcode=132(iinc)	,VAR=3,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5092#16,nextinst=19
+opcode=132(iinc)	,store=3,CONST=255,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5092#16,nextinst=19
 opcode=167(goto)	,branchbyte=-11,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5092#19,nextinst=22
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5095#22,nextinst=25
 opcode=89(dup)	,pushnum=1,load=44,lineinfo=org.apache.commons.lang3.StringUtils#repeat#5095#25,nextinst=26
@@ -3791,7 +3791,7 @@ opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUti
 opcode=112(irem)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5204#125,nextinst=126
 opcode=52(caload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5204#126,nextinst=127
 opcode=85(castore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5204#127,nextinst=128
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5203#128,nextinst=131
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5203#128,nextinst=131
 opcode=167(goto)	,branchbyte=-22,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5203#131,nextinst=134
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5206#134,nextinst=135
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#rightPad#5206#135,nextinst=138
@@ -3905,7 +3905,7 @@ opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUti
 opcode=112(irem)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5316#125,nextinst=126
 opcode=52(caload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5316#126,nextinst=127
 opcode=85(castore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5316#127,nextinst=128
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5315#128,nextinst=131
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5315#128,nextinst=131
 opcode=167(goto)	,branchbyte=-22,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5315#131,nextinst=134
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5318#134,nextinst=137
 opcode=89(dup)	,pushnum=1,load=25,lineinfo=org.apache.commons.lang3.StringUtils#leftPad#5318#137,nextinst=138
@@ -4119,7 +4119,7 @@ opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUti
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5650#69,nextinst=70
 opcode=184(invokestatic)	,calltype=(C)C,callclass=java.lang.Character,callname=toUpperCase,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5650#70,nextinst=73
 opcode=85(castore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5650#73,nextinst=74
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5643#74,nextinst=77
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5643#74,nextinst=77
 opcode=167(goto)	,branchbyte=-61,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5643#77,nextinst=80
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5653#80,nextinst=83
 opcode=89(dup)	,pushnum=1,load=43,lineinfo=org.apache.commons.lang3.StringUtils#swapCase#5653#83,nextinst=84
@@ -4146,7 +4146,7 @@ opcode=89(dup)	,pushnum=1,load=62,lineinfo=org.apache.commons.lang3.StringUtils#
 opcode=62(istore_3)	,popnum=1,store=3,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5684#27,nextinst=28
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5684#28,nextinst=29
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=18,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5684#29,nextinst=32
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5685#32,nextinst=35
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5685#32,nextinst=35
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5686#35,nextinst=36
 opcode=43(aload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5686#36,nextinst=37
 opcode=185(invokeinterface)	,calltype=()I,callclass=java.lang.CharSequence,callname=length,lineinfo=org.apache.commons.lang3.StringUtils#countMatches#5686#37,nextinst=42
@@ -4177,7 +4177,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5719#39,nextinst=42
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5720#42,nextinst=43
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5720#43,nextinst=44
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5718#44,nextinst=47
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5718#44,nextinst=47
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5718#47,nextinst=50
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5723#50,nextinst=51
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlpha#5723#51,nextinst=-1
@@ -4205,7 +4205,7 @@ opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlp
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5754#42,nextinst=45
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5755#45,nextinst=46
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5755#46,nextinst=47
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5753#47,nextinst=50
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5753#47,nextinst=50
 opcode=167(goto)	,branchbyte=-35,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5753#50,nextinst=53
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5758#53,nextinst=54
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphaSpace#5758#54,nextinst=-1
@@ -4231,7 +4231,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5789#39,nextinst=42
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5790#42,nextinst=43
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5790#43,nextinst=44
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5788#44,nextinst=47
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5788#44,nextinst=47
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5788#47,nextinst=50
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5793#50,nextinst=51
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumeric#5793#51,nextinst=-1
@@ -4259,7 +4259,7 @@ opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlp
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5824#42,nextinst=45
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5825#45,nextinst=46
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5825#46,nextinst=47
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5823#47,nextinst=50
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5823#47,nextinst=50
 opcode=167(goto)	,branchbyte=-35,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5823#50,nextinst=53
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5828#53,nextinst=54
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAlphanumericSpace#5828#54,nextinst=-1
@@ -4282,7 +4282,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=org.apache.commons.lang3.CharU
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5863#30,nextinst=33
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5864#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5864#34,nextinst=35
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5862#35,nextinst=38
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5862#35,nextinst=38
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5862#38,nextinst=41
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5867#41,nextinst=42
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAsciiPrintable#5867#42,nextinst=-1
@@ -4308,7 +4308,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5906#39,nextinst=42
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5907#42,nextinst=43
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5907#43,nextinst=44
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5905#44,nextinst=47
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5905#44,nextinst=47
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5905#47,nextinst=50
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5910#50,nextinst=51
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isNumeric#5910#51,nextinst=-1
@@ -4336,7 +4336,7 @@ opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isNum
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5943#42,nextinst=45
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5944#45,nextinst=46
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5944#46,nextinst=47
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5942#47,nextinst=50
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5942#47,nextinst=50
 opcode=167(goto)	,branchbyte=-35,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5942#50,nextinst=53
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5947#53,nextinst=54
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isNumericSpace#5947#54,nextinst=-1
@@ -4359,7 +4359,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5976#30,nextinst=33
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5977#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5977#34,nextinst=35
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5975#35,nextinst=38
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5975#35,nextinst=38
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5975#38,nextinst=41
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5980#41,nextinst=42
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isWhitespace#5980#42,nextinst=-1
@@ -4385,7 +4385,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6008#37,nextinst=40
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6009#40,nextinst=41
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6009#41,nextinst=42
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6007#42,nextinst=45
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6007#42,nextinst=45
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6007#45,nextinst=48
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6012#48,nextinst=49
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAllLowerCase#6012#49,nextinst=-1
@@ -4411,7 +4411,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6040#37,nextinst=40
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6041#40,nextinst=41
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6041#41,nextinst=42
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6039#42,nextinst=45
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6039#42,nextinst=45
 opcode=167(goto)	,branchbyte=-23,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6039#45,nextinst=48
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6044#48,nextinst=49
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#isAllUpperCase#6044#49,nextinst=-1
@@ -4692,7 +4692,7 @@ opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUti
 opcode=185(invokeinterface)	,calltype=(I)C,callclass=java.lang.CharSequence,callname=charAt,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6417#48,nextinst=53
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6417#53,nextinst=56
 opcode=167(goto)	,branchbyte=9,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6418#56,nextinst=59
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6416#59,nextinst=62
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6416#59,nextinst=62
 opcode=167(goto)	,branchbyte=-43,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6416#62,nextinst=65
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6421#65,nextinst=66
 opcode=43(aload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6421#66,nextinst=67
@@ -4755,7 +4755,7 @@ opcode=185(invokeinterface)	,calltype=()I,callclass=java.lang.CharSequence,calln
 opcode=21(iload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6479#77,nextinst=79
 opcode=184(invokestatic)	,calltype=(II)I,callclass=java.lang.Math,callname=max,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6479#79,nextinst=82
 opcode=54(istore)	,popnum=1,store=5,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6479#82,nextinst=84
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6472#84,nextinst=87
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6472#84,nextinst=87
 opcode=167(goto)	,branchbyte=-58,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6472#87,nextinst=90
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6484#90,nextinst=91
 opcode=154(ifne)	,popnum=1,branchbyte=12,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6484#91,nextinst=94
@@ -4797,13 +4797,13 @@ opcode=159(if_icmpeq)	,popnum=2,branchbyte=10,lineinfo=org.apache.commons.lang3.
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6499#162,nextinst=164
 opcode=54(istore)	,popnum=1,store=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6499#164,nextinst=166
 opcode=167(goto)	,branchbyte=9,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6500#166,nextinst=169
-opcode=132(iinc)	,VAR=9,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6497#169,nextinst=172
+opcode=132(iinc)	,store=9,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6497#169,nextinst=172
 opcode=167(goto)	,branchbyte=-32,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6497#172,nextinst=175
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6503#175,nextinst=177
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6503#177,nextinst=178
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6503#178,nextinst=181
 opcode=167(goto)	,branchbyte=9,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6504#181,nextinst=184
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6495#184,nextinst=187
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6495#184,nextinst=187
 opcode=167(goto)	,branchbyte=-69,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6495#187,nextinst=190
 opcode=21(iload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6508#190,nextinst=192
 opcode=2(iconst_m1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#indexOfDifference#6508#192,nextinst=193
@@ -4905,7 +4905,7 @@ opcode=25(aload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6661#91,nextinst=93
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6661#93,nextinst=95
 opcode=79(iastore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6661#95,nextinst=96
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6660#96,nextinst=99
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6660#96,nextinst=99
 opcode=167(goto)	,branchbyte=-16,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6660#99,nextinst=102
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6664#102,nextinst=103
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6664#103,nextinst=105
@@ -4962,7 +4962,7 @@ opcode=21(iload)	,pushnum=1,load=10,lineinfo=org.apache.commons.lang3.StringUtil
 opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6671#192,nextinst=193
 opcode=184(invokestatic)	,calltype=(II)I,callclass=java.lang.Math,callname=min,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6671#193,nextinst=196
 opcode=79(iastore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6671#196,nextinst=197
-opcode=132(iinc)	,VAR=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6668#197,nextinst=200
+opcode=132(iinc)	,store=7,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6668#197,nextinst=200
 opcode=167(goto)	,branchbyte=-68,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6668#200,nextinst=203
 opcode=25(aload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6675#203,nextinst=205
 opcode=58(astore)	,popnum=1,store=6,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6675#205,nextinst=207
@@ -4970,7 +4970,7 @@ opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=58(astore)	,popnum=1,store=4,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6676#209,nextinst=211
 opcode=25(aload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6677#211,nextinst=213
 opcode=58(astore)	,popnum=1,store=5,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6677#213,nextinst=215
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6664#215,nextinst=218
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6664#215,nextinst=218
 opcode=167(goto)	,branchbyte=-113,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6664#218,nextinst=221
 opcode=25(aload)	,pushnum=1,load=4,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6682#221,nextinst=223
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6682#223,nextinst=224
@@ -5055,7 +5055,7 @@ opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=21(iload)	,pushnum=1,load=9,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6795#140,nextinst=142
 opcode=21(iload)	,pushnum=1,load=9,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6795#142,nextinst=144
 opcode=79(iastore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6795#144,nextinst=145
-opcode=132(iinc)	,VAR=9,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6794#145,nextinst=148
+opcode=132(iinc)	,store=9,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6794#145,nextinst=148
 opcode=167(goto)	,branchbyte=-17,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6794#148,nextinst=151
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6799#151,nextinst=153
 opcode=21(iload)	,pushnum=1,load=8,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6799#153,nextinst=155
@@ -5148,7 +5148,7 @@ opcode=46(iaload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUt
 opcode=184(invokestatic)	,calltype=(II)I,callclass=java.lang.Math,callname=min,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6828#310,nextinst=313
 opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6828#313,nextinst=314
 opcode=79(iastore)	,popnum=3,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6828#314,nextinst=315
-opcode=132(iinc)	,VAR=13,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6822#315,nextinst=318
+opcode=132(iinc)	,store=13,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6822#315,nextinst=318
 opcode=167(goto)	,branchbyte=-72,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6822#318,nextinst=321
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6833#321,nextinst=323
 opcode=58(astore)	,popnum=1,store=7,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6833#323,nextinst=325
@@ -5156,7 +5156,7 @@ opcode=25(aload)	,pushnum=1,load=6,lineinfo=org.apache.commons.lang3.StringUtils
 opcode=58(astore)	,popnum=1,store=5,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6834#327,nextinst=329
 opcode=25(aload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6835#329,nextinst=331
 opcode=58(astore)	,popnum=1,store=6,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6835#331,nextinst=333
-opcode=132(iinc)	,VAR=9,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6803#333,nextinst=336
+opcode=132(iinc)	,store=9,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6803#333,nextinst=336
 opcode=167(goto)	,branchbyte=-163,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6803#336,nextinst=339
 opcode=25(aload)	,pushnum=1,load=5,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6840#339,nextinst=341
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.StringUtils#getLevenshteinDistance#6840#341,nextinst=342
@@ -5235,7 +5235,7 @@ opcode=184(invokestatic)	,calltype=(Ljava/lang/CharSequence;Ljava/lang/CharSeque
 opcode=153(ifeq)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6947#42,nextinst=45
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6948#45,nextinst=46
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6948#46,nextinst=47
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6946#47,nextinst=50
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6946#47,nextinst=50
 opcode=167(goto)	,branchbyte=-26,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6946#50,nextinst=53
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6951#53,nextinst=54
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#startsWithAny#6951#54,nextinst=-1
@@ -5322,7 +5322,7 @@ opcode=184(invokestatic)	,calltype=(Ljava/lang/CharSequence;Ljava/lang/CharSeque
 opcode=153(ifeq)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7104#42,nextinst=45
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7105#45,nextinst=46
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7105#46,nextinst=47
-opcode=132(iinc)	,VAR=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7103#47,nextinst=50
+opcode=132(iinc)	,store=4,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7103#47,nextinst=50
 opcode=167(goto)	,branchbyte=-26,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7103#50,nextinst=53
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7108#53,nextinst=54
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#endsWithAny#7108#54,nextinst=-1
@@ -5364,7 +5364,7 @@ opcode=184(invokestatic)	,calltype=(Ljava/lang/CharSequence;Ljava/lang/CharSeque
 opcode=153(ifeq)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7128#63,nextinst=66
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7129#66,nextinst=67
 opcode=176(areturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7129#67,nextinst=68
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7127#68,nextinst=71
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7127#68,nextinst=71
 opcode=167(goto)	,branchbyte=-29,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7127#71,nextinst=74
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7133#74,nextinst=77
 opcode=89(dup)	,pushnum=1,load=183,lineinfo=org.apache.commons.lang3.StringUtils#appendIfMissing#7133#77,nextinst=78
@@ -5426,7 +5426,7 @@ opcode=184(invokestatic)	,calltype=(Ljava/lang/CharSequence;Ljava/lang/CharSeque
 opcode=153(ifeq)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7229#63,nextinst=66
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7230#66,nextinst=67
 opcode=176(areturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7230#67,nextinst=68
-opcode=132(iinc)	,VAR=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7228#68,nextinst=71
+opcode=132(iinc)	,store=6,CONST=1,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7228#68,nextinst=71
 opcode=167(goto)	,branchbyte=-29,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7228#71,nextinst=74
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7234#74,nextinst=77
 opcode=89(dup)	,pushnum=1,load=183,lineinfo=org.apache.commons.lang3.StringUtils#prependIfMissing#7234#77,nextinst=78

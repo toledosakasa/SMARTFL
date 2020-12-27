@@ -148,7 +148,7 @@ opcode=182(invokevirtual)	,calltype=()I,callclass=java.lang.String,callname=leng
 opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#462#98,nextinst=99
 opcode=61(istore_2)	,popnum=1,store=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#462#99,nextinst=100
 opcode=167(goto)	,branchbyte=9,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#463#100,nextinst=103
-opcode=132(iinc)	,VAR=5,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#460#103,nextinst=106
+opcode=132(iinc)	,store=5,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#460#103,nextinst=106
 opcode=167(goto)	,branchbyte=-36,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#460#106,nextinst=109
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#466#109,nextinst=110
 opcode=158(ifle)	,popnum=1,branchbyte=37,lineinfo=org.apache.commons.lang3.math.NumberUtils#createNumber#466#110,nextinst=113
@@ -507,7 +507,7 @@ opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#
 opcode=159(if_icmpeq)	,popnum=2,branchbyte=5,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#625#24,nextinst=27
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#626#27,nextinst=28
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#626#28,nextinst=29
-opcode=132(iinc)	,VAR=1,CONST=255,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#624#29,nextinst=32
+opcode=132(iinc)	,store=1,CONST=255,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#624#29,nextinst=32
 opcode=167(goto)	,branchbyte=-19,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#624#32,nextinst=35
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#629#35,nextinst=36
 opcode=182(invokevirtual)	,calltype=()I,callclass=java.lang.String,callname=length,lineinfo=org.apache.commons.lang3.math.NumberUtils#isAllZeros#629#36,nextinst=39
@@ -574,7 +574,7 @@ opcode=182(invokevirtual)	,calltype=(Ljava/lang/String;I)Z,callclass=java.lang.S
 opcode=153(ifeq)	,popnum=1,branchbyte=12,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#721#43,nextinst=46
 opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#722#46,nextinst=48
 opcode=61(istore_2)	,popnum=1,store=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#722#48,nextinst=49
-opcode=132(iinc)	,VAR=1,CONST=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#723#49,nextinst=52
+opcode=132(iinc)	,store=1,CONST=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#723#49,nextinst=52
 opcode=167(goto)	,branchbyte=48,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#723#52,nextinst=55
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#724#55,nextinst=56
 opcode=18(ldc)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#724#56,nextinst=58
@@ -583,7 +583,7 @@ opcode=182(invokevirtual)	,calltype=(Ljava/lang/String;I)Z,callclass=java.lang.S
 opcode=153(ifeq)	,popnum=1,branchbyte=12,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#724#62,nextinst=65
 opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#725#65,nextinst=67
 opcode=61(istore_2)	,popnum=1,store=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#725#67,nextinst=68
-opcode=132(iinc)	,VAR=1,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#726#68,nextinst=71
+opcode=132(iinc)	,store=1,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#726#68,nextinst=71
 opcode=167(goto)	,branchbyte=29,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#726#71,nextinst=74
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#727#74,nextinst=75
 opcode=18(ldc)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#727#75,nextinst=77
@@ -598,7 +598,7 @@ opcode=96(iadd)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.Numbe
 opcode=164(if_icmple)	,popnum=2,branchbyte=9,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#727#91,nextinst=94
 opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#728#94,nextinst=96
 opcode=61(istore_2)	,popnum=1,store=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#728#96,nextinst=97
-opcode=132(iinc)	,VAR=1,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#729#97,nextinst=100
+opcode=132(iinc)	,store=1,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#729#97,nextinst=100
 opcode=187(new)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#732#100,nextinst=103
 opcode=89(dup)	,pushnum=1,load=42,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#732#103,nextinst=104
 opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.NumberUtils#createBigInteger#732#104,nextinst=105
@@ -670,7 +670,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#781#25,nextinst=26
 opcode=47(laload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#781#26,nextinst=27
 opcode=64(lstore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#781#27,nextinst=28
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#779#28,nextinst=31
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#779#28,nextinst=31
 opcode=167(goto)	,branchbyte=-21,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#779#31,nextinst=34
 opcode=31(lload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#785#34,nextinst=35
 opcode=173(lreturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#785#35,nextinst=-1
@@ -695,7 +695,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#804#24,nextinst=25
 opcode=46(iaload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#804#25,nextinst=26
 opcode=60(istore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#804#26,nextinst=27
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#802#27,nextinst=30
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#802#27,nextinst=30
 opcode=167(goto)	,branchbyte=-20,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#802#30,nextinst=33
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#808#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#808#34,nextinst=-1
@@ -720,7 +720,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#827#24,nextinst=25
 opcode=53(saload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#827#25,nextinst=26
 opcode=60(istore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#827#26,nextinst=27
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#825#27,nextinst=30
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#825#27,nextinst=30
 opcode=167(goto)	,branchbyte=-20,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#825#30,nextinst=33
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#831#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#831#34,nextinst=-1
@@ -745,7 +745,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#850#24,nextinst=25
 opcode=51(baload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#850#25,nextinst=26
 opcode=60(istore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#850#26,nextinst=27
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#848#27,nextinst=30
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#848#27,nextinst=30
 opcode=167(goto)	,branchbyte=-20,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#848#30,nextinst=33
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#854#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#854#34,nextinst=-1
@@ -778,7 +778,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#877#38,nextinst=39
 opcode=49(daload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#877#39,nextinst=40
 opcode=72(dstore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#877#40,nextinst=41
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#872#41,nextinst=44
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#872#41,nextinst=44
 opcode=167(goto)	,branchbyte=-34,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#872#44,nextinst=47
 opcode=39(dload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#881#47,nextinst=48
 opcode=175(dreturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#881#48,nextinst=-1
@@ -811,7 +811,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#904#37,nextinst=38
 opcode=48(faload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#904#38,nextinst=39
 opcode=68(fstore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#904#39,nextinst=40
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#899#40,nextinst=43
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#899#40,nextinst=43
 opcode=167(goto)	,branchbyte=-33,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#899#43,nextinst=46
 opcode=35(fload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#908#46,nextinst=47
 opcode=174(freturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#min#908#47,nextinst=-1
@@ -837,7 +837,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#929#25,nextinst=26
 opcode=47(laload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#929#26,nextinst=27
 opcode=64(lstore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#929#27,nextinst=28
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#927#28,nextinst=31
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#927#28,nextinst=31
 opcode=167(goto)	,branchbyte=-21,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#927#31,nextinst=34
 opcode=31(lload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#933#34,nextinst=35
 opcode=173(lreturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#933#35,nextinst=-1
@@ -862,7 +862,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#952#24,nextinst=25
 opcode=46(iaload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#952#25,nextinst=26
 opcode=60(istore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#952#26,nextinst=27
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#950#27,nextinst=30
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#950#27,nextinst=30
 opcode=167(goto)	,branchbyte=-20,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#950#30,nextinst=33
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#956#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#956#34,nextinst=-1
@@ -887,7 +887,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#975#24,nextinst=25
 opcode=53(saload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#975#25,nextinst=26
 opcode=60(istore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#975#26,nextinst=27
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#973#27,nextinst=30
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#973#27,nextinst=30
 opcode=167(goto)	,branchbyte=-20,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#973#30,nextinst=33
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#979#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#979#34,nextinst=-1
@@ -912,7 +912,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#998#24,nextinst=25
 opcode=51(baload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#998#25,nextinst=26
 opcode=60(istore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#998#26,nextinst=27
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#996#27,nextinst=30
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#996#27,nextinst=30
 opcode=167(goto)	,branchbyte=-20,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#996#30,nextinst=33
 opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1002#33,nextinst=34
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1002#34,nextinst=-1
@@ -945,7 +945,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=29(iload_3)	,pushnum=1,load=3,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1025#38,nextinst=39
 opcode=49(daload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1025#39,nextinst=40
 opcode=72(dstore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1025#40,nextinst=41
-opcode=132(iinc)	,VAR=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1020#41,nextinst=44
+opcode=132(iinc)	,store=3,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1020#41,nextinst=44
 opcode=167(goto)	,branchbyte=-34,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1020#44,nextinst=47
 opcode=39(dload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1029#47,nextinst=48
 opcode=175(dreturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1029#48,nextinst=-1
@@ -978,7 +978,7 @@ opcode=42(aload_0)	,pushnum=1,load=0,lineinfo=org.apache.commons.lang3.math.Numb
 opcode=28(iload_2)	,pushnum=1,load=2,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1052#37,nextinst=38
 opcode=48(faload)	,popnum=2,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1052#38,nextinst=39
 opcode=68(fstore_1)	,popnum=1,store=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1052#39,nextinst=40
-opcode=132(iinc)	,VAR=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1047#40,nextinst=43
+opcode=132(iinc)	,store=2,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1047#40,nextinst=43
 opcode=167(goto)	,branchbyte=-33,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1047#43,nextinst=46
 opcode=35(fload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1056#46,nextinst=47
 opcode=174(freturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#max#1056#47,nextinst=-1
@@ -1140,7 +1140,7 @@ opcode=184(invokestatic)	,calltype=(C)Z,callclass=java.lang.Character,callname=i
 opcode=154(ifne)	,popnum=1,branchbyte=5,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1301#27,nextinst=30
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1302#30,nextinst=31
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1302#31,nextinst=32
-opcode=132(iinc)	,VAR=1,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1300#32,nextinst=35
+opcode=132(iinc)	,store=1,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1300#32,nextinst=35
 opcode=167(goto)	,branchbyte=-24,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1300#35,nextinst=38
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1305#38,nextinst=39
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isDigits#1305#39,nextinst=-1
@@ -1234,11 +1234,11 @@ opcode=16(bipush)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#
 opcode=164(if_icmple)	,popnum=2,branchbyte=5,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1340#143,nextinst=146
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1343#146,nextinst=147
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1343#147,nextinst=148
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1339#148,nextinst=151
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1339#148,nextinst=151
 opcode=167(goto)	,branchbyte=-66,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1339#151,nextinst=154
 opcode=4(iconst_1)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1346#154,nextinst=155
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1346#155,nextinst=156
-opcode=132(iinc)	,VAR=2,CONST=255,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1348#156,nextinst=159
+opcode=132(iinc)	,store=2,CONST=255,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1348#156,nextinst=159
 opcode=21(iload)	,pushnum=1,load=7,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1350#159,nextinst=161
 opcode=54(istore)	,popnum=1,store=8,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1350#161,nextinst=163
 opcode=21(iload)	,pushnum=1,load=8,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1353#163,nextinst=165
@@ -1326,7 +1326,7 @@ opcode=54(istore)	,popnum=1,store=6,lineinfo=org.apache.commons.lang3.math.Numbe
 opcode=167(goto)	,branchbyte=5,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1380#310,nextinst=313
 opcode=3(iconst_0)	,pushnum=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1382#313,nextinst=314
 opcode=172(ireturn)	,popnum=-1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1382#314,nextinst=315
-opcode=132(iinc)	,VAR=8,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1384#315,nextinst=318
+opcode=132(iinc)	,store=8,CONST=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1384#315,nextinst=318
 opcode=167(goto)	,branchbyte=-155,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1384#318,nextinst=321
 opcode=21(iload)	,pushnum=1,load=8,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1386#321,nextinst=323
 opcode=43(aload_1)	,pushnum=1,load=1,lineinfo=org.apache.commons.lang3.math.NumberUtils#isNumber#1386#323,nextinst=324
