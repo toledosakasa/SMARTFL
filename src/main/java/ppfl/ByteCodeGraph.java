@@ -175,20 +175,22 @@ public class ByteCodeGraph {
 				// System.out.println("in kill "+stmtName);
 				if (post_idom.get(stmtName).equals(thisinst)) {
 					Node curPred = this.predstack.pop();
+					StmtNode curPredStmt = curPred.stmt;
 					Set<Integer> stores = null;
 					// if (!this.store_stack.isEmpty())
 					stores = this.store_stack.pop();
-                    // System.out.println("kill "+stores);
-                    boolean unexcuted_complement = true;
-                    if(unexcuted_complement){
-                        if (stores != null) {
-                            StmtNode curStmt = curPred.stmt;
-                            for (Integer i : stores) {
-                                Node defnode = addNewVarNode(i, curStmt);
-                                buildFactor(defnode, curPred, getLoadNodeAsUse(i), null, curStmt);
-                            }
-                        }
-                    }
+					// System.out.println("kill "+stores);
+					boolean unexecuted_complement = true;
+					if (unexecuted_complement) {
+						if (stores != null) {
+							// StmtNode curStmt = curPred.stmt;
+							for (Integer i : stores) {
+								StmtNode curStmt = getUnexeStmt(curPredStmt, i);
+								Node defnode = addNewVarNode(i, curStmt);
+								buildFactor(defnode, curPred, getLoadNodeAsUse(i), null, curStmt);
+							}
+						}
+					}
 					willcontinue = true;
 				}
 			}
@@ -590,7 +592,7 @@ public class ByteCodeGraph {
 					// System.out.println("add set" + branch_stores.get(instname));
 					Set<Integer> stores = branch_stores.get(instname);
 					// if (stores != null)
-						store_stack.push(stores);
+					store_stack.push(stores);
 				}
 				// debugLogger.info(this.parseinfo.form);
 				Interpreter.map[this.parseinfo.form].buildtrace(this);
@@ -676,7 +678,7 @@ public class ByteCodeGraph {
 	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
 			StmtNode stmt) {
 
-		if (auto_oracle && !stmt.getMethod().contentEquals(this.testname)) {
+		if (auto_oracle && !stmt.getMethod().contentEquals(this.testname) && !stmt.isUnexe()) {
 			int ln = stmt.getLineNumber();
 			if (this.lastDefinedLine != ln) {
 				this.lastDefinedLine = ln;
@@ -913,6 +915,16 @@ public class ByteCodeGraph {
 			assert (stmt != null && stmt.isStmt());
 		}
 		return stmt;
+	}
+
+	private StmtNode getUnexeStmt(StmtNode predstmt, int storeid) {
+		StmtNode ret = predstmt.getUnexeStmtFromMap(storeid);
+		if (ret == null) {
+			ret = this.addNewStmt(predstmt.getUnexeName(storeid));
+			ret.setUnexe();
+			predstmt.addUnexeStmt(storeid, ret);
+		}
+		return ret;
 	}
 
 	private StmtNode addNewStmt(String name) {
@@ -1284,18 +1296,18 @@ public class ByteCodeGraph {
 
 		if (traceclass != null) {
 			for (String s : traceclass.split(";")) {
-                if(!s.isEmpty())
-				this.addTracedClass(s);
+				if (!s.isEmpty())
+					this.addTracedClass(s);
 			}
 		}
 		if (sourcepath != null) {
 			for (String s : sourcepath.split(";")) {
-                if(!s.isEmpty())
-				this.parsesource(baseDir + s);
+				if (!s.isEmpty())
+					this.parsesource(baseDir + s);
 			}
 			// long startTime = System.currentTimeMillis();
-            this.get_idom();
-            this.get_stores();
+			this.get_idom();
+			this.get_stores();
 			// long endTime = System.currentTimeMillis();
 			// long thetime = endTime-startTime;
 			// System.out.println("idom time is "+ thetime);
@@ -1303,9 +1315,9 @@ public class ByteCodeGraph {
 		}
 		if (tracepath != null)
 			for (String s : tracepath.split(";")) {
-                if(s.isEmpty())
-                    continue;
-                String[] tmp = s.split(":");
+				if (s.isEmpty())
+					continue;
+				String[] tmp = s.split(":");
 				String testpath = tmp[0];
 				String testClassAndMethod = testpath.substring(0, testpath.lastIndexOf('.'));
 				String testMethod = testClassAndMethod.substring(testClassAndMethod.lastIndexOf('.') + 1,

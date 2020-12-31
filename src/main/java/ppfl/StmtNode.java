@@ -1,8 +1,33 @@
 package ppfl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 
 public class StmtNode extends Node {
+	private boolean isUnexe = false;
+	private Map<Integer, StmtNode> unexeStmtMap = new HashMap<>();
+
+	public void setUnexe() {
+		this.isUnexe = true;
+	}
+
+	public boolean isUnexe() {
+		return this.isUnexe;
+	}
+
+	public String getUnexeName(int id) {
+		return String.format("%s#unexe#%d", this.name, id);
+	}
+
+	public StmtNode getUnexeStmtFromMap(int id) {
+		return unexeStmtMap.get(id);
+	}
+
+	public void addUnexeStmt(int id, StmtNode stmt) {
+		unexeStmtMap.put(id, stmt);
+	}
 
 	public StmtNode(String sname) {
 		super(sname);
