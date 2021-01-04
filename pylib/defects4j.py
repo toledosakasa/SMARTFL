@@ -80,5 +80,8 @@ def getd4jcmdline(proj, id):
 
 
 def checkout(proj, id):
+    checkoutpath = './tmp_checkout'
+    if not(os.path.exists(checkoutpath)):
+        os.makedirs(checkoutpath)
     os.system(
         'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}{id}'.format(proj=proj, id=id))
