@@ -46,7 +46,7 @@ def getmetainfo(proj, id):
             'defects4j export -p {field} -w {workdir}'.format(field=field, workdir=workdir))
 
     print('Instrumenting all test methods')
-    cmdline_getallmethods = 'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj}{id}"'.format(
+    cmdline_getallmethods = 'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
     ret['methods.test.all'] = utf8open(
