@@ -43,3 +43,7 @@ if __name__ == '__main__':
 
     if args[1] == 'd4jinit':
         d4j.getd4jprojinfo()
+
+    if args[1] == 'rund4j':
+        cmdlines = d4j.getd4jcmdline(args[2], args[3])
+        print(cmdlines)
