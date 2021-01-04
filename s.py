@@ -2,7 +2,7 @@ import os
 import sys
 
 dirs2make = ["./configs", "./test/trace/patterns", "./test/trace/logs",
-             "./test/trace/logs/btrace", "./test/trace/logs/mytrace"]
+             "./test/trace/logs/btrace", "./test/trace/logs/mytrace", "./d4j_resources/metadata_cached/"]
 bindir = os.path.abspath("./target")
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
@@ -65,6 +65,9 @@ def getmetainfo(proj, id):
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
     # FIXME
+    inst_cmdline = 'mvn exec:java -Dexec.mainClass="ppfl.defects4j.Instrumenter" -Dexec.args="{proj}{id}"'.format(
+        proj=proj, id=id)
+    os.system(inst_cmdline)
     ret['methods.test.all'] = utf8open(
         './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(proj=proj, id=id)).readlines
 
