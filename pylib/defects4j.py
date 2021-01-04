@@ -21,35 +21,39 @@ def getinstclassinfo(proj):
 def getmetainfo(proj, id):
     ret = {}
     # caching
+    print('Checking for cache...')
     cachepath = os.path.abspath(
         './d4j_resources/metadata_cached/{proj}{id}.log'.format(proj=proj, id=id))
     if os.path.exists(cachepath):
+        print('cache found')
         lines = utf8open(cachepath).readlines()
         for line in lines:
             splits = line.split('=')
             ret[splits[0]] = splits[1]
         return ret
 
+    print('Cache not found. Generating metadata.')
     # if not cached, generate metadata
     workdir = os.path.abspath(
         './tmp_checkout/{proj}{id}'.format(proj=proj, id=id))
     if not os.path.exists(workdir):
         checkout(proj, id)
     fields = ['tests.all', 'classes.relevant.src', 'tests.trigger']
+
+    print('Exporting metadata')
     for field in fields:
         ret[field] = os.popen(
             'defects4j export -p {field} -w {workdir}'.format(field=field, workdir=workdir))
+
+    print('Instrumenting all test methods')
     cmdline_getallmethods = 'mvn -q exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj}{id}"'.format(
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
-
-    inst_cmdline = 'mvn exec:java -Dexec.mainClass="ppfl.defects4j.Instrumenter" -Dexec.args="{proj}{id}"'.format(
-        proj=proj, id=id)
-    os.system(inst_cmdline)
     ret['methods.test.all'] = utf8open(
         './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(proj=proj, id=id)).readlines
 
     # write to cache
+    print('Writing to cache...')
     cachedir = os.path.abspath('./d4j_resources/metadata_cached')
     if not os.path.exists(cachedir):
         os.mkdir(cachedir)
@@ -57,12 +61,15 @@ def getmetainfo(proj, id):
     for k in ret:
         cachefile.write('{key}={value}'.format(key=k, value=ret[k]))
     # cleanup
+    print('Removing temporary workdir')
     os.system('rm -rf {workdir}'.format(workdir=workdir))
     return ret
 
 
 def getd4jcmdline(proj, id):
+    print('getting metainfo')
     metadata = getmetainfo(proj, id)
+
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     instclasses = metadata['classes.relevant.src'] + \
