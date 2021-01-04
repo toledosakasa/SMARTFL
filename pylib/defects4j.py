@@ -38,7 +38,7 @@ def getmetainfo(proj, id):
         './tmp_checkout/{proj}{id}'.format(proj=proj, id=id))
     if not os.path.exists(workdir):
         checkout(proj, id)
-    fields = ['tests.all', 'classes.relevant.src', 'tests.trigger']
+    fields = ['tests.all', 'classes.relevant', 'tests.trigger']
 
     print('Exporting metadata')
     for field in fields:
