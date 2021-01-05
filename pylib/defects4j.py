@@ -53,7 +53,7 @@ def getmetainfo(proj, id):
         ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
     print('Instrumenting all test methods')
-    cmdline_getallmethods = 'mvn compile && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
+    cmdline_getallmethods = 'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
     allmethodslog = './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(
@@ -70,7 +70,7 @@ def getmetainfo(proj, id):
         cachefile.write('{key}={value}\n'.format(key=k, value=ret[k]))
     # cleanup
     print('Removing temporary file')
-    os.system('rm -rf {workdir}'.format(workdir=workdir))
+    # os.system('rm -rf {workdir}'.format(workdir=workdir))
     os.system('rm {logfile}'.format(logfile=allmethodslog))
     return ret
 
@@ -83,7 +83,9 @@ def getd4jcmdline(proj, id):
     instclasses = metadata['classes.relevant'] + \
         ';' + metadata['tests.all']
     instclasses = instclasses.replace(";", ":")
-    testnames = metadata['methods.test.all']
+    testnames = metadata['methods.test.all'].split(';')
+    l = len(testnames)
+    print(f'Test methods: {l}')
     ret = []
     for testname in testnames:
         app = "defects4j test -t {testname} \
@@ -100,3 +102,8 @@ def checkout(proj, id):
         os.makedirs(checkoutpath)
     os.system(
         'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}{id}'.format(proj=proj, id=id))
+
+
+def clearcache():
+    cachepath = os.path.abspath('./d4j_resources/metadata_cached/')
+    os.system('rm -rf '+cachepath)

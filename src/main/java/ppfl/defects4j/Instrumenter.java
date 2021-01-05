@@ -146,7 +146,7 @@ public class Instrumenter {
 						return false;
 
 					// An @test method. output it's name
-					String printMSG = String.format("%s.%s:%s%n", PackageName, ClassName, node.getName());
+					String printMSG = String.format("%s.%s::%s%n", PackageName, ClassName, node.getName());
 					outputBuilder.append(printMSG);
 					return true;
 				}
