@@ -50,15 +50,14 @@ def getmetainfo(proj, id):
             workdir=workdir, field=field)
         os.system(
             'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}'.format(field=field, workdir=workdir, tmp_logfieldfile=tmp_logfieldfile))
-        ret[field] = ';'.join(utf8open(tmp_logfieldfile).readlines()).strip()
+        ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
     print('Instrumenting all test methods')
     cmdline_getallmethods = 'mvn compile && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
-    ret['methods.test.all'] = ';'.join(utf8open(
-        './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(proj=proj, id=id)).readlines()).strip()
-
+    ret['methods.test.all'] = utf8open(
+        './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(proj=proj, id=id)).read().replace('\n', ';')
     # write to cache
     print('Writing to cache...')
     cachedir = os.path.abspath('./d4j_resources/metadata_cached')
