@@ -56,8 +56,10 @@ def getmetainfo(proj, id):
     cmdline_getallmethods = 'mvn compile && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
+    allmethodslog = './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(
+        proj=proj, id=id)
     ret['methods.test.all'] = utf8open(
-        './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(proj=proj, id=id)).read().replace('\n', ';')
+        allmethodslog).read().replace('\n', ';')
     # write to cache
     print('Writing to cache...')
     cachedir = os.path.abspath('./d4j_resources/metadata_cached')
@@ -67,8 +69,9 @@ def getmetainfo(proj, id):
     for k in ret:
         cachefile.write('{key}={value}\n'.format(key=k, value=ret[k]))
     # cleanup
-    print('Removing temporary workdir')
+    print('Removing temporary file')
     os.system('rm -rf {workdir}'.format(workdir=workdir))
+    os.system('rm {logfile}'.format(logfile=allmethodslog))
     return ret
 
 
