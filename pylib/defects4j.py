@@ -50,7 +50,7 @@ def getmetainfo(proj, id):
             'defects4j export -p {field} -w {workdir}'.format(field=field, workdir=workdir))
 
     print('Instrumenting all test methods')
-    cmdline_getallmethods = 'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
+    cmdline_getallmethods = 'mvn compile && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
     ret['methods.test.all'] = utf8open(
@@ -76,7 +76,7 @@ def getd4jcmdline(proj, id):
 
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
-    instclasses = metadata['classes.relevant.src'] + \
+    instclasses = metadata['classes.relevant'] + \
         ';' + metadata['tests.all']
     instclasses = instclasses.replace(";", ":")
     testnames = metadata['methods.test.all']
