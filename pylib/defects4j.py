@@ -50,7 +50,7 @@ def getmetainfo(proj, id):
             workdir=workdir, field=field)
         os.system(
             'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}'.format(field=field, workdir=workdir, tmp_logfieldfile=tmp_logfieldfile))
-        ret[field] = ';'.join(utf8open(tmp_logfieldfile).readlines())
+        ret[field] = ';'.join(utf8open(tmp_logfieldfile).readlines()).strip()
 
     print('Instrumenting all test methods')
     cmdline_getallmethods = 'mvn compile && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
