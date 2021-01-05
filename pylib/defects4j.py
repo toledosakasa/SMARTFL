@@ -7,6 +7,10 @@ def utf8open(filename):
     return open(filename, encoding='utf-8', errors='ignore')
 
 
+def utf8open_w(filename):
+    return open(filename, 'w+', encoding='utf-8', errors='ignore')
+
+
 def getd4jprojinfo():
     for proj in alld4jprojs:
         getinstclassinfo(proj)
@@ -57,7 +61,7 @@ def getmetainfo(proj, id):
     cachedir = os.path.abspath('./d4j_resources/metadata_cached')
     if not os.path.exists(cachedir):
         os.mkdir(cachedir)
-    cachefile = utf8open(cachepath)
+    cachefile = utf8open_w(cachepath)
     for k in ret:
         cachefile.write('{key}={value}'.format(key=k, value=ret[k]))
     # cleanup

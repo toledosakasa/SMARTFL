@@ -151,7 +151,7 @@ public class Instrumenter {
 				}
 
 			});
-
+			CurNum++;
 			System.out.println(CurNum + "/" + TotalNum);
 		}
 	}
