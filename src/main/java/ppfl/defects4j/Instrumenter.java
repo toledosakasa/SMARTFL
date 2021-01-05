@@ -37,7 +37,7 @@ public class Instrumenter {
 
 	private static void writeStringToFile(String FilePath, String output) {
 		try (FileWriter fw = new FileWriter(FilePath)) {
-			fw.write(output);
+			fw.writeln(output);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -110,9 +110,9 @@ public class Instrumenter {
 			String PackageNamet = null;
 			PackageNamet = cu.getPackage().getName().toString();
 			final String PackageName = PackageNamet;
-			cu.accept(new ASTVisitor() {
+			String ClassName = cu.getClass().getName();
 
-				String ClassName;
+			cu.accept(new ASTVisitor() {
 
 				public boolean isInnerClass(ASTNode node) {
 					while (node != null) {
