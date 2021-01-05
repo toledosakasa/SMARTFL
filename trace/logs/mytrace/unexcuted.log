@@ -1,3 +1,0 @@
-tracepath=Unexcuted.fail.log:0;Unexcuted.pass.log:1;
-sourcepath=trace.Unexcuted.source.log;
-tracedclass=trace.Unexcuted;

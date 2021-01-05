@@ -1,0 +1,19 @@
+
+opcode=26(iload_0)	,pushnum=1,load=0,lineinfo=trace.Unexecuted1#foo#8#0,nextinst=1
+opcode=16(bipush)	,pushnum=1,lineinfo=trace.Unexecuted1#foo#8#1,nextinst=3
+opcode=162(if_icmpge)	,popnum=2,branchbyte=6,lineinfo=trace.Unexecuted1#foo#8#3,nextinst=6
+opcode=132(iinc)	,store=1,CONST=1,lineinfo=trace.Unexecuted1#foo#9#6,nextinst=9
+opcode=27(iload_1)	,pushnum=1,load=1,lineinfo=trace.Unexecuted1#foo#12#9,nextinst=10
+opcode=172(ireturn)	,popnum=-1,lineinfo=trace.Unexecuted1#foo#12#10,nextinst=-1
+opcode=8(iconst_5)	,pushnum=1,lineinfo=trace.Unexecuted1#pass#17#0,nextinst=1
+opcode=4(iconst_1)	,pushnum=1,lineinfo=trace.Unexecuted1#pass#17#1,nextinst=2
+opcode=184(invokestatic)	,calltype=(II)I,callclass=trace.Unexecuted1,callname=foo,lineinfo=trace.Unexecuted1#pass#17#2,nextinst=5
+opcode=5(iconst_2)	,pushnum=1,lineinfo=trace.Unexecuted1#pass#17#5,nextinst=6
+opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.Unexecuted1#pass#17#6,nextinst=9
+opcode=177(return)	,popnum=-1,lineinfo=trace.Unexecuted1#pass#18#9,nextinst=-1
+opcode=16(bipush)	,pushnum=1,lineinfo=trace.Unexecuted1#fail#22#0,nextinst=2
+opcode=4(iconst_1)	,pushnum=1,lineinfo=trace.Unexecuted1#fail#22#2,nextinst=3
+opcode=184(invokestatic)	,calltype=(II)I,callclass=trace.Unexecuted1,callname=foo,lineinfo=trace.Unexecuted1#fail#22#3,nextinst=6
+opcode=3(iconst_0)	,pushnum=1,lineinfo=trace.Unexecuted1#fail#22#6,nextinst=7
+opcode=184(invokestatic)	,calltype=(II)V,callclass=org.junit.jupiter.api.Assertions,callname=assertEquals,lineinfo=trace.Unexecuted1#fail#22#7,nextinst=10
+opcode=177(return)	,popnum=-1,lineinfo=trace.Unexecuted1#fail#23#10,nextinst=-1
