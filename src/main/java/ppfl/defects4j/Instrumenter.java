@@ -96,6 +96,7 @@ public class Instrumenter {
 		int TotalNum = filelist.size();
 		int CurNum = 0;
 
+		StringBuilder outputBuilder = new StringBuilder("");
 		for (final String FilePath : filelist)
 
 		{
@@ -145,8 +146,8 @@ public class Instrumenter {
 						return false;
 
 					// An @test method. output it's name
-					String printMSG = String.format("%s.%s:%s", PackageName, ClassName, node.getName());
-					writeStringToFile(outputPath, printMSG);
+					String printMSG = String.format("%s.%s:%s%n", PackageName, ClassName, node.getName());
+					outputBuilder.append(printMSG);
 					return true;
 				}
 
@@ -154,6 +155,7 @@ public class Instrumenter {
 			CurNum++;
 			System.out.println(CurNum + "/" + TotalNum);
 		}
+		writeStringToFile(outputPath, outputBuilder.toString());
 	}
 
 }
