@@ -100,3 +100,8 @@ def checkout(proj, id):
         os.makedirs(checkoutpath)
     os.system(
         'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}{id}'.format(proj=proj, id=id))
+
+
+def clearcache():
+    cachepath = os.path.abspath('./d4j_resources/metadata_cached/')
+    os.system('rm -rf '+cachepath)
