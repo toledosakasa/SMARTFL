@@ -574,6 +574,28 @@ class GraphTest {
 	public void unexecutedtest_bc() {
 		ByteCodeGraph pgraph = unexecutedinit_bc();
 		pgraph.check_bp(true);
+    }
+    
+    ByteCodeGraph unexecuted1init_bc() {
+		String ppflroot = ".";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted1.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted1.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.Unexecuted1.source.log";
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+		pgraph.setAutoOracle(true);
+		pgraph.parsesource(sourcetrace);
+        pgraph.get_idom();
+        pgraph.get_stores();
+		pgraph.parsetrace(failtrace, "fail", false);
+		pgraph.parsetrace(passtrace, "pass", true);
+		pgraph.printgraph();
+		return pgraph;
+	}
+
+	@Test
+	public void unexecuted1test_bc() {
+		ByteCodeGraph pgraph = unexecuted1init_bc();
+		pgraph.check_bp(true);
 	}
 
 	ByteCodeGraph forinit_bc() {
