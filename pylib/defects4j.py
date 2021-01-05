@@ -73,7 +73,7 @@ def getmetainfo(proj, id):
 def getd4jcmdline(proj, id):
     print('getting metainfo')
     metadata = getmetainfo(proj, id)
-    print(metadata.keys)
+    print(metadata.keys())
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     instclasses = metadata['classes.relevant'] + \
