@@ -53,7 +53,7 @@ def getmetainfo(proj, id):
         ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
     print('Instrumenting all test methods')
-    cmdline_getallmethods = 'mvn compile && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
+    cmdline_getallmethods = 'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'.format(
         proj=proj, id=id)
     os.system(cmdline_getallmethods)
     allmethodslog = './d4j_resources/metadata_cached/{proj}{id}.alltests.log'.format(
@@ -70,7 +70,7 @@ def getmetainfo(proj, id):
         cachefile.write('{key}={value}\n'.format(key=k, value=ret[k]))
     # cleanup
     print('Removing temporary file')
-    os.system('rm -rf {workdir}'.format(workdir=workdir))
+    # os.system('rm -rf {workdir}'.format(workdir=workdir))
     os.system('rm {logfile}'.format(logfile=allmethodslog))
     return ret
 
