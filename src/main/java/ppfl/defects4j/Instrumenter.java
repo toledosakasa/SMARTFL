@@ -37,7 +37,7 @@ public class Instrumenter {
 
 	private static void writeStringToFile(String FilePath, String output) {
 		try (FileWriter fw = new FileWriter(FilePath)) {
-			fw.writeln(output);
+			fw.write(output);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
