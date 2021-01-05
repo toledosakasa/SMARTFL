@@ -76,8 +76,8 @@ def getd4jcmdline(proj, id):
     metadata = getmetainfo(proj, id)
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
-    instclasses = metadata['classes.relevant'] + \
-        ';' + metadata['tests.all']
+    instclasses = metadata['classes.relevant'].strip() + \
+        ';' + metadata['tests.all'].strip()
     instclasses = instclasses.replace(";", ":")
     testnames = metadata['methods.test.all'].split(';')
     l = len(testnames)
