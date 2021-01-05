@@ -3,7 +3,7 @@ package trace;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-public class Unexcuted {
+public class Unexecuted {
     public static int foo(int a, int b) {
         int c = 0;
         int d = 0;

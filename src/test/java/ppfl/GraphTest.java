@@ -554,11 +554,11 @@ class GraphTest {
 	// 	return pgraph;
 	// }
 
-    ByteCodeGraph unexcutedinit_bc() {
+    ByteCodeGraph unexecutedinit_bc() {
 		String ppflroot = ".";
-		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexcuted.fail.log";
-		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexcuted.pass.log";
-		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.Unexcuted.source.log";
+		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted.fail.log";
+		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted.pass.log";
+		String sourcetrace = ppflroot + "\\trace\\logs\\mytrace\\trace.Unexecuted.source.log";
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
@@ -571,8 +571,8 @@ class GraphTest {
 	}
 
 	@Test
-	public void unexcutedtest_bc() {
-		ByteCodeGraph pgraph = unexcutedinit_bc();
+	public void unexecutedtest_bc() {
+		ByteCodeGraph pgraph = unexecutedinit_bc();
 		pgraph.check_bp(true);
 	}
 

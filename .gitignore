@@ -8,3 +8,4 @@ configs/*.launch
 target/
 /.vscode/
 /result/
+*.pyc
