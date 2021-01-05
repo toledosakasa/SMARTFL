@@ -84,7 +84,8 @@ def getd4jcmdline(proj, id):
         ';' + metadata['tests.all']
     instclasses = instclasses.replace(";", ":")
     testnames = metadata['methods.test.all'].split(';')
-    print('Test methods: ' + len(testnames))
+    l = len(testnames)
+    print(f'Test methods: {l}')
     ret = []
     for testname in testnames:
         app = "defects4j test -t {testname} \
