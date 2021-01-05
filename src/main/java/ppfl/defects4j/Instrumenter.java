@@ -60,8 +60,8 @@ public class Instrumenter {
 	}
 
 	private static String getTestDir(String projdir) {
-		System.out.println("getting test dir from:" + projdir);
-		String s = readFileToString(projdir + "defects4j.build.properties");
+		// System.out.println("getting test dir from:" + projdir);
+		String s = projdir + "defects4j.build.properties";
 		try (BufferedReader reader = new BufferedReader(new FileReader(s))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
