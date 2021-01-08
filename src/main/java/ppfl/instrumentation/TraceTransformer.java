@@ -1,11 +1,16 @@
 package ppfl.instrumentation;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +46,9 @@ public class TraceTransformer implements ClassFileTransformer {
 	/** The class loader of the class we want to transform */
 	private ClassLoader targetClassLoader;
 
+	private boolean useD4jTest = false;
+	private Set<String> d4jMethodNames = new HashSet<>();
+
 	/** filename for logging */
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
 		this.targetClassName = targetClassName;
@@ -56,6 +64,28 @@ public class TraceTransformer implements ClassFileTransformer {
 		String logFile = null;
 		logFile = s.replace('\\', '.').replace('/', '.');
 		MDC.put("logfile", logFile);
+	}
+
+	public void setD4jDataFile(String filepath) {
+		useD4jTest = true;
+		String methodstring = "methods.tests.all=";
+		try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
+			String s = reader.readLine();
+			if (s.startsWith(methodstring)) {
+				String[] methodnames = s.substring(methodstring.length()).split(";");
+				Collections.addAll(d4jMethodNames, methodnames);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean isD4jTestMethod(CtClass cc, CtBehavior m) {
+		if (!useD4jTest) {
+			return false;
+		}
+		String longname = cc.getName() + "::" + m.getName();
+		return d4jMethodNames.contains(longname);
 	}
 
 	private byte[] transformBody(byte[] classfileBuffer) {
@@ -99,7 +129,6 @@ public class TraceTransformer implements ClassFileTransformer {
 		// branchbyte and byte index.
 		CodeIterator tempci = ca.iterator();
 		int lastln = -1;
-
 		Map<Integer, String> instmap = new HashMap<>();
 		for (int i = 0; tempci.hasNext(); i++) {
 			int index = tempci.lookAhead();
@@ -110,14 +139,14 @@ public class TraceTransformer implements ClassFileTransformer {
 			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index + ",nextinst=";
 			if (ln != lastln) {
 				lastln = ln;
-				debugLogger.info("{}", ln);
+				// debugLogger.info("{}", ln);
 				// System.out.println(ln);
 			}
 
 			// debugging:opcode
 			int op = tempci.byteAt(index);
 			String opc = Mnemonic.OPCODE[op];
-			debugLogger.info(opc);
+			// debugLogger.info(opc);
 			// System.out.println(opc);
 
 			tempci.next();
@@ -148,8 +177,21 @@ public class TraceTransformer implements ClassFileTransformer {
 			// ci.next();
 			index = ci.next();
 			// print advanced information(e.g. value pushed)
-			if (oi != null)
-				oi.insertByteCodeAfter(ci, index, constp, cbi);
+			// if (oi != null)
+			// oi.insertByteCodeAfter(ci, index, constp, cbi);
+		}
+		// if this is a d4j test method, log special delimiter.
+		if (isD4jTestMethod(cc, m)) {
+			ci = ca.iterator();
+			String longname = String.format("###%s::%s", cc.getName(), m.getName());
+			int instpos = ci.insertGap(6);
+			int instindex = constp.addStringInfo(longname);
+
+			ci.writeByte(19, instpos);// ldc_w
+			ci.write16bit(instindex, instpos + 1);
+
+			ci.writeByte(184, instpos + 3);// invokestatic
+			ci.write16bit(cbi.logstringindex, instpos + 4);
 		}
 		// not sure if this is necessary.
 		ca.computeMaxStack();

@@ -15,6 +15,7 @@ public class InstrumentationAgent {
 	private static String logFile = null;
 	private static String[] className = null;
 	private static List<String> classNames = null;
+	private static String d4jdatafile = null;
 
 	private InstrumentationAgent() {
 		throw new IllegalStateException("Agent class");
@@ -49,6 +50,9 @@ public class InstrumentationAgent {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+			}
+			if (s.startsWith("d4jdatafile=")) {
+				d4jdatafile = s.split("=")[1];
 			}
 		}
 		if (logFile == null && className == null && classNames == null)
@@ -91,6 +95,9 @@ public class InstrumentationAgent {
 		TraceTransformer dt = new TraceTransformer(clazz.getName(), classLoader);
 		if (logFile != null) {
 			dt.setLogFile(logFile);
+		}
+		if (d4jdatafile != null) {
+			dt.setD4jDataFile(d4jdatafile);
 		}
 		instrumentation.addTransformer(dt, true);
 		try {
