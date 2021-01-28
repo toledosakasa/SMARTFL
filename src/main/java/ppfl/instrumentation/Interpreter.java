@@ -160,8 +160,10 @@ public class Interpreter {
 		map[175] = new DreturnInst(175);
 		map[176] = new AreturnInst(176);
 		map[177] = new ReturnInst(177);
-		map[178] = new GetstaticInst(178);
-
+		map[178] = new GetStaticInst(178);
+		map[179] = new PutStaticInst(179);
+		map[180] = new GetFieldInst(180);
+		map[181] = new PutFieldInst(181);
 		map[182] = new InvokevirtualInst(182);
 		map[183] = new InvokespecialInst(183);
 		map[184] = new InvokestaticInst(184);
