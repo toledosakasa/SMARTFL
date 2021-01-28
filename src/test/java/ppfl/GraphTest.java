@@ -231,7 +231,7 @@ class GraphTest {
 		pgraph.setTraceAllClassed(false);
 
 		pgraph.initFromConfigFile(traceBaseDir, configpath);
-        // pgraph.buildNWrongFactor();
+		// pgraph.buildNWrongFactor();
 		pgraph.printgraph();
 		return pgraph;
 	}
@@ -246,6 +246,22 @@ class GraphTest {
 
 		ByteCodeGraph bgraph = d4jinit();
 		bgraph.check_bp(true);
+	}
+
+	@Test
+	public void d4jLogTest() {
+		ByteCodeGraph pgraph = new ByteCodeGraph();
+
+		String resultfile = "InfResult";
+		ByteCodeGraph.setResultLogger(resultfile);
+		String graphfile = "ProbGraph";
+		ByteCodeGraph.setGraphLogger(graphfile);
+
+		pgraph.setAutoOracle(true);
+		pgraph.setTraceAllClassed(false);
+		pgraph.initD4jProject("Lang", 3);
+		pgraph.printgraph();
+		pgraph.check_bp(true);
 	}
 
 	ByteCodeGraph mergeinit_bc() {
@@ -537,24 +553,24 @@ class GraphTest {
 	@Test
 	public void pred7test_bc() {
 		ByteCodeGraph pgraph = pred7init_bc();
-    }
-    
-    // ByteCodeGraph unexcutedinit_bc() {
-	// 	String ppflroot = ".";
-	// 	String traceBaseDir = ppflroot + "\\trace\\logs\\mytrace\\";
-	// 	String configpath = traceBaseDir + "unexcuted.log";
+	}
 
-	// 	ByteCodeGraph pgraph = new ByteCodeGraph();
-	// 	pgraph.setAutoOracle(true);
-	// 	pgraph.setTraceAllClassed(false);
+	// ByteCodeGraph unexcutedinit_bc() {
+	// String ppflroot = ".";
+	// String traceBaseDir = ppflroot + "\\trace\\logs\\mytrace\\";
+	// String configpath = traceBaseDir + "unexcuted.log";
 
-	// 	pgraph.initFromConfigFile(traceBaseDir, configpath);
-    //     // pgraph.buildNWrongFactor();
-	// 	pgraph.printgraph();
-	// 	return pgraph;
+	// ByteCodeGraph pgraph = new ByteCodeGraph();
+	// pgraph.setAutoOracle(true);
+	// pgraph.setTraceAllClassed(false);
+
+	// pgraph.initFromConfigFile(traceBaseDir, configpath);
+	// // pgraph.buildNWrongFactor();
+	// pgraph.printgraph();
+	// return pgraph;
 	// }
 
-    ByteCodeGraph unexecutedinit_bc() {
+	ByteCodeGraph unexecutedinit_bc() {
 		String ppflroot = ".";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted.fail.log";
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted.pass.log";
@@ -562,8 +578,8 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
-        pgraph.get_idom();
-        pgraph.get_stores();
+		pgraph.get_idom();
+		pgraph.get_stores();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
 		pgraph.printgraph();
@@ -574,9 +590,9 @@ class GraphTest {
 	public void unexecutedtest_bc() {
 		ByteCodeGraph pgraph = unexecutedinit_bc();
 		pgraph.check_bp(true);
-    }
-    
-    ByteCodeGraph unexecuted1init_bc() {
+	}
+
+	ByteCodeGraph unexecuted1init_bc() {
 		String ppflroot = ".";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted1.fail.log";
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\Unexecuted1.pass.log";
@@ -584,8 +600,8 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
-        pgraph.get_idom();
-        pgraph.get_stores();
+		pgraph.get_idom();
+		pgraph.get_stores();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
 		pgraph.printgraph();
@@ -606,16 +622,16 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
-        pgraph.get_idom();
-        pgraph.get_stores();
+		pgraph.get_idom();
+		pgraph.get_stores();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
 		// for(StmtNode stmt: pgraph.stmts){
-		// 	if(stmt.getLineNumber() == 7){
-		// 		pgraph.buildStmtFactor(stmt, 3e-5);
-		// 	}
-        // }
-        // pgraph.buildNWrongFactor();
+		// if(stmt.getLineNumber() == 7){
+		// pgraph.buildStmtFactor(stmt, 3e-5);
+		// }
+		// }
+		// pgraph.buildNWrongFactor();
 		pgraph.printgraph();
 		return pgraph;
 	}

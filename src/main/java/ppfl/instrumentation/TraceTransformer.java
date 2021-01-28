@@ -1,7 +1,9 @@
 package ppfl.instrumentation;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -40,7 +42,9 @@ public class TraceTransformer implements ClassFileTransformer {
 	public static final String SOURCELOGGERNAME = "PPFL_LOGGER_SOURCE";
 	public static final Logger traceLogger = LoggerFactory.getLogger(TRACELOGGERNAME);
 	public static final Logger sourceLogger = LoggerFactory.getLogger(SOURCELOGGERNAME);
-
+	private static final int BUFFERSIZE = 1 << 20;
+	private static BufferedWriter sourceWriter = null;
+	private static BufferedWriter traceWriter = null;
 	/** The internal form class name of the class to transform */
 	private String targetClassName;
 	/** The class loader of the class we want to transform */
@@ -54,6 +58,39 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
 		Interpreter.init();
+		FileWriter file = null;
+		try {
+			file = new FileWriter("trace/logs/mytrace/all.log");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		traceWriter = new BufferedWriter(file, BUFFERSIZE);
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				try {
+					TraceTransformer.traceWriter.flush();
+					// closing the stream may trigger double-close bug.
+					// TraceTransformer.traceWriter.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	private static void setSourceFile(String clazzname) {
+		setWriterFile(String.format("trace/logs/mytrace/%s.source.log", clazzname));
+	}
+
+	private static void setWriterFile(String filename) {
+		FileWriter file = null;
+		try {
+			file = new FileWriter(filename);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		sourceWriter = new BufferedWriter(file, BUFFERSIZE);
 	}
 
 	public void setTargetClassName(String s) {
@@ -91,6 +128,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	private byte[] transformBody(byte[] classfileBuffer) {
 		byte[] byteCode = classfileBuffer;
 		this.setLogger(this.targetClassName);
+		setSourceFile(this.targetClassName);
 		debugLogger.info("[Agent] Transforming class {}", this.targetClassName);
 		try {
 			ClassPool cp = ClassPool.getDefault();
@@ -123,31 +161,18 @@ public class TraceTransformer implements ClassFileTransformer {
 		// add constants to constpool.
 		// index will be used during instrumentation.
 		ConstPool constp = mi.getConstPool();
-		CallBackIndex cbi = new CallBackIndex(constp);
+		CallBackIndex cbi = new CallBackIndex(constp, traceWriter);
 
 		// record line info and instructions, since instrumentation will change
 		// branchbyte and byte index.
 		CodeIterator tempci = ca.iterator();
-		int lastln = -1;
 		Map<Integer, String> instmap = new HashMap<>();
 		for (int i = 0; tempci.hasNext(); i++) {
 			int index = tempci.lookAhead();
 			int ln = mi.getLineNumber(index);
 
-			// debugging:line number
 			String getinst = getInstMap(tempci, index, constp);
 			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index + ",nextinst=";
-			if (ln != lastln) {
-				lastln = ln;
-				// debugLogger.info("{}", ln);
-				// System.out.println(ln);
-			}
-
-			// debugging:opcode
-			int op = tempci.byteAt(index);
-			String opc = Mnemonic.OPCODE[op];
-			// debugLogger.info(opc);
-			// System.out.println(opc);
 
 			tempci.next();
 			if (!tempci.hasNext()) {
@@ -169,32 +194,43 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			// insert bytecode right before this inst.
 			// print basic information of this instruction
-			// LOGGER.log(Level.SEVERE, instinfo);
 			sourceLogger.info(instinfo);
-			if (oi != null)
+			try {
+				sourceWriter.write(instinfo);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			if (oi != null) {
 				oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+			}
 			// move to the next inst. everything below this will be inserted after the inst.
-			// ci.next();
 			index = ci.next();
 			// print advanced information(e.g. value pushed)
-			// if (oi != null)
-			// oi.insertByteCodeAfter(ci, index, constp, cbi);
+			if (oi != null) {
+				// if (oi.form > 42)
+				oi.insertByteCodeAfter(ci, index, constp, cbi);
+			}
 		}
-		// if this is a d4j test method, log special delimiter.
-		if (isD4jTestMethod(cc, m)) {
-			ci = ca.iterator();
-			String longname = String.format("###%s::%s", cc.getName(), m.getName());
-			int instpos = ci.insertGap(6);
-			int instindex = constp.addStringInfo(longname);
+		// log method name at the beginning of this method.
+		ci = ca.iterator();
+		String longname = String.format("%n###%s::%s", cc.getName(), m.getName());
+		int instpos = ci.insertGap(6);
+		int instindex = constp.addStringInfo(longname);
 
-			ci.writeByte(19, instpos);// ldc_w
-			ci.write16bit(instindex, instpos + 1);
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
 
-			ci.writeByte(184, instpos + 3);// invokestatic
-			ci.write16bit(cbi.logstringindex, instpos + 4);
-		}
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.logstringindex, instpos + 4);
 		// not sure if this is necessary.
 		ca.computeMaxStack();
+		// flushing buffer
+		try {
+			sourceWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

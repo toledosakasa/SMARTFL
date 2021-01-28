@@ -1,5 +1,7 @@
 package ppfl.instrumentation;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.FileSystems;
@@ -55,7 +57,7 @@ public class InstrumentationAgent {
 				d4jdatafile = s.split("=")[1];
 			}
 		}
-		if (logFile == null && className == null && classNames == null)
+		if (logFile == null && className == null && classNames == null && d4jdatafile == null)
 			return;
 		transformClass(inst);
 	}
@@ -64,6 +66,42 @@ public class InstrumentationAgent {
 		debugLogger.info("[Agent] In transformClass method");
 		Class<?> targetCls = null;
 		ClassLoader targetClassLoader = null;
+		if (d4jdatafile != null) {
+			String relevantClasses = null;
+			String allTestClasses = null;
+			// String configpath = String.format("d4j_resources/metadata_cached/%s%d.log",
+			// project, id);
+			try (BufferedReader reader = new BufferedReader(new FileReader(d4jdatafile));) {
+				String tmp;
+				while ((tmp = reader.readLine()) != null) {
+					String[] splt = tmp.split("=");
+					if (splt[0].equals("classes.relevant")) {
+						relevantClasses = splt[1];
+					}
+					if (splt[0].equals("tests.all")) {
+						allTestClasses = splt[1];
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			ArrayList<String> classNameList = new ArrayList<>();
+			if (relevantClasses != null) {
+				for (String s : relevantClasses.split(";")) {
+					if (!s.isEmpty()) {
+						classNameList.add(s);
+					}
+				}
+			}
+			if (allTestClasses != null) {
+				for (String s : allTestClasses.split(";")) {
+					if (!s.isEmpty()) {
+						classNameList.add(s);
+					}
+				}
+			}
+			className = classNameList.toArray(new String[classNameList.size()]);
+		}
 		if (className == null) {
 			return;
 		}

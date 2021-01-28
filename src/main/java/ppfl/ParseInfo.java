@@ -18,7 +18,43 @@ public class ParseInfo {
 	public String opcode;
 
 	public ParseInfo() {
+		tracemap = new HashMap<>();
+	}
 
+	public void setDomain(String traceClass, String traceMethod) {
+		tracemap = new HashMap<>();
+		this.traceclass = traceClass;
+		this.tracemethod = traceMethod;
+	}
+
+	public String getlineinfo() {
+		return String.format("%s#%s#%d#%d", this.traceclass, this.tracemethod, this.linenumber, this.byteindex);
+	}
+
+	private void checkAndPut(Map<String, String> m, String key, String value) {
+		if (Integer.parseInt(value) >= 0) {
+			m.put(key, value);
+		}
+	}
+
+	public void parseString(String encoded) {
+		String[] split = encoded.split(",");
+		// int comp[] = { opc, popn, pushn, load, store, nextinst };
+		this.form = Integer.parseInt(split[0]);
+		checkAndPut(tracemap, "popnum", split[1]);
+		checkAndPut(tracemap, "pushnum", split[2]);
+		checkAndPut(tracemap, "load", split[3]);
+		checkAndPut(tracemap, "store", split[4]);
+		checkAndPut(tracemap, "nextinst", split[7]);
+		for (int i = 8; i < split.length; i++) {
+			String[] splitinstinfo = split[i].split("=");
+			if (splitinstinfo.length < 2) {
+				System.err.println(encoded);
+			}
+			String infotype = splitinstinfo[0];
+			String infovalue = splitinstinfo[1];
+			tracemap.put(infotype, infovalue);
+		}
 	}
 
 	public ParseInfo(String trace) {
