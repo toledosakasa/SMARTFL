@@ -28,6 +28,10 @@ public class Node {
 	private int stacksize; // for double:2. Other type:1.
 	StmtNode stmt;
 
+	// Heap
+	private boolean isHeapObject = false;
+	private int address = 0;
+
 	public Node(String name) {
 		this.obs = false;
 		this.p = 0.5;
@@ -80,6 +84,24 @@ public class Node {
 			throw new IllegalArgumentException("Invalid stack size: " + s);
 		}
 		this.stacksize = s;
+	}
+
+	public boolean isHeapObject() {
+		return this.isHeapObject;
+	}
+
+	public void setHeapObject() {
+		this.isHeapObject = true;
+	}
+
+	public void setAddress(int add) {
+		this.address = add;
+	}
+
+	public int getAddress() {
+		if (!isHeapObject)
+			return 0;
+		return address;
 	}
 
 	public String getName() {
