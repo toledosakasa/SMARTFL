@@ -48,9 +48,10 @@ if __name__ == '__main__':
         projname = args[2]
         bugid = args[3]
         cmdlines = d4j.getd4jcmdline(projname, bugid)
-        print(cmdlines[0])
         cdcmd = f'cd tmp_checkout/{projname}{bugid} && '
         for cmdline in cmdlines:
-            os.system(cdcmd + cmdline)
+            print(cmdline)
+            input()
+            #os.system(cdcmd + cmdline)
     if args[1] == 'clearcache':
         d4j.clearcache()
