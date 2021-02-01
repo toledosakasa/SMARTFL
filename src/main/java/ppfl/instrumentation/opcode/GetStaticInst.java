@@ -4,7 +4,6 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
-import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
 //178

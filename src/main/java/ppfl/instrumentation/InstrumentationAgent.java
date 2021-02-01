@@ -69,6 +69,7 @@ public class InstrumentationAgent {
 		if (d4jdatafile != null) {
 			String relevantClasses = null;
 			String allTestClasses = null;
+			String relevantTests = null;
 			// String configpath = String.format("d4j_resources/metadata_cached/%s%d.log",
 			// project, id);
 			try (BufferedReader reader = new BufferedReader(new FileReader(d4jdatafile));) {
@@ -80,6 +81,9 @@ public class InstrumentationAgent {
 					}
 					if (splt[0].equals("tests.all")) {
 						allTestClasses = splt[1];
+					}
+					if (splt[0].equals("tests.relevant")) {
+						relevantTests = splt[1];
 					}
 				}
 			} catch (IOException e) {
@@ -93,8 +97,8 @@ public class InstrumentationAgent {
 					}
 				}
 			}
-			if (allTestClasses != null) {
-				for (String s : allTestClasses.split(";")) {
+			if (relevantTests != null) {// TODO change to all test classes(filtering)
+				for (String s : relevantTests.split(";")) {
 					if (!s.isEmpty()) {
 						classNameList.add(s);
 					}
