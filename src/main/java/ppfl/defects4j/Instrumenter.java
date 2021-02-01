@@ -170,10 +170,10 @@ public class Instrumenter {
 				}
 
 			});
+			outputBuilder.append(String.format("%n"));
 			CurNum++;
 			System.out.println(CurNum + "/" + TotalNum);
 		}
-		outputBuilder.append(String.format("%n"));
 		writeStringToFile(outputPath, outputBuilder.toString());
 	}
 
