@@ -17,7 +17,7 @@ def getd4jprojinfo():
 
 
 def getinstclassinfo(proj):
-    cmdline = f"defects4j query -p {proj} -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger\"  -o ./d4j_resources/{proj}.csv"
+    cmdline = f"defects4j query -p {proj} -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger,tests.relevant\"  -o ./d4j_resources/{proj}.csv"
     os.system(cmdline)
 
 
@@ -41,7 +41,8 @@ def getmetainfo(proj, id):
         f'./tmp_checkout/{proj}{id}')
     if not os.path.exists(workdir):
         checkout(proj, id)
-    fields = ['tests.all', 'classes.relevant', 'tests.trigger']
+    fields = ['tests.all', 'classes.relevant',
+              'tests.trigger', 'tests.relevant']
 
     print('Exporting metadata')
     for field in fields:
