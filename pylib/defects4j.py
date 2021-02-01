@@ -78,19 +78,25 @@ def getd4jcmdline(proj, id):
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     instclasses = metadata['classes.relevant'].strip() + \
-        ';' + metadata['tests.all'].strip()
+        ';' + metadata['tests.relevant'].strip()
     instclasses = instclasses.replace(";", ":")
-    testnames = metadata['methods.test.all'].split(';')
-    l = len(testnames)
-    print(f'Test methods: {l}')
+    testmethods = metadata['methods.test.all'].split(';')
+    relevant_classes = metadata['tests.relevant'].split(';')
+    #l = len(testnames)
+    #print(f'Test methods: {l}')
+    #" defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss2,testStringCreateNumberEnsureNoPrecisionLoss1,testStringCreateNumberEnsureNoPrecisionLoss3"
     ret = []
-    for testname in testnames:
-        dottestname = testname.replace("::", ".")
-        app = f"defects4j test -t {testname} \
-          -a \"-Djvmargs=-noverify \
-              -Djvmargs=-javaagent:{jarpath}=logfile={dottestname},\
-                  instrumentingclass={instclasses}\""
-        ret.append(app)
+    d4jdatafile = os.path.abspath(
+        f'./d4j_resources/metadata_cached/{proj}{id}.log')
+    for testmethod in testmethods:
+        testclassname = testmethod.split('::')[0]
+        if testclassname in relevant_classes:
+            app = f"defects4j test -t {testmethod} \
+            -a \"-Djvmargs=-noverify \
+                -Djvmargs=-javaagent:{jarpath}=,\
+                    instrumentingclass={instclasses},\
+                        d4jdatafile={d4jdatafile}\""
+            ret.append(app)
     return ret
 
 
