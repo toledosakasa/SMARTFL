@@ -111,7 +111,6 @@ public class Instrumenter {
 			String PackageNamet = null;
 			PackageNamet = cu.getPackage().getName().toString();
 			final String PackageName = PackageNamet;
-			String ClassName = cu.getClass().getName();
 
 			cu.accept(new ASTVisitor() {
 
@@ -123,6 +122,19 @@ public class Instrumenter {
 								return true;
 					}
 					return false;
+				}
+
+				public boolean visit(TypeDeclaration node) {
+					String ClassName = node.getName().toString();
+					if (isInnerClass(node))
+						return true;
+					if (node.isInterface())
+						return false;
+					else {
+						String printMSG = String.format("%s.%s::", PackageName, ClassName);
+						outputBuilder.append(printMSG);
+						return true;
+					}
 				}
 
 				public boolean visit(MethodDeclaration node) {
@@ -146,7 +158,7 @@ public class Instrumenter {
 						return false;
 
 					// An @test method. output it's name
-					String printMSG = String.format("%s.%s::%s%n", PackageName, ClassName, node.getName());
+					String printMSG = String.format("%s", node.getName());
 					outputBuilder.append(printMSG);
 					return true;
 				}
@@ -155,6 +167,7 @@ public class Instrumenter {
 			CurNum++;
 			System.out.println(CurNum + "/" + TotalNum);
 		}
+		outputBuilder.append(String.format("%n"));
 		writeStringToFile(outputPath, outputBuilder.toString());
 	}
 
