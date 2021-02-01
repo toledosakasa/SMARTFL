@@ -90,7 +90,7 @@ def getd4jcmdline(proj, id):
     d4jdatafile = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
     for testmethod in testmethods:
-        if testmethod == '':
+        if testmethod.strip() == '':
             continue
         testclassname = testmethod.split('::')[0]
         if testclassname in relevant_classes:
