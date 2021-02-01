@@ -51,7 +51,7 @@ if __name__ == '__main__':
         cdcmd = f'cd tmp_checkout/{projname}{bugid} && '
         for cmdline in cmdlines:
             print(cmdline)
-            input()
-            #os.system(cdcmd + cmdline)
+            # input()
+            os.system(cdcmd + cmdline)
     if args[1] == 'clearcache':
         d4j.clearcache()
