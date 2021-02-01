@@ -114,6 +114,8 @@ public class Instrumenter {
 
 			cu.accept(new ASTVisitor() {
 
+				boolean firstTest = false;
+
 				public boolean isInnerClass(ASTNode node) {
 					while (node != null) {
 						node = node.getParent();
@@ -158,6 +160,10 @@ public class Instrumenter {
 						return false;
 
 					// An @test method. output it's name
+					if (firstTest) {
+						outputBuilder.append(",");
+					}
+					firstTest = true;
 					String printMSG = String.format("%s", node.getName());
 					outputBuilder.append(printMSG);
 					return true;
