@@ -77,11 +77,12 @@ def getd4jcmdline(proj, id):
     metadata = getmetainfo(proj, id)
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
+    tests_relevant = metadata['tests.relevant']
     instclasses = metadata['classes.relevant'].strip() + \
-        ';' + metadata['tests.relevant'].strip()
+        ';' + tests_relevant.strip()
     instclasses = instclasses.replace(";", ":")
     testmethods = metadata['methods.test.all'].split(';')
-    relevant_classes = metadata['tests.relevant'].split(';')
+    relevant_classes = tests_relevant.split(';')
     #l = len(testnames)
     #print(f'Test methods: {l}')
     #" defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss2,testStringCreateNumberEnsureNoPrecisionLoss1,testStringCreateNumberEnsureNoPrecisionLoss3"
