@@ -8,9 +8,9 @@
       <PatternLayout pattern="%msg%n" />
     </Console>
 
-    <RandomAccessFile name="TraceAppender_simple" fileName="trace/logs/mytrace/all.log" Append="false" immediateFlush="false" bufferSize="1048576">
+    <!-- <RandomAccessFile name="TraceAppender_simple" fileName="trace/logs/mytrace/all.log" Append="false" immediateFlush="false" bufferSize="1048576">
       <PatternLayout pattern="%msg" />
-    </RandomAccessFile>
+    </RandomAccessFile> -->
 
     <RandomAccessFile name="SourceAppender_simple" fileName="trace/logs/mytrace/all.source.log" Append="false" immediateFlush="false" bufferSize="1048576">
       <PatternLayout pattern="%msg" />
