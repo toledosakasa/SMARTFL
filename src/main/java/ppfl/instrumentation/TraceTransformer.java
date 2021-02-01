@@ -52,6 +52,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	private boolean useD4jTest = false;
 	private Set<String> d4jMethodNames = new HashSet<>();
+	private boolean logSourceToScreen = false;
 
 	/** filename for logging */
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
@@ -60,7 +61,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		Interpreter.init();
 		FileWriter file = null;
 		try {
-			file = new FileWriter("trace/logs/mytrace/all.log");
+			file = new FileWriter("trace/logs/mytrace/all.log", true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -95,6 +96,10 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	public void setTargetClassName(String s) {
 		this.targetClassName = s;
+	}
+
+	public void setLogSourceToScreen(boolean b) {
+		this.logSourceToScreen = b;
 	}
 
 	public void setLogFile(String s) {
@@ -194,7 +199,8 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			// insert bytecode right before this inst.
 			// print basic information of this instruction
-			sourceLogger.info(instinfo);
+			if (logSourceToScreen)
+				sourceLogger.info(instinfo);
 			try {
 				sourceWriter.write(instinfo);
 			} catch (IOException e) {

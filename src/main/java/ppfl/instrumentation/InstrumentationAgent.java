@@ -18,6 +18,7 @@ public class InstrumentationAgent {
 	private static String[] className = null;
 	private static List<String> classNames = null;
 	private static String d4jdatafile = null;
+	private static boolean logSourceToScreen = false;
 
 	private InstrumentationAgent() {
 		throw new IllegalStateException("Agent class");
@@ -55,6 +56,9 @@ public class InstrumentationAgent {
 			}
 			if (s.startsWith("d4jdatafile=")) {
 				d4jdatafile = s.split("=")[1];
+			}
+			if (s.startsWith("screenlog=")) {
+				logSourceToScreen = Boolean.parseBoolean(s.split("=")[1]);
 			}
 		}
 		if (logFile == null && className == null && classNames == null && d4jdatafile == null)
@@ -140,6 +144,9 @@ public class InstrumentationAgent {
 		}
 		if (d4jdatafile != null) {
 			dt.setD4jDataFile(d4jdatafile);
+		}
+		if (logSourceToScreen) {
+			dt.setLogSourceToScreen(true);
 		}
 		instrumentation.addTransformer(dt, true);
 		try {
