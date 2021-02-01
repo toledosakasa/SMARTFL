@@ -94,9 +94,7 @@ def getd4jcmdline(proj, id):
             continue
         testclassname = testmethod.split('::')[0]
         if testclassname in relevant_classes:
-            app = f"defects4j test -t {testmethod} \
-            -a \"-Djvmargs=-noverify \
-                -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
+            app = f"defects4j test -t {testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
             ret.append(app)
     return ret
 
