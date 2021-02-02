@@ -19,6 +19,7 @@ public class InstrumentationAgent {
 	private static List<String> classNames = null;
 	private static String d4jdatafile = null;
 	private static boolean logSourceToScreen = false;
+	private static boolean simpleLog = false;
 
 	private InstrumentationAgent() {
 		throw new IllegalStateException("Agent class");
@@ -60,10 +61,23 @@ public class InstrumentationAgent {
 			if (s.startsWith("screenlog=")) {
 				logSourceToScreen = Boolean.parseBoolean(s.split("=")[1]);
 			}
+			if (s.startsWith("simplelog=")) {
+				simpleLog = Boolean.parseBoolean(s.split("=")[1]);
+			}
 		}
 		if (logFile == null && className == null && classNames == null && d4jdatafile == null)
 			return;
 		transformClass(inst);
+	}
+
+	private static void addNameToList(List<String> l, String names) {
+		if (names != null) {
+			for (String s : names.split(";")) {
+				if (!s.isEmpty()) {
+					l.add(s);
+				}
+			}
+		}
 	}
 
 	private static void transformClass(Instrumentation instrumentation) {
@@ -94,20 +108,13 @@ public class InstrumentationAgent {
 				e.printStackTrace();
 			}
 			ArrayList<String> classNameList = new ArrayList<>();
-			if (relevantClasses != null) {
-				for (String s : relevantClasses.split(";")) {
-					if (!s.isEmpty()) {
-						classNameList.add(s);
-					}
-				}
+			addNameToList(classNameList, relevantClasses);
+			if (simpleLog) {
+				addNameToList(classNameList, allTestClasses);
+			} else {
+				addNameToList(classNameList, relevantTests);
 			}
-			if (relevantTests != null) {// TODO change to all test classes(filtering)
-				for (String s : relevantTests.split(";")) {
-					if (!s.isEmpty()) {
-						classNameList.add(s);
-					}
-				}
-			}
+
 			className = classNameList.toArray(new String[classNameList.size()]);
 		}
 		if (className == null) {
@@ -147,6 +154,9 @@ public class InstrumentationAgent {
 		}
 		if (logSourceToScreen) {
 			dt.setLogSourceToScreen(true);
+		}
+		if (simpleLog) {
+			dt.setSimpleLog(true);
 		}
 		instrumentation.addTransformer(dt, true);
 		try {

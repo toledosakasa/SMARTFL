@@ -53,6 +53,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	private boolean useD4jTest = false;
 	private Set<String> d4jMethodNames = new HashSet<>();
 	private boolean logSourceToScreen = false;
+	private boolean simpleLog = false;
 
 	/** filename for logging */
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
@@ -100,6 +101,10 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	public void setLogSourceToScreen(boolean b) {
 		this.logSourceToScreen = b;
+	}
+
+	public void setSimpleLog(boolean b) {
+		this.simpleLog = b;
 	}
 
 	public void setLogFile(String s) {
@@ -168,6 +173,31 @@ public class TraceTransformer implements ClassFileTransformer {
 		ConstPool constp = mi.getConstPool();
 		CallBackIndex cbi = new CallBackIndex(constp, traceWriter);
 
+		if (!this.simpleLog)
+			instrumentByteCode(m, cc, mi, ca, constp, cbi);
+		// log method name at the beginning of this method.
+		CodeIterator ci = ca.iterator();
+		String longname = String.format("%n###%s::%s", cc.getName(), m.getName());
+		int instpos = ci.insertGap(6);
+		int instindex = constp.addStringInfo(longname);
+
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.logstringindex, instpos + 4);
+		// not sure if this is necessary.
+		ca.computeMaxStack();
+		// flushing buffer
+		try {
+			sourceWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void instrumentByteCode(CtBehavior m, CtClass cc, MethodInfo mi, CodeAttribute ca, ConstPool constp,
+			CallBackIndex cbi) throws BadBytecode {
 		// record line info and instructions, since instrumentation will change
 		// branchbyte and byte index.
 		CodeIterator tempci = ca.iterator();
@@ -217,25 +247,6 @@ public class TraceTransformer implements ClassFileTransformer {
 				// if (oi.form > 42)
 				oi.insertByteCodeAfter(ci, index, constp, cbi);
 			}
-		}
-		// log method name at the beginning of this method.
-		ci = ca.iterator();
-		String longname = String.format("%n###%s::%s", cc.getName(), m.getName());
-		int instpos = ci.insertGap(6);
-		int instindex = constp.addStringInfo(longname);
-
-		ci.writeByte(19, instpos);// ldc_w
-		ci.write16bit(instindex, instpos + 1);
-
-		ci.writeByte(184, instpos + 3);// invokestatic
-		ci.write16bit(cbi.logstringindex, instpos + 4);
-		// not sure if this is necessary.
-		ca.computeMaxStack();
-		// flushing buffer
-		try {
-			sourceWriter.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
