@@ -92,6 +92,15 @@ public class ParseInfo {
 		return null;
 	}
 
+	public Integer getAddressFromStack() {
+		if (this.tracemap.containsKey("stack")) {
+			String[] stackValue = this.tracemap.get("stack").split(":");
+			if (stackValue[0].contentEquals("Obj"))
+				return Integer.valueOf(stackValue[1]);
+		}
+		return null;
+	}
+
 	public void print() {
 		for (Map.Entry<String, String> s : tracemap.entrySet()) {
 			debugLogger.info(s + "=" + s.getValue());
