@@ -41,11 +41,11 @@ public class SwapInst extends OpcodeInst {
 		// build the stmtnode(common)
 		super.buildtrace(graph);
 
-        Node top = graph.getRuntimeStack().pop();
-        Node NextTop = graph.getRuntimeStack().pop();
+		Node top = graph.getRuntimeStack().pop();
+		Node NextTop = graph.getRuntimeStack().pop();
 		assert (NextTop.getSize() == 1);
 		graph.getRuntimeStack().push(top);
-        graph.getRuntimeStack().push(nextTop);
+		graph.getRuntimeStack().push(NextTop);
 	}
 
 }
