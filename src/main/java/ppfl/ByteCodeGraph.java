@@ -42,6 +42,7 @@ public class ByteCodeGraph {
 
 	private static Set<String> tracedClass = new HashSet<>();
 	private boolean traceAllClasses = true;
+	String currentTestMethod = null;
 
 	public void setTraceAllClassed(boolean value) {
 		this.traceAllClasses = value;
@@ -62,6 +63,23 @@ public class ByteCodeGraph {
 
 	}
 
+	public boolean useD4jTest = false;
+	private Set<String> d4jMethodNames = new HashSet<>();
+	private Set<String> d4jTriggerTestNames = new HashSet<>();
+
+	private boolean isD4jTestMethod(String className, String methodName) {
+		if (!useD4jTest) {
+			return false;
+		}
+		String longname = className + "::" + methodName;
+		return d4jMethodNames.contains(longname);
+	}
+
+	private boolean getD4jTestState(String fullname) {
+		assert (d4jMethodNames.contains(fullname));
+		return !d4jTriggerTestNames.contains(fullname);
+	}
+
 	public List<FactorNode> factornodes;
 	public List<Node> nodes;
 	public List<StmtNode> stmts;
@@ -69,6 +87,8 @@ public class ByteCodeGraph {
 	public Map<String, Node> stmtmap;
 	public Map<String, Integer> varcountmap;
 	public Map<String, Integer> stmtcountmap;
+	public Map<String, Integer> heapcountmap;
+	public Map<String, Integer> staticheapcountmap;
 	public org.graphstream.graph.Graph viewgraph;
 	public Set<String> instset;
 	public Set<String> outset;
@@ -88,7 +108,7 @@ public class ByteCodeGraph {
 	// unfolding)
 	public int max_loop;
 
-	public String testname;
+	public String testname = null;
 
 	public int nsamples = 1 << 20;
 	public int bp_times = 100;
@@ -126,7 +146,7 @@ public class ByteCodeGraph {
 	}
 
 	// local vars used by parsing
-	public ParseInfo parseinfo;
+	public ParseInfo parseinfo = new ParseInfo();
 
 	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
 	// input of test function as 1.0(always true)
@@ -185,8 +205,8 @@ public class ByteCodeGraph {
 						if (stores != null) {
 							// StmtNode curStmt = curPred.stmt;
 							for (Integer i : stores) {
-                                StmtNode curStmt = getUnexeStmt(curPredStmt, i);
-                                Node usenode = getLoadNodeAsUse(i);
+								StmtNode curStmt = getUnexeStmt(curPredStmt, i);
+								Node usenode = getLoadNodeAsUse(i);
 								Node defnode = addNewVarNode(i, curStmt);
 								buildFactor(defnode, curPred, usenode, null, curStmt);
 							}
@@ -206,6 +226,8 @@ public class ByteCodeGraph {
 		stmtmap = new HashMap<>();
 		varcountmap = new HashMap<>();
 		stmtcountmap = new HashMap<>();
+		heapcountmap = new HashMap<>();
+		staticheapcountmap = new HashMap<>();
 		instset = new HashSet<>();
 		outset = new HashSet<>();
 		predataflowmap = new HashMap<>();
@@ -278,10 +300,15 @@ public class ByteCodeGraph {
 	}
 
 	public void initmaps() {
-		// TODO this could be incomplete.
+		// TODO this could be incomplete...
 		this.varcountmap = new HashMap<>();
 		this.stackframe = new ArrayDeque<>();
 		this.predicates.clear();
+	}
+
+	public void parseD4jSource(String project, int id, String classname) {
+		String fullname = String.format("tmp_checkout/%s%s/trace/logs/mytrace/%s.source.log", project, id, classname);
+		parsesource(fullname);
 	}
 
 	public void parsesource(String sourcefilename) {
@@ -573,6 +600,70 @@ public class ByteCodeGraph {
 		// }
 	}
 
+	public void parseJoinedTrace(String tracefilename) {
+		this.predstack.clear();
+		this.initmaps();
+		try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
+			String t = null;
+			boolean testpass = true;
+			while ((t = parseTraceFromReader(reader, t, testpass)) != null) {
+				System.err.println(t);
+				testpass = getD4jTestState(t);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String parseTraceFromReader(BufferedReader reader, String testname, boolean testpass) throws IOException {
+		this.predstack.clear();
+		if (testname != null)
+			this.testname = testname.split("::")[1];
+		this.initmaps();
+		String t;
+		String delimiterPrefix = "###";
+		while ((t = reader.readLine()) != null) {
+			if (t.isEmpty()) {
+				continue;
+			}
+			if (t.startsWith(delimiterPrefix)) {
+				t = t.substring(delimiterPrefix.length());
+				String[] splt = t.split("::");
+				if (splt.length >= 2 && isD4jTestMethod(splt[0], splt[1])) {
+					// after all lines are parsed, auto-assign oracle for the last defined var
+					// with test state(pass = true,fail = false)
+					if (auto_oracle) {
+						for (Node i : lastDefinedVar) {
+							i.observe(testpass);
+							graphLogger.info("Observe {} as {}", i.name, testpass);
+						}
+					}
+					return t;
+				}
+				continue;
+			}
+			this.parseinfo = new ParseInfo(t);
+			String instname = this.parseinfo.getvalue("lineinfo");
+			killPredStack(instname);
+			if (predataflowmap.get(instname).size() > 1) {
+				// System.out.println("add set" + branch_stores.get(instname));
+				Set<Integer> stores = branch_stores.get(instname);
+				// if (stores != null)
+				store_stack.push(stores);
+			}
+			Interpreter.map[this.parseinfo.form].buildtrace(this);
+		}
+		// after all lines are parsed, auto-assign oracle for the last defined var
+		// with test state(pass = true,fail = false)
+		if (auto_oracle) {
+			for (Node i : lastDefinedVar) {
+				i.observe(testpass);
+				graphLogger.info("Observe {} as {}", i.name, testpass);
+			}
+		}
+		return null;
+	}
+
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.predstack.clear();
 		this.testname = testname;
@@ -774,6 +865,24 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
+	private void incStaticHeapIndex(String field) {
+		String def = getFormalStaticHeapName(field);
+		if (!staticheapcountmap.containsKey(def)) {
+			staticheapcountmap.put(def, 1);
+		} else {
+			staticheapcountmap.put(def, staticheapcountmap.get(def) + 1);
+		}
+	}
+
+	private void incHeapIndex(Node objectAddress, String field) {
+		String def = getFormalHeapName(objectAddress, field);
+		if (!heapcountmap.containsKey(def)) {
+			heapcountmap.put(def, 1);
+		} else {
+			heapcountmap.put(def, heapcountmap.get(def) + 1);
+		}
+	}
+
 	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
 		assert (traceclass.equals(this.getFrame().traceclass));
 		assert (tracemethod.equals(this.getFrame().tracemethod));
@@ -840,12 +949,28 @@ public class ByteCodeGraph {
 		return this.getDomain() + name;
 	}
 
+	private String getFormalStaticHeapName(String field) {
+		return field;
+	}
+
+	private String getFormalHeapName(Node objectAddress, String field) {
+		return String.format("%x.%s", objectAddress.getAddress(), field);
+	}
+
 	private String getFormalVarNameWithIndex(int varindex, String traceclass, String tracemethod) {
 		return getVarName(getFormalVarName(varindex, traceclass, tracemethod), this.varcountmap);
 	}
 
 	private String getFormalVarNameWithIndex(int varindex) {
 		return getVarName(getFormalVarName(varindex), this.varcountmap);
+	}
+
+	private String getFormalStaticHeapNameWithIndex(String field) {
+		return getVarName(getFormalStaticHeapName(field), this.heapcountmap);
+	}
+
+	private String getFormalHeapNameWithIndex(Node objectAddress, String field) {
+		return getVarName(getFormalHeapName(objectAddress, field), this.heapcountmap);
 	}
 
 	private String getVarName(String name, Integer count) {
@@ -869,6 +994,23 @@ public class ByteCodeGraph {
 
 	private boolean hasNode(String name) {
 		return nodemap.containsKey(getNodeName(name)) || stmtmap.containsKey(name);
+	}
+
+	public Node addNewStaticHeapNode(String field, StmtNode stmt) {
+		this.incStaticHeapIndex(field);
+		String nodename = this.getFormalStaticHeapNameWithIndex(field);
+		Node node = new Node(nodename, this.testname, stmt);
+		this.addNode(nodename, node);
+		return node;
+	}
+
+	public Node addNewHeapNode(Node objectAddress, String field, StmtNode stmt) {
+		assert (objectAddress.isHeapObject());
+		this.incHeapIndex(objectAddress, field);
+		String nodename = this.getFormalHeapNameWithIndex(objectAddress, field);
+		Node node = new Node(nodename, this.testname, stmt);
+		this.addNode(nodename, node);
+		return node;
 	}
 
 	public Node addNewStackNode(StmtNode stmt) {
@@ -942,6 +1084,14 @@ public class ByteCodeGraph {
 			nodemap.put(getNodeName(name), node);
 			nodes.add(node);
 		}
+	}
+
+	public Node getStaticHeapNode(String field) {
+		return this.getNode(this.getFormalStaticHeapName(field));
+	}
+
+	public Node getHeapNode(Node objectAddress, String field) {
+		return this.getNode(this.getFormalHeapName(objectAddress, field));
 	}
 
 	public Node getLoadNodeAsUse(int loadvar) {
@@ -1273,6 +1423,73 @@ public class ByteCodeGraph {
 		return fileData.toString();
 	}
 
+	public void initD4jProject(String project, int id) {
+		this.useD4jTest = true;
+		String triggerTests = null;
+		String relevantClasses = null;
+		String allTestMethods = null;
+		String allTestClasses = null;
+		String configpath = String.format("d4j_resources/metadata_cached/%s%d.log", project, id);
+		try (BufferedReader reader = new BufferedReader(new FileReader(configpath));) {
+			String tmp;
+			while ((tmp = reader.readLine()) != null) {
+				String[] splt = tmp.split("=");
+				if (splt[0].equals("classes.relevant")) {
+					relevantClasses = splt[1];
+				}
+				if (splt[0].equals("tests.all")) {
+					allTestClasses = splt[1];
+				}
+				if (splt[0].equals("tests.trigger")) {
+					triggerTests = splt[1];
+				}
+				if (splt[0].equals("methods.test.all")) {
+					allTestMethods = splt[1];
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (relevantClasses != null) {
+			for (String s : relevantClasses.split(";")) {
+				if (!s.isEmpty()) {
+					this.addTracedClass(s);
+					this.parseD4jSource(project, id, s);
+				}
+			}
+		}
+		if (allTestClasses != null) {
+			for (String s : allTestClasses.split(";")) {
+				if (!s.isEmpty()) {
+					this.addTracedClass(s);
+					this.parseD4jSource(project, id, s);
+				}
+			}
+		}
+		if (triggerTests != null) {
+			for (String s : triggerTests.split(";")) {
+				if (!s.isEmpty())
+					this.d4jTriggerTestNames.add(s);
+			}
+		}
+		if (allTestMethods != null) {
+			for (String s : allTestMethods.split(";")) {
+				if (!s.isEmpty())
+					this.d4jMethodNames.add(s);
+			}
+		}
+		// long startTime = System.currentTimeMillis();
+		this.get_idom();
+		this.get_stores();
+		// long endTime = System.currentTimeMillis();
+		// long thetime = endTime-startTime;
+		// System.out.println("idom time is "+ thetime);
+		String tracefilename = String.format("tmp_checkout/%s%s/trace/logs/mytrace/all.log", project, id);
+		this.parseJoinedTrace(tracefilename);
+		// this.parseD4jTrace(tracefilename);
+	}
+
 	public void initFromConfigFile(String baseDir, String configpath) {
 		String sourcepath = null;
 		String tracepath = null;
@@ -1326,7 +1543,6 @@ public class ByteCodeGraph {
 				boolean testpass = tmp[1].equals("1");
 				this.parsetrace(baseDir + tmp[0], testMethod, testpass);
 			}
-
 	}
 
 }
