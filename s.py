@@ -48,6 +48,7 @@ if __name__ == '__main__':
         projname = args[2]
         bugid = args[3]
         simplelogcmd, cmdlines = d4j.getd4jcmdline(projname, bugid)
+        print(simplelogcmd)
         os.system(simplelogcmd)
         input()
         cdcmd = f'cd tmp_checkout/{projname}{bugid} && '
