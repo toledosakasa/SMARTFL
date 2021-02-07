@@ -205,8 +205,8 @@ public class ByteCodeGraph {
 						if (stores != null) {
 							// StmtNode curStmt = curPred.stmt;
 							for (Integer i : stores) {
-                                StmtNode curStmt = getUnexeStmt(curPredStmt, i);
-                                Node usenode = getLoadNodeAsUse(i);
+								StmtNode curStmt = getUnexeStmt(curPredStmt, i);
+								Node usenode = getLoadNodeAsUse(i);
 								Node defnode = addNewVarNode(i, curStmt);
 								buildFactor(defnode, curPred, usenode, null, curStmt);
 							}
