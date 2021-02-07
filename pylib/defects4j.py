@@ -83,12 +83,10 @@ def getd4jcmdline(proj, id):
     instclasses = instclasses.replace(";", ":")
     testmethods = metadata['methods.test.all'].split(';')
     relevant_classes = tests_relevant.split(';')
-    #l = len(testnames)
-    #print(f'Test methods: {l}')
-    #" defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss2,testStringCreateNumberEnsureNoPrecisionLoss1,testStringCreateNumberEnsureNoPrecisionLoss3"
-    ret = []
     d4jdatafile = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
+    ret = []
+    simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
     for testmethod in testmethods:
         if testmethod.strip() == '':
             continue
@@ -96,7 +94,7 @@ def getd4jcmdline(proj, id):
         if testclassname in relevant_classes:
             app = f"defects4j test -t {testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
             ret.append(app)
-    return ret
+    return simplelogcmd,ret
 
 
 def checkout(proj, id):
