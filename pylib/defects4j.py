@@ -32,6 +32,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
         print('cache found')
         lines = utf8open(cachepath).readlines()
         for line in lines:
+            line = line.strip()
             splits = line.split('=')
             ret[splits[0]] = splits[1]
         return ret
@@ -75,10 +76,9 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
 
 def parseprofile(line: str, trigger_tests: List[str], testmethods: List[str]):
     line = line[3:]
-# org.apache.commons.lang3.ArrayUtilsTest::testLastIndexOfShort
     sp = line.split('::')
-    class_name = sp[0]
-    method_name = sp[1]
+    class_name = sp[0].strip()
+    method_name = sp[1].strip()
     is_trigger = True if line in trigger_tests else False
     is_test = False
     for testmethod in testmethods:
