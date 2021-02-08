@@ -109,12 +109,25 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
             continue
         if curtrigger:
             fail_coverage.add((class_name, method_name))
+    print('fail_coverage:')
+    print(fail_coverage)
+    input()
+    for line in profile:
+        if line.strip() == '':
+            continue
+        class_name, method_name, is_trigger, is_test = parseprofile(
+            line, trigger_tests, testmethods)
+        if is_test:
+            curclass, curmethod = class_name, method_name
+            curtrigger = is_trigger
+            continue
+        if curtrigger:
+            continue
+        if (curclass, curmethod) in pass_coverage:
+            pass_coverage[(curclass, curmethod)].add(
+                (class_name, method_name))
         else:
-            if (curclass, curmethod) in pass_coverage:
-                pass_coverage[(curclass, curmethod)].add(
-                    (class_name, method_name))
-            else:
-                pass_coverage[(curclass, curmethod)] = set()
+            pass_coverage[(curclass, curmethod)] = set()
     for (class_name, method_name), coverage in pass_coverage.items():
         if len(coverage & fail_coverage) > 0:
             ret.append((class_name, method_name))
