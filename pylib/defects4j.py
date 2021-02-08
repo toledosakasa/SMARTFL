@@ -119,9 +119,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
             continue
         if curtrigger:
             fail_coverage.add((class_name, method_name))
-    print('fail_coverage:')
-    print(fail_coverage)
-    input()
+
     for line in profile:
         if line.strip() == '':
             continue
@@ -141,7 +139,8 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     for (class_name, method_name), coverage in pass_coverage.items():
         if len(coverage & fail_coverage) > 0:
             ret.append((class_name, method_name))
-    print(fail_coverage)
+    for t in trigger_tests_set:
+        ret.append(t)
     return sorted(ret)
 
 
