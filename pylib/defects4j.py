@@ -87,6 +87,8 @@ def parseprofile(line: str, trigger_tests: List[str], testmethods: List[str]):
             methods = sp[1].split(',')
             is_test = True if method_name in methods else False
             break
+    print((class_name, method_name, is_trigger, is_test))
+    input()
     return class_name, method_name, is_trigger, is_test
 
 
