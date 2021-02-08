@@ -167,7 +167,7 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
         os.system(cdcmd + simplelogcmd)
     relevant_testmethods = resolve_profile(
-        utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests, testmethods)
+        utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods)
     print(relevant_testmethods)
     input()
 
