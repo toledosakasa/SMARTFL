@@ -91,7 +91,7 @@ def parseprofile(line: str, trigger_tests: List[str], testmethods: List[str]):
 
 
 def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
-    print(profile.__len__)
+    print(len(profile))
     ret = []
     pass_coverage = {}
     fail_coverage = set()
@@ -99,6 +99,8 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     curmethod = ''
     curtrigger = False
     for line in profile:
+        if line.strip() == '':
+            continue
         class_name, method_name, is_trigger, is_test = parseprofile(
             line, trigger_tests, testmethods)
         if is_test:
@@ -116,6 +118,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     for (class_name, method_name), coverage in pass_coverage.items():
         if len(coverage & fail_coverage) > 0:
             ret.append((class_name, method_name))
+    print(fail_coverage)
     return sorted(ret)
 
 
