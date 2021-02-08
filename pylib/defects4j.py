@@ -1,4 +1,5 @@
 import os
+from typing import Any, Dict, List
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 
@@ -16,12 +17,12 @@ def getd4jprojinfo():
         getinstclassinfo(proj)
 
 
-def getinstclassinfo(proj):
+def getinstclassinfo(proj: str):
     cmdline = f"defects4j query -p {proj} -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger,tests.relevant\"  -o ./d4j_resources/{proj}.csv"
     os.system(cmdline)
 
 
-def getmetainfo(proj, id):
+def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     ret = {}
     # caching
     print('Checking for cache...')
@@ -72,21 +73,78 @@ def getmetainfo(proj, id):
     return ret
 
 
-def getd4jcmdline(proj, id):
+def parseprofile(line: str, trigger_tests: List[str], testmethods: List[str]):
+    line = line[3:]
+# org.apache.commons.lang3.ArrayUtilsTest::testLastIndexOfShort
+    sp = line.split('::')
+    class_name = sp[0]
+    method_name = sp[1]
+    is_trigger = True if line in trigger_tests else False
+    is_test = False
+    for testmethod in testmethods:
+        sp = testmethod.split('::')
+        if class_name == sp[0]:
+            methods = sp[1].split(',')
+            is_test = True if method_name in methods else False
+            break
+    return class_name, method_name, is_trigger, is_test
+
+
+def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
+    ret = []
+    pass_coverage = {}
+    fail_coverage = set()
+    curclass = ''
+    curmethod = ''
+    curtrigger = False
+    for line in profile:
+        class_name, method_name, is_trigger, is_test = parseprofile(
+            line, trigger_tests, testmethods)
+        if is_test:
+            curclass, curmethod = class_name, method_name
+            curtrigger = is_trigger
+            continue
+        if curtrigger:
+            fail_coverage.add((class_name, method_name))
+        else:
+            if (curclass, curmethod) in pass_coverage:
+                pass_coverage[(curclass, curmethod)].add(
+                    (class_name, method_name))
+            else:
+                pass_coverage[(curclass, curmethod)] = set()
+    for (class_name, method_name), coverage in pass_coverage.items():
+        if len(coverage & fail_coverage) > 0:
+            ret.append((class_name, method_name))
+    return sorted(ret)
+
+
+def getd4jcmdline(proj: str, id: str) -> List[str]:
     print('getting metainfo')
     metadata = getmetainfo(proj, id)
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
-    tests_relevant = metadata['tests.relevant']
-    instclasses = metadata['classes.relevant'].strip() + \
-        ';' + tests_relevant.strip()
+    tests_relevant = metadata['tests.relevant'].strip()
+    classes_relevant = metadata['classes.relevant'].strip()
+    instclasses = classes_relevant + ';' + tests_relevant
     instclasses = instclasses.replace(";", ":")
     testmethods = metadata['methods.test.all'].split(';')
     relevant_classes = tests_relevant.split(';')
+    trigger_tests = metadata['tests.trigger'].strip()
     d4jdatafile = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
+    checkoutdir = f'tmp_checkout/{proj}{id}'
+
+    profile = checkoutdir + '/trace/log/mytrace/profile.log'
+    if not os.path.exists(profile):
+        cdcmd = f'cd {checkoutdir} && '
+        simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
+        os.system(cdcmd + simplelogcmd)
+    relevant_testmethods = resolve_profile(
+        utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests, testmethods)
+    print(relevant_testmethods)
+    input()
+
     ret = []
-    simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
     for testmethod in testmethods:
         if testmethod.strip() == '':
             continue
@@ -94,10 +152,10 @@ def getd4jcmdline(proj, id):
         if testclassname in relevant_classes:
             app = f"defects4j test -t {testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
             ret.append(app)
-    return simplelogcmd,ret
+    return ret
 
 
-def checkout(proj, id):
+def checkout(proj: str, id: str):
     checkoutpath = './tmp_checkout'
     if not(os.path.exists(checkoutpath)):
         os.makedirs(checkoutpath)

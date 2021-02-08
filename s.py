@@ -47,11 +47,9 @@ if __name__ == '__main__':
     if args[1] == 'rund4j':
         projname = args[2]
         bugid = args[3]
-        simplelogcmd, cmdlines = d4j.getd4jcmdline(projname, bugid)
-        cdcmd = f'cd tmp_checkout/{projname}{bugid} && '
-        print(simplelogcmd)
-        os.system(cdcmd + simplelogcmd)
-        input()
+        cmdlines = d4j.getd4jcmdline(projname, bugid)
+        checkoutdir = f'tmp_checkout/{projname}{bugid}'
+        cdcmd = f'cd {checkoutdir} && '
         for cmdline in cmdlines:
             print(cmdline)
             # input()
