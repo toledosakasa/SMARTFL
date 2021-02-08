@@ -81,8 +81,6 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
     method_name = sp[1].strip()
     is_trigger = line in trigger_tests
     is_test = (class_name, method_name) in testmethods
-    print((class_name, method_name, is_trigger, is_test))
-    input()
     return class_name, method_name, is_trigger, is_test
 
 
