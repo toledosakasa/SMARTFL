@@ -103,8 +103,19 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.logSourceToScreen = b;
 	}
 
+	private static void setSimpleLogFile() {
+		FileWriter file = null;
+		try {
+			file = new FileWriter("trace/logs/mytrace/profile.log", false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		traceWriter = new BufferedWriter(file, BUFFERSIZE);
+	}
+
 	public void setSimpleLog(boolean b) {
 		this.simpleLog = b;
+		setSimpleLogFile();
 	}
 
 	public void setLogFile(String s) {
