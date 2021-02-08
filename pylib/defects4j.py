@@ -134,7 +134,7 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
     checkoutdir = f'tmp_checkout/{proj}{id}'
 
-    profile = checkoutdir + '/trace/log/mytrace/profile.log'
+    profile = checkoutdir + '/trace/logs/mytrace/profile.log'
     if not os.path.exists(profile):
         cdcmd = f'cd {checkoutdir} && '
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
