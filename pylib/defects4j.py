@@ -97,6 +97,9 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     trigger_tests_set = set(trigger_tests)
     testmethods_set = set()
     for testmethod in testmethods:
+        testmethod = testmethod.strip()
+        if testmethod == '':
+            continue
         sp = testmethod.split('::')
         methods = sp[1].split(',')
         for method in methods:
