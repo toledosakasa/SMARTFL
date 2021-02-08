@@ -79,7 +79,7 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
     sp = line.split('::')
     class_name = sp[0].strip()
     method_name = sp[1].strip()
-    is_trigger = line in trigger_tests
+    is_trigger = (class_name, method_name) in trigger_tests
     is_test = (class_name, method_name) in testmethods
     return class_name, method_name, is_trigger, is_test
 
@@ -92,7 +92,13 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     curclass = ''
     curmethod = ''
     curtrigger = False
-    trigger_tests_set = set(trigger_tests)
+    trigger_tests_set = set()
+    for trigger_test in trigger_tests:
+        trigger_test = trigger_test.strip()
+        if trigger_test == '':
+            continue
+        sp = trigger_test.split('::')
+        trigger_tests_set.add((sp[0], sp[1].strip()))
     testmethods_set = set()
     for testmethod in testmethods:
         testmethod = testmethod.strip()
