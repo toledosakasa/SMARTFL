@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 
@@ -74,19 +74,13 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     return ret
 
 
-def parseprofile(line: str, trigger_tests: List[str], testmethods: List[str]):
+def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
     line = line[3:]
     sp = line.split('::')
     class_name = sp[0].strip()
     method_name = sp[1].strip()
-    is_trigger = True if line in trigger_tests else False
-    is_test = False
-    for testmethod in testmethods:
-        sp = testmethod.split('::')
-        if class_name == sp[0]:
-            methods = sp[1].split(',')
-            is_test = True if method_name in methods else False
-            break
+    is_trigger = line in trigger_tests
+    is_test = (class_name, method_name) in testmethods
     print((class_name, method_name, is_trigger, is_test))
     input()
     return class_name, method_name, is_trigger, is_test
@@ -100,11 +94,18 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     curclass = ''
     curmethod = ''
     curtrigger = False
+    trigger_tests_set = set(trigger_tests)
+    testmethods_set = set()
+    for testmethod in testmethods:
+        sp = testmethod.split('::')
+        methods = sp[1].split(',')
+        for method in methods:
+            testmethods_set.add((sp[0], method.strip()))
     for line in profile:
         if line.strip() == '':
             continue
         class_name, method_name, is_trigger, is_test = parseprofile(
-            line, trigger_tests, testmethods)
+            line, trigger_tests_set, testmethods_set)
         if is_test:
             curclass, curmethod = class_name, method_name
             curtrigger = is_trigger
@@ -118,7 +119,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
         if line.strip() == '':
             continue
         class_name, method_name, is_trigger, is_test = parseprofile(
-            line, trigger_tests, testmethods)
+            line, trigger_tests_set, testmethods_set)
         if is_test:
             curclass, curmethod = class_name, method_name
             curtrigger = is_trigger
