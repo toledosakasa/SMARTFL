@@ -144,15 +144,13 @@ public class Instrumenter {
 						return false;
 
 					boolean flag = true;
-					if (node.getName().toString().startsWith("test"))
-						flag = false;
-					else {
-						List<ASTNode> l = node.modifiers();
-						for (ASTNode n : l) {
-							if (n.toString().startsWith("@Test")) {
-								flag = false;
-								break;
-							}
+					// if (node.getName().toString().startsWith("test"))
+					// flag = false;
+					List<ASTNode> l = node.modifiers();
+					for (ASTNode n : l) {
+						if (n.toString().startsWith("@Test")) {
+							flag = false;
+							break;
 						}
 					}
 
