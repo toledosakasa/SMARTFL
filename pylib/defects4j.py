@@ -25,7 +25,7 @@ def getinstclassinfo(proj: str):
 def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     ret = {}
     # caching
-    print('Checking for cache...')
+    print('Checking for cache...', end='')
     cachepath = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
     if os.path.exists(cachepath):
@@ -92,6 +92,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     curclass = ''
     curmethod = ''
     curtrigger = False
+    currelevant = False
     trigger_tests_set = set()
     for trigger_test in trigger_tests:
         trigger_test = trigger_test.strip()
@@ -128,19 +129,16 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
         if is_test:
             curclass, curmethod = class_name, method_name
             curtrigger = is_trigger
+            currelevant = False
             continue
         if curtrigger:
-            continue
-        if (curclass, curmethod) in pass_coverage:
-            pass_coverage[(curclass, curmethod)].add(
-                (class_name, method_name))
-        else:
-            pass_coverage[(curclass, curmethod)] = set()
-    for (class_name, method_name), coverage in pass_coverage.items():
-        if len(coverage & fail_coverage) > 0:
             ret.append((class_name, method_name))
-    for t in trigger_tests_set:
-        ret.append(t)
+            continue
+        if currelevant or (class_name, method_name) not in fail_coverage:
+            continue
+        # relevant
+        ret.append((class_name, method_name))
+        currelevant = True
     return sorted(ret)
 
 
