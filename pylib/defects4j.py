@@ -131,14 +131,12 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
             curtrigger = is_trigger
             currelevant = False
             continue
-        if curtrigger:
-            ret.append((class_name, method_name))
-            continue
-        if currelevant or (class_name, method_name) not in fail_coverage:
+        if currelevant:
             continue
         # relevant
-        ret.append((curclass, curmethod))
-        currelevant = True
+        if (class_name, method_name) in fail_coverage:
+            ret.append((curclass, curmethod))
+            currelevant = True
     return sorted(ret)
 
 
