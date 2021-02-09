@@ -29,7 +29,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     cachepath = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
     if os.path.exists(cachepath):
-        print('cache found')
+        print('found')
         lines = utf8open(cachepath).readlines()
         for line in lines:
             line = line.strip()
@@ -37,7 +37,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
             ret[splits[0]] = splits[1]
         return ret
 
-    print('Cache not found. Generating metadata.')
+    print('not found. Generating metadata.')
     # if not cached, generate metadata
     workdir = os.path.abspath(
         f'./tmp_checkout/{proj}{id}')
@@ -60,7 +60,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     ret['methods.test.all'] = utf8open(
         allmethodslog).read().replace('\n', ';')
     # write to cache
-    print('Writing to cache...')
+    print('Writing to cache')
     cachedir = os.path.abspath('./d4j_resources/metadata_cached')
     if not os.path.exists(cachedir):
         os.mkdir(cachedir)
@@ -87,7 +87,6 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
 def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
     print(len(profile))
     ret = []
-    pass_coverage = {}
     fail_coverage = set()
     curclass = ''
     curmethod = ''
@@ -128,7 +127,6 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
             line, trigger_tests_set, testmethods_set)
         if is_test:
             curclass, curmethod = class_name, method_name
-            curtrigger = is_trigger
             currelevant = False
             continue
         if currelevant:
@@ -157,12 +155,17 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     checkoutdir = f'tmp_checkout/{proj}{id}'
 
     profile = checkoutdir + '/trace/logs/mytrace/profile.log'
+    print('checking profile...', end='')
     if not os.path.exists(profile):
+        print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
         os.system(cdcmd + simplelogcmd)
+    else:
+        print('found.')
     relevant_testmethods = resolve_profile(
         utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods)
+    relevant_method_number = len(relevant_testmethods)
     print(relevant_testmethods)
     input()
 
