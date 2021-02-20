@@ -192,6 +192,7 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     # return ret
     for testclass_rel in reltest_dict:
         app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
+        app += ' > /dev/null'
         ret.append(app)
     return ret
 
