@@ -64,6 +64,6 @@ if __name__ == '__main__':
             # input()
             os.system(cdcmd + cmdline)
         time_end = time.time()
-        print('d4j tracing complete after ', time_end-time_start)
+        print('d4j tracing complete after ', time_end-time_start, 'sec')
     if args[1] == 'clearcache':
         d4j.clearcache()
