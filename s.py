@@ -52,7 +52,7 @@ if __name__ == '__main__':
         cdcmd = f'cd {checkoutdir} && '
         for cmdline in cmdlines:
             print(cmdline)
-            # input()
+            input()
             os.system(cdcmd + cmdline)
     if args[1] == 'clearcache':
         d4j.clearcache()

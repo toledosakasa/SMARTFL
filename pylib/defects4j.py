@@ -169,27 +169,35 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     input()
     relevant_method_number = len(relevant_testmethods)
 
-    testmethods_rel = {}
+    reltest_dict = {}  # {classname : [methodnames]}
 
     for (cname, mname) in relevant_testmethods:
-        if cname in testmethods_rel:
-            testmethods_rel[cname].append(mname)
+        if cname in reltest_dict:
+            reltest_dict[cname].append(mname)
         else:
-            testmethods_rel[cname] = [mname]
+            reltest_dict[cname] = [mname]
 
-    relevant_testclass_number = len(testmethods_rel)
+    relevant_testclass_number = len(reltest_dict)
 
     print(f'{relevant_testclass_number} classes, {relevant_method_number} methods')
-    print(testmethods_rel)
+    print(reltest_dict)
     input()
 
     ret = []
-    for testmethod in testmethods:
-        if testmethod.strip() == '':
+    # for testmethod in testmethods:
+    #     if testmethod.strip() == '':
+    #         continue
+    #     testclassname = testmethod.split('::')[0]
+    #     if testclassname in relevant_classes:
+    #         app = f"defects4j test -t {testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
+    #         ret.append(app)
+    # return ret
+    for testclass_rel in reltest_dict:
+        if testclass_rel.strip() == '':
             continue
-        testclassname = testmethod.split('::')[0]
+        testclassname = testclass_rel.split('::')[0]
         if testclassname in relevant_classes:
-            app = f"defects4j test -t {testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
+            app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
             ret.append(app)
     return ret
 
