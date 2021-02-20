@@ -59,7 +59,8 @@ if __name__ == '__main__':
             os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
         cdcmd = f'cd {checkoutdir} && '
         for cmdline in cmdlines:
-            print(cmdline)
+            testclassname = cmdline.split('::')[0].split(' ')[-1]
+            print('testing ', testclassname)
             # input()
             os.system(cdcmd + cmdline)
         time_end = time.time()
