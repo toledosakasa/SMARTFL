@@ -191,12 +191,8 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     #         ret.append(app)
     # return ret
     for testclass_rel in reltest_dict:
-        if testclass_rel.strip() == '':
-            continue
-        testclassname = testclass_rel.split('::')[0]
-        if testclassname in relevant_classes:
-            app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
-            ret.append(app)
+        app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
+        ret.append(app)
     return ret
 
 
