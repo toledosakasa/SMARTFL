@@ -162,15 +162,11 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
         os.system(cdcmd + simplelogcmd)
     else:
-        print('found.')
+        print('found')
     relevant_testmethods = resolve_profile(
         utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods)
-    print(relevant_testmethods)
-    input()
-    relevant_method_number = len(relevant_testmethods)
 
     reltest_dict = {}  # {classname : [methodnames]}
-
     for (cname, mname) in relevant_testmethods:
         if cname in reltest_dict:
             reltest_dict[cname].append(mname)
@@ -178,10 +174,12 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
             reltest_dict[cname] = [mname]
 
     relevant_testclass_number = len(reltest_dict)
+    relevant_method_number = len(relevant_testmethods)
 
-    print(f'{relevant_testclass_number} classes, {relevant_method_number} methods')
-    print(reltest_dict)
-    input()
+    print(
+        f'relevant tests:{relevant_testclass_number} classes, {relevant_method_number} methods')
+    # print(reltest_dict)
+    # input()
 
     ret = []
     # for testmethod in testmethods:
