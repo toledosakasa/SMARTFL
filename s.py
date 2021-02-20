@@ -1,6 +1,7 @@
 import os
 import sys
 import pylib.defects4j as d4j
+import time
 
 
 def runtesttrace(cmdarg):
@@ -45,6 +46,8 @@ if __name__ == '__main__':
         d4j.getd4jprojinfo()
 
     if args[1] == 'rund4j':
+        time_start = time.time()
+
         projname = args[2]
         bugid = args[3]
         cmdlines = d4j.getd4jcmdline(projname, bugid)
@@ -59,5 +62,7 @@ if __name__ == '__main__':
             print(cmdline)
             # input()
             os.system(cdcmd + cmdline)
+        time_end = time.time()
+        print('d4j tracing complete after ', time_end-time_start)
     if args[1] == 'clearcache':
         d4j.clearcache()
