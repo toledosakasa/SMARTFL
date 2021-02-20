@@ -85,7 +85,7 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
 
 
 def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
-    print(len(profile))
+    print('profile length:' + len(profile))
     ret = []
     fail_coverage = set()
     curclass = ''
@@ -165,8 +165,22 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
         print('found.')
     relevant_testmethods = resolve_profile(
         utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods)
-    relevant_method_number = len(relevant_testmethods)
     print(relevant_testmethods)
+    input()
+    relevant_method_number = len(relevant_testmethods)
+
+    testmethods_rel = {}
+
+    for (cname, mname) in relevant_testmethods:
+        if cname in testmethods_rel:
+            testmethods_rel[cname].append(mname)
+        else:
+            testmethods_rel[cname] = [mname]
+
+    relevant_testclass_number = len(testmethods_rel)
+
+    print(f'{relevant_testclass_number} classes, {relevant_method_number} methods')
+    print(testmethods_rel)
     input()
 
     ret = []
