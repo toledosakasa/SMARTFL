@@ -49,6 +49,8 @@ if __name__ == '__main__':
         bugid = args[3]
         cmdlines = d4j.getd4jcmdline(projname, bugid)
         checkoutdir = f'tmp_checkout/{projname}{bugid}'
+        # cleanup previous log
+        os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
         cdcmd = f'cd {checkoutdir} && '
         for cmdline in cmdlines:
             print(cmdline)
