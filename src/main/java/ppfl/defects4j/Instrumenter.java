@@ -85,7 +85,7 @@ public class Instrumenter {
 
 		// consistent with s.py
 		String dirPath = String.format("./tmp_checkout/%s%s/", proj, id);
-		String outputPath = String.format("./d4j_resources/metadata_cached/%s%s.alltests.log", proj, id);
+		String outputPath = String.format("./d4j_resources/metadata_cached/%s/%s.alltests.log", proj, id);
 
 		List<String> filelist = new ArrayList<>();
 		getFilelist(getTestDir(dirPath), filelist);

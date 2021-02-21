@@ -27,6 +27,9 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     ret = {}
     # caching
     print('Checking for metainfo...', end='')
+    cachedir = os.path.abspath(f'./d4j_resources/metadata_cached/{proj}')
+    if not os.path.exists(cachedir):
+        os.mkdir(cachedir)
     cachepath = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}/{id}.log')
     if os.path.exists(cachepath):
@@ -62,9 +65,6 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
         allmethodslog).read().replace('\n', ';')
     # write to cache
     print('Writing to cache')
-    cachedir = os.path.abspath('./d4j_resources/metadata_cached')
-    if not os.path.exists(cachedir):
-        os.mkdir(cachedir)
     cachefile = utf8open_w(cachepath)
     for (k, v) in ret.items():
         cachefile.write(f'{k}={v}\n')
