@@ -143,12 +143,8 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     metadata = getmetainfo(proj, id)
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
-    tests_relevant = metadata['tests.relevant'].strip()
     classes_relevant = metadata['classes.relevant'].strip()
-    instclasses = classes_relevant + ';' + tests_relevant
-    instclasses = instclasses.replace(";", ":")
     testmethods = metadata['methods.test.all'].split(';')
-    relevant_classes = tests_relevant.split(';')
     trigger_tests = metadata['tests.trigger'].strip()
     d4jdatafile = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
@@ -175,6 +171,9 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
 
     relevant_testclass_number = len(reltest_dict)
     relevant_method_number = len(relevant_testmethods)
+
+    instclasses = classes_relevant + ';' + ';'.join(reltest_dict.keys())
+    instclasses = instclasses.replace(";", ":")
 
     print(
         f'relevant tests:{relevant_testclass_number} classes, {relevant_method_number} methods')

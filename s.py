@@ -60,10 +60,10 @@ if __name__ == '__main__':
         cdcmd = f'cd {checkoutdir} && '
         for cmdline in cmdlines:
             testclassname = cmdline.split('::')[0].split(' ')[-1]
-            print('testing ', testclassname)
+            print('testing', testclassname)
             # input()
             os.system(cdcmd + cmdline)
         time_end = time.time()
-        print('d4j tracing complete after ', time_end-time_start, 'sec')
+        print('d4j tracing complete after', time_end-time_start, 'sec')
     if args[1] == 'clearcache':
         d4j.clearcache()
