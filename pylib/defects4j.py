@@ -217,7 +217,7 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
 
 
 def checkout(proj: str, id: str):
-    checkoutpath = './tmp_checkout/{proj}/{id}'
+    checkoutpath = f'./tmp_checkout/{proj}/{id}'
     if not(os.path.exists(checkoutpath)):
         os.makedirs(checkoutpath)
     os.system(
