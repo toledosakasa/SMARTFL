@@ -61,7 +61,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
 
     print('Instrumenting all test methods')
     cmdline_getallmethods = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'
-    # cmdline_getallmethods += ' > /dev/null'
+    cmdline_getallmethods += ' > d4j.instrumenter.log'
     os.system(cmdline_getallmethods)
     allmethodslog = f'./d4j_resources/metadata_cached/{proj}/{id}.alltests.log'
     ret['methods.test.all'] = utf8open(
