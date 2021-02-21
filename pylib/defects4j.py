@@ -86,7 +86,7 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
 
 
 def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
-    print(f'profile length:{len(profile)}')
+    print(f'parsing profile, length:{len(profile)}')
     ret = []
     fail_coverage = set()
     curclass = ''

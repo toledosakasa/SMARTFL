@@ -53,7 +53,7 @@ if __name__ == '__main__':
         cmdlines = d4j.getd4jcmdline(projname, bugid)
         checkoutdir = f'tmp_checkout/{projname}{bugid}'
         # cleanup previous log
-        previouslog = f'rm {checkoutdir}/trace/logs/mytrace/all.log'
+        previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
         if os.path.exists(previouslog):
             print('removing previous trace logs.')
             os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
