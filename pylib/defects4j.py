@@ -150,7 +150,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
     checkoutdir = f'tmp_checkout/{proj}/{id}'
 
     profile_result = os.path.abspath(
-        f'./d4j_resources/metadata_cached/{proj}/{id}.profile,log')
+        f'./d4j_resources/metadata_cached/{proj}/{id}.profile.log')
     print('checking profiling result...', end='')
     if(os.path.exists(profile_result)):
         print('found')

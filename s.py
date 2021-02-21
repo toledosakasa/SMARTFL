@@ -47,9 +47,11 @@ if __name__ == '__main__':
 
     if args[1] == 'rund4j':
         time_start = time.time()
-
         projname = args[2]
         bugid = args[3]
+        workdir = os.path.abspath(f'./tmp_checkout/{projname}/{bugid}')
+        if not os.path.exists(workdir):
+            d4j.checkout(projname, bugid)
         cmdlines = d4j.getd4jcmdline(projname, bugid)
         checkoutdir = f'tmp_checkout/{projname}/{bugid}'
         # cleanup previous log
