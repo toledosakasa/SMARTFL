@@ -26,9 +26,9 @@ def getinstclassinfo(proj: str):
 def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     ret = {}
     # caching
-    print('Checking for cache...', end='')
+    print('Checking for metainfo...', end='')
     cachepath = os.path.abspath(
-        f'./d4j_resources/metadata_cached/{proj}{id}.log')
+        f'./d4j_resources/metadata_cached/{proj}/{id}.log')
     if os.path.exists(cachepath):
         print('found')
         lines = utf8open(cachepath).readlines()
@@ -41,7 +41,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     print('not found. Generating metadata.')
     # if not cached, generate metadata
     workdir = os.path.abspath(
-        f'./tmp_checkout/{proj}{id}')
+        f'./tmp_checkout/{proj}/{id}')
     if not os.path.exists(workdir):
         checkout(proj, id)
     fields = ['tests.all', 'classes.relevant',
@@ -57,7 +57,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     print('Instrumenting all test methods')
     cmdline_getallmethods = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'
     os.system(cmdline_getallmethods)
-    allmethodslog = f'./d4j_resources/metadata_cached/{proj}{id}.alltests.log'
+    allmethodslog = f'./d4j_resources/metadata_cached/{proj}/{id}.alltests.log'
     ret['methods.test.all'] = utf8open(
         allmethodslog).read().replace('\n', ';')
     # write to cache
@@ -146,11 +146,11 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
     testmethods = metadata['methods.test.all'].split(';')
     trigger_tests = metadata['tests.trigger'].strip()
     d4jdatafile = os.path.abspath(
-        f'./d4j_resources/metadata_cached/{proj}{id}.log')
-    checkoutdir = f'tmp_checkout/{proj}{id}'
+        f'./d4j_resources/metadata_cached/{proj}/{id}.log')
+    checkoutdir = f'tmp_checkout/{proj}/{id}'
 
     profile_result = os.path.abspath(
-        f'./d4j_resources/metadata_cached/{proj}{id}.profile,log')
+        f'./d4j_resources/metadata_cached/{proj}/{id}.profile,log')
     print('checking profiling result...', end='')
     if(os.path.exists(profile_result)):
         print('found')
@@ -175,7 +175,6 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
 
 
 def getd4jcmdline(proj: str, id: str) -> List[str]:
-    print('getting metainfo')
     metadata = getmetainfo(proj, id)
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
@@ -218,11 +217,11 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
 
 
 def checkout(proj: str, id: str):
-    checkoutpath = './tmp_checkout'
+    checkoutpath = './tmp_checkout/{proj}/{id}'
     if not(os.path.exists(checkoutpath)):
         os.makedirs(checkoutpath)
     os.system(
-        f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}{id}')
+        f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id}')
 
 
 def clearcache():
