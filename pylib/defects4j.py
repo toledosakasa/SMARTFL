@@ -20,6 +20,7 @@ def getd4jprojinfo():
 
 def getinstclassinfo(proj: str):
     cmdline = f"defects4j query -p {proj} -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger,tests.relevant\"  -o ./d4j_resources/{proj}.csv"
+    cmdline += ' > d4j.query.log'
     os.system(cmdline)
 
 
@@ -53,12 +54,14 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     print('Exporting metadata')
     for field in fields:
         tmp_logfieldfile = f'{workdir}/{field}.log'
-        os.system(
-            f'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}')
+        cmdline = f'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}'
+        cmdline += ' > d4j.export.log'
+        os.system(cmdline)
         ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
     print('Instrumenting all test methods')
     cmdline_getallmethods = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'
+    # cmdline_getallmethods += ' > /dev/null'
     os.system(cmdline_getallmethods)
     allmethodslog = f'./d4j_resources/metadata_cached/{proj}/{id}.alltests.log'
     ret['methods.test.all'] = utf8open(
@@ -164,6 +167,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
         print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
+        simplelogcmd += ' > d4j.profile.log'
         os.system(cdcmd + simplelogcmd)
     else:
         print('found')
