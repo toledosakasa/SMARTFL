@@ -1,5 +1,6 @@
 import os
 from typing import Any, Dict, List, Set
+import json
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 
@@ -138,9 +139,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     return sorted(ret)
 
 
-def getd4jcmdline(proj: str, id: str) -> List[str]:
-    print('getting metainfo')
-    metadata = getmetainfo(proj, id)
+def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     classes_relevant = metadata['classes.relevant'].strip()
@@ -150,6 +149,15 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
         f'./d4j_resources/metadata_cached/{proj}{id}.log')
     checkoutdir = f'tmp_checkout/{proj}{id}'
 
+    profile_result = os.path.abspath(
+        f'./d4j_resources/metadata_cached/{proj}{id}.profile,log')
+    print('checking profiling result...', end='')
+    if(os.path.exists(profile_result)):
+        print('found')
+        tmpstr = utf8open(profile_result).read()
+        return json.loads(tmpstr)
+
+    print('not found')
     profile = checkoutdir + '/trace/logs/mytrace/profile.log'
     print('checking profile...', end='')
     if not os.path.exists(profile):
@@ -161,6 +169,19 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
         print('found')
     relevant_testmethods = resolve_profile(
         utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods)
+    print('writing profiling result...')
+    json.dump(relevant_testmethods, utf8open_w(profile_result))
+    return relevant_testmethods
+
+
+def getd4jcmdline(proj: str, id: str) -> List[str]:
+    print('getting metainfo')
+    metadata = getmetainfo(proj, id)
+    jarpath = os.path.abspath(
+        "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
+    classes_relevant = metadata['classes.relevant'].strip()
+
+    relevant_testmethods = getd4jtestprofile(metadata, proj, id)
 
     reltest_dict = {}  # {classname : [methodnames]}
     for (cname, mname) in relevant_testmethods:
@@ -190,7 +211,7 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     #         ret.append(app)
     # return ret
     for testclass_rel in reltest_dict:
-        app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
+        app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses}\""
         app += ' > /dev/null'
         ret.append(app)
     return ret
