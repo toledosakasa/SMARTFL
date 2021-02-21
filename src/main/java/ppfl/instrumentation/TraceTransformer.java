@@ -148,8 +148,10 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	private byte[] transformBody(byte[] classfileBuffer) {
 		byte[] byteCode = classfileBuffer;
-		this.setLogger(this.targetClassName);
-		setSourceFile(this.targetClassName);
+		if (!this.simpleLog) {
+			this.setLogger(this.targetClassName);
+			setSourceFile(this.targetClassName);
+		}
 		debugLogger.info("[Agent] Transforming class {}", this.targetClassName);
 		try {
 			ClassPool cp = ClassPool.getDefault();
