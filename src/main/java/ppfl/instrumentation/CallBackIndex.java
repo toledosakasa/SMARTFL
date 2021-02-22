@@ -176,7 +176,8 @@ public class CallBackIndex {
 	public static String printTopStack1(String i) {
 		try {
 			writer.write(",stack=Str:");
-			writer.write(i);
+			// FIXME this is currently buggy if the string include \n.
+			// writer.write(i);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
