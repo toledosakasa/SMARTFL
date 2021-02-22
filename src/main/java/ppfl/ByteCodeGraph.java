@@ -208,7 +208,9 @@ public class ByteCodeGraph {
 								StmtNode curStmt = getUnexeStmt(curPredStmt, i);
 								Node usenode = getLoadNodeAsUse(i);
 								if (usenode == null) {
-									System.out.println("null use " + i);
+									// System.out.println("null use " + i);
+									// TODO this can be unsound?
+									continue;
 								}
 								Node defnode = addNewVarNode(i, curStmt);
 								buildFactor(defnode, curPred, usenode, null, curStmt);
