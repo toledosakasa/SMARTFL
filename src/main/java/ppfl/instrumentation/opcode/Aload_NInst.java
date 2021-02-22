@@ -14,11 +14,6 @@ public class Aload_NInst extends OpcodeInst {
 	public Aload_NInst(int _form, int _loadindex) {
 		super(_form, 1, 0);
 		loadindex = _loadindex;
-		this.doBuild = false;
-		this.doPop = false;
-		this.doPush = false;
-		this.doLoad = false;
-		this.doStore = false;
 	}
 
 	@Override

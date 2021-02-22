@@ -13,11 +13,6 @@ public class AloadInst extends OpcodeInst {
 
 	public AloadInst(int _form) {
 		super(_form, 1, 0);
-		this.doBuild = false;
-		this.doPop = false;
-		this.doPush = false;
-		this.doLoad = false;
-		this.doStore = false;
 	}
 
 	@Override
