@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
 //178
@@ -29,10 +30,11 @@ public class GetStaticInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		String field = graph.parseinfo.getvalue("field");
-		usenodes.add(graph.getStaticHeapNode(field));
+		Node usenode = graph.getStaticHeapNode(field);
+		if (usenode != null)
+			usenodes.add(usenode);
 		defnode = graph.addNewStackNode(stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-
 	}
 
 	@Override
