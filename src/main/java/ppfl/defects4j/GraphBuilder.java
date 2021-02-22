@@ -13,7 +13,7 @@ public class GraphBuilder {
     String triggerTests = null;
     String relevantClasses = null;
     String allTestMethods = null;
-    String configpath = String.format("d4j_resources/metadata_cached/%s%d.log", project, id);
+    String configpath = String.format("d4j_resources/metadata_cached/%s/%d.log", project, id);
     try (BufferedReader reader = new BufferedReader(new FileReader(configpath))) {
       String tmp;
       while ((tmp = reader.readLine()) != null) {
@@ -59,8 +59,16 @@ public class GraphBuilder {
     }
     if (allTestMethods != null) {
       for (String s : allTestMethods.split(";")) {
-        if (!s.isEmpty())
-          pgraph.d4jMethodNames.add(s);
+        if (!s.isEmpty()) {
+          String[] splt = s.split("::");
+          if (splt.length < 2)
+            continue;
+          String[] methodsname = splt[1].split(",");
+          for (String methodname : methodsname) {
+            pgraph.d4jMethodNames.add(splt[0] + "::" + methodname);
+          }
+
+        }
       }
     }
     // long startTime = System.currentTimeMillis();
@@ -69,7 +77,7 @@ public class GraphBuilder {
     // long endTime = System.currentTimeMillis();
     // long thetime = endTime-startTime;
     // System.out.println("idom time is "+ thetime);
-    String tracefilename = String.format("tmp_checkout/%s%s/trace/logs/mytrace/all.log", project, id);
+    String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
     pgraph.parseJoinedTrace(tracefilename);
     // this.parseD4jTrace(tracefilename);
   }
