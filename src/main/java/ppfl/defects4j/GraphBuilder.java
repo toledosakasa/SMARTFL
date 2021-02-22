@@ -13,18 +13,17 @@ public class GraphBuilder {
     String triggerTests = null;
     String relevantClasses = null;
     String allTestMethods = null;
-    String allTestClasses = null;
     String configpath = String.format("d4j_resources/metadata_cached/%s%d.log", project, id);
-    try (BufferedReader reader = new BufferedReader(new FileReader(configpath));) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(configpath))) {
       String tmp;
       while ((tmp = reader.readLine()) != null) {
         String[] splt = tmp.split("=");
-        if (splt[0].equals("classes.relevant")) {
-          relevantClasses = splt[1];
-        }
-        if (splt[0].equals("tests.all")) {
-          allTestClasses = splt[1];
-        }
+        // if (splt[0].equals("classes.relevant")) {
+        // relevantClasses = splt[1];
+        // }
+        // if (splt[0].equals("tests.all")) {
+        // allTestClasses = splt[1];
+        // }
         if (splt[0].equals("tests.trigger")) {
           triggerTests = splt[1];
         }
@@ -32,6 +31,13 @@ public class GraphBuilder {
           allTestMethods = splt[1];
         }
       }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    String instpath = String.format("d4j_resources/metadata_cached/%s/%d.inst.log", project, id);
+    try (BufferedReader reader = new BufferedReader(new FileReader(instpath))) {
+      relevantClasses = reader.readLine();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -44,14 +50,7 @@ public class GraphBuilder {
         }
       }
     }
-    if (allTestClasses != null) {
-      for (String s : allTestClasses.split(";")) {
-        if (!s.isEmpty()) {
-          pgraph.addTracedClass(s);
-          pgraph.parseD4jSource(project, id, s);
-        }
-      }
-    }
+
     if (triggerTests != null) {
       for (String s : triggerTests.split(";")) {
         if (!s.isEmpty())
