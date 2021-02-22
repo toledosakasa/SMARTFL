@@ -307,7 +307,7 @@ public class ByteCodeGraph {
 	}
 
 	public void parseD4jSource(String project, int id, String classname) {
-		String fullname = String.format("tmp_checkout/%s%s/trace/logs/mytrace/%s.source.log", project, id, classname);
+		String fullname = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/%s.source.log", project, id, classname);
 		parsesource(fullname);
 	}
 
@@ -1485,7 +1485,7 @@ public class ByteCodeGraph {
 		// long endTime = System.currentTimeMillis();
 		// long thetime = endTime-startTime;
 		// System.out.println("idom time is "+ thetime);
-		String tracefilename = String.format("tmp_checkout/%s%s/trace/logs/mytrace/all.log", project, id);
+		String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
 		this.parseJoinedTrace(tracefilename);
 		// this.parseD4jTrace(tracefilename);
 	}

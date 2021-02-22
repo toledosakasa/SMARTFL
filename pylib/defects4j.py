@@ -197,6 +197,12 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     relevant_method_number = len(relevant_testmethods)
 
     instclasses = classes_relevant + ';' + ';'.join(reltest_dict.keys())
+
+    print('writing relevant insts')
+    instclasses_cache = os.path.abspath(
+        f'./d4j_resources/metadata_cached/{proj}/{id}.inst.log')
+    utf8open_w(instclasses_cache).write(instclasses)
+
     instclasses = instclasses.replace(";", ":")
 
     print(
