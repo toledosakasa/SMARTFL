@@ -207,6 +207,9 @@ public class ByteCodeGraph {
 							for (Integer i : stores) {
 								StmtNode curStmt = getUnexeStmt(curPredStmt, i);
 								Node usenode = getLoadNodeAsUse(i);
+								if (usenode == null) {
+									System.out.println("null use " + i);
+								}
 								Node defnode = addNewVarNode(i, curStmt);
 								buildFactor(defnode, curPred, usenode, null, curStmt);
 							}
@@ -607,7 +610,7 @@ public class ByteCodeGraph {
 			String t = null;
 			boolean testpass = true;
 			while ((t = parseTraceFromReader(reader, t, testpass)) != null) {
-				System.err.println(t);
+				System.out.println(t);
 				testpass = getD4jTestState(t);
 			}
 		} catch (IOException e) {
@@ -623,6 +626,7 @@ public class ByteCodeGraph {
 		String t;
 		String delimiterPrefix = "###";
 		while ((t = reader.readLine()) != null) {
+			System.out.println(t);
 			if (t.isEmpty()) {
 				continue;
 			}
