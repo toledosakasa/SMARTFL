@@ -202,10 +202,12 @@ public class TraceTransformer implements ClassFileTransformer {
 		// not sure if this is necessary.
 		ca.computeMaxStack();
 		// flushing buffer
-		try {
-			sourceWriter.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!this.simpleLog) {
+			try {
+				sourceWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
