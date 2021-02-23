@@ -605,6 +605,19 @@ public class ByteCodeGraph {
 		// }
 	}
 
+	private void debugStack(Deque<RuntimeFrame> s) {
+		for (RuntimeFrame r : s) {
+			System.out.print(r.runtimestack.size());
+			System.out.print("-");
+		}
+		System.out.print("\n");
+		for (RuntimeFrame r : s) {
+			System.out.print(r.tracemethod);
+			System.out.print("-");
+		}
+		System.out.print("\n");
+	}
+
 	public void parseJoinedTrace(String tracefilename) {
 		this.predstack.clear();
 		this.initmaps();
@@ -628,7 +641,6 @@ public class ByteCodeGraph {
 		String t;
 		String delimiterPrefix = "###";
 		while ((t = reader.readLine()) != null) {
-			System.out.println(t);
 			if (t.isEmpty()) {
 				continue;
 			}
@@ -648,6 +660,7 @@ public class ByteCodeGraph {
 				}
 				continue;
 			}
+			System.out.println(t);
 			this.parseinfo = new ParseInfo(t);
 			String instname = this.parseinfo.getvalue("lineinfo");
 			killPredStack(instname);
@@ -658,6 +671,8 @@ public class ByteCodeGraph {
 				store_stack.push(stores);
 			}
 			Interpreter.map[this.parseinfo.form].buildtrace(this);
+			// debug runtime stack
+			debugStack(this.stackframe);
 		}
 		// after all lines are parsed, auto-assign oracle for the last defined var
 		// with test state(pass = true,fail = false)
