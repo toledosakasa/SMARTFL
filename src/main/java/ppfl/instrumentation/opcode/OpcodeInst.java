@@ -67,6 +67,17 @@ public class OpcodeInst {
 		return splitMethodDesc(desc).size();
 	}
 
+	public static boolean isVoidMethodByDesc(String desc) {
+		int endIndex = desc.lastIndexOf(')');
+		if (endIndex == -1) {
+			// System.err.println(beginIndex);
+			// System.err.println(endIndex);
+			throw new IllegalArgumentException("bracket mismatch in descriptor");
+		}
+		String rettype = desc.substring(endIndex + 1);
+		return rettype.contentEquals("V");
+	}
+
 	public static List<String> splitMethodDesc(String desc) {
 		// \[*L[^;]+;|\[[ZBCSIFDJ]|[ZBCSIFDJ]
 		int beginIndex = desc.indexOf('(');
@@ -214,7 +225,7 @@ public class OpcodeInst {
 
 		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
-			int instpos = ci.insertGap(6);
+			int instpos = ci.insertExGap(6);
 			// inst = encode(inst);
 			int instindex = constp.addStringInfo(inst);
 			// System.out.println(constp.getStringInfo(instindex));
