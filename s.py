@@ -67,5 +67,10 @@ if __name__ == '__main__':
             os.system(cdcmd + cmdline)
         time_end = time.time()
         print('d4j tracing complete after', time_end-time_start, 'sec')
+    if args[2] == 'parsed4j':
+        projname = args[2]
+        bugid = args[3]
+        os.system(
+            f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={projname} {bugid}"')
     if args[1] == 'clearcache':
         d4j.clearcache()
