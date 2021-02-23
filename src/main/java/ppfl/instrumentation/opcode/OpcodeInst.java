@@ -225,7 +225,7 @@ public class OpcodeInst {
 
 		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
-			int instpos = ci.insertExGap(6);
+			int instpos = ci.insertGap(6);
 			// inst = encode(inst);
 			int instindex = constp.addStringInfo(inst);
 			// System.out.println(constp.getStringInfo(instindex));
@@ -300,6 +300,21 @@ public class OpcodeInst {
 		this.prednodes = new ArrayList<>();
 		this.usenodes = new ArrayList<>();
 		this.defnode = null;
+
+		// temporary solution for throwing-return.
+		String logclass = info.traceclass;
+		String logmethod = info.tracemethod;
+		String stackclass = graph.getFrame().traceclass;
+		String stackmethod = graph.getFrame().tracemethod;
+		while (!logclass.contentEquals(stackclass) || !logmethod.contentEquals(stackmethod)) {
+			// Debug use
+			// System.out.println("Exception!!");
+			graph.popStackFrame();
+			// FIXME should be the previous stmt
+			graph.addNewStackNode(stmt);
+			stackclass = graph.getFrame().traceclass;
+			stackmethod = graph.getFrame().tracemethod;
+		}
 
 		if (this.doPred) {
 			Node thepred = graph.getPredStack();

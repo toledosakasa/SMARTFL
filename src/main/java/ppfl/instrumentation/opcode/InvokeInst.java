@@ -45,7 +45,7 @@ public class InvokeInst extends OpcodeInst {
 
 		// collect arguments
 		if (graph.getRuntimeStack().size() < argcnt) {
-			System.out.println(String.format("%d stacks is not enough for %d args", graph.getRuntimeStack().size(), argcnt));
+			System.err.println(String.format("%d stacks is not enough for %d args", graph.getRuntimeStack().size(), argcnt));
 		}
 		for (int i = 0; i < argcnt; i++) {
 			Node node = graph.getRuntimeStack().pop();
@@ -54,7 +54,7 @@ public class InvokeInst extends OpcodeInst {
 
 		// if not traced
 		if (!graph.isTraced(traceclass)) {
-			System.out.println("Not traced");
+			// System.out.println("Not traced");
 			if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 				defnode = graph.addNewStackNode(stmt);
 				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);

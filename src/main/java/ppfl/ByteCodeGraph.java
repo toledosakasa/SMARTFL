@@ -625,7 +625,8 @@ public class ByteCodeGraph {
 			String t = null;
 			boolean testpass = true;
 			while ((t = parseTraceFromReader(reader, t, testpass)) != null) {
-				System.out.println(t);
+				// Debug use
+				// System.out.println(t);
 				testpass = getD4jTestState(t);
 			}
 		} catch (IOException e) {
@@ -660,7 +661,8 @@ public class ByteCodeGraph {
 				}
 				continue;
 			}
-			System.out.println(t);
+			// Debug use
+			// System.out.println(t);
 			this.parseinfo = new ParseInfo(t);
 			String instname = this.parseinfo.getvalue("lineinfo");
 			killPredStack(instname);
@@ -672,7 +674,7 @@ public class ByteCodeGraph {
 			}
 			Interpreter.map[this.parseinfo.form].buildtrace(this);
 			// debug runtime stack
-			debugStack(this.stackframe);
+			// debugStack(this.stackframe);
 		}
 		// after all lines are parsed, auto-assign oracle for the last defined var
 		// with test state(pass = true,fail = false)
