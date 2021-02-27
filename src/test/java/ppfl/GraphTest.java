@@ -612,10 +612,9 @@ class GraphTest {
 	public void unexecuted1test_bc() {
 		ByteCodeGraph pgraph = unexecuted1init_bc();
 		pgraph.check_bp(true);
-    }
-    
+	}
 
-    ByteCodeGraph multiinit_bc() {
+	ByteCodeGraph multiinit_bc() {
 		String ppflroot = ".";
 		String failtrace = ppflroot + "\\trace\\logs\\mytrace\\MultiTest.fail.log";
 		String passtrace = ppflroot + "\\trace\\logs\\mytrace\\MultiTest.pass.log";
@@ -623,8 +622,8 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 		pgraph.setAutoOracle(true);
 		pgraph.parsesource(sourcetrace);
-        pgraph.get_idom();
-        pgraph.get_stores();
+		pgraph.get_idom();
+		pgraph.get_stores();
 		pgraph.parsetrace(failtrace, "fail", false);
 		pgraph.parsetrace(passtrace, "pass", true);
 		pgraph.printgraph();
@@ -633,7 +632,7 @@ class GraphTest {
 
 	@Test
 	public void multitest_bc() {
-        String resultfile = "InfResult";
+		String resultfile = "InfResult";
 		ByteCodeGraph.setResultLogger(resultfile);
 		String graphfile = "ProbGraph";
 		ByteCodeGraph.setGraphLogger(graphfile);
