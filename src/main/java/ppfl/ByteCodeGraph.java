@@ -100,6 +100,9 @@ public class ByteCodeGraph {
 	public Map<String, Set<Integer>> branch_stores;
 	private boolean shouldview;
 
+	public StmtNode prevstmt;
+	public List<Node> exceptionuse;
+
 	public void stopview() {
 		shouldview = false;
 	}
@@ -1017,6 +1020,11 @@ public class ByteCodeGraph {
 
 	private boolean hasNode(String name) {
 		return nodemap.containsKey(getNodeName(name)) || stmtmap.containsKey(name);
+	}
+
+	public Node addNewExceptionNode() {
+		Node ret = this.addNewStackNode(this.prevstmt);
+		return ret;
 	}
 
 	public Node addNewStaticHeapNode(String field, StmtNode stmt) {

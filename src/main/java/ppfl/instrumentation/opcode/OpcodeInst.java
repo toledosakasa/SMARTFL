@@ -301,6 +301,12 @@ public class OpcodeInst {
 		this.usenodes = new ArrayList<>();
 		this.defnode = null;
 
+		if (this.doPred) {
+			Node thepred = graph.getPredStack();
+			if (thepred != null)
+				prednodes.add(thepred);
+		}
+
 		// temporary solution for throwing-return.
 		String logclass = info.traceclass;
 		String logmethod = info.tracemethod;
@@ -309,18 +315,17 @@ public class OpcodeInst {
 		while (!logclass.contentEquals(stackclass) || !logmethod.contentEquals(stackmethod)) {
 			// Debug use
 			// System.out.println("Exception!!");
+
 			graph.popStackFrame();
 			// FIXME should be the previous stmt
-			graph.addNewStackNode(stmt);
+			// Node defnode = graph.addNewStackNode(stmt);
+			Node exceptDef = graph.addNewExceptionNode();
+			List<Node> exceptUse = graph.exceptionuse;
+			graph.buildFactor(exceptDef, prednodes, exceptUse, null, graph.prevstmt);
 			stackclass = graph.getFrame().traceclass;
 			stackmethod = graph.getFrame().tracemethod;
 		}
-
-		if (this.doPred) {
-			Node thepred = graph.getPredStack();
-			if (thepred != null)
-				prednodes.add(thepred);
-		}
+		graph.prevstmt = stmt;
 
 		if (this.doLoad && info.getintvalue("load") != null) {
 			int loadvar = info.getintvalue("load");

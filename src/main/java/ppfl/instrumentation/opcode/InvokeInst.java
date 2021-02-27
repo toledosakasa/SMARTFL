@@ -59,6 +59,9 @@ public class InvokeInst extends OpcodeInst {
 				defnode = graph.addNewStackNode(stmt);
 				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 			}
+			// graph.exceptionuse = new ArrayList<>();
+			// graph.exceptionuse.addAll(usenodes);
+			graph.exceptionuse = usenodes;
 			return;
 		}
 
