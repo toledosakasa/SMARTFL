@@ -67,7 +67,7 @@ if __name__ == '__main__':
             os.system(cdcmd + cmdline)
         time_end = time.time()
         print('d4j tracing complete after', time_end-time_start, 'sec')
-    if args[2] == 'parsed4j':
+    if args[1] == 'parsed4j':
         projname = args[2]
         bugid = args[3]
         os.system(
