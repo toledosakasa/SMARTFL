@@ -31,7 +31,9 @@ public class GetFieldInst extends OpcodeInst {
 		super.buildtrace(graph);
 		Node objectAddress = graph.getRuntimeStack().pop();
 		String field = graph.parseinfo.getvalue("field");
-		usenodes.add(graph.getHeapNode(objectAddress, field));
+		Node usenode = graph.getHeapNode(objectAddress, field);
+		if (usenode != null)
+			usenodes.add(usenode);
 		defnode = graph.addNewStackNode(stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 
