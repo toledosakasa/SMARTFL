@@ -9,6 +9,11 @@ import ppfl.ByteCodeGraph;
 public class GraphBuilder {
 
   private static void setupD4jProject(ByteCodeGraph pgraph, String project, int id) {
+    String resultfile = String.format("InfResult-%s%d", project, id);
+    pgraph.setResultLogger(resultfile);
+    String graphfile = String.format("ProbGraph-%s%d", project, id);
+    pgraph.setGraphLogger(graphfile);
+
     pgraph.useD4jTest = true;
     String triggerTests = null;
     String relevantClasses = null;
@@ -67,35 +72,32 @@ public class GraphBuilder {
           for (String methodname : methodsname) {
             pgraph.d4jMethodNames.add(splt[0] + "::" + methodname);
           }
-
         }
       }
     }
+    System.out.println("Parse source complete");
     // long startTime = System.currentTimeMillis();
     pgraph.get_idom();
     pgraph.get_stores();
+    System.out.println("Static analyze complete");
     // long endTime = System.currentTimeMillis();
     // long thetime = endTime-startTime;
     // System.out.println("idom time is "+ thetime);
     String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
     pgraph.parseJoinedTrace(tracefilename);
+    System.out.println("Parse complete");
     // this.parseD4jTrace(tracefilename);
   }
 
   public static void main(String args[]) {
     ByteCodeGraph pgraph = new ByteCodeGraph();
 
-    String resultfile = "InfResult";
-    ByteCodeGraph.setResultLogger(resultfile);
-    String graphfile = "ProbGraph";
-    ByteCodeGraph.setGraphLogger(graphfile);
-
     pgraph.setAutoOracle(true);
     pgraph.setTraceAllClassed(false);
     if (args.length >= 2) {
       setupD4jProject(pgraph, args[0], Integer.parseInt(args[1]));
     } else {
-      setupD4jProject(pgraph, "Lang", 3);
+      setupD4jProject(pgraph, "Lang", 4);
     }
     // pgraph.initD4jProject();
     pgraph.printgraph();

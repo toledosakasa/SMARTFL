@@ -27,15 +27,15 @@ import ppfl.instrumentation.RuntimeFrame;
 
 public class ByteCodeGraph {
 
-	private static Logger graphLogger = LoggerFactory.getLogger("Debugger");
-	private static Logger resultLogger = LoggerFactory.getLogger("Debugger");
+	private Logger graphLogger = LoggerFactory.getLogger("Debugger");
+	private Logger resultLogger = LoggerFactory.getLogger("Debugger");
 
-	public static void setGraphLogger(String graphfile) {
+	public void setGraphLogger(String graphfile) {
 		MDC.put("graphfile", graphfile);
 		graphLogger = LoggerFactory.getLogger("GraphLogger");
 	}
 
-	public static void setResultLogger(String resultfile) {
+	public void setResultLogger(String resultfile) {
 		MDC.put("resultfile", resultfile);
 		resultLogger = LoggerFactory.getLogger("ResultLogger");
 	}
@@ -629,7 +629,7 @@ public class ByteCodeGraph {
 			boolean testpass = true;
 			while ((t = parseTraceFromReader(reader, t, testpass)) != null) {
 				// Debug use
-				// System.out.println(t);
+				System.out.println(t);
 				testpass = getD4jTestState(t);
 			}
 		} catch (IOException e) {
@@ -644,7 +644,12 @@ public class ByteCodeGraph {
 		this.initmaps();
 		String t;
 		String delimiterPrefix = "###";
+		int linecounter = 0;
 		while ((t = reader.readLine()) != null) {
+			linecounter++;
+			if (linecounter % 10000 == 0) {
+				System.out.println(linecounter);
+			}
 			if (t.isEmpty()) {
 				continue;
 			}
