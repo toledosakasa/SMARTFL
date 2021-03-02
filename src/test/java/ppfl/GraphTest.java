@@ -239,12 +239,11 @@ class GraphTest {
 	@Test
 	public void d4jTest() {
 
-		String resultfile = "InfResult";
-		ByteCodeGraph.setResultLogger(resultfile);
-		String graphfile = "ProbGraph";
-		ByteCodeGraph.setGraphLogger(graphfile);
-
 		ByteCodeGraph bgraph = d4jinit();
+		String resultfile = "InfResult";
+		bgraph.setResultLogger(resultfile);
+		String graphfile = "ProbGraph";
+		bgraph.setGraphLogger(graphfile);
 		bgraph.check_bp(true);
 	}
 
@@ -253,9 +252,9 @@ class GraphTest {
 		ByteCodeGraph pgraph = new ByteCodeGraph();
 
 		String resultfile = "InfResult";
-		ByteCodeGraph.setResultLogger(resultfile);
+		pgraph.setResultLogger(resultfile);
 		String graphfile = "ProbGraph";
-		ByteCodeGraph.setGraphLogger(graphfile);
+		pgraph.setGraphLogger(graphfile);
 
 		pgraph.setAutoOracle(true);
 		pgraph.setTraceAllClassed(false);
@@ -632,11 +631,11 @@ class GraphTest {
 
 	@Test
 	public void multitest_bc() {
-		String resultfile = "InfResult";
-		ByteCodeGraph.setResultLogger(resultfile);
-		String graphfile = "ProbGraph";
-		ByteCodeGraph.setGraphLogger(graphfile);
 		ByteCodeGraph pgraph = multiinit_bc();
+		String resultfile = "InfResult";
+		pgraph.setResultLogger(resultfile);
+		String graphfile = "ProbGraph";
+		pgraph.setGraphLogger(graphfile);
 		pgraph.check_bp(true);
 	}
 
