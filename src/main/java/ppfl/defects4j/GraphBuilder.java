@@ -97,10 +97,11 @@ public class GraphBuilder {
     if (args.length >= 2) {
       setupD4jProject(pgraph, args[0], Integer.parseInt(args[1]));
     } else {
-      setupD4jProject(pgraph, "Lang", 4);
+      setupD4jProject(pgraph, "Lang", 3);
     }
     // pgraph.initD4jProject();
     pgraph.printgraph();
     pgraph.check_bp(true);
+    System.out.println("BP finished");
   }
 }
