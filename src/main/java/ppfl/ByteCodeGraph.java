@@ -316,7 +316,13 @@ public class ByteCodeGraph {
 
 	public void parseD4jSource(String project, int id, String classname) {
 		String fullname = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/%s.source.log", project, id, classname);
-		parsesource(fullname);
+		try {
+			parsesource(fullname);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("parse source crash at " + fullname);
+			throw (e);
+		}
 	}
 
 	public void parsesource(String sourcefilename) {
@@ -627,11 +633,22 @@ public class ByteCodeGraph {
 		try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
 			String t = null;
 			boolean testpass = true;
-			while ((t = parseTraceFromReader(reader, t, testpass)) != null) {
-				// Debug use
-				System.out.println(t);
-				testpass = getD4jTestState(t);
-			}
+			do {
+				try {
+					t = parseTraceFromReader(reader, t, testpass);
+					testpass = getD4jTestState(t);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.err.println("parse joined trace crashed at " + t);
+					throw (e);
+				}
+			} while (t != null);
+
+			// while ((t = parseTraceFromReader(reader, t, testpass)) != null) {
+			// // Debug use
+			// System.out.println(t);
+			// testpass = getD4jTestState(t);
+			// }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -669,20 +686,27 @@ public class ByteCodeGraph {
 				}
 				continue;
 			}
-			// Debug use
-			// System.out.println(t);
-			this.parseinfo = new ParseInfo(t);
-			String instname = this.parseinfo.getvalue("lineinfo");
-			killPredStack(instname);
-			if (predataflowmap.get(instname).size() > 1) {
-				// System.out.println("add set" + branch_stores.get(instname));
-				Set<Integer> stores = branch_stores.get(instname);
-				// if (stores != null)
-				store_stack.push(stores);
+			try {
+				// Debug use
+				// System.out.println(t);
+				this.parseinfo = new ParseInfo(t);
+				String instname = this.parseinfo.getvalue("lineinfo");
+				killPredStack(instname);
+				if (predataflowmap.get(instname).size() > 1) {
+					// System.out.println("add set" + branch_stores.get(instname));
+					Set<Integer> stores = branch_stores.get(instname);
+					// if (stores != null)
+					store_stack.push(stores);
+				}
+				Interpreter.map[this.parseinfo.form].buildtrace(this);
+				// debug runtime stack
+				// debugStack(this.stackframe);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.println("parse trace crashed at " + t);
+				throw (e);
 			}
-			Interpreter.map[this.parseinfo.form].buildtrace(this);
-			// debug runtime stack
-			// debugStack(this.stackframe);
+
 		}
 		// after all lines are parsed, auto-assign oracle for the last defined var
 		// with test state(pass = true,fail = false)
