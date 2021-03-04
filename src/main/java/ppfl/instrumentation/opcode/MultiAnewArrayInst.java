@@ -13,9 +13,6 @@ public class MultiAnewArrayInst extends OpcodeInst {
 
 	public MultiAnewArrayInst(int _form) {
 		super(_form, -1, 1);
-		this.doPush = false;
-		this.doPop = false;
-		this.doBuild = false;
 	}
 
 	@Override
