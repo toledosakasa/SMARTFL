@@ -12,7 +12,7 @@ public class MultiAnewArrayInst extends OpcodeInst {
 	public int dimension = 0;
 
 	public MultiAnewArrayInst(int _form) {
-		super(_form, 1, 1);
+		super(_form, -1, 1);
 		this.doPush = false;
 		this.doPop = false;
 		this.doBuild = false;
@@ -29,7 +29,7 @@ public class MultiAnewArrayInst extends OpcodeInst {
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder("\n");
 		ret.append("opcode=" + this.form + "(" + this.opcode + ")\t");
-		ret.append(",popnum=" + ci.byteAt(index + 1));
+		ret.append(",popnum=" + ci.byteAt(index + 3));
 		ret.append(",pushnum=1");
 		return ret.toString();
 	}
