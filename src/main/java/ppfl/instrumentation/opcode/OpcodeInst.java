@@ -222,7 +222,6 @@ public class OpcodeInst {
 	// there's no need to override this.
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
 			throws BadBytecode {
-
 		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(6);

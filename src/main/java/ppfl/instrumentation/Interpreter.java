@@ -177,6 +177,7 @@ public class Interpreter {
 		map[192] = new CheckCastInst(192);
 		map[193] = new InstanceOfInst(193);
 
+		map[197] = new MultiAnewArrayInst(197);
 		map[198] = new IfnullInst(198);
 		map[199] = new IfnonnullInst(199);
 		map[200] = new Goto_wInst(200);
