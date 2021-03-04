@@ -636,6 +636,7 @@ public class ByteCodeGraph {
 			do {
 				try {
 					t = parseTraceFromReader(reader, t, testpass);
+					System.out.println(t);
 					testpass = getD4jTestState(t);
 				} catch (Exception e) {
 					e.printStackTrace();
