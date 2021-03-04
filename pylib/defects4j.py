@@ -1,4 +1,5 @@
 import os
+import time
 from typing import Any, Dict, List, Set
 import json
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
@@ -20,7 +21,7 @@ def getd4jprojinfo():
 
 def getinstclassinfo(proj: str):
     cmdline = f"defects4j query -p {proj} -q \"bug.id,classes.relevant.src,classes.relevant.test,tests.trigger,tests.relevant\"  -o ./d4j_resources/{proj}.csv"
-    cmdline += ' > d4j.query.log'
+    cmdline += f' > trace/runtimelog/{proj}query.log'
     os.system(cmdline)
 
 
@@ -55,13 +56,13 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     for field in fields:
         tmp_logfieldfile = f'{workdir}/{field}.log'
         cmdline = f'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}'
-        cmdline += ' > d4j.export.log'
+        cmdline += f' > trace/runtimelog/{proj}{id}d4j.export.log'
         os.system(cmdline)
         ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
     print('Instrumenting all test methods')
     cmdline_getallmethods = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'
-    cmdline_getallmethods += ' > d4j.instrumenter.log'
+    cmdline_getallmethods += f' > trace/runtimelog/{proj}{id}.instrumenter.log'
     os.system(cmdline_getallmethods)
     allmethodslog = f'./d4j_resources/metadata_cached/{proj}/{id}.alltests.log'
     ret['methods.test.all'] = utf8open(
@@ -167,7 +168,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
         print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
-        simplelogcmd += ' > d4j.profile.log'
+        simplelogcmd += f' > ../../../trace/runtimelog/{proj}{id}.profile.log'
         os.system(cdcmd + simplelogcmd)
     else:
         print('found')
@@ -234,6 +235,44 @@ def checkout(proj: str, id: str):
         f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id}')
 
 
-def clearcache():
-    cachepath = os.path.abspath('./d4j_resources/metadata_cached/')
-    os.system('rm -rf '+cachepath)
+def cleanupcheckout(proj: str, id: str):
+    checkoutpath = f'./tmp_checkout/{proj}/{id}'
+    if (os.path.exists(checkoutpath)):
+        os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
+
+
+def clearcache(proj: str, id: str):
+    cachepath = f'./d4j_resources/metadata_cached/{proj}/{id}.*'
+    os.system('rm '+cachepath)
+
+
+def rund4j(proj: str, id: str):
+    time_start = time.time()
+    workdir = os.path.abspath(f'./tmp_checkout/{proj}/{id}')
+    if not os.path.exists(workdir):
+        checkout(proj, id)
+    cmdlines = getd4jcmdline(proj, id)
+    checkoutdir = f'tmp_checkout/{proj}/{id}'
+    # cleanup previous log
+    previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
+    if os.path.exists(previouslog):
+        print('removing previous trace logs.')
+        os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
+    cdcmd = f'cd {checkoutdir} && '
+    for cmdline in cmdlines:
+        testclassname = cmdline.split('::')[0].split(' ')[-1]
+        print('testing', testclassname)
+        # input()
+        os.system(cdcmd + cmdline)
+    time_end = time.time()
+    print('d4j tracing complete after', time_end-time_start, 'sec')
+
+
+def parse(proj: str, id: str):
+    cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"'
+    os.system(cmdline)
+
+
+def fl(proj: str, id: str):
+    rund4j(proj, id)
+    parse(proj, id)

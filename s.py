@@ -21,7 +21,7 @@ def runtest(cmdarg):
 
 def makedirs():
     dirs2make = ["./configs", "./test/trace/patterns", "./test/trace/logs",
-                 "./test/trace/logs/btrace", "./test/trace/logs/mytrace", "./d4j_resources/metadata_cached/"]
+                 "./trace/runtimelog/", "./test/trace/logs/mytrace", "./d4j_resources/metadata_cached/"]
     for dir in dirs2make:
         if not(os.path.exists(dir)):
             os.makedirs(dir)
@@ -45,32 +45,15 @@ if __name__ == '__main__':
     if args[1] == 'd4jinit':
         d4j.getd4jprojinfo()
 
+    if args[1] == 'fl':
+        d4j.rund4j(args[2], args[3])
+        d4j.parse(args[2], args[3])
+
     if args[1] == 'rund4j':
-        time_start = time.time()
-        projname = args[2]
-        bugid = args[3]
-        workdir = os.path.abspath(f'./tmp_checkout/{projname}/{bugid}')
-        if not os.path.exists(workdir):
-            d4j.checkout(projname, bugid)
-        cmdlines = d4j.getd4jcmdline(projname, bugid)
-        checkoutdir = f'tmp_checkout/{projname}/{bugid}'
-        # cleanup previous log
-        previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
-        if os.path.exists(previouslog):
-            print('removing previous trace logs.')
-            os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
-        cdcmd = f'cd {checkoutdir} && '
-        for cmdline in cmdlines:
-            testclassname = cmdline.split('::')[0].split(' ')[-1]
-            print('testing', testclassname)
-            # input()
-            os.system(cdcmd + cmdline)
-        time_end = time.time()
-        print('d4j tracing complete after', time_end-time_start, 'sec')
+        d4j.rund4j(args[2], args[3])
+
     if args[1] == 'parsed4j':
-        projname = args[2]
-        bugid = args[3]
-        os.system(
-            f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={projname} {bugid}"')
+        d4j.parse(args[2], args[3])
     if args[1] == 'clearcache':
-        d4j.clearcache()
+        d4j.clearcache(args[2], args[3])
+        d4j.cleanupcheckout(args[2], args[3])
