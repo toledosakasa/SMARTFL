@@ -3,10 +3,13 @@ package ppfl.instrumentation.opcode;
 import java.util.ArrayList;
 import java.util.List;
 
+import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
+import ppfl.instrumentation.CallBackIndex;
+import ppfl.instrumentation.TraceDomain;
 
 //Utils for all invoke insts.
 public class InvokeInst extends OpcodeInst {
@@ -30,11 +33,26 @@ public class InvokeInst extends OpcodeInst {
 		return ret.toString();
 	}
 
+	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
+			throws BadBytecode {
+		int instpos = ci.insertExGap(8);
+		String msg = "\n###RET@" + instinfo.trim();
+		int instindex = constp.addStringInfo(msg);
+
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.logstringindex, instpos + 4);
+	}
+
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		String traceclass = info.getvalue("callclass");
 		String tracemethod = info.getvalue("callname");
+		String signature = info.getvalue("calltype");
+		TraceDomain callDomain = new TraceDomain(traceclass, tracemethod, signature);
 		// defs
 		String desc = info.getvalue("calltype");
 		int argcnt = OpcodeInst.getArgNumByDesc(desc);
@@ -52,21 +70,30 @@ public class InvokeInst extends OpcodeInst {
 			usenodes.add(node);
 		}
 
-		// if not traced
+		// mark untraced invokes
 		if (!graph.isTraced(traceclass)) {
-			// System.out.println("Not traced");
-			if (!OpcodeInst.isVoidMethodByDesc(desc)) {
-				defnode = graph.addNewStackNode(stmt);
-				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-			}
-			// graph.exceptionuse = new ArrayList<>();
-			// graph.exceptionuse.addAll(usenodes);
-			graph.exceptionuse = usenodes;
-			return;
+			graph.untracedInvoke = graph.parseinfo;
+			graph.untracedStmt = stmt;
+			graph.untraceduse = usenodes;
+			graph.untracedpred = prednodes;
 		}
 
+		// // if not traced
+		// if (!graph.isTraced(traceclass)) {
+		// // System.out.println("Not traced");
+		// if (!OpcodeInst.isVoidMethodByDesc(desc)) {
+		// defnode = graph.addNewStackNode(stmt);
+		// graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		// }
+		// // graph.exceptionuse = new ArrayList<>();
+		// // graph.exceptionuse.addAll(usenodes);
+		// graph.untraceduse = usenodes;
+		// return;
+		// }
+
 		// switch stack frame
-		graph.pushStackFrame(traceclass, tracemethod);
+		if (graph.isTraced(traceclass))
+			graph.pushStackFrame(callDomain);
 
 		// static arguments starts with 0
 		int paravarindex = 0;
@@ -78,7 +105,7 @@ public class InvokeInst extends OpcodeInst {
 			Node curArgument = usenodes.get(argcnt - i - 1);
 			adduse.add(curArgument);
 
-			Node defnode = graph.addNewVarNode(paravarindex, stmt, traceclass, tracemethod);
+			Node defnode = graph.addNewVarNode(paravarindex, stmt, callDomain);
 			graph.buildFactor(defnode, prednodes, adduse, null, stmt);
 			paravarindex += curArgument.getSize();
 		}

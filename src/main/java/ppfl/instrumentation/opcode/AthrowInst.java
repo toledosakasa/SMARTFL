@@ -23,7 +23,11 @@ public class AthrowInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		graph.exceptionuse = new ArrayList<>();
-		graph.exceptionuse.add(defnode);
+		// graph.throwuse = new ArrayList<>();
+		// graph.throwuse.add(defnode);
+		graph.unsolvedThrow = graph.parseinfo;
+		graph.throwStmt = stmt;
+		graph.throwuse = usenodes;
+		graph.throwpred = prednodes;
 	}
 }

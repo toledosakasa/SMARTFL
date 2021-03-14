@@ -20,6 +20,7 @@ import ppfl.Node;
 import ppfl.ParseInfo;
 import ppfl.StmtNode;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.instrumentation.TraceDomain;
 
 public class OpcodeInst {
 	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
@@ -237,6 +238,12 @@ public class OpcodeInst {
 		}
 	}
 
+	// only for invoke insts.
+	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
+			throws BadBytecode {
+		// doing nothing
+	}
+
 	// extended class should override this method.
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		// print stack value pushed by this instruction.
@@ -253,12 +260,11 @@ public class OpcodeInst {
 
 	public void buildstmt(ByteCodeGraph graph) {
 		this.info = graph.parseinfo;
-		String traceclass = info.traceclass;
-		String tracemethod = info.tracemethod;
+		TraceDomain tDomain = info.domain;
 		int linenumber = info.linenumber;
 		int byteindex = info.byteindex;
 
-		String stmtname = traceclass + ":" + tracemethod + "#" + linenumber;
+		String stmtname = tDomain.toString() + "#" + linenumber;
 		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + byteindex;
 		// if (!graph.hasNode(stmtname)) {
@@ -284,7 +290,7 @@ public class OpcodeInst {
 
 		// auto-assigned observation: test function always true
 		if (graph.auto_oracle) {
-			if (tracemethod.contentEquals(graph.testname)) {
+			if (tDomain.tracemethod.contentEquals(graph.testname)) {
 				stmt.observe(true);
 				debugLogger.info("Observe {} as true", stmt.getName());
 			}
@@ -306,25 +312,31 @@ public class OpcodeInst {
 				prednodes.add(thepred);
 		}
 
-		// temporary solution for throwing-return.
-		String logclass = info.traceclass;
-		String logmethod = info.tracemethod;
-		String stackclass = graph.getFrame().traceclass;
-		String stackmethod = graph.getFrame().tracemethod;
-		while (!logclass.contentEquals(stackclass) || !logmethod.contentEquals(stackmethod)) {
-			// Debug use
-			// System.out.println("Exception!!");
+		// // temporary solution for throwing-return.
+		// String logclass = info.traceclass;
+		// String logmethod = info.tracemethod;
+		// String stackclass = graph.getFrame().traceclass;
+		// String stackmethod = graph.getFrame().tracemethod;
 
-			graph.popStackFrame();
-			// FIXME should be the previous stmt
-			// Node defnode = graph.addNewStackNode(stmt);
-			Node exceptDef = graph.addNewExceptionNode();
-			List<Node> exceptUse = graph.exceptionuse;
-			graph.buildFactor(exceptDef, prednodes, exceptUse, null, graph.prevstmt);
-			stackclass = graph.getFrame().traceclass;
-			stackmethod = graph.getFrame().tracemethod;
-		}
-		graph.prevstmt = stmt;
+		// if (!logclass.contentEquals(stackclass) ||
+		// !logmethod.contentEquals(stackmethod)) {
+		// RuntimeFrame prev = graph.getPrevFrame();
+		// stackclass = prev.traceclass;
+		// stackmethod = prev.tracemethod;
+		// if (logclass.contentEquals(stackclass) &&
+		// logmethod.contentEquals(stackmethod)) {
+		// // Debug use
+		// // System.out.println("Exception!!");
+		// graph.popStackFrame();
+		// Node exceptDef = graph.addNewExceptionNode();
+		// List<Node> exceptUse = graph.exceptionuse;
+		// graph.buildFactor(exceptDef, prednodes, exceptUse, null, graph.prevstmt);
+		// } else {
+		// // skip this stmt
+		// return;
+		// }
+		// }
+		// graph.prevstmt = stmt;
 
 		if (this.doLoad && info.getintvalue("load") != null) {
 			int loadvar = info.getintvalue("load");

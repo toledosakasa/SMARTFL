@@ -24,6 +24,8 @@ import org.slf4j.MDC;
 
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
+import ppfl.instrumentation.TraceDomain;
+import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class ByteCodeGraph {
 
@@ -54,6 +56,10 @@ public class ByteCodeGraph {
 
 	public void addTracedClass(Collection<String> className) {
 		tracedClass.addAll(className);
+	}
+
+	public boolean isUntracedInvoke(ParseInfo p) {
+		return p.isInvoke() && (!isTraced(p.getCallClass()));
 	}
 
 	public boolean isTraced(String className) {
@@ -100,8 +106,16 @@ public class ByteCodeGraph {
 	public Map<String, Set<Integer>> branch_stores;
 	private boolean shouldview;
 
-	public StmtNode prevstmt;
-	public List<Node> exceptionuse;
+	public StmtNode untracedStmt;
+	public List<Node> untraceduse;
+	public List<Node> untracedpred;
+
+	public ParseInfo untracedInvoke = null;
+
+	public StmtNode throwStmt;
+	public List<Node> throwuse;
+	public List<Node> throwpred;
+	public ParseInfo unsolvedThrow = null;
 
 	public void stopview() {
 		shouldview = false;
@@ -131,21 +145,40 @@ public class ByteCodeGraph {
 
 	// should be called while invoking.
 	// e.g. invokestatic
-	public void pushStackFrame(String tclass, String tmethod) {
-		RuntimeFrame topush = RuntimeFrame.getFrame(tclass, tmethod);
+	public void pushStackFrame(TraceDomain domain) {
+		RuntimeFrame topush = RuntimeFrame.getFrame(domain);
 		topush.entercnt++;
 		this.stackframe.push(topush);
 	}
 
 	public RuntimeFrame getFrame() {
 		if (stackframe.isEmpty()) {
-			stackframe.push(RuntimeFrame.getFrame(parseinfo.traceclass, parseinfo.tracemethod));
+			stackframe.push(RuntimeFrame.getFrame(parseinfo.domain));
 		}
 		return stackframe.peek();
 	}
 
+	public RuntimeFrame getPrevFrame() {
+		if (stackframe.size() < 2)
+			return null;
+		RuntimeFrame top = stackframe.removeFirst();
+		RuntimeFrame ret = stackframe.peekFirst();
+		stackframe.addFirst(top);
+		return ret;
+	}
+
 	public Deque<Node> getRuntimeStack() {
 		return getFrame().runtimestack;
+	}
+
+	public boolean isInCallStack(ParseInfo p) {
+		TraceDomain tDomain = p.domain;
+		for (RuntimeFrame rFrame : stackframe) {
+			if (rFrame.domain.equals(tDomain)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// local vars used by parsing
@@ -353,7 +386,8 @@ public class ByteCodeGraph {
 				Integer storen = info.getintvalue("store");
 				if (storen != null)
 					store_num.put(thisinst, storen);
-				String classandmethod = info.traceclass + "#" + info.tracemethod;
+				// String classandmethod = info.traceclass + "#" + info.tracemethod;
+				String classandmethod = info.domain.toString();
 				String assistkey = classandmethod + info.byteindex;
 				assistnamemap.put(assistkey, thisinst);
 				List<String> theedges = new ArrayList<>();
@@ -621,10 +655,133 @@ public class ByteCodeGraph {
 		}
 		System.out.print("\n");
 		for (RuntimeFrame r : s) {
-			System.out.print(r.tracemethod);
+			System.out.print(r.domain.tracemethod);
 			System.out.print("-");
 		}
 		System.out.print("\n");
+	}
+
+	private void cleanupOnChunk() {
+		this.untracedInvoke = null;
+		this.unsolvedThrow = null;
+	}
+
+	public void pruneAndParse(String tracefilename) {
+		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedClass);
+		jTrace.parseFile(tracefilename);
+		parseJoinedTracePruned(jTrace);
+	}
+
+	public void parseJoinedTracePruned(JoinedTrace jTrace) {
+		this.predstack.clear();
+		this.initmaps();
+		for (TraceChunk tChunk : jTrace.traceList) {
+			this.cleanupOnChunk();
+			boolean testpass = tChunk.testpass;
+			this.testname = tChunk.getTestName();
+			boolean debugswitch = false;
+			for (ParseInfo pInfo : tChunk.parsedTraces) {
+				try {
+					this.parseinfo = pInfo;
+					String instname = this.parseinfo.getvalue("lineinfo");
+
+					// solve current untraced invoke
+					if (this.untracedInvoke != null) {
+						if (untracedInvoke.matchReturn(pInfo, true)) {
+							if (pInfo.isReturnMsg) {
+								// normally returned
+								String desc = this.untracedInvoke.getvalue("calltype");
+								if (!OpcodeInst.isVoidMethodByDesc(desc)) {
+									Node defnode = this.addNewStackNode(this.untracedStmt);
+									buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
+								}
+								this.untracedInvoke = null;
+								continue;
+							} else {
+								// catched
+								Node exceptDef = addNewExceptionNode();
+								buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
+								this.untracedInvoke = null;
+							}
+						} else {
+							// check if the control flow had already been thrown upward
+							if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
+								TraceDomain curDomain = pInfo.domain;
+								TraceDomain frameDomain = this.getFrame().domain;
+								while (!curDomain.equals(frameDomain)) {
+									this.stackframe.pop();
+									frameDomain = this.getFrame().domain;
+								}
+								Node exceptDef = addNewExceptionNode();
+								buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
+								this.untracedInvoke = null;
+							}
+						}
+					}
+
+					// solve current throw.
+					if (this.unsolvedThrow != null) {
+						if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
+							TraceDomain curDomain = pInfo.domain;
+							TraceDomain frameDomain = this.getFrame().domain;
+							while (!curDomain.equals(frameDomain)) {
+								this.stackframe.pop();
+								frameDomain = this.getFrame().domain;
+							}
+							Node exceptDef = addNewExceptionNode();
+							buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
+							this.unsolvedThrow = null;
+						} else {
+							// should not happen
+							// maybe quit on crash.
+							// System.out.println("Athrow is not catched!");
+							// pInfo.debugprint();
+						}
+					}
+					// untraced invoke has been resolved.
+					// skip @ret message.
+					if (this.parseinfo.isReturnMsg) {
+						continue;
+					}
+
+					// Debug use
+					// System.out.println(instname);
+
+					killPredStack(instname);
+					if (predataflowmap.get(instname).size() > 1) {
+						// System.out.println("add set" + branch_stores.get(instname));
+						Set<Integer> stores = branch_stores.get(instname);
+						// if (stores != null)
+						store_stack.push(stores);
+					}
+					Interpreter.map[this.parseinfo.form].buildtrace(this);
+
+					// if (pInfo.linenumber == 236 && pInfo.byteindex == 432) {
+					// debugswitch = true;
+					// }
+					// debug runtime stacks
+					if (debugswitch) {
+						pInfo.debugprint();
+						debugStack(this.stackframe);
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("parse trace crashed");
+					System.out.println("Test name is: " + tChunk.fullname);
+					pInfo.debugprint();
+					// throw (e);
+				}
+			}
+			// after all lines are parsed, auto-assign oracle for the last defined var
+			// with test state(pass = true,fail = false)
+			if (auto_oracle) {
+				for (Node i : lastDefinedVar) {
+					i.observe(testpass);
+					graphLogger.info("Observe {} as {}", i.name, testpass);
+				}
+			}
+		}
 	}
 
 	public void parseJoinedTrace(String tracefilename) {
@@ -939,9 +1096,10 @@ public class ByteCodeGraph {
 		}
 	}
 
-	private void incVarIndex(int varindex, String traceclass, String tracemethod) {
-		assert (traceclass.equals(this.getFrame().traceclass));
-		assert (tracemethod.equals(this.getFrame().tracemethod));
+	private void incVarIndex(int varindex, TraceDomain domain) {
+		assert (this.getFrame().domain.equals(domain));
+		// assert (traceclass.equals(this.getFrame().traceclass));
+		// assert (tracemethod.equals(this.getFrame().tracemethod));
 		incVarIndex(varindex);
 		// String def = this.getFormalVarName(varindex, traceclass, tracemethod);
 		// if (!varcountmap.containsKey(def)) {
@@ -983,9 +1141,10 @@ public class ByteCodeGraph {
 		return getVarName(this.getFormalStackName(), this.getRuntimeStack().size());
 	}
 
-	private String getFormalVarName(int varindex, String traceclass, String tracemethod) {
-		assert (traceclass.equals(this.getFrame().traceclass));
-		assert (tracemethod.equals(this.getFrame().tracemethod));
+	private String getFormalVarName(int varindex, TraceDomain domain) {
+		assert (this.getFrame().domain.equals(domain));
+		// assert (traceclass.equals(this.getFrame().traceclass));
+		// assert (tracemethod.equals(this.getFrame().tracemethod));
 		return getFormalVarName(varindex);
 		// String name = String.valueOf(varindex);
 		// return this.getDomain() + name;
@@ -1013,8 +1172,8 @@ public class ByteCodeGraph {
 		return String.format("%x.%s", objectAddress.getAddress(), field);
 	}
 
-	private String getFormalVarNameWithIndex(int varindex, String traceclass, String tracemethod) {
-		return getVarName(getFormalVarName(varindex, traceclass, tracemethod), this.varcountmap);
+	private String getFormalVarNameWithIndex(int varindex, TraceDomain domain) {
+		return getVarName(getFormalVarName(varindex, domain), this.varcountmap);
 	}
 
 	private String getFormalVarNameWithIndex(int varindex) {
@@ -1053,7 +1212,7 @@ public class ByteCodeGraph {
 	}
 
 	public Node addNewExceptionNode() {
-		Node ret = this.addNewStackNode(this.prevstmt);
+		Node ret = this.addNewStackNode(this.untracedStmt);
 		return ret;
 	}
 
@@ -1092,9 +1251,9 @@ public class ByteCodeGraph {
 		return defnode;
 	}
 
-	public Node addNewVarNode(int varindex, StmtNode stmt, String traceclass, String tracemethod) {
-		this.incVarIndex(varindex, traceclass, tracemethod);
-		String nodename = this.getFormalVarNameWithIndex(varindex, traceclass, tracemethod);
+	public Node addNewVarNode(int varindex, StmtNode stmt, TraceDomain domain) {
+		this.incVarIndex(varindex, domain);
+		String nodename = this.getFormalVarNameWithIndex(varindex, domain);
 		Node defnode = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, defnode);
 		return defnode;

@@ -33,6 +33,7 @@ public class Aload_NInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		if (defnode != null)
+			defnode.setAddress(graph.parseinfo.getAddressFromStack());
 	}
 }
