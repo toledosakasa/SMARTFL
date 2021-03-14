@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import ppfl.ByteCodeGraph;
+import ppfl.JoinedTrace;
 
 public class GraphBuilder {
 
@@ -84,7 +85,8 @@ public class GraphBuilder {
     // long thetime = endTime-startTime;
     // System.out.println("idom time is "+ thetime);
     String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
-    pgraph.parseJoinedTrace(tracefilename);
+    // pgraph.parseJoinedTrace(tracefilename);
+    pgraph.pruneAndParse(tracefilename);
     System.out.println("Parse complete");
     // this.parseD4jTrace(tracefilename);
   }
