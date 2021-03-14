@@ -110,9 +110,16 @@ public class Node {
 
 	// not override ok?
 	public String getStmtName() {
+		// System.out.println(this.stmt.getName());
 		String[] lineinfos = this.stmt.getName().split(":");
-		String stmtname = lineinfos[0] + "#" + lineinfos[1];
-		return stmtname;
+		StringBuilder sb = new StringBuilder(lineinfos[0]);
+		for (int i = 1; i < lineinfos.length; i++) {
+			sb.append("#");
+			sb.append(lineinfos[i]);
+		}
+		// String stmtname = "#".join(lineinfos);
+		// String stmtname = lineinfos[0] + "#" + lineinfos[1];
+		return sb.toString();
 	}
 
 	public String getPrintName() {

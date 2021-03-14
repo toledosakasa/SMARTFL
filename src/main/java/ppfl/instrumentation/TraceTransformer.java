@@ -28,8 +28,10 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.ExceptionTable;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.Mnemonic;
+import ppfl.instrumentation.opcode.InvokeInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class TraceTransformer implements ClassFileTransformer {
@@ -220,9 +222,11 @@ public class TraceTransformer implements ClassFileTransformer {
 		for (int i = 0; tempci.hasNext(); i++) {
 			int index = tempci.lookAhead();
 			int ln = mi.getLineNumber(index);
-
 			String getinst = getInstMap(tempci, index, constp);
-			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + ln + "#" + index + ",nextinst=";
+			String sig = m.getSignature();
+			ExceptionTable eTable = m.getMethodInfo().getCodeAttribute().getExceptionTable();
+			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + sig + "#" + ln + "#" + index
+					+ ",nextinst=";
 
 			tempci.next();
 			if (!tempci.hasNext()) {
@@ -255,12 +259,17 @@ public class TraceTransformer implements ClassFileTransformer {
 			if (oi != null) {
 				oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 			}
+			int previndex = index;
 			// move to the next inst. everything below this will be inserted after the inst.
 			index = ci.next();
 			// print advanced information(e.g. value pushed)
 			if (oi != null) {
 				// if (oi.form > 42)
-				oi.insertByteCodeAfter(ci, index, constp, cbi);
+				if (oi instanceof InvokeInst) {
+					oi.insertReturnSite(ci, index, constp, instinfo, cbi);
+				} else {
+					oi.insertByteCodeAfter(ci, index, constp, cbi);
+				}
 			}
 		}
 	}

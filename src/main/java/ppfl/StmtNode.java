@@ -87,8 +87,14 @@ public class StmtNode extends Node {
 
 	public String getClassMethod() {
 		String[] lineinfos = this.name.split(":");
-		String classandmethod = lineinfos[0] + "#" + lineinfos[1].split("#")[0];
-		return classandmethod;
+		StringBuilder sb = new StringBuilder(lineinfos[0]);
+		for (int i = 1; i < lineinfos.length - 2; i++) {
+			sb.append("#");
+			sb.append(lineinfos[i]);
+		}
+		// String classandmethod = lineinfos[0] + "#" + lineinfos[1].split("#")[0];
+
+		return sb.toString();
 	}
 
 	public String getMethod() {
