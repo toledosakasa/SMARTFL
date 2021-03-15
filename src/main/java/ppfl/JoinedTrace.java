@@ -8,11 +8,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import ppfl.instrumentation.TraceDomain;
+
 public class JoinedTrace {
 
   private Set<String> d4jMethodNames = new HashSet<>();
   private Set<String> d4jTriggerTestNames = new HashSet<>();
-  private Set<String> tracedClass = new HashSet<>();
+  private Set<TraceDomain> tracedDomain = new HashSet<>();
 
   public List<TraceChunk> traceList;
 
@@ -37,10 +39,10 @@ public class JoinedTrace {
     return !d4jTriggerTestNames.contains(fullname);
   }
 
-  public JoinedTrace(Set<String> d4jMethodNames, Set<String> d4jTriggerTestNames, Set<String> tracedClass) {
+  public JoinedTrace(Set<String> d4jMethodNames, Set<String> d4jTriggerTestNames, Set<TraceDomain> tracedDomain) {
     this.d4jMethodNames = d4jMethodNames;
     this.d4jTriggerTestNames = d4jTriggerTestNames;
-    this.tracedClass = tracedClass;
+    this.tracedDomain = tracedDomain;
   }
 
   // this could be memory-unfriendly.
@@ -74,7 +76,7 @@ public class JoinedTrace {
     // prune
     for (TraceChunk chunk : this.traceList) {
       // System.out.println("Pruning " + chunk.fullname);
-      chunk.prune(this.tracedClass);
+      chunk.prune(this.tracedDomain);
     }
 
   }

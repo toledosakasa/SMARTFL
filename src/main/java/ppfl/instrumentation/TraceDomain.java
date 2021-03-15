@@ -6,9 +6,9 @@ public class TraceDomain {
   public String signature;
 
   public TraceDomain(String traceclass, String tracemethod, String signature) {
-    this.traceclass = traceclass;
-    this.tracemethod = tracemethod;
-    this.signature = signature;
+    this.traceclass = traceclass.trim();
+    this.tracemethod = tracemethod.trim();
+    this.signature = signature.trim();
   }
 
   @Override
@@ -25,5 +25,13 @@ public class TraceDomain {
     TraceDomain instance = (TraceDomain) oth;
     return traceclass.equals(instance.traceclass) && tracemethod.equals(instance.tracemethod)
         && signature.equals(instance.signature);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = this.traceclass.hashCode();
+    result = result * 31 + this.tracemethod.hashCode();
+    result = result * 31 + this.signature.hashCode();
+    return result;
   }
 }

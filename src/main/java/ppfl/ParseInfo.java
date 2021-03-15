@@ -58,8 +58,11 @@ public class ParseInfo {
 		return this.form == 58 || (this.form >= 75 && this.form <= 78);
 	}
 
-	public String getCallClass() {
-		return this.tracemap.get("callclass");
+	public TraceDomain getCallDomain() {
+		String signature = this.tracemap.get("calltype");
+		String callclass = this.tracemap.get("callclass");
+		String callmethod = this.tracemap.get("callname");
+		return new TraceDomain(callclass, callmethod, signature);
 	}
 
 	public boolean isUntracedInvoke(Set<String> tracedClass) {

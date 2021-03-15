@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.graphstream.graph.implementations.SingleGraph;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class ByteCodeGraph {
 		resultLogger = LoggerFactory.getLogger("ResultLogger");
 	}
 
-	private static Set<String> tracedClass = new HashSet<>();
+	private static Set<TraceDomain> tracedDomain = new HashSet<>();
 	private boolean traceAllClasses = true;
 	String currentTestMethod = null;
 
@@ -50,22 +51,26 @@ public class ByteCodeGraph {
 		this.traceAllClasses = value;
 	}
 
-	public void addTracedClass(String className) {
-		tracedClass.add(className);
+	public void addTracedDomain(TraceDomain domain) {
+		tracedDomain.add(domain);
 	}
 
-	public void addTracedClass(Collection<String> className) {
-		tracedClass.addAll(className);
+	public void addTracedDomain(Collection<TraceDomain> domain) {
+		tracedDomain.addAll(domain);
 	}
 
 	public boolean isUntracedInvoke(ParseInfo p) {
-		return p.isInvoke() && (!isTraced(p.getCallClass()));
+		return p.isInvoke() && (!isTraced(p.getCallDomain()));
 	}
 
-	public boolean isTraced(String className) {
+	public boolean isTraced(TraceDomain domain) {
 		if (this.traceAllClasses)
 			return true;
-		return tracedClass.contains(className);
+		boolean ret = tracedDomain.contains(domain);
+		// if (!ret) {
+		// System.out.println("untraced:" + domain.toString());
+		// }
+		return ret;
 
 	}
 
@@ -347,6 +352,26 @@ public class ByteCodeGraph {
 		this.predicates.clear();
 	}
 
+	public void parseWhatIsTracedLog(String logfilename) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(logfilename))) {
+			String t;
+			while ((t = reader.readLine()) != null) {
+				String[] splt = t.split("::");
+				String traceclass = splt[0];
+				splt = splt[1].split(",");
+				for (String methodAndDesc : splt) {
+					splt = methodAndDesc.split("#");
+					String tracemethod = splt[0];
+					String signature = splt[1];
+					TraceDomain tDomain = new TraceDomain(traceclass, tracemethod, signature);
+					tracedDomain.add(tDomain);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void parseD4jSource(String project, int id, String classname) {
 		String fullname = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/%s.source.log", project, id, classname);
 		try {
@@ -374,6 +399,7 @@ public class ByteCodeGraph {
 			nonextinsts.add("freturn");
 			nonextinsts.add("ireturn");
 			nonextinsts.add("lreturn");
+			nonextinsts.add("athrow");
 			// TODO consider throw
 			Set<String> switchinsts = new HashSet<>();
 			switchinsts.add("tableswitch");
@@ -661,13 +687,14 @@ public class ByteCodeGraph {
 		System.out.print("\n");
 	}
 
-	private void cleanupOnChunk() {
+	private void cleanupOnChunkSwitch() {
 		this.untracedInvoke = null;
 		this.unsolvedThrow = null;
+		this.initmaps();
 	}
 
 	public void pruneAndParse(String tracefilename) {
-		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedClass);
+		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
 		jTrace.parseFile(tracefilename);
 		parseJoinedTracePruned(jTrace);
 	}
@@ -676,7 +703,7 @@ public class ByteCodeGraph {
 		this.predstack.clear();
 		this.initmaps();
 		for (TraceChunk tChunk : jTrace.traceList) {
-			this.cleanupOnChunk();
+			this.cleanupOnChunkSwitch();
 			boolean testpass = tChunk.testpass;
 			this.testname = tChunk.getTestName();
 			boolean debugswitch = false;
@@ -756,7 +783,7 @@ public class ByteCodeGraph {
 					}
 					Interpreter.map[this.parseinfo.form].buildtrace(this);
 
-					// if (pInfo.linenumber == 236 && pInfo.byteindex == 432) {
+					// if (pInfo.linenumber == 342 && pInfo.byteindex == 12) {
 					// debugswitch = true;
 					// }
 					// debug runtime stacks
@@ -770,7 +797,7 @@ public class ByteCodeGraph {
 					System.out.println("parse trace crashed");
 					System.out.println("Test name is: " + tChunk.fullname);
 					pInfo.debugprint();
-					// throw (e);
+					throw (e);
 				}
 			}
 			// after all lines are parsed, auto-assign oracle for the last defined var
@@ -1674,7 +1701,7 @@ public class ByteCodeGraph {
 		if (relevantClasses != null) {
 			for (String s : relevantClasses.split(";")) {
 				if (!s.isEmpty()) {
-					this.addTracedClass(s);
+					// this.addTracedDomain(s);
 					this.parseD4jSource(project, id, s);
 				}
 			}
@@ -1682,7 +1709,7 @@ public class ByteCodeGraph {
 		if (allTestClasses != null) {
 			for (String s : allTestClasses.split(";")) {
 				if (!s.isEmpty()) {
-					this.addTracedClass(s);
+					// this.addTracedDomain(s);
 					this.parseD4jSource(project, id, s);
 				}
 			}
@@ -1734,8 +1761,8 @@ public class ByteCodeGraph {
 
 		if (traceclass != null) {
 			for (String s : traceclass.split(";")) {
-				if (!s.isEmpty())
-					this.addTracedClass(s);
+				// if (!s.isEmpty())
+				// this.addTracedDomain(s);
 			}
 		}
 		if (sourcepath != null) {

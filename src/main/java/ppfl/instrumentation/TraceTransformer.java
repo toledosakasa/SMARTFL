@@ -47,6 +47,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static final int BUFFERSIZE = 1 << 20;
 	private static BufferedWriter sourceWriter = null;
 	private static BufferedWriter traceWriter = null;
+	private static BufferedWriter whatIsTracedWriter = null;
 	/** The internal form class name of the class to transform */
 	private String targetClassName;
 	/** The class loader of the class we want to transform */
@@ -62,6 +63,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
 		Interpreter.init();
+		setWhatIsTracedWriterFile();
 		FileWriter file = null;
 		try {
 			file = new FileWriter("trace/logs/mytrace/all.log", true);
@@ -95,6 +97,17 @@ public class TraceTransformer implements ClassFileTransformer {
 			e.printStackTrace();
 		}
 		sourceWriter = new BufferedWriter(file, BUFFERSIZE);
+	}
+
+	private static void setWhatIsTracedWriterFile() {
+		FileWriter file = null;
+		String filename = "trace/logs/mytrace/traced.source.log";
+		try {
+			file = new FileWriter(filename, true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		whatIsTracedWriter = new BufferedWriter(file, BUFFERSIZE);
 	}
 
 	public void setTargetClassName(String s) {
@@ -148,6 +161,17 @@ public class TraceTransformer implements ClassFileTransformer {
 		return d4jMethodNames.contains(longname);
 	}
 
+	private void writeWhatIsTraced(String str) {
+		if (this.simpleLog)
+			return;
+		try {
+			whatIsTracedWriter.write(str);
+			whatIsTracedWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private byte[] transformBody(byte[] classfileBuffer) {
 		byte[] byteCode = classfileBuffer;
 		if (!this.simpleLog) {
@@ -158,10 +182,12 @@ public class TraceTransformer implements ClassFileTransformer {
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(targetClassName);
-
+			writeWhatIsTraced(this.targetClassName + "::");
 			for (CtBehavior m : cc.getDeclaredBehaviors()) {
+				writeWhatIsTraced(m.getName() + "#" + m.getSignature() + ",");
 				transformBehavior(m, cc);
 			}
+			writeWhatIsTraced("\n");
 			byteCode = cc.toBytecode();
 			cc.detach();
 

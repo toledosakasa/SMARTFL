@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import ppfl.instrumentation.TraceDomain;
+
 public class TraceChunk {
 
   private class MatchedPoint {
@@ -37,7 +39,7 @@ public class TraceChunk {
     this.traces.add(s);
   }
 
-  public void prune(Set<String> tracedClass) {
+  public void prune(Set<TraceDomain> TracedDomain) {
     // List<Integer> toadd = new ArrayList<>();
     for (int i = 0; i < traces.size(); i++) {
       ParseInfo parsed = new ParseInfo(traces.get(i));

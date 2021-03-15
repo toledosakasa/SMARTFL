@@ -48,10 +48,13 @@ public class GraphBuilder {
       e.printStackTrace();
     }
 
+    String whatIsTracedLog = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/traced.source.log", project, id);
+    pgraph.parseWhatIsTracedLog(whatIsTracedLog);
+
     if (relevantClasses != null) {
       for (String s : relevantClasses.split(";")) {
         if (!s.isEmpty()) {
-          pgraph.addTracedClass(s);
+          // pgraph.addTracedDomain(s);
           pgraph.parseD4jSource(project, id, s);
         }
       }

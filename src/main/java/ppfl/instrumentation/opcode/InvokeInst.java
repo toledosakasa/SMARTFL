@@ -71,7 +71,7 @@ public class InvokeInst extends OpcodeInst {
 		}
 
 		// mark untraced invokes
-		if (!graph.isTraced(traceclass)) {
+		if (!graph.isTraced(callDomain)) {
 			graph.untracedInvoke = graph.parseinfo;
 			graph.untracedStmt = stmt;
 			graph.untraceduse = usenodes;
@@ -92,7 +92,7 @@ public class InvokeInst extends OpcodeInst {
 		// }
 
 		// switch stack frame
-		if (graph.isTraced(traceclass))
+		if (graph.isTraced(callDomain))
 			graph.pushStackFrame(callDomain);
 
 		// static arguments starts with 0
