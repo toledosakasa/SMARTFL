@@ -14,6 +14,8 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 public class Instrumenter {
@@ -139,22 +141,33 @@ public class Instrumenter {
 					}
 				}
 
+				private boolean isVoidType(Type type) {
+					if (!type.isPrimitiveType())
+						return false;
+					return type.toString().equals("void");
+				}
+
+				private boolean isD4jTestMethod(MethodDeclaration node) {
+
+					List<ASTNode> l = node.modifiers();
+					for (ASTNode n : l) {
+						if (n.toString().startsWith("@Test")) {
+							return true;
+						}
+					}
+					boolean flag = false;
+					if (node.getName().toString().startsWith("test") && Modifier.isPublic(node.getModifiers())
+							&& node.parameters().isEmpty() && isVoidType(node.getReturnType2()))
+						flag = true;
+					return flag;
+				}
+
 				public boolean visit(MethodDeclaration node) {
 					if (node.isConstructor())//
 						return false;
 
-					boolean flag = true;
-					// if (node.getName().toString().startsWith("test"))
-					// flag = false;
-					List<ASTNode> l = node.modifiers();
-					for (ASTNode n : l) {
-						if (n.toString().startsWith("@Test")) {
-							flag = false;
-							break;
-						}
-					}
-
-					if (flag)
+					boolean flag = isD4jTestMethod(node);
+					if (!flag)
 						return false;
 
 					// An @test method. output it's name
