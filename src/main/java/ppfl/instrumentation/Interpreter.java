@@ -115,8 +115,6 @@ public class Interpreter {
 			map[i] = new LlogicInst(i);
 		}
 		map[132] = new IincInst(132);
-		// map[132].setPara(0, paratype.PARAVAR);
-		// map[132].setPara(1, paratype.PARACONST);
 		for (int i = 136; i <= 142; i += 3) {
 			map[i] = new IturntypeInst(i);
 		}
@@ -176,6 +174,8 @@ public class Interpreter {
 		map[191] = new AthrowInst(191);
 		map[192] = new CheckCastInst(192);
 		map[193] = new InstanceOfInst(193);
+		map[194] = new MonitorEnterInst(194);
+		map[195] = new MonitorExitInst(195);
 
 		map[197] = new MultiAnewArrayInst(197);
 		map[198] = new IfnullInst(198);
