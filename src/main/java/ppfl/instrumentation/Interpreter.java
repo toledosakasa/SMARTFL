@@ -80,7 +80,12 @@ public class Interpreter {
 		map[87] = new PopInst(87);
 		map[88] = new Pop2Inst(88);
 		map[89] = new DupInst(89);
+		map[90] = new Dup_x1Inst(90);
+		map[91] = new Dup_x2Inst(91);
 		map[92] = new Dup2Inst(92);
+		map[93] = new Dup2_x1Inst(93);
+		map[94] = new Dup2_x2Inst(94);
+		map[95] = new SwapInst(95);
 		for (int i = 96; i <= 112; i += 4) {
 			map[i] = new IarithInst(i);
 		}
@@ -155,8 +160,10 @@ public class Interpreter {
 		map[175] = new DreturnInst(175);
 		map[176] = new AreturnInst(176);
 		map[177] = new ReturnInst(177);
-		map[178] = new GetstaticInst(178);
-
+		map[178] = new GetStaticInst(178);
+		map[179] = new PutStaticInst(179);
+		map[180] = new GetFieldInst(180);
+		map[181] = new PutFieldInst(181);
 		map[182] = new InvokevirtualInst(182);
 		map[183] = new InvokespecialInst(183);
 		map[184] = new InvokestaticInst(184);

@@ -1,7 +1,10 @@
 package ppfl.instrumentation.opcode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +24,7 @@ import ppfl.instrumentation.CallBackIndex;
 public class OpcodeInst {
 	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 
-	int form;
+	public int form;
 	String opcode;
 
 	// buildtrace
@@ -135,6 +138,64 @@ public class OpcodeInst {
 		return ",calltype=" + calltype + ",callclass=" + callclass + ",callname=" + callname;
 	}
 
+	String getfieldinfo(CodeIterator ci, int index, ConstPool constp) {
+		int num = this.getu16bitpara(ci, index);
+		StringBuilder ret = new StringBuilder();
+		ret.append(",field=");
+		ret.append(constp.getFieldrefClassName(num));
+		ret.append(".");
+		ret.append(constp.getFieldrefName(num));
+		return ret.toString();
+	}
+
+	private static int getIntFromMap(Map<String, String> m, String key) {
+		String s = m.get(key);
+		if (s == null)
+			return -1;
+		m.remove(key);
+		return Integer.parseInt(s);
+	}
+
+	public String encode(String msg) {
+		String[] splt = msg.split(",");
+		Map<String, String> m = new HashMap<>();
+		for (String s : splt) {
+			String[] tmp = s.split("=");
+			m.put(tmp[0].trim(), tmp[1].trim());
+		}
+		StringBuilder sb = new StringBuilder("\n");
+		String op = m.get("opcode");
+		// if (op == null) {
+		// System.err.println(m.keySet());
+		// }
+		op = op.substring(0, op.indexOf('('));
+		m.remove("opcode");
+
+		int opc = Integer.parseInt(op);// 2
+		int popn = getIntFromMap(m, "popnum");// 1
+		int pushn = getIntFromMap(m, "pushnum");// 1
+		int load = getIntFromMap(m, "load");// 4
+		int store = getIntFromMap(m, "store");// 4
+		// TODO compress lineinfo
+		// String lineinfo[] = m.get("lineinfo").split("#");
+		// m.remove("lineinfo");
+		// int linenum = Integer.parseInt(lineinfo[2]);// 4
+		// int byteindex = Integer.parseInt(lineinfo[3]);// 4
+		int nextinst = getIntFromMap(m, "nextinst");// 4
+
+		int comp[] = { opc, popn, pushn, load, store, nextinst };
+		sb.append(opc);
+		for (int i = 1; i < comp.length; i++) {
+			sb.append(',');
+			sb.append(comp[i]);
+		}
+
+		for (Entry<String, String> k : m.entrySet()) {
+			sb.append(String.format(",%s=%s", k.getKey(), k.getValue()));
+		}
+		return sb.toString();
+	}
+
 	// temporary.
 	// extended class should override this method.
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
@@ -154,6 +215,7 @@ public class OpcodeInst {
 		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(6);
+			// inst = encode(inst);
 			int instindex = constp.addStringInfo(inst);
 			// System.out.println(constp.getStringInfo(instindex));
 
@@ -251,7 +313,7 @@ public class OpcodeInst {
 		if (this.doPush && info.getintvalue("pushnum") != null) {
 			int instpushnum = info.getintvalue("pushnum");
 			// push must not be more than 1
-			assert (instpushnum == 1);
+			assert (instpushnum <= 1);
 			defnode = graph.addNewStackNode(stmt);
 		}
 		if (this.doStore && info.getintvalue("store") != null) {

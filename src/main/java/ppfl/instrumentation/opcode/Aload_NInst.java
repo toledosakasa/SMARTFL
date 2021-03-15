@@ -3,6 +3,7 @@ package ppfl.instrumentation.opcode;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //42-45
@@ -13,6 +14,11 @@ public class Aload_NInst extends OpcodeInst {
 	public Aload_NInst(int _form, int _loadindex) {
 		super(_form, 1, 0);
 		loadindex = _loadindex;
+		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -23,11 +29,15 @@ public class Aload_NInst extends OpcodeInst {
 	}
 
 	@Override
-	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
-			throws BadBytecode {
+	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(cbi.tsindex_object, instpos + 1);
 	}
 
+	@Override
+	public void buildtrace(ByteCodeGraph graph) {
+		super.buildtrace(graph);
+		defnode.setAddress(graph.parseinfo.getAddressFromStack());
+	}
 }

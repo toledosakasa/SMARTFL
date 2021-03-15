@@ -4,14 +4,15 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
-//25
-public class AloadInst extends OpcodeInst {
+//95
+public class SwapInst extends OpcodeInst {
 
 	int loadindex;
 
-	public AloadInst(int _form) {
+	public SwapInst(int _form) {
 		super(_form, 1, 0);
 		this.doBuild = false;
 		this.doPop = false;
@@ -29,15 +30,22 @@ public class AloadInst extends OpcodeInst {
 
 	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
-		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
-		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.tsindex_object, instpos + 1);
+		// int instpos = ci.insertExGap(3);// the gap must be long enough for the
+		// following instrumentation
+		// ci.writeByte(184, instpos);// invokestatic
+		// ci.write16bit(cbi.tsindex_int, instpos + 1);
 	}
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
+		// build the stmtnode(common)
 		super.buildtrace(graph);
-		defnode.setAddress(graph.parseinfo.getAddressFromStack());
+
+		Node top = graph.getRuntimeStack().pop();
+		Node NextTop = graph.getRuntimeStack().pop();
+		assert (NextTop.getSize() == 1);
+		graph.getRuntimeStack().push(top);
+		graph.getRuntimeStack().push(NextTop);
 	}
 
 }
