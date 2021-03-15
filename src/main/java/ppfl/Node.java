@@ -173,10 +173,27 @@ public class Node {
 		}
 
 		double ratio = 1;
+		int countnan= 0;
 		for (Edge n : edges) {
+			double tmpratio = n.get_fton() / (1 - n.get_fton());
+			if(Double.isInfinite(tmpratio))
+				countnan++;
+			else if (tmpratio == 0.0)
+				countnan--;
 			ratio = ratio * n.get_fton() / (1 - n.get_fton());
 		}
 		double result = ratio / (ratio + 1);
+		if(Double.isNaN(result))
+		{
+			if(countnan>0)
+				result = 1;
+			else if (countnan<0)
+				result = 0;
+			else{
+				//System.out.println("0.5 error here");
+				result = 0.5;
+			}
+		}
 		double delta = result - this.p;
 		if (delta < 0)
 			delta = -delta;
@@ -186,7 +203,23 @@ public class Node {
 			double b = (1 - n.get_fton());
 			double a = n.get_fton();
 			// double tv1 = b/(b+a/result);
-			double tv1 = b / (b + a / ratio);
+			double tv1;
+			if(Double.isNaN(ratio)||Double.isInfinite(ratio))
+			{
+				if(countnan>0)
+					tv1 = 1;
+				else if (countnan<0)
+					tv1 = 0;
+				else{
+					tv1 = 1-b;
+				}
+			}
+			else if (Double.isNaN(a / ratio)||Double.isInfinite(a/ratio))
+				tv1 = 0;
+			else
+				tv1 = b / (b + a / ratio);
+			// if(Double.isNaN(tv1))
+			// 	System.out.println("here is bug nan + a/ratio = "+ a/ratio+ ", b = "+ b+ ", ratio = " + ratio);
 			n.set_ntof(tv1);
 		}
 		return delta > epsilon;
