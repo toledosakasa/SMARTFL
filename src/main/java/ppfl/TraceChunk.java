@@ -69,6 +69,7 @@ public class TraceChunk {
       // }
       // }
     }
+    this.traces.clear();
   }
 
   private MatchedPoint matchLastReturnOrCatch(int pos, ParseInfo toMatch, Set<String> tracedClass) {
