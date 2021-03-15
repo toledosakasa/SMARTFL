@@ -57,3 +57,5 @@ if __name__ == '__main__':
     if args[1] == 'clearcache':
         d4j.clearcache(args[2], args[3])
         d4j.cleanupcheckout(args[2], args[3])
+    if args[1] == 'rerun':
+        d4j.rerun(args[2], args[3])

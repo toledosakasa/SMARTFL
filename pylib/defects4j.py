@@ -91,6 +91,7 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
 
 def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
     print(f'parsing profile, length:{len(profile)}')
+    print('trigger tests is: ', trigger_tests)
     ret = []
     fail_coverage = set()
     curclass = ''
@@ -111,8 +112,11 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
             continue
         sp = testmethod.split('::')
         methods = sp[1].split(',')
+        # print(sp[0], sp[1])
         for method in methods:
-            testmethods_set.add((sp[0], method.strip()))
+            method = method.strip()
+            if method != '':
+                testmethods_set.add((sp[0], method))
     for line in profile:
         if line.strip() == '':
             continue
@@ -124,7 +128,6 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
             continue
         if curtrigger:
             fail_coverage.add((class_name, method_name))
-
     for line in profile:
         if line.strip() == '':
             continue
@@ -174,6 +177,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
         print('found')
     relevant_testmethods = resolve_profile(
         utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods)
+    # print(relevant_testmethods)
     print('writing profiling result...')
     json.dump(relevant_testmethods, utf8open_w(profile_result))
     return relevant_testmethods
@@ -266,6 +270,13 @@ def rund4j(proj: str, id: str):
         os.system(cdcmd + cmdline)
     time_end = time.time()
     print('d4j tracing complete after', time_end-time_start, 'sec')
+
+
+def rerun(proj: str, id: str):
+    clearcache(proj, id)
+    cleanupcheckout(proj, id)
+    os.system('mvn package -DskipTests')
+    rund4j(proj, id)
 
 
 def parse(proj: str, id: str):
