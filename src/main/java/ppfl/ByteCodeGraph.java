@@ -704,6 +704,13 @@ public class ByteCodeGraph {
 		this.initmaps();
 		for (TraceChunk tChunk : jTrace.traceList) {
 			this.cleanupOnChunkSwitch();
+			int tracelength = tChunk.parsedTraces.size();
+			System.out.println("parsing trace,length=" + tracelength + ":");
+			System.out.println("\t" + tChunk.fullname);
+			if (tracelength > 100000) {
+				System.out.println("Trace is too long, skipping");
+				continue;
+			}
 			boolean testpass = tChunk.testpass;
 			this.testname = tChunk.getTestName();
 			boolean debugswitch = false;
