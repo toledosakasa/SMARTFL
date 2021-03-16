@@ -293,7 +293,7 @@ public class ByteCodeGraph {
 		viewgraph.setAutoCreate(true);
 		viewgraph.setAttribute("layout.quality", 4);
 		viewgraph.setAttribute("layout.force");
-		shouldview = true;
+		shouldview = false;
 		String styleSheet = "node {" +
 		// " text-background-mode: rounded-box;"+
 				"	text-alignment: at-right;" + "	text-offset: 5px, 0px;" + "	text-style: italic;" + "	size: 15px, 15px;" + "}"
