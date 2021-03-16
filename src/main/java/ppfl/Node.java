@@ -30,7 +30,7 @@ public class Node {
 
 	// Heap
 	private boolean isHeapObject = false;
-	private int address = 0;
+	private Integer address = 0;
 
 	public Node(String name) {
 		this.obs = false;
@@ -94,13 +94,16 @@ public class Node {
 		this.isHeapObject = true;
 	}
 
-	public void setAddress(int add) {
+	public void setAddress(Integer add) {
 		this.address = add;
 	}
 
 	public int getAddress() {
 		if (!isHeapObject)
 			return 0;
+		if (address == null) {
+			return 0;
+		}
 		return address;
 	}
 

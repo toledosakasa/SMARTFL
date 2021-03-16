@@ -717,6 +717,8 @@ public class ByteCodeGraph {
 			if (untracedInvoke.matchReturn(pInfo, true)) {
 				if (pInfo.isReturnMsg) {
 					// normally returned
+					if (debugswitch)
+						System.out.println("normally returned");
 					String desc = this.untracedInvoke.getvalue("calltype");
 					if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 						Node defnode = this.addNewStackNode(this.untracedStmt);
@@ -725,6 +727,8 @@ public class ByteCodeGraph {
 					this.untracedInvoke = null;
 					return;
 				} else {
+					if (debugswitch)
+						System.out.println("normally catched");
 					// catched
 					Node exceptDef = addNewExceptionNode();
 					buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
@@ -733,6 +737,10 @@ public class ByteCodeGraph {
 			} else {
 				// check if the control flow had already been thrown upward
 				if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
+					if (debugswitch) {
+						System.out.println("thrown");
+						pInfo.debugprint();
+					}
 					TraceDomain curDomain = pInfo.domain;
 					TraceDomain frameDomain = this.getFrame().domain;
 					while (!curDomain.equals(frameDomain)) {
@@ -742,6 +750,9 @@ public class ByteCodeGraph {
 					Node exceptDef = addNewExceptionNode();
 					buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
 					this.untracedInvoke = null;
+				} else {
+					// is inside untraced call. should skip
+					return;
 				}
 			}
 		}
@@ -813,6 +824,7 @@ public class ByteCodeGraph {
 				System.out.println("parse trace crashed");
 				System.out.println("Test name is: " + tChunk.fullname);
 				pInfo.debugprint();
+				// System.exit(0);
 				throw (e);
 			}
 		}
@@ -835,6 +847,7 @@ public class ByteCodeGraph {
 			} catch (Exception e) {
 				System.err.println("parse " + tChunk.fullname + " failed");
 				e.printStackTrace();
+				// throw (e);
 			}
 		}
 	}
