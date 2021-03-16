@@ -78,6 +78,13 @@ public class Instrumenter {
 		return null;
 	}
 
+	private static String getRawName(String filepath) {
+		String[] splt = filepath.split("/");
+		String filename = splt[splt.length - 1];
+		assert (filename.endsWith(".java"));
+		return filename.substring(0, filename.length() - 5);
+	}
+
 	public static void main(String args[]) {
 
 		boolean verboset = false;
@@ -134,7 +141,9 @@ public class Instrumenter {
 						return true;
 					if (node.isInterface())
 						return false;
-					else {
+					if (!ClassName.equals(getRawName(FilePath))) {
+						return false;
+					} else {
 						String printMSG = String.format("%s.%s::", PackageName, ClassName);
 						outputBuilder.append(printMSG);
 						return true;
@@ -144,6 +153,7 @@ public class Instrumenter {
 				private boolean isVoidType(Type type) {
 					if (!type.isPrimitiveType())
 						return false;
+					// System.out.println(type.toString());
 					return type.toString().equals("void");
 				}
 
