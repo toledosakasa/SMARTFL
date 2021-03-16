@@ -150,6 +150,9 @@ public class ParseInfo {
 			tracemap.put(infotype, infovalue);
 		}
 		String[] lineinfos = this.getvalue("lineinfo").split("#");
+		if (lineinfos.length < 3) {
+			System.out.println(trace);
+		}
 		// this.traceclass = lineinfos[0];
 		// this.tracemethod = lineinfos[1];
 		// this.signature = this.getvalue("sig");

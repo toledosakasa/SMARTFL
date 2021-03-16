@@ -42,7 +42,13 @@ public class TraceChunk {
   public void prune(Set<TraceDomain> TracedDomain) {
     // List<Integer> toadd = new ArrayList<>();
     for (int i = 0; i < traces.size(); i++) {
-      ParseInfo parsed = new ParseInfo(traces.get(i));
+      ParseInfo parsed = null;
+      try {
+        parsed = new ParseInfo(traces.get(i));
+      } catch (Exception e) {
+        System.out.println(this.fullname + " " + i);
+        throw (e);
+      }
       parsedTraces.add(parsed);
       // // remove normal return msg.
       // if (parsed.isReturnMsg) {

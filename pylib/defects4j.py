@@ -128,6 +128,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
             continue
         if curtrigger:
             fail_coverage.add((class_name, method_name))
+            # print(fail_coverage)
     for line in profile:
         if line.strip() == '':
             continue

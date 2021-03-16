@@ -700,125 +700,141 @@ public class ByteCodeGraph {
 
 	public void pruneAndParse(String tracefilename) {
 		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
-		jTrace.parseFile(tracefilename);
+		try {
+			jTrace.parseFile(tracefilename);
+		} catch (Exception e) {
+			System.err.println("parse failed.");
+		}
 		parseJoinedTracePruned(jTrace);
+	}
+
+	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch) {
+		this.parseinfo = pInfo;
+		String instname = this.parseinfo.getvalue("lineinfo");
+
+		// solve current untraced invoke
+		if (this.untracedInvoke != null) {
+			if (untracedInvoke.matchReturn(pInfo, true)) {
+				if (pInfo.isReturnMsg) {
+					// normally returned
+					String desc = this.untracedInvoke.getvalue("calltype");
+					if (!OpcodeInst.isVoidMethodByDesc(desc)) {
+						Node defnode = this.addNewStackNode(this.untracedStmt);
+						buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
+					}
+					this.untracedInvoke = null;
+					return;
+				} else {
+					// catched
+					Node exceptDef = addNewExceptionNode();
+					buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
+					this.untracedInvoke = null;
+				}
+			} else {
+				// check if the control flow had already been thrown upward
+				if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
+					TraceDomain curDomain = pInfo.domain;
+					TraceDomain frameDomain = this.getFrame().domain;
+					while (!curDomain.equals(frameDomain)) {
+						this.stackframe.pop();
+						frameDomain = this.getFrame().domain;
+					}
+					Node exceptDef = addNewExceptionNode();
+					buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
+					this.untracedInvoke = null;
+				}
+			}
+		}
+
+		// solve current throw.
+		if (this.unsolvedThrow != null) {
+			if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
+				TraceDomain curDomain = pInfo.domain;
+				TraceDomain frameDomain = this.getFrame().domain;
+				while (!curDomain.equals(frameDomain)) {
+					this.stackframe.pop();
+					frameDomain = this.getFrame().domain;
+				}
+				Node exceptDef = addNewExceptionNode();
+				buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
+				this.unsolvedThrow = null;
+			} else {
+				// should not happen
+				// maybe quit on crash.
+				// System.out.println("Athrow is not catched!");
+				// pInfo.debugprint();
+			}
+		}
+		// untraced invoke has been resolved.
+		// skip @ret message.
+		if (this.parseinfo.isReturnMsg) {
+			return;
+		}
+
+		// Debug use
+		// System.out.println(instname);
+
+		killPredStack(instname);
+		if (predataflowmap.get(instname).size() > 1) {
+			// System.out.println("add set" + branch_stores.get(instname));
+			Set<Integer> stores = branch_stores.get(instname);
+			// if (stores != null)
+			store_stack.push(stores);
+		}
+		Interpreter.map[this.parseinfo.form].buildtrace(this);
+
+		// if (pInfo.linenumber == 342 && pInfo.byteindex == 12) {
+		// debugswitch = true;
+		// }
+		// debug runtime stacks
+		if (debugswitch) {
+			pInfo.debugprint();
+			debugStack(this.stackframe);
+		}
+	}
+
+	private void parseChunk(TraceChunk tChunk) {
+		this.cleanupOnChunkSwitch();
+		int tracelength = tChunk.parsedTraces.size();
+		System.out.println("parsing trace,length=" + tracelength + ":");
+		System.out.println("\t" + tChunk.fullname);
+		if (tracelength > 100000) {
+			System.out.println("Trace is too long, skipping");
+			return;
+		}
+		boolean testpass = tChunk.testpass;
+		this.testname = tChunk.getTestName();
+		boolean debugswitch = false;
+		for (ParseInfo pInfo : tChunk.parsedTraces) {
+			try {
+				parseSingleTrace(pInfo, debugswitch);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("parse trace crashed");
+				System.out.println("Test name is: " + tChunk.fullname);
+				pInfo.debugprint();
+				throw (e);
+			}
+		}
+		// after all lines are parsed, auto-assign oracle for the last defined var
+		// with test state(pass = true,fail = false)
+		if (auto_oracle) {
+			for (Node i : lastDefinedVar) {
+				i.observe(testpass);
+				graphLogger.info("Observe {} as {}", i.name, testpass);
+			}
+		}
 	}
 
 	public void parseJoinedTracePruned(JoinedTrace jTrace) {
 		this.predstack.clear();
 		this.initmaps();
 		for (TraceChunk tChunk : jTrace.traceList) {
-			this.cleanupOnChunkSwitch();
-			int tracelength = tChunk.parsedTraces.size();
-			System.out.println("parsing trace,length=" + tracelength + ":");
-			System.out.println("\t" + tChunk.fullname);
-			if (tracelength > 100000) {
-				System.out.println("Trace is too long, skipping");
-				continue;
-			}
-			boolean testpass = tChunk.testpass;
-			this.testname = tChunk.getTestName();
-			boolean debugswitch = false;
-			for (ParseInfo pInfo : tChunk.parsedTraces) {
-				try {
-					this.parseinfo = pInfo;
-					String instname = this.parseinfo.getvalue("lineinfo");
-
-					// solve current untraced invoke
-					if (this.untracedInvoke != null) {
-						if (untracedInvoke.matchReturn(pInfo, true)) {
-							if (pInfo.isReturnMsg) {
-								// normally returned
-								String desc = this.untracedInvoke.getvalue("calltype");
-								if (!OpcodeInst.isVoidMethodByDesc(desc)) {
-									Node defnode = this.addNewStackNode(this.untracedStmt);
-									buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
-								}
-								this.untracedInvoke = null;
-								continue;
-							} else {
-								// catched
-								Node exceptDef = addNewExceptionNode();
-								buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
-								this.untracedInvoke = null;
-							}
-						} else {
-							// check if the control flow had already been thrown upward
-							if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
-								TraceDomain curDomain = pInfo.domain;
-								TraceDomain frameDomain = this.getFrame().domain;
-								while (!curDomain.equals(frameDomain)) {
-									this.stackframe.pop();
-									frameDomain = this.getFrame().domain;
-								}
-								Node exceptDef = addNewExceptionNode();
-								buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
-								this.untracedInvoke = null;
-							}
-						}
-					}
-
-					// solve current throw.
-					if (this.unsolvedThrow != null) {
-						if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
-							TraceDomain curDomain = pInfo.domain;
-							TraceDomain frameDomain = this.getFrame().domain;
-							while (!curDomain.equals(frameDomain)) {
-								this.stackframe.pop();
-								frameDomain = this.getFrame().domain;
-							}
-							Node exceptDef = addNewExceptionNode();
-							buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
-							this.unsolvedThrow = null;
-						} else {
-							// should not happen
-							// maybe quit on crash.
-							// System.out.println("Athrow is not catched!");
-							// pInfo.debugprint();
-						}
-					}
-					// untraced invoke has been resolved.
-					// skip @ret message.
-					if (this.parseinfo.isReturnMsg) {
-						continue;
-					}
-
-					// Debug use
-					// System.out.println(instname);
-
-					killPredStack(instname);
-					if (predataflowmap.get(instname).size() > 1) {
-						// System.out.println("add set" + branch_stores.get(instname));
-						Set<Integer> stores = branch_stores.get(instname);
-						// if (stores != null)
-						store_stack.push(stores);
-					}
-					Interpreter.map[this.parseinfo.form].buildtrace(this);
-
-					// if (pInfo.linenumber == 342 && pInfo.byteindex == 12) {
-					// debugswitch = true;
-					// }
-					// debug runtime stacks
-					if (debugswitch) {
-						pInfo.debugprint();
-						debugStack(this.stackframe);
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("parse trace crashed");
-					System.out.println("Test name is: " + tChunk.fullname);
-					pInfo.debugprint();
-					throw (e);
-				}
-			}
-			// after all lines are parsed, auto-assign oracle for the last defined var
-			// with test state(pass = true,fail = false)
-			if (auto_oracle) {
-				for (Node i : lastDefinedVar) {
-					i.observe(testpass);
-					graphLogger.info("Observe {} as {}", i.name, testpass);
-				}
+			try {
+				parseChunk(tChunk);
+			} catch (Exception e) {
+				System.err.println("parse " + tChunk.fullname + " failed");
+				e.printStackTrace();
 			}
 		}
 	}

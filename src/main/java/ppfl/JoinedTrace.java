@@ -52,7 +52,14 @@ public class JoinedTrace {
     try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
       String t = null;
       String delimiterPrefix = "###";
+      int i = 0;
       while ((t = reader.readLine()) != null) {
+        // System.out.println(t.length());
+        ++i;
+        // if (t.endsWith("AggregateTrans")) {
+        // System.out.println(i);
+        // System.out.println(t);
+        // }
         if (t.isEmpty()) {
           continue;
         }
@@ -76,7 +83,12 @@ public class JoinedTrace {
     // prune
     for (TraceChunk chunk : this.traceList) {
       // System.out.println("Pruning " + chunk.fullname);
-      chunk.prune(this.tracedDomain);
+      try {
+        chunk.prune(this.tracedDomain);
+      } catch (Exception e) {
+        System.err.println("prune at " + chunk.fullname + " failed");
+        this.traceList.remove(chunk);
+      }
     }
 
   }
