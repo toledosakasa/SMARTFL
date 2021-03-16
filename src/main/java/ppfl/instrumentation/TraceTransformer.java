@@ -182,16 +182,17 @@ public class TraceTransformer implements ClassFileTransformer {
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(targetClassName);
+			writeWhatIsTraced("\n");
 			writeWhatIsTraced(this.targetClassName + "::");
 			for (CtBehavior m : cc.getDeclaredBehaviors()) {
 				writeWhatIsTraced(m.getName() + "#" + m.getSignature() + ",");
 				transformBehavior(m, cc);
 			}
-			writeWhatIsTraced("\n");
 			byteCode = cc.toBytecode();
 			cc.detach();
 
-		} catch (NotFoundException | CannotCompileException | IOException | BadBytecode e) {
+		} catch (Exception e) {
+			System.out.println(e);
 			debugLogger.error("[Bug]bytecode error", e);
 		}
 		return byteCode;

@@ -356,12 +356,17 @@ public class ByteCodeGraph {
 		try (BufferedReader reader = new BufferedReader(new FileReader(logfilename))) {
 			String t;
 			while ((t = reader.readLine()) != null) {
+				if (t.isEmpty())
+					continue;
 				String[] splt = t.split("::");
 				String traceclass = splt[0];
 				splt = splt[1].split(",");
 				for (String methodAndDesc : splt) {
 					splt = methodAndDesc.split("#");
 					String tracemethod = splt[0];
+					if (splt.length < 2) {
+						System.out.println(t);
+					}
 					String signature = splt[1];
 					TraceDomain tDomain = new TraceDomain(traceclass, tracemethod, signature);
 					tracedDomain.add(tDomain);
