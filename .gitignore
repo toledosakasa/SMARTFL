@@ -9,3 +9,4 @@ target/
 /.vscode/
 /result/
 *.pyc
+trace/runtimelog/
