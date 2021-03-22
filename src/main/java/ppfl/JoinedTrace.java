@@ -25,7 +25,8 @@ public class JoinedTrace {
   }
 
   private void addSingleTrace(String trace) {
-    traceList.get(traceList.size() - 1).add(trace);
+    if (!traceList.isEmpty())
+      traceList.get(traceList.size() - 1).add(trace);
   }
 
   private boolean isD4jTestMethod(String longname) {

@@ -703,6 +703,7 @@ public class ByteCodeGraph {
 		try {
 			jTrace.parseFile(tracefilename);
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.err.println("parse failed.");
 		}
 		parseJoinedTracePruned(jTrace);
