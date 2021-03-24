@@ -9,11 +9,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 public class InstrumentationAgent {
-	private static Logger debugLogger = LoggerFactory.getLogger(InstrumentationAgent.class);
+	// private static Logger debugLogger =
+	// LoggerFactory.getLogger(InstrumentationAgent.class);
 	private static String logFile = null;
 	private static String[] className = null;
 	private static List<String> classNames = null;
@@ -37,7 +38,7 @@ public class InstrumentationAgent {
 	private static synchronized void main(String agentArgs, Instrumentation inst) {
 		if (agentArgs == null || agentArgs.equals(""))
 			return;
-		debugLogger.info("[Agent] In main method");
+		// debugLogger.info("[Agent] In main method");
 		for (String s : agentArgs.split(",")) {
 			if (s.startsWith("instrumentingclass=")) {
 				className = s.split("=")[1].split(":");
@@ -81,7 +82,7 @@ public class InstrumentationAgent {
 	}
 
 	private static void transformClass(Instrumentation instrumentation) {
-		debugLogger.info("[Agent] In transformClass method");
+		// debugLogger.info("[Agent] In transformClass method");
 		Class<?> targetCls = null;
 		ClassLoader targetClassLoader = null;
 		if (d4jdatafile != null) {
@@ -123,13 +124,13 @@ public class InstrumentationAgent {
 		for (String classname : className) {
 			// see if we can get the class using forName
 			try {
-				debugLogger.info("className:{}", classname);
+				// debugLogger.info("className:{}", classname);
 				targetCls = Class.forName(classname);
 				targetClassLoader = targetCls.getClassLoader();
 				transform(targetCls, targetClassLoader, instrumentation);
 				continue;
 			} catch (Exception ex) {
-				debugLogger.error("Class [{}] not found with Class.forName", classname);
+				// debugLogger.error("Class [{}] not found with Class.forName", classname);
 			}
 			// otherwise iterate all loaded classes and find what we want
 			for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {

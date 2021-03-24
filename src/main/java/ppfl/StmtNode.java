@@ -35,38 +35,38 @@ public class StmtNode extends Node {
 	}
 
 	@Override
-	public void print(Logger lgr, String prefix) {
+	public void print(MyWriter lgr, String prefix) {
 		if (this.obs) {
-			lgr.info("{}{}(Statement) observed = {}", prefix, this.name, this.obsvalue);
+			lgr.writeln("%s%s(Statement) observed = %b", prefix, this.name, this.obsvalue);
 		} else {
-			lgr.info("{}{}(Statement)", prefix, this.name);
+			lgr.writeln("%s%s(Statement)", prefix, this.name);
 		}
 	}
 
 	@Override
-	public void print(Logger lgr) {
+	public void print(MyWriter lgr) {
 		if (this.obs) {
-			lgr.info("{}(Statement) observed = {}", this.name, this.obsvalue);
+			lgr.writeln("%s(Statement) observed = %b", this.name, this.obsvalue);
 		} else {
-			lgr.info("{}(Statement)", this.name);
+			lgr.writeln("%s(Statement)", this.name);
 		}
 	}
 
 	@Override
 	public void print(String prefix) {
 		if (this.obs) {
-			printLogger.info("{}{}(Statement) observed = {}", prefix, this.name, this.obsvalue);
+			printLogger.writeln("%s%s(Statement) observed = %b", prefix, this.name, this.obsvalue);
 		} else {
-			printLogger.info("{}{}(Statement)", prefix, this.name);
+			printLogger.writeln("%s%s(Statement)", prefix, this.name);
 		}
 	}
 
 	@Override
 	public void print() {
 		if (this.obs) {
-			printLogger.info("{}(Statement) observed = {}", this.name, this.obsvalue);
+			printLogger.writeln("%s(Statement) observed = %b", this.name, this.obsvalue);
 		} else {
-			printLogger.info("{}(Statement)", this.name);
+			printLogger.writeln("%s(Statement)", this.name);
 		}
 	}
 

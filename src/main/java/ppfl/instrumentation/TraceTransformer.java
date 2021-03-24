@@ -14,11 +14,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
+// import org.slf4j.MDC;
 
-import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -31,19 +30,23 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.ExceptionTable;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.Mnemonic;
+import ppfl.MyWriter;
+import ppfl.WriterUtils;
 import ppfl.instrumentation.opcode.InvokeInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
-	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
 	// The logger name
 	public static final String TRACELOGGERNAME = "PPFL_LOGGER";
 	public static final String SOURCELOGGERNAME = "PPFL_LOGGER_SOURCE";
-	public static final Logger traceLogger = LoggerFactory.getLogger(TRACELOGGERNAME);
-	public static final Logger sourceLogger = LoggerFactory.getLogger(SOURCELOGGERNAME);
+	// public static final Logger traceLogger =
+	// LoggerFactory.getLogger(TRACELOGGERNAME);
+	// public static final Logger sourceLogger =
+	// LoggerFactory.getLogger(SOURCELOGGERNAME);
 	private static final int BUFFERSIZE = 1 << 20;
 	private static BufferedWriter sourceWriter = null;
 	private static BufferedWriter traceWriter = null;
@@ -134,9 +137,9 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	public void setLogFile(String s) {
-		String logFile = null;
-		logFile = s.replace('\\', '.').replace('/', '.');
-		MDC.put("logfile", logFile);
+		// String logFile = null;
+		// logFile = s.replace('\\', '.').replace('/', '.');
+		// MDC.put("logfile", logFile);
 	}
 
 	public void setD4jDataFile(String filepath) {
@@ -178,7 +181,9 @@ public class TraceTransformer implements ClassFileTransformer {
 			this.setLogger(this.targetClassName);
 			setSourceFile(this.targetClassName);
 		}
-		debugLogger.info("[Agent] Transforming class {}", this.targetClassName);
+		// debugLogger.write(String.format("[Agent] Transforming class %s",
+		// this.targetClassName));
+
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(targetClassName);
@@ -193,14 +198,14 @@ public class TraceTransformer implements ClassFileTransformer {
 
 		} catch (Exception e) {
 			System.out.println(e);
-			debugLogger.error("[Bug]bytecode error", e);
+			// debugLogger.error("[Bug]bytecode error", e);
 		}
 		return byteCode;
 	}
 
 	private void transformBehavior(CtBehavior m, CtClass cc) throws NotFoundException, BadBytecode {
 		// hello in console
-		debugLogger.info("[Agent] Transforming method {}", m.getName());
+		// debugLogger.info("[Agent] Transforming method {}", m.getName());
 
 		if (!(m instanceof CtMethod)) {
 			return;
@@ -275,8 +280,9 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			// insert bytecode right before this inst.
 			// print basic information of this instruction
-			if (logSourceToScreen)
-				sourceLogger.info(instinfo);
+			// if (logSourceToScreen)
+			// sourceLogger.info(instinfo);
+
 			try {
 				sourceWriter.write(instinfo);
 			} catch (IOException e) {
@@ -315,14 +321,14 @@ public class TraceTransformer implements ClassFileTransformer {
 			// return transformBody(loader, className, classBeingRedefined,
 			// protectionDomain, classfileBuffer);
 		} catch (Exception e) {
-			debugLogger.error("[Bug]Exception", e);
+			// debugLogger.error("[Bug]Exception", e);
 			e.printStackTrace();
 			return null;
 		}
 	}
 
 	private void setLogger(String clazzname) {
-		MDC.put("sourcefile", clazzname);
+		// MDC.put("sourcefile", clazzname);
 	}
 
 	private String getInstMap(CodeIterator ci, int index, ConstPool constp) {
@@ -331,7 +337,8 @@ public class TraceTransformer implements ClassFileTransformer {
 		String opc = Mnemonic.OPCODE[op];
 		OpcodeInst oi = Interpreter.map[op];
 		if (oi == null) {
-			debugLogger.warn("unsupported opcode: {}", opc);
+			debugLogger.write("unsupported opcode: ");
+			debugLogger.write(opc + "\n");
 			return "";
 		}
 		inst = oi.getinst(ci, index, constp);

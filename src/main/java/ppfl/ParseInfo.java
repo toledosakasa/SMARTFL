@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import ppfl.instrumentation.TraceDomain;
 
 public class ParseInfo {
 
-	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
 
 	Map<String, String> tracemap;
 	public TraceDomain domain;
@@ -195,7 +195,7 @@ public class ParseInfo {
 
 	public void print() {
 		for (Map.Entry<String, String> s : tracemap.entrySet()) {
-			debugLogger.info(s + "=" + s.getValue());
+			debugLogger.writeln(s + "=" + s.getValue());
 		}
 	}
 }

@@ -2,13 +2,13 @@ package ppfl;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Node {
 
-	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
-	protected static Logger printLogger = debugLogger;
+	// private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	// protected static Logger printLogger = debugLogger;
+	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
+	protected static MyWriter printLogger = debugLogger;
 
 	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from
 	// inference procedure.
@@ -228,55 +228,56 @@ public class Node {
 		return p;
 	}
 
-	public static void setLogger(Logger lgr) {
-		printLogger = lgr;
+	public static void setLogger(MyWriter lgr) {
+		// printLogger = lgr;
 	}
 
-	public void print(Logger lgr, String prefix) {
+	public void print(MyWriter lgr, String prefix) {
 		if (this.obs) {
-			lgr.info("{}{} observed = {}", prefix, this.getPrintName(), this.obsvalue);
+			lgr.writeln("%s%s observed = %b", prefix, this.getPrintName(), this.obsvalue);
 		} else {
-			lgr.info("{}{}", prefix, this.getPrintName());
+			lgr.writeln("%s%s", prefix, this.getPrintName());
 		}
 	}
 
 	public void print(String prefix) {
 		if (this.obs) {
-			printLogger.info("{}{} observed = {}", prefix, this.getPrintName(), this.obsvalue);
+			printLogger.writeln("%s%s observed = %b", prefix, this.getPrintName(), this.obsvalue);
 		} else {
-			printLogger.info("{}{}", prefix, this.getPrintName());
+			printLogger.writeln("%s%s", prefix, this.getPrintName());
 		}
 	}
 
-	public void print(Logger lgr) {
+	public void print(MyWriter lgr) {
 		if (this.obs) {
-			lgr.info("{} observed = {}", this.getPrintName(), this.obsvalue);
+			lgr.writeln("%s observed = %b", this.getPrintName(), this.obsvalue);
+			// lgr.info("{} observed = {}", this.getPrintName(), this.obsvalue);
 		} else {
-			lgr.info(this.getPrintName());
+			lgr.writeln(this.getPrintName());
 		}
 	}
 
 	public void print() {
 		if (this.obs) {
-			printLogger.info("{} observed = {}", this.getPrintName(), this.obsvalue);
+			printLogger.writeln("%s observed = %b", this.getPrintName(), this.obsvalue);
 		} else {
-			printLogger.info(this.getPrintName());
+			printLogger.writeln(this.getPrintName());
 		}
 	}
 
 	public void printprob() {
 		if (this.obs) {
-			printLogger.info("{}obs prob = {}", this.getPrintName(), (this.obsvalue ? 1.0 : 0.0));
+			printLogger.writeln("%sobs prob = %s", this.getPrintName(), (this.obsvalue ? 1.0 : 0.0));
 		} else
-			printLogger.info("{} prob = {}", this.getPrintName(), getprob());
+			printLogger.writeln("%s prob = %f", this.getPrintName(), getprob());
 	}
 
 	public void bpPrintProb() {
-		printLogger.info("{} prob_bp = {}", this.getPrintName(), bp_getprob());
+		printLogger.writeln("%s prob_bp = %f", this.getPrintName(), bp_getprob());
 	}
 
-	public void bpPrintProb(Logger lgr) {
-		lgr.info("{} prob_bp = {}", this.getPrintName(), bp_getprob());
+	public void bpPrintProb(MyWriter lgr) {
+		lgr.writeln("%s prob_bp = %lf", this.getPrintName(), bp_getprob());
 	}
 
 }

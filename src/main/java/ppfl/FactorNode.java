@@ -3,13 +3,13 @@ package ppfl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 public class FactorNode {
 
-	protected static Logger debugLogger = LoggerFactory.getLogger("Debugger");
-	protected static Logger printLogger = LoggerFactory.getLogger("GraphLogger");
+	protected static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
+	protected static MyWriter printLogger = WriterUtils.getWriter("GraphLogger");
 
 	private List<Node> preds;
 	private Node def;
@@ -32,13 +32,13 @@ public class FactorNode {
 	private List<Edge> pedges;
 	private List<Edge> uedges;
 
-    public FactorNode(){
-        this.stmt = null;
-        this.def = null;
+	public FactorNode() {
+		this.stmt = null;
+		this.def = null;
 		this.dedge = null;
-    }
+	}
 
-	//factor with only a stmt node
+	// factor with only a stmt node
 	public FactorNode(Node stmt, Edge sedge, double value) {
 		this.stmt = stmt;
 		this.def = null;
@@ -49,7 +49,7 @@ public class FactorNode {
 		this.stmtvalue = value;
 		this.alledges = new ArrayList<>();
 		alledges.add(sedge);
-		tensor.add(1-value);
+		tensor.add(1 - value);
 		tensor.add(value);
 	}
 
@@ -234,63 +234,61 @@ public class FactorNode {
 		return MEDIUM;
 	}
 
-	public void print(Logger lgr) {
+	public void print(MyWriter lgr) {
 
 		stmt.print(lgr, "Statement: ");
-		if(def != null){
-			lgr.info("\tdef:");
+		if (def != null) {
+			lgr.writeln("\tdef:");
 			def.print(lgr, "\t\t");
-		}
-		else{
-			lgr.info("\tstmtvalue = "+this.stmtvalue);
+		} else {
+			lgr.writeln("\tstmtvalue = " + this.stmtvalue);
 		}
 
 		if (uses != null) {
-			lgr.info("\tuses:");
+			lgr.writeln("\tuses:");
 			for (Node n : uses) {
 				n.print(lgr, "\t\t");
 			}
 		}
 		if (preds != null) {
-			lgr.info("\tpreds:");
+			lgr.writeln("\tpreds:");
 			for (Node n : preds) {
 				n.print(lgr, "\t\t");
 			}
 		}
 		if (ops != null) {
-			lgr.info("\tops:");
+			lgr.writeln("\tops:");
 			for (String eachop : ops) {
-				lgr.info("\t\t{}", eachop);
+				lgr.writeln("\t\t{}", eachop);
 			}
 		}
 	}
 
 	public void print() {
 		stmt.print("Statement: ");
-		if(def != null){
-			debugLogger.info("\tdef:");
+		if (def != null) {
+			debugLogger.writeln("\tdef:");
 			def.print("\t\t");
-		}
-		else{
-			debugLogger.info("\tstmtvalue = "+this.stmtvalue);
+		} else {
+			debugLogger.writeln("\tstmtvalue = " + this.stmtvalue);
 		}
 
 		if (uses != null) {
-			debugLogger.info("\tuses:");
+			debugLogger.writeln("\tuses:");
 			for (Node n : uses) {
 				n.print("\t\t");
 			}
 		}
 		if (preds != null) {
-			debugLogger.info("\tpreds:");
+			debugLogger.writeln("\tpreds:");
 			for (Node n : preds) {
 				n.print("\t\t");
 			}
 		}
 		if (ops != null) {
-			debugLogger.info("\tops:");
+			debugLogger.writeln("\tops:");
 			for (String eachop : ops) {
-				debugLogger.info("\t\t{}", eachop);
+				debugLogger.writeln("\t\t{}", eachop);
 			}
 		}
 	}

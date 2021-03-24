@@ -16,12 +16,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.graphstream.graph.implementations.SingleGraph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
+// import org.slf4j.MDC;
 
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
@@ -30,17 +29,19 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class ByteCodeGraph {
 
-	private Logger graphLogger = LoggerFactory.getLogger("Debugger");
-	private Logger resultLogger = LoggerFactory.getLogger("Debugger");
+	private MyWriter graphLogger = WriterUtils.getWriter("Debugger");
+	private MyWriter resultLogger = WriterUtils.getWriter("Debugger");
 
 	public void setGraphLogger(String graphfile) {
-		MDC.put("graphfile", graphfile);
-		graphLogger = LoggerFactory.getLogger("GraphLogger");
+		// MDC.put("graphfile", graphfile);
+		WriterUtils.setPath("trace/logs/mytrace/");
+		graphLogger = WriterUtils.getWriter(graphfile);
 	}
 
 	public void setResultLogger(String resultfile) {
-		MDC.put("resultfile", resultfile);
-		resultLogger = LoggerFactory.getLogger("ResultLogger");
+		// MDC.put("resultfile", resultfile);
+		WriterUtils.setPath("trace/logs/mytrace/");
+		resultLogger = WriterUtils.getWriter(resultfile);
 	}
 
 	private static Set<TraceDomain> tracedDomain = new HashSet<>();
@@ -834,7 +835,7 @@ public class ByteCodeGraph {
 		if (auto_oracle) {
 			for (Node i : lastDefinedVar) {
 				i.observe(testpass);
-				graphLogger.info("Observe {} as {}", i.name, testpass);
+				graphLogger.writeln("Observe %s as %b", i.name, testpass);
 			}
 		}
 	}
@@ -906,7 +907,7 @@ public class ByteCodeGraph {
 					if (auto_oracle) {
 						for (Node i : lastDefinedVar) {
 							i.observe(testpass);
-							graphLogger.info("Observe {} as {}", i.name, testpass);
+							graphLogger.writeln("Observe %s as %b", i.name, testpass);
 						}
 					}
 					return t;
@@ -940,7 +941,7 @@ public class ByteCodeGraph {
 		if (auto_oracle) {
 			for (Node i : lastDefinedVar) {
 				i.observe(testpass);
-				graphLogger.info("Observe {} as {}", i.name, testpass);
+				graphLogger.writeln("Observe %s as %b", i.name, testpass);
 			}
 		}
 		return null;
@@ -978,7 +979,7 @@ public class ByteCodeGraph {
 			if (auto_oracle) {
 				for (Node i : lastDefinedVar) {
 					i.observe(testpass);
-					graphLogger.info("Observe {} as {}", i.name, testpass);
+					graphLogger.writeln("Observe %s as %b", i.name, testpass);
 				}
 			}
 		} catch (IOException e) {
@@ -1266,8 +1267,8 @@ public class ByteCodeGraph {
 
 	private String getVarName(String name, Map<String, Integer> map) {
 		if (!map.containsKey(name)) {
-			graphLogger.info("varmap does not contains {}", name);
-			graphLogger.info("map entries are {}", map);
+			graphLogger.writeln("varmap does not contains %s", name);
+			graphLogger.writeln("map entries are %s", map);
 		}
 		return getVarName(name, map.get(name));
 	}
@@ -1510,7 +1511,7 @@ public class ByteCodeGraph {
 		path_reduce();
 		boolean outreduced = true;
 		if (outreduced) {
-			graphLogger.info("\nReduced Nodes: ");
+			graphLogger.writeln("\nReduced Nodes: ");
 			for (Node n : stmts) {
 				if (n.getreduced())
 					n.print(graphLogger);
@@ -1519,7 +1520,7 @@ public class ByteCodeGraph {
 				if (n.getreduced())
 					n.print(graphLogger);
 			}
-			graphLogger.info("\n");
+			graphLogger.writeln("\n");
 		}
 
 		for (int i = 0; i < bp_times; i++) {
@@ -1536,7 +1537,7 @@ public class ByteCodeGraph {
 					isend = false;
 			}
 			if (isend) {
-				graphLogger.info("\n\n{}\n\n", i);
+				graphLogger.writeln("\n\n%d\n\n", i);
 				break;
 			}
 		}
@@ -1557,38 +1558,38 @@ public class ByteCodeGraph {
 	}
 
 	public void printgraph() {
-		graphLogger.info("\nNodes: stmt={},node={}", stmts.size(), nodes.size());
+		graphLogger.writeln("\nNodes: stmt=%d,node=%d", stmts.size(), nodes.size());
 		for (Node n : stmts) {
 			n.print(graphLogger);
 		}
 		for (Node n : nodes) {
 			n.print(graphLogger);
 		}
-		graphLogger.info("Factors: {}", factornodes.size());
+		graphLogger.writeln("Factors: %d", factornodes.size());
 		for (FactorNode n : factornodes) {
 			n.print(graphLogger);
 		}
 	}
 
 	public void printprobs() {
-		graphLogger.info("\nProbabilities: ");
-		graphLogger.info("Vars:{}", nodes.size());
+		graphLogger.writeln("\nProbabilities: ");
+		graphLogger.writeln("Vars:%d", nodes.size());
 		for (Node n : nodes) {
 			n.printprob();
 		}
-		graphLogger.info("Stmts:{}", stmts.size());
+		graphLogger.writeln("Stmts:%d", stmts.size());
 		for (StmtNode n : stmts) {
 			n.printprob();
 		}
 	}
 
 	public void bp_printprobs() {
-		graphLogger.info("\nProbabilities: ");
-		graphLogger.info("Vars:{}", nodes.size());
+		graphLogger.writeln("\nProbabilities: ");
+		graphLogger.writeln("Vars:%d", nodes.size());
 		for (Node n : nodes) {
 			n.bpPrintProb();
 		}
-		graphLogger.info("Stmts:{}", stmts.size());
+		graphLogger.writeln("Stmts:%d", stmts.size());
 		for (StmtNode n : stmts) {
 			n.bpPrintProb();
 		}
@@ -1601,8 +1602,8 @@ public class ByteCodeGraph {
 
 	public void check_bp(boolean verbose) {
 		long bptime = this.bp_inference();
-		resultLogger.info("\nProbabilities: ");
-		resultLogger.info("Vars:{}", nodes.size());
+		resultLogger.writeln("\nProbabilities: ");
+		resultLogger.writeln("Vars:%d", nodes.size());
 		// Node.setLogger(resultLogger);
 
 		int cnt = 0;
@@ -1614,11 +1615,11 @@ public class ByteCodeGraph {
 			}
 			n.bpPrintProb();
 		}
-		resultLogger.info("Stmts:{}", stmts.size());
+		resultLogger.writeln("Stmts:%d", stmts.size());
 		for (StmtNode n : stmts) {
 			n.bpPrintProb(resultLogger);
 		}
-		resultLogger.info("Belief propagation time : {}s", bptime / 1000.0);
+		resultLogger.writeln("Belief propagation time : %fs", bptime / 1000.0);
 	}
 
 	public double check_bp_with_bf(boolean verbose) {
@@ -1629,8 +1630,8 @@ public class ByteCodeGraph {
 		long bftime = this.bf_inference();
 		long bptime = this.bp_inference();
 		if (verbose) {
-			graphLogger.info("\nProbabilities: ");
-			graphLogger.info("Vars:{}", nodes.size());
+			graphLogger.writeln("\nProbabilities: ");
+			graphLogger.writeln("Vars:%d", nodes.size());
 		}
 		for (Node n : nodes) {
 			if (verbose) {
@@ -1647,7 +1648,7 @@ public class ByteCodeGraph {
 			}
 		}
 		if (verbose)
-			graphLogger.info("Stmts:{}", stmts.size());
+			graphLogger.writeln("Stmts:{}", stmts.size());
 		for (StmtNode n : stmts) {
 			if (verbose) {
 				n.printprob();
@@ -1662,10 +1663,10 @@ public class ByteCodeGraph {
 			}
 		}
 		if (verbose) {
-			graphLogger.info("Var max relative difference:{} at {}", maxdiff, diffname);
-			graphLogger.info("Stmt max relative difference:{} at {}", maxdiffstmt, diffnamestmt);
-			graphLogger.info("Brute force time : {}s", bftime / 1000.0);
-			graphLogger.info("Belief propagation time : {}s", bptime / 1000.0);
+			graphLogger.writeln("Var max relative difference:%f at %s", maxdiff, diffname);
+			graphLogger.writeln("Stmt max relative difference:%f at %s", maxdiffstmt, diffnamestmt);
+			graphLogger.writeln("Brute force time : %fs", bftime / 1000.0);
+			graphLogger.writeln("Belief propagation time : %fs", bptime / 1000.0);
 		}
 
 		return maxdiff;
@@ -1679,19 +1680,19 @@ public class ByteCodeGraph {
 		for (Node n : nodes) {
 			if (n.getName().equals(name)) {
 				valid = true;
-				graphLogger.info("Node observed as {}", v);
+				graphLogger.writeln("Node observed as %b", v);
 				n.observe(v);
 			}
 		}
 		for (Node n : stmts) {
 			if (n.getName().equals(s)) {
 				valid = true;
-				graphLogger.info("Stmt observed as {}", v);
+				graphLogger.writeln("Stmt observed as %b", v);
 				n.observe(v);
 			}
 		}
 		if (!valid) {
-			graphLogger.info("Invalid Observe");
+			graphLogger.writeln("Invalid Observe");
 		}
 	}
 

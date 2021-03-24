@@ -8,22 +8,25 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
 import ppfl.ByteCodeGraph;
+import ppfl.MyWriter;
 import ppfl.Node;
 import ppfl.ParseInfo;
 import ppfl.StmtNode;
+import ppfl.WriterUtils;
 import ppfl.instrumentation.CallBackIndex;
 import ppfl.instrumentation.TraceDomain;
 
 public class OpcodeInst {
-	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	private static MyWriter debugWriter = WriterUtils.getWriter("Debugger");
+	// private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 
 	public int form;
 	String opcode;
@@ -292,7 +295,7 @@ public class OpcodeInst {
 		if (graph.auto_oracle) {
 			if (tDomain.tracemethod.contentEquals(graph.testname)) {
 				stmt.observe(true);
-				debugLogger.info("Observe {} as true", stmt.getName());
+				debugWriter.write(String.format("Observe %s as true", stmt.getName()));
 			}
 		}
 
