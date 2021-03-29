@@ -16,7 +16,6 @@ public class WriterUtils {
   public static boolean running = true;
 
   public static Thread cleanup() {
-
     return new Thread() {
       @Override
       public void run() {

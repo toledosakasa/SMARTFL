@@ -111,6 +111,8 @@ public class GraphBuilder {
     // pgraph.printgraph();
     pgraph.check_bp(true);
     System.out.println("BP finished");
+
+    // shutdownhook not working when using exec:java.
     WriterUtils.cleanup().run();
   }
 }
