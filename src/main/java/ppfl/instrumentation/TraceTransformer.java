@@ -2,6 +2,7 @@ package ppfl.instrumentation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import javassist.bytecode.ExceptionTable;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.Mnemonic;
 import ppfl.MyWriter;
+import ppfl.ProfileUtils;
 import ppfl.WriterUtils;
 import ppfl.instrumentation.opcode.InvokeInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
@@ -65,6 +67,9 @@ public class TraceTransformer implements ClassFileTransformer {
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
+
+		File logdir = new File("trace/logs/mytrace/");
+		logdir.mkdirs();
 		Interpreter.init();
 		setWhatIsTracedWriterFile();
 		FileWriter file = null;
@@ -143,17 +148,33 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	public void setD4jDataFile(String filepath) {
+		// System.out.println(filepath);
 		useD4jTest = true;
-		String methodstring = "methods.tests.all=";
+		String methodstring = "methods.test.all=";
 		try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
-			String s = reader.readLine();
-			if (s.startsWith(methodstring)) {
-				String[] methodnames = s.substring(methodstring.length()).split(";");
-				Collections.addAll(d4jMethodNames, methodnames);
+			String s = null;
+			while ((s = reader.readLine()) != null) {
+				if (!s.startsWith(methodstring))
+					continue;
+				String[] classandmethods = s.substring(methodstring.length()).split(";");
+				// Collections.addAll(d4jMethodNames, methodnames);
+				for (String tmp : classandmethods) {
+					if (!tmp.isEmpty()) {
+						String[] splt = tmp.split("::");
+						if (splt.length < 2)
+							continue;
+						String[] methodsname = splt[1].split(",");
+						for (String methodname : methodsname) {
+							d4jMethodNames.add(splt[0] + "::" + methodname);
+						}
+					}
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		// System.out.println(d4jMethodNames.size());
+		ProfileUtils.setD4jMethods(d4jMethodNames);
 	}
 
 	private boolean isD4jTestMethod(CtClass cc, CtBehavior m) {
@@ -223,16 +244,27 @@ public class TraceTransformer implements ClassFileTransformer {
 		if (!this.simpleLog)
 			instrumentByteCode(m, cc, mi, ca, constp, cbi);
 		// log method name at the beginning of this method.
-		CodeIterator ci = ca.iterator();
-		String longname = String.format("%n###%s::%s", cc.getName(), m.getName());
-		int instpos = ci.insertGap(6);
-		int instindex = constp.addStringInfo(longname);
+		if (!this.simpleLog) {
+			CodeIterator ci = ca.iterator();
+			String longname = String.format("%n###%s::%s", cc.getName(), m.getName());
+			int instpos = ci.insertGap(6);
+			int instindex = constp.addStringInfo(longname);
 
-		ci.writeByte(19, instpos);// ldc_w
-		ci.write16bit(instindex, instpos + 1);
+			ci.writeByte(19, instpos);// ldc_w
+			ci.write16bit(instindex, instpos + 1);
 
-		ci.writeByte(184, instpos + 3);// invokestatic
-		ci.write16bit(cbi.logstringindex, instpos + 4);
+			ci.writeByte(184, instpos + 3);// invokestatic
+			ci.write16bit(cbi.logstringindex, instpos + 4);
+		}
+		if (this.simpleLog) {
+			ProfileUtils.init(constp, traceWriter);
+			CodeIterator ci = ca.iterator();
+			String longname = String.format("%s::%s", cc.getName(), m.getName());
+
+			ProfileUtils.logMethodName(ci, longname, constp);
+
+		}
+
 		// not sure if this is necessary.
 		ca.computeMaxStack();
 		// flushing buffer
