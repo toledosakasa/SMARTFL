@@ -277,7 +277,7 @@ public class Node {
 	}
 
 	public void bpPrintProb(MyWriter lgr) {
-		lgr.writeln("%s prob_bp = %lf", this.getPrintName(), bp_getprob());
+		lgr.writeln("%s prob_bp = %f", this.getPrintName(), bp_getprob());
 	}
 
 }
