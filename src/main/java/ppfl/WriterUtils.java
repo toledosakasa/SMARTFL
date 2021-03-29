@@ -13,17 +13,26 @@ public class WriterUtils {
   public static Map<String, MyWriter> wMap = new HashMap<>();
   static final int BUFFERSIZE = 1048576;
   static String path = null;
+  public static boolean running = true;
 
-  private WriterUtils() {
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+  public static Thread cleanup() {
+
+    return new Thread() {
       @Override
       public void run() {
-        for (Entry<String, MyWriter> entry : wMap.entrySet())
+        if (!running)
+          return;
+        running = false;
+        for (Entry<String, MyWriter> entry : wMap.entrySet()) {
           entry.getValue().flush();
-        // closing the stream may trigger double-close bug.
-        // TraceTransformer.traceWriter.close();
+          entry.getValue().close();
+        }
       }
-    });
+    };
+  }
+
+  private WriterUtils() {
+    Runtime.getRuntime().addShutdownHook(cleanup());
   }
 
   public static void setPath(String newPath) {
@@ -42,9 +51,7 @@ public class WriterUtils {
     if (!name.endsWith(".log"))
       name = name + ".log";
     if (!wMap.containsKey(name)) {
-
       File file = new File(path, name);
-
       BufferedWriter bWriter = null;
       try {
         if (!file.exists()) {

@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import ppfl.ByteCodeGraph;
-import ppfl.JoinedTrace;
+import ppfl.WriterUtils;
 
 public class GraphBuilder {
 
@@ -95,6 +95,9 @@ public class GraphBuilder {
   }
 
   public static void main(String args[]) {
+
+    // Runtime.getRuntime().addShutdownHook(WriterUtils.cleanup());
+
     ByteCodeGraph pgraph = new ByteCodeGraph();
 
     pgraph.setAutoOracle(true);
@@ -105,8 +108,9 @@ public class GraphBuilder {
       setupD4jProject(pgraph, "Lang", 7);
     }
     // pgraph.initD4jProject();
-    pgraph.printgraph();
+    // pgraph.printgraph();
     pgraph.check_bp(true);
     System.out.println("BP finished");
+    WriterUtils.cleanup().run();
   }
 }

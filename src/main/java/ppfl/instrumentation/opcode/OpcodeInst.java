@@ -295,7 +295,7 @@ public class OpcodeInst {
 		if (graph.auto_oracle) {
 			if (tDomain.tracemethod.contentEquals(graph.testname)) {
 				stmt.observe(true);
-				debugWriter.write(String.format("Observe %s as true", stmt.getName()));
+				// debugWriter.writeln(String.format("Observe %s as true", stmt.getName()));
 			}
 		}
 

@@ -32,6 +32,8 @@ public class ByteCodeGraph {
 	private MyWriter graphLogger = WriterUtils.getWriter("Debugger");
 	private MyWriter resultLogger = WriterUtils.getWriter("Debugger");
 
+	private boolean debug_logger_switch = false;
+
 	public void setGraphLogger(String graphfile) {
 		// MDC.put("graphfile", graphfile);
 		WriterUtils.setPath("trace/logs/mytrace/");
@@ -835,7 +837,8 @@ public class ByteCodeGraph {
 		if (auto_oracle) {
 			for (Node i : lastDefinedVar) {
 				i.observe(testpass);
-				graphLogger.writeln("Observe %s as %b", i.name, testpass);
+				if (debug_logger_switch)
+					graphLogger.writeln("Observe %s as %b", i.name, testpass);
 			}
 		}
 	}
@@ -907,7 +910,8 @@ public class ByteCodeGraph {
 					if (auto_oracle) {
 						for (Node i : lastDefinedVar) {
 							i.observe(testpass);
-							graphLogger.writeln("Observe %s as %b", i.name, testpass);
+							if (debug_logger_switch)
+								graphLogger.writeln("Observe %s as %b", i.name, testpass);
 						}
 					}
 					return t;
@@ -979,7 +983,8 @@ public class ByteCodeGraph {
 			if (auto_oracle) {
 				for (Node i : lastDefinedVar) {
 					i.observe(testpass);
-					graphLogger.writeln("Observe %s as %b", i.name, testpass);
+					if (debug_logger_switch)
+						graphLogger.writeln("Observe %s as %b", i.name, testpass);
 				}
 			}
 		} catch (IOException e) {
@@ -1266,7 +1271,7 @@ public class ByteCodeGraph {
 	}
 
 	private String getVarName(String name, Map<String, Integer> map) {
-		if (!map.containsKey(name)) {
+		if (!map.containsKey(name) && debug_logger_switch) {
 			graphLogger.writeln("varmap does not contains %s", name);
 			graphLogger.writeln("map entries are %s", map);
 		}
@@ -1510,7 +1515,7 @@ public class ByteCodeGraph {
 		long startTime = System.currentTimeMillis();
 		path_reduce();
 		boolean outreduced = true;
-		if (outreduced) {
+		if (outreduced && debug_logger_switch) {
 			graphLogger.writeln("\nReduced Nodes: ");
 			for (Node n : stmts) {
 				if (n.getreduced())
@@ -1537,7 +1542,8 @@ public class ByteCodeGraph {
 					isend = false;
 			}
 			if (isend) {
-				graphLogger.writeln("\n\n%d\n\n", i);
+				if (debug_logger_switch)
+					graphLogger.writeln("\n\n%d\n\n", i);
 				break;
 			}
 		}
@@ -1620,6 +1626,7 @@ public class ByteCodeGraph {
 			n.bpPrintProb(resultLogger);
 		}
 		resultLogger.writeln("Belief propagation time : %fs", bptime / 1000.0);
+		// resultLogger.flush();
 	}
 
 	public double check_bp_with_bf(boolean verbose) {
