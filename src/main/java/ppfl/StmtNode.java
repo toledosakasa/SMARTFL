@@ -3,8 +3,6 @@ package ppfl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 public class StmtNode extends Node {
 	private boolean isUnexe = false;
 	private Map<Integer, StmtNode> unexeStmtMap = new HashMap<>();
