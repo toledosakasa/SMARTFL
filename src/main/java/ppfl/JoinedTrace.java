@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -82,8 +83,9 @@ public class JoinedTrace {
       e.printStackTrace();
     }
     // prune
-    for (TraceChunk chunk : this.traceList) {
-      // System.out.println("Pruning " + chunk.fullname);
+    Iterator<TraceChunk> it = this.traceList.iterator();
+    while (it.hasNext()) {
+      TraceChunk chunk = it.next();
       try {
         chunk.prune(this.tracedDomain);
       } catch (Exception e) {
