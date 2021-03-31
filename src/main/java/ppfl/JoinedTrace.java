@@ -90,7 +90,8 @@ public class JoinedTrace {
         chunk.prune(this.tracedDomain);
       } catch (Exception e) {
         System.err.println("prune at " + chunk.fullname + " failed");
-        this.traceList.remove(chunk);
+        it.remove();
+        // this.traceList.remove(chunk);
       }
     }
 
