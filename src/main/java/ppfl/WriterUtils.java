@@ -47,6 +47,10 @@ public class WriterUtils {
   // }
 
   public static MyWriter getWriter(String name) {
+    return getWriter(name, false);
+  }
+
+  public static MyWriter getWriter(String name, boolean append) {
     if (!name.endsWith(".log"))
       name = name + ".log";
     if (!wMap.containsKey(name)) {
@@ -56,7 +60,7 @@ public class WriterUtils {
         if (!file.exists()) {
           file.createNewFile();
         }
-        bWriter = new BufferedWriter(new FileWriter(file, true), BUFFERSIZE);
+        bWriter = new BufferedWriter(new FileWriter(file, append), BUFFERSIZE);
       } catch (IOException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
