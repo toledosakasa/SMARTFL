@@ -15,7 +15,7 @@ public class CallBackIndex {
 	 *
 	 */
 	private static final String PRINT_CALLBACK_NAME = "printTopStack1";
-	private static final int BUFFERSIZE = 1048576;
+	private static final int BUFFERSIZE = 1024;
 	// use the logger set by TraceTransformer
 	public int logstringindex;
 	public int tsindex_int;

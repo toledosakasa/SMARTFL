@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 public class WriterUtils {
   private static WriterUtils instance = new WriterUtils();
   public static Map<String, MyWriter> wMap = new HashMap<>();
-  static final int BUFFERSIZE = 1048576;
+  static final int BUFFERSIZE = 1024;
   static String path = null;
   public static boolean running = true;
 
