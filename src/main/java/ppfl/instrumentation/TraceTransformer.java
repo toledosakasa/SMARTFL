@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
@@ -51,7 +52,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	// LoggerFactory.getLogger(SOURCELOGGERNAME);
 	private static final int BUFFERSIZE = 1 << 20;
 	private static BufferedWriter sourceWriter = null;
-	private static BufferedWriter traceWriter = null;
+	private static Writer traceWriter = null;
 	private static BufferedWriter whatIsTracedWriter = null;
 	/** The internal form class name of the class to transform */
 	private String targetClassName;
@@ -78,7 +79,8 @@ public class TraceTransformer implements ClassFileTransformer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		traceWriter = new BufferedWriter(file, BUFFERSIZE);
+		traceWriter = file;
+		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
@@ -129,11 +131,12 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static void setSimpleLogFile() {
 		FileWriter file = null;
 		try {
-			file = new FileWriter("trace/logs/mytrace/profile.log", false);
+			file = new FileWriter("trace/logs/mytrace/profile.log", true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		traceWriter = new BufferedWriter(file, BUFFERSIZE);
+		traceWriter = file;
+		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
 	}
 
 	public void setSimpleLog(boolean b) {

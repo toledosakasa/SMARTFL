@@ -3,6 +3,7 @@ package ppfl.instrumentation;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -31,7 +32,7 @@ public class CallBackIndex {
 	public int tsindex_object;
 
 	// logger
-	private static BufferedWriter writer = null;
+	private static Writer writer = null;
 
 	public int getLdcCallBack(Object o) {
 		// decide v's type using instanceof
@@ -57,7 +58,7 @@ public class CallBackIndex {
 			return tsindex_object;
 	}
 
-	public CallBackIndex(ConstPool constp, BufferedWriter writer) throws NotFoundException {
+	public CallBackIndex(ConstPool constp, Writer writer) throws NotFoundException {
 		// FileWriter file = null;
 		// try {
 		// file = new FileWriter("trace/logs/mytrace/all.log");
