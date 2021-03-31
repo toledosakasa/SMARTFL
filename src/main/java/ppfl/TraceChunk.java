@@ -47,6 +47,7 @@ public class TraceChunk {
         parsed = new ParseInfo(traces.get(i));
       } catch (Exception e) {
         System.out.println(this.fullname + " " + i);
+        System.out.println(traces.get(i));
         throw (e);
       }
       parsedTraces.add(parsed);
