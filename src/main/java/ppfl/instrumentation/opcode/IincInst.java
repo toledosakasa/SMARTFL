@@ -45,4 +45,13 @@ public class IincInst extends OpcodeInst {
 		return ret.toString();
 	}
 
+	@Override
+	public String getinst_wide(CodeIterator ci, int index, ConstPool constp) {
+		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		int incVar = getu16bitpara(ci, index);
+		ret.append(",store=" + incVar);
+		ret.append(",CONST=" + getu16bitpara(ci, index + 2));
+		return ret.toString();
+	}
+
 }

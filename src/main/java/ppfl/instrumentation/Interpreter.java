@@ -176,7 +176,7 @@ public class Interpreter {
 		map[193] = new InstanceOfInst(193);
 		map[194] = new MonitorEnterInst(194);
 		map[195] = new MonitorExitInst(195);
-
+		map[196] = new WideInst(196);
 		map[197] = new MultiAnewArrayInst(197);
 		map[198] = new IfnullInst(198);
 		map[199] = new IfnonnullInst(199);

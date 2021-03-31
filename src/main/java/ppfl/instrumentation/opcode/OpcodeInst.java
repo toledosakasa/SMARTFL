@@ -223,6 +223,11 @@ public class OpcodeInst {
 		return ret.toString();
 	}
 
+	// extended class should override this method. (wide index)
+	public String getinst_wide(CodeIterator ci, int index, ConstPool constp) {
+		return getinst(ci, index, constp);
+	}
+
 	// there's no need to override this.
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
 			throws BadBytecode {
@@ -299,6 +304,11 @@ public class OpcodeInst {
 			}
 		}
 
+	}
+
+	// override needed.
+	public void buildtrace_wide(ByteCodeGraph graph) {
+		buildtrace(graph);
 	}
 
 	// override needed.
