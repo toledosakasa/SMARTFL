@@ -63,13 +63,24 @@ public class ProfileUtils {
   }
 
   public static void logMethodName_inst(String str) {
+    // if (str.contains("setUp")) {
+    // StackTraceElement stack[] = Thread.currentThread().getStackTrace();
+    // for (int i = 0; i < stack.length; i++) {
+    // System.out.print("\t" + stack[i].getClassName() + "#" +
+    // stack[i].getMethodName());
+    // }
+    // }
+
+    // FIXME deal with junit setUp method.
     if (isD4jTestMethod(str)) {
       profileCnt = new HashSet<>();
+      // System.out.println(str);
     }
-    if (profileCnt == null || profileCnt.contains(str)) {
+    if (profileCnt != null && profileCnt.contains(str)) {
       return;
     }
-    profileCnt.add(str);
+    if (profileCnt != null)
+      profileCnt.add(str);
     try {
       writer.write("\n###" + str);
     } catch (IOException e) {

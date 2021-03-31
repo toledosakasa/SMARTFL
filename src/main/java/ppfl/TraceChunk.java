@@ -39,6 +39,10 @@ public class TraceChunk {
     this.traces.add(s);
   }
 
+  public void addSetUp(List<String> s) {
+    this.traces.addAll(s);
+  }
+
   public void prune(Set<TraceDomain> TracedDomain) {
     // List<Integer> toadd = new ArrayList<>();
     for (int i = 0; i < traces.size(); i++) {

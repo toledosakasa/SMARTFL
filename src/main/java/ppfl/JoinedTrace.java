@@ -19,13 +19,23 @@ public class JoinedTrace {
 
   public List<TraceChunk> traceList;
 
+  private List<String> setUpTraces = null;
+
   private void addTraceChunk(String fullname) {
     TraceChunk toadd = new TraceChunk(fullname);
     toadd.testpass = getD4jTestState(fullname);
     traceList.add(toadd);
+    if (setUpTraces != null) {
+      toadd.addSetUp(setUpTraces);
+      setUpTraces = null;
+    }
   }
 
   private void addSingleTrace(String trace) {
+    if (setUpTraces != null) {
+      setUpTraces.add(trace);
+      return;
+    }
     if (!traceList.isEmpty())
       traceList.get(traceList.size() - 1).add(trace);
   }
@@ -34,6 +44,15 @@ public class JoinedTrace {
     // String longname = className + "::" + methodName;
     // System.out.println(longname);
     return d4jMethodNames.contains(longname);
+  }
+
+  private boolean isSetUp(String longname) {
+    return longname.endsWith("::setUp");
+  }
+
+  private void addSetUp(String t) {
+    this.setUpTraces = new ArrayList<>();
+    // this.setUpTraces.add(t);
   }
 
   private boolean getD4jTestState(String fullname) {
@@ -69,6 +88,9 @@ public class JoinedTrace {
           // System.out.println(t);
           t = t.substring(delimiterPrefix.length());
           // String[] splt = t.split("::");
+          if (isSetUp(t)) {
+            this.addSetUp(t);
+          }
           if (isD4jTestMethod(t)) {
             this.addTraceChunk(t);
           }
