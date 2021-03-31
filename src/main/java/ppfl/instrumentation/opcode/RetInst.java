@@ -19,7 +19,7 @@ public class RetInst extends OpcodeInst {
 	// FIXME: the operand is unused.
 	@Override
 	public String getinst_wide(CodeIterator ci, int index, ConstPool constp) {
-		return getinst(ci, index, constp)
+		return getinst(ci, index, constp);
 	}
 
 }
