@@ -17,10 +17,10 @@ public class FactorNode {
 	private List<Node> uses;
 	private List<String> ops;// TODO consider operators
 	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==", "!=" };
-	private double HIGH = 1 - 1e-10;
+	private double HIGH = 1; // can change to 1-1e-10
 	private double VHIGH = 0.99999;
 	private double MEDIUM = 0.5;
-	private double LOW = 1e-10;
+	private double LOW = 0; // can change to 1e-10
 	private List<Double> tensor;
 	private List<Node> allnodes;
 	private List<Edge> alledges;
@@ -107,7 +107,7 @@ public class FactorNode {
 		for (int i = 0; i < nnodes; i++) {
 			tmpvlist.add(alledges.get(i).get_ntof());
 		}
-
+		// System.out.println("tmplist = "+tmpvlist);
 		for (int j = 0; j < nnodes; j++) {
 			double v0 = 0;
 			double v1 = 0;
@@ -133,21 +133,51 @@ public class FactorNode {
 							continue;
 
 						if (bit0 == 0)
+						{
+							// double tmp00 = tmp0* (1 - tmpvlist.get(mm));
+							// if(Double.isNaN(tmp00))
+							// 	System.out.println("in 0 , tmp0 = "+tmp0+", val = "+(1 - tmpvlist.get(mm)));
 							tmp0 *= (1 - tmpvlist.get(mm));
+
+						}
 						else
+						{
+							// double tmp01 = tmp0* tmpvlist.get(mm);
+							// if(Double.isNaN(tmp01))
+							// 	System.out.println("in 1 , tmp0 = "+tmp0+", val = "+tmpvlist.get(mm));
 							tmp0 *= tmpvlist.get(mm);
+						}
 
 						if (bit1 == 0)
+						{
+							// double tmp10 = tmp1* (1 - tmpvlist.get(mm));
+							// if(Double.isNaN(tmp10))
+							// 	System.out.println("in 0 , tmp1 = "+tmp1+", val = "+(1 - tmpvlist.get(mm)));
 							tmp1 *= (1 - tmpvlist.get(mm));
+
+						}
 						else
+						{
+							// double tmp11 = tmp1*tmpvlist.get(mm);
+							// if(Double.isNaN(tmp11))
+							// 	System.out.println("in 0 , tmp1 = "+tmp1+", val = "+tmpvlist.get(mm));
 							tmp1 *= tmpvlist.get(mm);
+						}
 					}
 
 					v0 += tmp0;
 					v1 += tmp1;
 				}
 			}
-			alledges.get(j).set_fton(v1 / (v1 + v0));
+			// if(v1 + v0 == 0.0){
+			// 	System.out.println("one 0 detected");
+			// 	alledges.get(j).set_fton(0.0);
+			// }
+			// else
+			// if(Double.isNaN(v1 / (v1 + v0))){
+			// 	System.out.println("find nan , v1 = "+v1+", v0 = "+v0);
+			// }
+				alledges.get(j).set_fton(v1 / (v1 + v0));
 		}
 	}
 

@@ -13,7 +13,7 @@ public class MultiTest {
 	public int foo(int n) {
         int cnt = 1;
         // int res = 0;
-        int a0=0;
+        int a0=n-2;
         int a1=0;
         int a2=0;
         int a3=0;
@@ -44,7 +44,7 @@ public class MultiTest {
         int a28=0;
         int a29=0;
         for(;cnt<n;cnt++){ //<=n
-            a0++;
+            // a0++;
             a1+=a0;
             a2+=a1;
             a3+=a2;
@@ -73,6 +73,9 @@ public class MultiTest {
             a26+=a25;
             a27+=a26;
             a28+=a27;
+            if(cnt == 5){
+                a29+=10; //error
+            }
             a29+=a28;
         }
         return a29;
@@ -80,12 +83,12 @@ public class MultiTest {
 
 	@Test
 	void pass() {
-		assertEquals(foo(0), 0);
+		assertEquals(foo(2), 0);
     }
     
     @Test
 	void fail() {
-		assertEquals(foo(2), 0);
+		assertEquals(foo(10), 0);
 	}
 
 }
