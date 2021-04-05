@@ -59,3 +59,8 @@ if __name__ == '__main__':
         d4j.cleanupcheckout(args[2], args[3])
     if args[1] == 'rerun':
         d4j.rerun(args[2], args[3])
+    if args[1] == 'eval':
+        if(len(args) == 3):
+            d4j.evalproj(args[2])
+        if(len(args) == 4):
+            d4j.eval(args[2], args[3])

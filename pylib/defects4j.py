@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Set
 import json
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
+project_bug_nums = {"Lang": 65}
 
 
 def utf8open(filename):
@@ -323,3 +324,59 @@ def parse(proj: str, id: str):
 def fl(proj: str, id: str):
     rund4j(proj, id)
     parse(proj, id)
+
+
+def evalproj(proj: str):
+    no_oracle = 0
+    no_result = 0
+    not_listed = 0
+    top = []
+    for i in range(11):
+        top.append(0)
+    allbugs = project_bug_nums[proj]
+    for i in range(1, allbugs+1):
+        result = eval(proj, str(i))
+        if(result > 0 and result <= 10):
+            for j in range(result, 11):
+                top[j] += 1
+    print(f'top1={top[1]},top3={top[3]},top10={top[10]}')
+
+
+def eval(proj: str, id: str):
+    try:
+        oraclefile = utf8open(f'oracle/ActualFaultStatement/{proj}/{id}')
+    except IOError:
+        return -1
+    oracle_lines = set()
+    for line in oraclefile.readlines():
+        sp = line.split('||')
+        for oracle in sp:
+            oracle_lines.add(oracle.strip())
+    try:
+        resultfile = utf8open(
+            f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+    except IOError:
+        return -2
+    i = 0
+    ret = -3
+    lastline = ''
+    for line in resultfile.readlines():
+        if(line.strip() == '' or line.startswith('Probabilities:') or line.startswith('Vars:') or line.startswith('Stmts:') or line.startswith('Belief propagation time')):
+            continue
+        sp = line.split(':')
+        if(sp.__len__() < 3):
+            print(line)
+        classname = sp[0]
+        methodname = sp[1]
+        sp = sp[2].split('#')
+        linenumber = sp[1]
+        fullname = f'{classname}.{methodname}:{linenumber}'
+        if fullname == lastline:
+            continue
+        i += 1
+        if fullname in oracle_lines:
+            ret = i
+            break
+        lastline = fullname
+    print(f'result ranking is: {ret}')
+    return ret
