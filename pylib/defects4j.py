@@ -91,32 +91,47 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
 
 def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
     print(f'parsing profile, length:{len(profile)}')
-    print('trigger tests is: ', trigger_tests)
-    ret = []
+    print('trigger tests are: ', trigger_tests)
+    relevant = []
+    relevant_cnt = {}
+
+    # currelevant = False
+    trigger_tests_set, trigger_tests_map = parse_trigger_tests(trigger_tests)
+    testmethods_set = parse_test_methods(testmethods)
+    fail_coverage = get_fail_coverage(
+        profile, trigger_tests_set, testmethods_set)
+    for line in profile:
+        if line.strip() == '':
+            continue
+        class_name, method_name, is_trigger, is_test = parseprofile(
+            line, trigger_tests_set, testmethods_set)
+        if is_test:
+            curclass, curmethod = class_name, method_name
+            # currelevant = False
+            continue
+        # if currelevant:
+        #     continue
+        # relevant
+        if (class_name, method_name) in fail_coverage:
+            curtest = (curclass, curmethod)
+            relevant.append(curtest)
+            if curclass in relevant_cnt:
+                methodmap = relevant_cnt[curclass]
+                if curmethod in methodmap:
+                    methodmap[curmethod] += 1
+                else:
+                    methodmap[curmethod] = 1
+            else:
+                relevant_cnt[curtest] = {curmethod: 1}
+            # currelevant = True
+    # TODO use relevant_cnt for filtering
+    relevant = list(set(relevant))
+    return sorted(relevant)
+
+
+def get_fail_coverage(profile, trigger_tests_set, testmethods_set):
     fail_coverage = set()
-    curclass = ''
-    curmethod = ''
     curtrigger = False
-    currelevant = False
-    trigger_tests_set = set()
-    for trigger_test in trigger_tests:
-        trigger_test = trigger_test.strip()
-        if trigger_test == '':
-            continue
-        sp = trigger_test.split('::')
-        trigger_tests_set.add((sp[0], sp[1].strip()))
-    testmethods_set = set()
-    for testmethod in testmethods:
-        testmethod = testmethod.strip()
-        if testmethod == '':
-            continue
-        sp = testmethod.split('::')
-        methods = sp[1].split(',')
-        # print(sp[0], sp[1])
-        for method in methods:
-            method = method.strip()
-            if method != '':
-                testmethods_set.add((sp[0], method))
     for line in profile:
         if line.strip() == '':
             continue
@@ -129,22 +144,42 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
         if curtrigger:
             fail_coverage.add((class_name, method_name))
             # print(fail_coverage)
-    for line in profile:
-        if line.strip() == '':
+    return fail_coverage
+
+
+def parse_test_methods(testmethods):
+    testmethods_set = set()
+    for testmethod in testmethods:
+        testmethod = testmethod.strip()
+        if testmethod == '':
             continue
-        class_name, method_name, is_trigger, is_test = parseprofile(
-            line, trigger_tests_set, testmethods_set)
-        if is_test:
-            curclass, curmethod = class_name, method_name
-            currelevant = False
+        sp = testmethod.split('::')
+        methods = sp[1].split(',')
+        # print(sp[0], sp[1])
+        for method in methods:
+            method = method.strip()
+            if method != '':
+                testmethods_set.add((sp[0], method))
+    return testmethods_set
+
+
+def parse_trigger_tests(trigger_tests):
+    trigger_tests_set = set()
+    trigger_tests_map = {}
+    for trigger_test in trigger_tests:
+        trigger_test = trigger_test.strip()
+        if trigger_test == '':
             continue
-        if currelevant:
-            continue
-        # relevant
-        if (class_name, method_name) in fail_coverage:
-            ret.append((curclass, curmethod))
-            currelevant = True
-    return sorted(ret)
+        sp = trigger_test.split('::')
+        classname = sp[0].strip()
+        methodname = sp[1].strip()
+        trigger_tests_set.add((classname, methodname))
+        if classname in trigger_tests_map:
+            if not methodname in trigger_tests_map[classname]:
+                trigger_tests_map[classname].append(methodname)
+        else:
+            trigger_tests_map[classname] = [methodname]
+    return trigger_tests_set, trigger_tests_map
 
 
 def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
