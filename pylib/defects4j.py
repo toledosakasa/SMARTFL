@@ -346,6 +346,7 @@ def eval(proj: str, id: str):
     try:
         oraclefile = utf8open(f'oracle/ActualFaultStatement/{proj}/{id}')
     except IOError:
+        print(f'{proj}{id} has no oracle')
         return -1
     oracle_lines = set()
     for line in oraclefile.readlines():
@@ -356,6 +357,7 @@ def eval(proj: str, id: str):
         resultfile = utf8open(
             f'trace/logs/mytrace/InfResult-{proj}{id}.log')
     except IOError:
+        print(f'{proj}{id} has failed.')
         return -2
     i = 0
     ret = -3
@@ -378,5 +380,5 @@ def eval(proj: str, id: str):
             ret = i
             break
         lastline = fullname
-    print(f'result ranking is: {ret}')
+    print(f'{proj}{id} result ranking: {ret}')
     return ret
