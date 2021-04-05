@@ -62,7 +62,7 @@ public class ProfileUtils {
     ci.write16bit(logindex, instpos + 4);
   }
 
-  public static void logMethodName_inst(String str) {
+  public static synchronized void logMethodName_inst(String str) {
     // if (str.contains("setUp")) {
     // StackTraceElement stack[] = Thread.currentThread().getStackTrace();
     // for (int i = 0; i < stack.length; i++) {
@@ -83,7 +83,8 @@ public class ProfileUtils {
       profileCnt.add(str);
     try {
       writer.write("\n###" + str);
-    } catch (IOException e) {
+      writer.flush();
+    } catch (IOException e) {  
       e.printStackTrace();
     }
   }

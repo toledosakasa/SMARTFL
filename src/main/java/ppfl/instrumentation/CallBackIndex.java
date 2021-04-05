@@ -90,6 +90,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=I:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -101,6 +102,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=D:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -112,6 +114,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=S:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -123,6 +126,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=C:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -134,6 +138,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=B:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -145,6 +150,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=Z:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -156,6 +162,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=F:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -167,6 +174,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=J:");
 			writer.write(String.valueOf(i));
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -179,6 +187,7 @@ public class CallBackIndex {
 			writer.write(",stack=Str:");
 			// FIXME this is currently buggy if the string include \n.
 			// writer.write(i);
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -191,6 +200,7 @@ public class CallBackIndex {
 		try {
 			writer.write(",stack=Obj:");
 			writer.write(String.valueOf(java.lang.System.identityHashCode(i)));
+			writer.flush();
 		} catch (IOException e) {
 			// e.printStackTrace();
 		}
@@ -202,6 +212,7 @@ public class CallBackIndex {
 	public static void logString(String s) {
 		try {
 			writer.write(s);
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

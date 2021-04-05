@@ -10,20 +10,22 @@ public class MyWriter {
 
   Writer writer;
 
-  public void write(String s) {
+  public synchronized void write(String s) {
     try {
       writer.write(s);
+      writer.flush();
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
-  public void writeln(String s) {
+  public synchronized void writeln(String s) {
     if (!s.endsWith("\n"))
       s = s + "\n";
     try {
       writer.write(s);
+      writer.flush();
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
