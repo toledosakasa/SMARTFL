@@ -339,7 +339,9 @@ def evalproj(proj: str):
         if(result > 0 and result <= 10):
             for j in range(result, 11):
                 top[j] += 1
-    print(f'top1={top[1]},top3={top[3]},top10={top[10]}')
+        if result == -3:
+            no_result += 1
+    print(f'top1={top[1]},top3={top[3]},top10={top[10]},failed={no_result}')
 
 
 def eval(proj: str, id: str):
@@ -361,7 +363,7 @@ def eval(proj: str, id: str):
         return -2
     i = 0
     ret = -3
-    lastline = ''
+    lines = set()
     for line in resultfile.readlines():
         if(line.strip() == '' or line.startswith('Probabilities:') or line.startswith('Vars:') or line.startswith('Stmts:') or line.startswith('Belief propagation time')):
             continue
@@ -373,12 +375,12 @@ def eval(proj: str, id: str):
         sp = sp[2].split('#')
         linenumber = sp[1]
         fullname = f'{classname}.{methodname}:{linenumber}'
-        if fullname == lastline:
+        if fullname in lines:
             continue
+        lines.add(fullname)
         i += 1
         if fullname in oracle_lines:
             ret = i
             break
-        lastline = fullname
     print(f'{proj}{id} result ranking: {ret}')
     return ret
