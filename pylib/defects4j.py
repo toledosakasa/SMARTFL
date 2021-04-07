@@ -119,6 +119,8 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
         # if currelevant:
         #     continue
         # relevant
+        if curclass == '' or curmethod == '':
+            continue
         if (class_name, method_name) in fail_coverage:
             # FIXME weird use-before-def bug for curclass,curmethod at Math-2.
             curtest = (curclass, curmethod)
