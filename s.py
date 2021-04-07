@@ -2,6 +2,7 @@ import os
 import sys
 import pylib.defects4j as d4j
 import time
+import func_timeout
 
 
 def runtesttrace(cmdarg):
@@ -46,8 +47,9 @@ if __name__ == '__main__':
         d4j.getd4jprojinfo()
 
     if args[1] == 'fl':
-        d4j.rund4j(args[2], args[3])
-        d4j.parse(args[2], args[3])
+        d4j.fl(args[2], args[3])
+        #d4j.rund4j(args[2], args[3])
+        #d4j.parse(args[2], args[3])
 
     if args[1] == 'rund4j':
         d4j.rund4j(args[2], args[3])
@@ -64,3 +66,12 @@ if __name__ == '__main__':
             d4j.evalproj(args[2])
         if(len(args) == 4):
             d4j.eval(args[2], args[3])
+    if args[1] == 'testproj':
+        name = args[2]
+        os.system('mvn package -DskipTests')
+        for i in range(1, d4j.project_bug_nums[name]+1):
+            try:
+                d4j.fl(name, i)
+            except func_timeout.exceptions.FunctionTimedOut:
+                print(f'timeout at {name}-{i}')
+        d4j.evalproj(name)

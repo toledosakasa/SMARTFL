@@ -1,10 +1,14 @@
 import os
+from pylib.countmap import CountMap
 import time
+from func_timeout import func_set_timeout
+import func_timeout
 from typing import Any, Dict, List, Set
 import json
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
-project_bug_nums = {"Lang": 65}
+project_bug_nums = {"Lang": 65, "Math": 106,
+                    "Time": 27, "Closure": 176, "Chart": 26}
 
 
 def utf8open(filename):
@@ -94,7 +98,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     print(f'parsing profile, length:{len(profile)}')
     print('trigger tests are: ', trigger_tests)
     relevant = []
-    relevant_cnt = {}
+    relevant_cnt = CountMap()
 
     # currelevant = False
     trigger_tests_set, trigger_tests_map = parse_trigger_tests(trigger_tests)
@@ -116,18 +120,12 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
         if (class_name, method_name) in fail_coverage:
             curtest = (curclass, curmethod)
             relevant.append(curtest)
-            if curclass in relevant_cnt:
-                methodmap = relevant_cnt[curclass]
-                if curmethod in methodmap:
-                    methodmap[curmethod] += 1
-                else:
-                    methodmap[curmethod] = 1
-            else:
-                relevant_cnt[curtest] = {curmethod: 1}
+            relevant_cnt.add(curclass, curmethod)
             # currelevant = True
     # TODO use relevant_cnt for filtering
-    relevant = list(set(relevant))
-    return sorted(relevant)
+    # relevant = list(set(relevant))
+    # return sorted(relevant)
+    return relevant_cnt.filter(trigger_tests_map)
 
 
 def get_fail_coverage(profile, trigger_tests_set, testmethods_set):
@@ -139,7 +137,7 @@ def get_fail_coverage(profile, trigger_tests_set, testmethods_set):
         class_name, method_name, is_trigger, is_test = parseprofile(
             line, trigger_tests_set, testmethods_set)
         if is_test:
-            curclass, curmethod = class_name, method_name
+            #curclass, curmethod = class_name, method_name
             curtrigger = is_trigger
             continue
         if curtrigger:
@@ -321,7 +319,10 @@ def parse(proj: str, id: str):
     os.system(cmdline)
 
 
+@func_set_timeout(1200)
 def fl(proj: str, id: str):
+    cleanupcheckout(proj, id)
+    clearcache(proj, id)
     rund4j(proj, id)
     parse(proj, id)
 
