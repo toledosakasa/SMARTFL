@@ -76,6 +76,8 @@ if __name__ == '__main__':
                 d4j.fl(name, i)
             except func_timeout.exceptions.FunctionTimedOut:
                 print(f'timeout at {name}-{i}')
+            except:
+                print(f'{name}{i} failed.')
         time_end = time.time()
         totaltime = time_end-time_start
         print(f'total time: {totaltime/60}min')
