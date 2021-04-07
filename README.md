@@ -1,5 +1,8 @@
 # ppfl
 
+## Requiring
+pip install func_timeout
+
 ## Run Tracing
 ```
 python s.py trace MergeTest#fail
