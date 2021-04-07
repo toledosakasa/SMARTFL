@@ -213,10 +213,14 @@ public class TraceTransformer implements ClassFileTransformer {
 			CtClass cc = cp.get(targetClassName);
 			writeWhatIsTraced("\n");
 			writeWhatIsTraced(this.targetClassName + "::");
-			for (CtBehavior m : cc.getDeclaredBehaviors()) {
-				writeWhatIsTraced(m.getName() + "#" + m.getSignature() + ",");
+			for (MethodInfo m : cc.getClassFile().getMethods()) {
+				writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
 				transformBehavior(m, cc);
 			}
+			// for (CtBehavior m : cc.getDeclaredBehaviors()) {
+			// writeWhatIsTraced(m.getName() + "#" + m.getSignature() + ",");
+			// transformBehavior(m, cc);
+			// }
 			byteCode = cc.toBytecode();
 			cc.detach();
 
@@ -227,16 +231,17 @@ public class TraceTransformer implements ClassFileTransformer {
 		return byteCode;
 	}
 
-	private void transformBehavior(CtBehavior m, CtClass cc) throws NotFoundException, BadBytecode {
+	private void transformBehavior(MethodInfo m, CtClass cc) throws NotFoundException, BadBytecode {
 		// hello in console
 		// debugLogger.info("[Agent] Transforming method {}", m.getName());
 
-		if (!(m instanceof CtMethod)) {
-			return;
-		}
+		// if (!(m instanceof CtMethod)) {
+		// return;
+		// }
 
 		// get iterator
-		MethodInfo mi = m.getMethodInfo();
+		// MethodInfo mi = m.getMethodInfo();
+		MethodInfo mi = m;
 		CodeAttribute ca = mi.getCodeAttribute();
 
 		// add constants to constpool.
@@ -245,7 +250,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		CallBackIndex cbi = new CallBackIndex(constp, traceWriter);
 
 		if (!this.simpleLog)
-			instrumentByteCode(m, cc, mi, ca, constp, cbi);
+			instrumentByteCode(cc, mi, ca, constp, cbi);
 		// log method name at the beginning of this method.
 		if (!this.simpleLog) {
 			CodeIterator ci = ca.iterator();
@@ -280,8 +285,8 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 	}
 
-	private void instrumentByteCode(CtBehavior m, CtClass cc, MethodInfo mi, CodeAttribute ca, ConstPool constp,
-			CallBackIndex cbi) throws BadBytecode {
+	private void instrumentByteCode(CtClass cc, MethodInfo mi, CodeAttribute ca, ConstPool constp, CallBackIndex cbi)
+			throws BadBytecode {
 		// record line info and instructions, since instrumentation will change
 		// branchbyte and byte index.
 		CodeIterator tempci = ca.iterator();
@@ -290,9 +295,10 @@ public class TraceTransformer implements ClassFileTransformer {
 			int index = tempci.lookAhead();
 			int ln = mi.getLineNumber(index);
 			String getinst = getInstMap(tempci, index, constp);
-			String sig = m.getSignature();
-			ExceptionTable eTable = m.getMethodInfo().getCodeAttribute().getExceptionTable();
-			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + m.getName() + "#" + sig + "#" + ln + "#" + index
+			String sig = mi.getDescriptor();
+			// ExceptionTable eTable =
+			// m.getMethodInfo().getCodeAttribute().getExceptionTable();
+			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + mi.getName() + "#" + sig + "#" + ln + "#" + index
 					+ ",nextinst=";
 
 			tempci.next();
