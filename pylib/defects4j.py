@@ -105,6 +105,8 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     testmethods_set = parse_test_methods(testmethods)
     fail_coverage = get_fail_coverage(
         profile, trigger_tests_set, testmethods_set)
+    curclass = ''
+    curmethod = ''
     for line in profile:
         if line.strip() == '':
             continue
@@ -118,6 +120,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
         #     continue
         # relevant
         if (class_name, method_name) in fail_coverage:
+            # FIXME weird use-before-def bug for curclass,curmethod at Math-2.
             curtest = (curclass, curmethod)
             relevant.append(curtest)
             relevant_cnt.add(curclass, curmethod)
