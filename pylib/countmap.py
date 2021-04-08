@@ -20,7 +20,7 @@ class CountMap:
             self.class_relevant_cnt[curclass] = 1
 
     def filter(self, triggertests):
-        max_class_count = 10
+        max_class_count = 5
         sorted_classes = sorted(self.class_relevant_cnt.keys(
         ), key=lambda t: self.class_relevant_cnt[t]/self.class_method_cnt[t], reverse=True)
         sorted_classes = sorted_classes[:max_class_count]
@@ -31,7 +31,7 @@ class CountMap:
                 sorted_classes.append(triggerclass)
 
         # get methods
-        max_method_count = 10
+        max_method_count = 5
         ret = []
         for curclass in sorted_classes:
             curmap = self.relevant_cnt[curclass]
