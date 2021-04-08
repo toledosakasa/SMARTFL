@@ -786,6 +786,9 @@ public class ByteCodeGraph {
 			return;
 		}
 
+		// Begin with the initial testmethod.
+		this.getFrame();
+
 		// Debug use
 		// System.out.println(instname);
 
