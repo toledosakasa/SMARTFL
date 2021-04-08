@@ -78,6 +78,7 @@ if __name__ == '__main__':
                 print(f'timeout at {name}-{i}')
             except:
                 print(f'{name}{i} failed.')
+            d4j.deletecheckout(name, i)
         time_end = time.time()
         totaltime = time_end-time_start
         print(f'total time: {totaltime/60}min')

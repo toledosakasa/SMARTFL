@@ -279,6 +279,12 @@ def checkout(proj: str, id: str):
         f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id}')
 
 
+def deletecheckout(proj: str, id: str):
+    checkoutpath = f'./tmp_checkout/{proj}/{id}'
+    if (os.path.exists(checkoutpath)):
+        os.system(f'rm -rf ./tmp_checkout/{proj}/{id}')
+
+
 def cleanupcheckout(proj: str, id: str):
     checkoutpath = f'./tmp_checkout/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
