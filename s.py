@@ -48,6 +48,7 @@ if __name__ == '__main__':
 
     if args[1] == 'fl':
         d4j.fl(args[2], args[3])
+        d4j.eval(args[2], args[3])
         #d4j.rund4j(args[2], args[3])
         #d4j.parse(args[2], args[3])
 
