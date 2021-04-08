@@ -363,6 +363,9 @@ public class ByteCodeGraph {
 					continue;
 				String[] splt = t.split("::");
 				String traceclass = splt[0];
+				if (splt.length < 2) {
+					continue;
+				}
 				splt = splt[1].split(",");
 				for (String methodAndDesc : splt) {
 					splt = methodAndDesc.split("#");
