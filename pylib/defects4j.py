@@ -52,8 +52,7 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     # if not cached, generate metadata
     workdir = os.path.abspath(
         f'./tmp_checkout/{proj}/{id}')
-    if not os.path.exists(workdir):
-        checkout(proj, id)
+    checkout(proj, id)
     fields = ['tests.all', 'classes.relevant',
               'tests.trigger', 'tests.relevant']
 
@@ -275,8 +274,9 @@ def checkout(proj: str, id: str):
     checkoutpath = f'./tmp_checkout/{proj}/{id}'
     if not(os.path.exists(checkoutpath)):
         os.makedirs(checkoutpath)
-    os.system(
-        f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id}')
+    if not(os.path.exists(checkoutpath + '/.defects4j.config')):
+        os.system(
+            f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id}')
 
 
 def deletecheckout(proj: str, id: str):
@@ -298,9 +298,7 @@ def clearcache(proj: str, id: str):
 
 def rund4j(proj: str, id: str):
     time_start = time.time()
-    workdir = os.path.abspath(f'./tmp_checkout/{proj}/{id}')
-    if not os.path.exists(workdir):
-        checkout(proj, id)
+    checkout(proj, id)
     cmdlines = getd4jcmdline(proj, id)
     checkoutdir = f'tmp_checkout/{proj}/{id}'
     # cleanup previous log
