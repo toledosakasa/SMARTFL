@@ -336,6 +336,24 @@ def fl(proj: str, id: str):
     parse(proj, id)
 
 
+def evalproj_method(proj: str):
+    no_oracle = 0
+    no_result = 0
+    not_listed = 0
+    top = []
+    for i in range(11):
+        top.append(0)
+    allbugs = project_bug_nums[proj]
+    for i in range(1, allbugs+1):
+        result = eval_method(proj, str(i))
+        if(result > 0 and result <= 10):
+            for j in range(result, 11):
+                top[j] += 1
+        if result == -3:
+            no_result += 1
+    print(f'top1={top[1]},top3={top[3]},top10={top[10]},failed={no_result}')
+
+
 def evalproj(proj: str):
     no_oracle = 0
     no_result = 0
@@ -352,6 +370,48 @@ def evalproj(proj: str):
         if result == -3:
             no_result += 1
     print(f'top1={top[1]},top3={top[3]},top10={top[10]},failed={no_result}')
+
+
+def eval_method(proj: str, id: str):
+    try:
+        oraclefile = utf8open(f'oracle/ActualFaultStatement/{proj}/{id}')
+    except IOError:
+        print(f'{proj}{id} has no oracle')
+        return -1
+    oracle_lines = set()
+    for line in oraclefile.readlines():
+        sp = line.split('||')
+        for oracle in sp:
+            oracle_lines.add(oracle.strip().split(':')[0])
+    try:
+        resultfile = utf8open(
+            f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+    except IOError:
+        print(f'{proj}{id} has failed.')
+        return -2
+    i = 0
+    ret = -3
+    lines = set()
+    for line in resultfile.readlines():
+        if(line.strip() == '' or line.startswith('Probabilities:') or line.startswith('Vars:') or line.startswith('Stmts:') or line.startswith('Belief propagation time')):
+            continue
+        sp = line.split(':')
+        if(sp.__len__() < 3):
+            print(line)
+        classname = sp[0]
+        methodname = sp[1]
+        sp = sp[2].split('#')
+        linenumber = sp[1]
+        fullname = f'{classname}.{methodname}'
+        if fullname in lines:
+            continue
+        lines.add(fullname)
+        i += 1
+        if fullname in oracle_lines:
+            ret = i
+            break
+    print(f'{proj}{id} result ranking: {ret}')
+    return ret
 
 
 def eval(proj: str, id: str):

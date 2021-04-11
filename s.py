@@ -67,6 +67,11 @@ if __name__ == '__main__':
             d4j.evalproj(args[2])
         if(len(args) == 4):
             d4j.eval(args[2], args[3])
+    if args[1] == 'meval':
+        if(len(args) == 3):
+            d4j.evalproj_method(args[2])
+        if(len(args) == 4):
+            d4j.eval_method(args[2], args[3])
     if args[1] == 'testproj':
         time_start = time.time()
         name = args[2]
