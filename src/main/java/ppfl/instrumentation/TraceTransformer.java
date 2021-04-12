@@ -10,9 +10,11 @@ import java.io.Writer;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,7 +42,7 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
-	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
+	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger_trace");
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
 	// The logger name
@@ -63,6 +65,8 @@ public class TraceTransformer implements ClassFileTransformer {
 	private Set<String> d4jMethodNames = new HashSet<>();
 	private boolean logSourceToScreen = false;
 	private boolean simpleLog = false;
+
+	private Set<String> transformedMethods = new HashSet<>();
 
 	/** filename for logging */
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
@@ -213,10 +217,32 @@ public class TraceTransformer implements ClassFileTransformer {
 			CtClass cc = cp.get(targetClassName);
 			writeWhatIsTraced("\n");
 			writeWhatIsTraced(this.targetClassName + "::");
-			for (MethodInfo m : cc.getClassFile().getMethods()) {
-				writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
-				transformBehavior(m, cc);
+
+			List<MethodInfo> methods = new ArrayList<>();
+			methods.addAll(cc.getClassFile().getMethods());
+
+			// methods.add(staticInit);
+			// for (CtBehavior cb : cc.getDeclaredBehaviors()) {
+			// MethodInfo m = cb.getMethodInfo();
+			// methods.add(m);
+			// }
+			// buggy
+			// for (CtMethod cb : cc.getMethods()) {
+			// MethodInfo m = cb.getMethodInfo();
+			// methods.add(m);
+			// }
+			for (MethodInfo m : methods) {
+				String longname = m.getName() + "#" + m.getDescriptor();
+				if (!transformedMethods.contains(longname)) {
+					transformedMethods.add(longname);
+					writeWhatIsTraced(longname + ",");
+					transformBehavior(m, cc);
+				}
 			}
+
+			MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
+			writeWhatIsTraced(staticInit.getName() + "#" + staticInit.getDescriptor() + ",");
+			transformBehavior(staticInit, cc);
 			// for (CtBehavior m : cc.getDeclaredBehaviors()) {
 			// writeWhatIsTraced(m.getName() + "#" + m.getSignature() + ",");
 			// transformBehavior(m, cc);
@@ -233,7 +259,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	private void transformBehavior(MethodInfo m, CtClass cc) throws NotFoundException, BadBytecode {
 		// hello in console
-		// debugLogger.info("[Agent] Transforming method {}", m.getName());
+		// debugLogger.writeln("%s::%s", cc.getName(), m.getName());
 
 		// if (!(m instanceof CtMethod)) {
 		// return;
@@ -339,7 +365,9 @@ public class TraceTransformer implements ClassFileTransformer {
 			// print advanced information(e.g. value pushed)
 			if (oi != null) {
 				// if (oi.form > 42)
-				if (oi instanceof InvokeInst) {
+				// getstatic should be treated like invocation,
+				// in the case that static-initializer may be called.
+				if (oi instanceof InvokeInst || oi.form == 178) {
 					oi.insertReturnSite(ci, index, constp, instinfo, cbi);
 				} else {
 					oi.insertByteCodeAfter(ci, index, constp, cbi);

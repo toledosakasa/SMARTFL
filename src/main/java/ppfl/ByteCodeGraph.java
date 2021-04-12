@@ -117,13 +117,17 @@ public class ByteCodeGraph {
 	public StmtNode untracedStmt;
 	public List<Node> untraceduse;
 	public List<Node> untracedpred;
-
 	public ParseInfo untracedInvoke = null;
 
 	public StmtNode throwStmt;
 	public List<Node> throwuse;
 	public List<Node> throwpred;
 	public ParseInfo unsolvedThrow = null;
+
+	public StmtNode staticStmt;
+	public List<Node> staticuse;
+	public List<Node> staticpred;
+	public ParseInfo unsolvedStatic = null;
 
 	public void stopview() {
 		shouldview = false;
@@ -715,7 +719,15 @@ public class ByteCodeGraph {
 		parseJoinedTracePruned(jTrace);
 	}
 
-	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch) {
+	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
+		if (debugswitch) {
+			try {
+				System.in.read();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		this.parseinfo = pInfo;
 		String instname = this.parseinfo.getvalue("lineinfo");
 
@@ -783,6 +795,16 @@ public class ByteCodeGraph {
 				// pInfo.debugprint();
 			}
 		}
+
+		if (this.unsolvedStatic != null) {
+			if (unsolvedStatic.matchStaticReturn(pInfo)) {
+				this.unsolvedStatic = null;
+				return;
+			} else {
+				// skip
+				return;
+			}
+		}
 		// untraced invoke has been resolved.
 		// skip @ret message.
 		if (this.parseinfo.isReturnMsg) {
@@ -791,7 +813,17 @@ public class ByteCodeGraph {
 
 		// Begin with the initial testmethod.
 		this.getFrame();
-
+		// if (!this.getFrame().domain.equals(this.parseinfo.domain)) {
+		// try {
+		// System.out.println(linec);
+		// System.in.read();
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// pInfo.debugprint();
+		// debugStack(this.stackframe);
+		// }
 		// Debug use
 		// System.out.println(instname);
 
@@ -804,7 +836,7 @@ public class ByteCodeGraph {
 		}
 		Interpreter.map[this.parseinfo.form].buildtrace(this);
 
-		// if (pInfo.linenumber == 342 && pInfo.byteindex == 12) {
+		// if (pInfo.linenumber == 94 && pInfo.byteindex == 0) {
 		// debugswitch = true;
 		// }
 		// debug runtime stacks
@@ -826,9 +858,14 @@ public class ByteCodeGraph {
 		boolean testpass = tChunk.testpass;
 		this.testname = tChunk.getTestName();
 		boolean debugswitch = false;
+		int linec = 0;
 		for (ParseInfo pInfo : tChunk.parsedTraces) {
 			try {
-				parseSingleTrace(pInfo, debugswitch);
+				// if (pInfo.linenumber == 94 && pInfo.byteindex == 0) {
+				// debugswitch = true;
+				// }
+				linec++;
+				parseSingleTrace(pInfo, debugswitch, linec);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("parse trace crashed");

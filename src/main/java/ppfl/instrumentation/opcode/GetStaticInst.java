@@ -27,6 +27,20 @@ public class GetStaticInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
+			throws BadBytecode {
+		int instpos = ci.insertExGap(8);
+		String msg = "\n###RET@" + instinfo.trim();
+		int instindex = constp.addStringInfo(msg);
+
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.logstringindex, instpos + 4);
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		String field = graph.parseinfo.getvalue("field");
@@ -35,6 +49,11 @@ public class GetStaticInst extends OpcodeInst {
 			usenodes.add(usenode);
 		defnode = graph.addNewStackNode(stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+
+		graph.unsolvedStatic = graph.parseinfo;
+		graph.staticStmt = stmt;
+		graph.staticuse = usenodes;
+		graph.staticpred = prednodes;
 	}
 
 	@Override

@@ -74,6 +74,14 @@ public class ParseInfo {
 		return oth != null && oth.domain.equals(this.domain);
 	}
 
+	public boolean matchStaticReturn(ParseInfo returnMsg) {
+		if (returnMsg.isReturnMsg && this.form == 178) {
+			return this.matchDomain(returnMsg) && this.linenumber == returnMsg.linenumber
+					&& this.byteindex == returnMsg.byteindex;
+		}
+		return false;
+	}
+
 	public boolean matchReturn(ParseInfo returnMsg, boolean matchCatch) {
 		if (!this.matchDomain(returnMsg) || (!returnMsg.isReturnMsg && !matchCatch)) {
 			return false;
