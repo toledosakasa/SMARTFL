@@ -33,6 +33,7 @@ public class InvokeInst extends OpcodeInst {
 		return ret.toString();
 	}
 
+	@Override
 	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
 			throws BadBytecode {
 		int instpos = ci.insertExGap(8);
