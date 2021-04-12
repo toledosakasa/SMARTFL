@@ -328,7 +328,7 @@ def parse(proj: str, id: str):
     os.system(cmdline)
 
 
-@func_set_timeout(1200)
+@func_set_timeout(1800)
 def fl(proj: str, id: str):
     cleanupcheckout(proj, id)
     clearcache(proj, id)
