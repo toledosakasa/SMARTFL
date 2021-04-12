@@ -125,7 +125,9 @@ public class CallBackIndex {
 	public static char printTopStack1(char i) {
 		try {
 			writer.write(",stack=C:");
-			writer.write(String.valueOf(i));
+			// FIXME this is currently buggy if the string include \n or other special
+			// character.
+			// writer.write(String.valueOf(i));
 			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
