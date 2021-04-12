@@ -77,6 +77,8 @@ public class InvokeInst extends OpcodeInst {
 			graph.untracedStmt = stmt;
 			graph.untraceduse = usenodes;
 			graph.untracedpred = prednodes;
+		} else {
+			graph.tracedInvoke = graph.parseinfo;
 		}
 
 		// // if not traced

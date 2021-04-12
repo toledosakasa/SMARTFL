@@ -74,6 +74,13 @@ public class ParseInfo {
 		return oth != null && oth.domain.equals(this.domain);
 	}
 
+	public boolean matchTracedInvoke(ParseInfo oth) {
+		if (this.isInvoke()) {
+			return this.getCallDomain().equals(oth.domain);
+		}
+		return false;
+	}
+
 	public boolean matchStaticReturn(ParseInfo returnMsg) {
 		if (returnMsg.isReturnMsg && this.form == 178) {
 			return this.matchDomain(returnMsg) && this.linenumber == returnMsg.linenumber
