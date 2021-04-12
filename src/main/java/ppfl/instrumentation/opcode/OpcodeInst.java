@@ -150,6 +150,12 @@ public class OpcodeInst {
 		String calltype = constp.getMethodrefType(callindex);
 		String callclass = constp.getMethodrefClassName(callindex);
 		String callname = constp.getMethodrefName(callindex);
+		// String callname = null;
+		// if (constp.isConstructor(callclass, callindex) == 0) {
+		// callname = "init";
+		// } else {
+		// callname = constp.getMethodrefName(callindex);
+		// }
 		return ",calltype=" + calltype + ",callclass=" + callclass + ",callname=" + callname;
 	}
 

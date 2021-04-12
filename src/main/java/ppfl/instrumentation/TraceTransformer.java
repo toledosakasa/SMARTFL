@@ -221,17 +221,10 @@ public class TraceTransformer implements ClassFileTransformer {
 			List<MethodInfo> methods = new ArrayList<>();
 			methods.addAll(cc.getClassFile().getMethods());
 
-			// methods.add(staticInit);
-			// for (CtBehavior cb : cc.getDeclaredBehaviors()) {
-			// MethodInfo m = cb.getMethodInfo();
-			// methods.add(m);
-			// }
-			// buggy
-			// for (CtMethod cb : cc.getMethods()) {
-			// MethodInfo m = cb.getMethodInfo();
-			// methods.add(m);
-			// }
 			for (MethodInfo m : methods) {
+				// if (!this.simpleLog && m.isStaticInitializer()) {
+				// continue;
+				// }
 				String longname = m.getName() + "#" + m.getDescriptor();
 				if (!transformedMethods.contains(longname)) {
 					transformedMethods.add(longname);
@@ -241,8 +234,11 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 
 			MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
-			writeWhatIsTraced(staticInit.getName() + "#" + staticInit.getDescriptor() + ",");
-			transformBehavior(staticInit, cc);
+			if (staticInit != null) {
+				writeWhatIsTraced(staticInit.getName() + "#" + staticInit.getDescriptor() + ",");
+				transformBehavior(staticInit, cc);
+			}
+
 			// for (CtBehavior m : cc.getDeclaredBehaviors()) {
 			// writeWhatIsTraced(m.getName() + "#" + m.getSignature() + ",");
 			// transformBehavior(m, cc);
