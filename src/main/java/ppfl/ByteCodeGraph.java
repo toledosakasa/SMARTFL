@@ -857,7 +857,7 @@ public class ByteCodeGraph {
 				parseChunk(tChunk);
 			} catch (Exception e) {
 				System.err.println("parse " + tChunk.fullname + " failed");
-				e.printStackTrace();
+				// e.printStackTrace();
 				// throw (e);
 			}
 		}
