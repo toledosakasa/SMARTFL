@@ -114,6 +114,9 @@ public class ByteCodeGraph {
 	public Map<String, Set<Integer>> branch_stores;
 	private boolean shouldview;
 
+	// to prevent lazy-evaluation on static initializers.
+	public ParseInfo tracedInvoke = null;
+
 	public StmtNode untracedStmt;
 	public List<Node> untraceduse;
 	public List<Node> untracedpred;
@@ -730,6 +733,17 @@ public class ByteCodeGraph {
 		}
 		this.parseinfo = pInfo;
 		String instname = this.parseinfo.getvalue("lineinfo");
+
+		// solve traced invoke
+		if (this.tracedInvoke != null) {
+			if (tracedInvoke.matchTracedInvoke(pInfo)) {
+				this.tracedInvoke = null;
+				// return;
+			} else {
+				// skip
+				return;
+			}
+		}
 
 		// solve current untraced invoke
 		if (this.untracedInvoke != null) {
