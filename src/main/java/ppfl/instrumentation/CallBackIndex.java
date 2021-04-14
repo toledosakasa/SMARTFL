@@ -58,6 +58,10 @@ public class CallBackIndex {
 			return tsindex_object;
 	}
 
+	public static void setWriter(Writer w) {
+		writer = w;
+	}
+
 	public CallBackIndex(ConstPool constp, Writer writer) throws NotFoundException {
 		// FileWriter file = null;
 		// try {
