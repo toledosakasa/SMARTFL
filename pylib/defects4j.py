@@ -289,6 +289,7 @@ def cleanupcheckout(proj: str, id: str):
     checkoutpath = f'./tmp_checkout/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
         os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
+        os.system(f'rm -rf {checkoutpath}/trace/classcache/')
 
 
 def clearcache(proj: str, id: str):

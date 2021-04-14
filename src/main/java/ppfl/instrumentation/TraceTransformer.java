@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
+import java.nio.file.Paths;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +32,6 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
-import javassist.bytecode.ExceptionTable;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.Mnemonic;
 import ppfl.MyWriter;
@@ -206,12 +205,29 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	private byte[] transformBody(byte[] classfileBuffer) {
 		byte[] byteCode = classfileBuffer;
+		// debugLogger.write(String.format("[Agent] Transforming class %s",
+		// this.targetClassName));
+
+		String classcachefolder = "trace/classcache/";
+		File file = new File(classcachefolder);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		File classcache = new File(classcachefolder, this.targetClassName + ".log");
+		if (!this.simpleLog && classcache.exists()) {
+			// debugLogger.writeln("Cache loaded:" + this.targetClassName);
+			try {
+				return java.nio.file.Files.readAllBytes(classcache.toPath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		if (!this.simpleLog) {
 			this.setLogger(this.targetClassName);
 			setSourceFile(this.targetClassName);
 		}
-		// debugLogger.write(String.format("[Agent] Transforming class %s",
-		// this.targetClassName));
 
 		try {
 			ClassPool cp = ClassPool.getDefault();
@@ -258,6 +274,14 @@ public class TraceTransformer implements ClassFileTransformer {
 		} catch (Exception e) {
 			System.out.println(e);
 			// debugLogger.error("[Bug]bytecode error", e);
+		}
+		if (!this.simpleLog) {
+			try {
+				java.nio.file.Files.write(Paths.get(classcachefolder, this.targetClassName + ".log"), byteCode);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return byteCode;
 	}
