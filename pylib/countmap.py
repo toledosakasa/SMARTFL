@@ -31,7 +31,7 @@ class CountMap:
                 sorted_classes_trim.append(triggerclass)
 
         # get methods
-        max_method_count = 5
+        max_method_count = 10
         ret = []
         for curclass in sorted_classes_trim:
             curmap = self.relevant_cnt[curclass]
