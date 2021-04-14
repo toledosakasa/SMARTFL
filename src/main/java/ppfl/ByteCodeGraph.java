@@ -115,6 +115,7 @@ public class ByteCodeGraph {
 	private boolean shouldview;
 
 	// to prevent lazy-evaluation on static initializers.
+	private boolean solveTracedInvoke = true;
 	public ParseInfo tracedInvoke = null;
 
 	public StmtNode untracedStmt;
@@ -708,6 +709,8 @@ public class ByteCodeGraph {
 	private void cleanupOnChunkSwitch() {
 		this.untracedInvoke = null;
 		this.unsolvedThrow = null;
+		this.tracedInvoke = null;
+		this.unsolvedStatic = null;
 		this.initmaps();
 	}
 
@@ -735,11 +738,15 @@ public class ByteCodeGraph {
 		String instname = this.parseinfo.getvalue("lineinfo");
 
 		// solve traced invoke
-		if (this.tracedInvoke != null) {
+		if (this.solveTracedInvoke && this.tracedInvoke != null) {
 			if (tracedInvoke.matchTracedInvoke(pInfo)) {
 				this.tracedInvoke = null;
 				// return;
 			} else {
+				// System.out.println("skipped" + linec);
+				// System.out.println(this.tracedInvoke.getCallDomain());
+				// System.out.println(pInfo.domain);
+				// int a = 1 / 0;
 				// skip
 				return;
 			}
