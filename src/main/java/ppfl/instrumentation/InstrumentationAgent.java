@@ -146,10 +146,12 @@ public class InstrumentationAgent {
 	}
 
 	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
-		TraceTransformer dt = new TraceTransformer(clazz.getName(), classLoader);
+		String logfilename = "all.log";
 		if (logFile != null) {
-			dt.setLogFile(logFile);
+			logfilename = logFile;
 		}
+		TraceTransformer dt = new TraceTransformer(clazz.getName(), classLoader, logfilename);
+
 		if (d4jdatafile != null) {
 			dt.setD4jDataFile(d4jdatafile);
 		}
