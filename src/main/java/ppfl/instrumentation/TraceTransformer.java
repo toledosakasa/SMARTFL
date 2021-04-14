@@ -25,6 +25,7 @@ import java.util.Set;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
@@ -215,12 +216,21 @@ public class TraceTransformer implements ClassFileTransformer {
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(targetClassName);
+			if (cc.getGenericSignature() != null) {
+				return cc.toBytecode();
+			}
 			writeWhatIsTraced("\n");
 			writeWhatIsTraced(this.targetClassName + "::");
 
 			List<MethodInfo> methods = new ArrayList<>();
-			methods.addAll(cc.getClassFile().getMethods());
+			// methods.addAll(cc.getClassFile().getMethods());
 
+			for (CtMethod cm : cc.getDeclaredMethods()) {
+				methods.add(cm.getMethodInfo());
+			}
+			for (CtConstructor ccon : cc.getDeclaredConstructors()) {
+				methods.add(ccon.getMethodInfo());
+			}
 			for (MethodInfo m : methods) {
 				// if (!this.simpleLog && m.isStaticInitializer()) {
 				// continue;
@@ -232,7 +242,6 @@ public class TraceTransformer implements ClassFileTransformer {
 					transformBehavior(m, cc);
 				}
 			}
-
 			MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
 			if (staticInit != null) {
 				writeWhatIsTraced(staticInit.getName() + "#" + staticInit.getDescriptor() + ",");
