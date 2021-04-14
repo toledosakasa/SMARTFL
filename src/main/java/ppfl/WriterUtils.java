@@ -46,6 +46,11 @@ public class WriterUtils {
   // return instance;
   // }
 
+  public static MyWriter getWriter(String parent, String child) {
+    setPath(parent);
+    return getWriter(child, false);
+  }
+
   public static MyWriter getWriter(String name) {
     return getWriter(name, false);
   }

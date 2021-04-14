@@ -40,6 +40,15 @@ public class MyWriter {
     writeln(String.format(format, args));
   }
 
+  public void append(CharSequence csq) {
+    try {
+      writer.append(csq);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void flush() {
     try {
       writer.flush();
