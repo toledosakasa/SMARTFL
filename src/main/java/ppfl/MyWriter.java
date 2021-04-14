@@ -10,7 +10,7 @@ public class MyWriter {
 
   Writer writer;
 
-  public synchronized void write(String s) {
+  public void write(String s) {
     try {
       writer.write(s);
       writer.flush();
@@ -20,7 +20,7 @@ public class MyWriter {
     }
   }
 
-  public synchronized void writeln(String s) {
+  public void writeln(String s) {
     if (!s.endsWith("\n"))
       s = s + "\n";
     try {
