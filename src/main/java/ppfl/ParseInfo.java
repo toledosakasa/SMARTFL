@@ -76,6 +76,15 @@ public class ParseInfo {
 
 	public boolean matchTracedInvoke(ParseInfo oth) {
 		if (this.isInvoke()) {
+			// if (this.getCallDomain().equals(oth.domain)) {
+			// System.out.println(oth.domain.toString());
+			// try {
+			// System.in.read();
+			// } catch (IOException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
+			// }
 			return this.getCallDomain().equals(oth.domain);
 		}
 		return false;
