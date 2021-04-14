@@ -1687,7 +1687,8 @@ public class ByteCodeGraph {
 		}
 		resultLogger.writeln("Stmts:%d", stmts.size());
 		for (StmtNode n : stmts) {
-			n.bpPrintProb(resultLogger);
+			if (!n.getreduced())
+				n.bpPrintProb(resultLogger);
 		}
 		resultLogger.writeln("Belief propagation time : %fs", bptime / 1000.0);
 		// resultLogger.flush();
