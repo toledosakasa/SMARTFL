@@ -37,6 +37,9 @@ if __name__ == '__main__':
         s.py mytrace preprocessing for built-in tracing''')
         exit()
 
+    if args[1] == 'rebuild':
+        os.system('mvn package -DskipTests')
+
     if args[1] == 'trace':
         runtesttrace(args[2])
 
@@ -75,7 +78,6 @@ if __name__ == '__main__':
     if args[1] == 'testproj':
         time_start = time.time()
         name = args[2]
-        # os.system('mvn package -DskipTests')
         for i in range(1, d4j.project_bug_nums[name]+1):
             print(f'running {name}{i}')
             try:
