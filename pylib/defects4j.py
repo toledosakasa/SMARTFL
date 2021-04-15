@@ -349,12 +349,13 @@ def fl(proj: str, id: str, debug=True):
 def fl_wrap(proj: str, id: str):
     print(f'running {name}{i}')
     try:
-        d4j.fl(name, i, False)
+        fl(name, i, False)
     except func_timeout.exceptions.FunctionTimedOut:
         print(f'timeout at {name}-{i}')
     except:
         print(f'{name}{i} failed.')
-    d4j.deletecheckout(name, i)
+    deletecheckout(name, i)
+    eval(name, i)
 
 
 def testproj(proj: str):
