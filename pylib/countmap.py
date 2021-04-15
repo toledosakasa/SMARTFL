@@ -42,15 +42,15 @@ class CountMap:
                 collected, key=lambda x: self.relevant_cnt[x[0]][x[1]], reverse=True)
             ret = (ret + sort_collected)[:max_method_count]
         ret = list(set(ret))
-        i = 0
-        sum = 0
-        debugp = []
-        for r in ret:
-            sum = sum + self.relevant_cnt[r[0]][r[1]]
-            debugp.append(self.relevant_cnt[r[0]][r[1]])
-            i = i + 1
-        print('avg coverage: ', sum / i)
-        print(debugp)
+        # i = 0
+        # sum = 0
+        # debugp = []
+        # for r in ret:
+        #     sum = sum + self.relevant_cnt[r[0]][r[1]]
+        #     debugp.append(self.relevant_cnt[r[0]][r[1]])
+        #     i = i + 1
+        # print('avg coverage: ', sum / i)
+        # print(debugp)
 
         return ret
 
