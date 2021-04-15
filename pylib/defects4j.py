@@ -5,6 +5,8 @@ from func_timeout import func_set_timeout
 import func_timeout
 from typing import Any, Dict, List, Set
 import json
+from multiprocessing import Pool, TimeoutError
+
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 project_bug_nums = {"Lang": 65, "Math": 106,
@@ -255,18 +257,15 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
     # input()
 
     ret = []
-    # for testmethod in testmethods:
-    #     if testmethod.strip() == '':
-    #         continue
-    #     testclassname = testmethod.split('::')[0]
-    #     if testclassname in relevant_classes:
-    #         app = f"defects4j test -t {testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},d4jdatafile={d4jdatafile}\""
-    #         ret.append(app)
-    # return ret
+    # for testclass_rel in reltest_dict:
+    #     app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses}\""
+    #     app += ' > /dev/null'
+    #     ret.append(app)
     for testclass_rel in reltest_dict:
-        app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses}\""
-        app += ' > /dev/null'
-        ret.append(app)
+        for testmethod_rel in reltest_dict[testclass_rel]:
+            app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log\""
+            app += '>/dev/null 2>&1'
+            ret.append(app)
     return ret
 
 
@@ -289,6 +288,7 @@ def cleanupcheckout(proj: str, id: str):
     checkoutpath = f'./tmp_checkout/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
         os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
+        os.system(f'rm -rf {checkoutpath}/trace/logs/run/')
         os.system(f'rm -rf {checkoutpath}/trace/classcache/')
 
 
@@ -308,11 +308,17 @@ def rund4j(proj: str, id: str):
         print('removing previous trace logs.')
         os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
     cdcmd = f'cd {checkoutdir} && '
-    for cmdline in cmdlines:
-        testclassname = cmdline.split('::')[0].split(' ')[-1]
-        print('testing', testclassname)
-        # input()
-        os.system(cdcmd + cmdline)
+    cmdlines = [cdcmd + cmdline for cmdline in cmdlines]
+    os.system(cmdlines[0])
+    with Pool(processes=8) as pool:
+        pool.map(os.system, cmdlines[1:])
+        pool.close()
+        pool.join()
+    # for cmdline in cmdlines:
+    #     testclassname = cmdline.split('::')[0].split(' ')[-1]
+    #     print('testing', testclassname)
+    #     # input()
+    #     os.system(cdcmd + cmdline)
     time_end = time.time()
     print('d4j tracing complete after', time_end-time_start, 'sec')
 

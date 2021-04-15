@@ -69,21 +69,22 @@ public class TraceTransformer implements ClassFileTransformer {
 	private Set<String> transformedMethods = new HashSet<>();
 
 	/** filename for logging */
-	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader) {
+	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader, String logfilename) {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
 
-		File logdir = new File("trace/logs/mytrace/");
+		File logdir = new File("trace/logs/run/");
 		logdir.mkdirs();
 		Interpreter.init();
 		setWhatIsTracedWriterFile();
 		FileWriter file = null;
 		try {
-			file = new FileWriter("trace/logs/mytrace/all.log", true);
+			file = new FileWriter("trace/logs/run/" + logfilename, true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		traceWriter = file;
+		CallBackIndex.setWriter(traceWriter);
 		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -117,6 +118,8 @@ public class TraceTransformer implements ClassFileTransformer {
 		FileWriter file = null;
 		String filename = "trace/logs/mytrace/traced.source.log";
 		try {
+			File logdir = new File("trace/logs/mytrace/");
+			logdir.mkdirs();
 			file = new FileWriter(filename, true);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -135,6 +138,8 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static void setSimpleLogFile() {
 		FileWriter file = null;
 		try {
+			File logdir = new File("trace/logs/mytrace/");
+			logdir.mkdirs();
 			file = new FileWriter("trace/logs/mytrace/profile.log", true);
 		} catch (IOException e) {
 			e.printStackTrace();

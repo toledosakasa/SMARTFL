@@ -88,8 +88,9 @@ public class GraphBuilder {
     // long thetime = endTime-startTime;
     // System.out.println("idom time is "+ thetime);
     String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
-    // pgraph.parseJoinedTrace(tracefilename);
-    pgraph.pruneAndParse(tracefilename);
+    // pgraph.pruneAndParse(tracefilename);
+    String folder = String.format("tmp_checkout/%s/%s/trace/logs/run/", project, id);
+    pgraph.parseFolder(folder);
     System.out.println("Parse complete");
     // this.parseD4jTrace(tracefilename);
   }

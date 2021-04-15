@@ -114,6 +114,8 @@ public class ByteCodeGraph {
 	public Map<String, Set<Integer>> branch_stores;
 	private boolean shouldview;
 
+	private boolean resultFilter = false;
+
 	// to prevent lazy-evaluation on static initializers.
 	private boolean solveTracedInvoke = true;
 	public ParseInfo tracedInvoke = null;
@@ -712,6 +714,17 @@ public class ByteCodeGraph {
 		this.tracedInvoke = null;
 		this.unsolvedStatic = null;
 		this.initmaps();
+	}
+
+	public void parseFolder(String folder) {
+		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
+		try {
+			jTrace.parseFolder(folder);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("parse failed.");
+		}
+		parseJoinedTracePruned(jTrace);
 	}
 
 	public void pruneAndParse(String tracefilename) {
@@ -1687,7 +1700,7 @@ public class ByteCodeGraph {
 		}
 		resultLogger.writeln("Stmts:%d", stmts.size());
 		for (StmtNode n : stmts) {
-			if (!n.getreduced())
+			if (!this.resultFilter || !n.getreduced())
 				n.bpPrintProb(resultLogger);
 		}
 		resultLogger.writeln("Belief propagation time : %fs", bptime / 1000.0);
