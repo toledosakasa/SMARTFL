@@ -32,17 +32,19 @@ def getinstclassinfo(proj: str):
     os.system(cmdline)
 
 
-def getmetainfo(proj: str, id: str) -> Dict[str, str]:
+def getmetainfo(proj: str, id: str, debug=True) -> Dict[str, str]:
     ret = {}
     # caching
-    print('Checking for metainfo...', end='')
+    if debug:
+        print('Checking for metainfo...', end='')
     cachedir = os.path.abspath(f'./d4j_resources/metadata_cached/{proj}')
     if not os.path.exists(cachedir):
         os.mkdir(cachedir)
     cachepath = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}/{id}.log')
     if os.path.exists(cachepath):
-        print('found')
+        if debug:
+            print('found')
         lines = utf8open(cachepath).readlines()
         for line in lines:
             line = line.strip()
@@ -50,7 +52,8 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
             ret[splits[0]] = splits[1]
         return ret
 
-    print('not found. Generating metadata.')
+    if debug:
+        print('not found. Generating metadata.')
     # if not cached, generate metadata
     workdir = os.path.abspath(
         f'./tmp_checkout/{proj}/{id}')
@@ -58,7 +61,8 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     fields = ['tests.all', 'classes.relevant',
               'tests.trigger', 'tests.relevant']
 
-    print('Exporting metadata')
+    if debug:
+        print('Exporting metadata')
     for field in fields:
         tmp_logfieldfile = f'{workdir}/{field}.log'
         cmdline = f'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}'
@@ -67,7 +71,8 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
         os.system(cmdline)
         ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
-    print('Instrumenting all test methods')
+    if debug:
+        print('Instrumenting all test methods')
     cmdline_getallmethods = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'
     cmdline_getallmethods += f' > trace/runtimelog/{proj}{id}.instrumenter.log 2>&1'
     os.system(cmdline_getallmethods)
@@ -75,12 +80,14 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     ret['methods.test.all'] = utf8open(
         allmethodslog).read().replace('\n', ';')
     # write to cache
-    print('Writing to cache')
+    if debug:
+        print('Writing to cache')
     cachefile = utf8open_w(cachepath)
     for (k, v) in ret.items():
         cachefile.write(f'{k}={v}\n')
     # cleanup
-    print('Removing temporary file')
+    if debug:
+        print('Removing temporary file')
     # os.system(f'rm -rf {workdir}')
     os.system(f'rm {allmethodslog}')
     return ret
@@ -96,9 +103,10 @@ def parseprofile(line: str, trigger_tests: Set[str], testmethods: Set[str]):
     return class_name, method_name, is_trigger, is_test
 
 
-def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str]) -> List[str]:
-    print(f'parsing profile, length:{len(profile)}')
-    print('trigger tests are: ', trigger_tests)
+def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tests: List[str], testmethods: List[str], debug=True) -> List[str]:
+    if debug:
+        print(f'parsing profile, length:{len(profile)}')
+        print('trigger tests are: ', trigger_tests)
     relevant = []
     relevant_cnt = CountMap()
 
@@ -188,7 +196,7 @@ def parse_trigger_tests(trigger_tests):
     return trigger_tests_set, trigger_tests_map
 
 
-def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
+def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     classes_relevant = metadata['classes.relevant'].strip()
@@ -200,38 +208,44 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
 
     profile_result = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}/{id}.profile.log')
-    print('checking profiling result...', end='')
+    if debug:
+        print('checking profiling result...', end='')
     if(os.path.exists(profile_result)):
-        print('found')
+        if debug:
+            print('found')
         tmpstr = utf8open(profile_result).read()
         return json.loads(tmpstr)
 
-    print('not found')
     profile = checkoutdir + '/trace/logs/mytrace/profile.log'
-    print('checking profile...', end='')
+    if debug:
+        print('not found')
+        print('checking profile...', end='')
     if not os.path.exists(profile):
-        print('not found. generating...')
+        if debug:
+            print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
         simplelogcmd += f' > ../../../trace/runtimelog/{proj}{id}.profile.log 2>&1'
         os.system(cdcmd + simplelogcmd)
     else:
-        print('found')
+        if debug:
+            print('found')
     relevant_testmethods = resolve_profile(
-        utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods)
+        utf8open(profile).readlines(), classes_relevant.split(';'), trigger_tests.split(';'), testmethods, debug)
     # print(relevant_testmethods)
-    print('writing profiling result...')
+    if debug:
+        print('writing profiling result...')
     json.dump(relevant_testmethods, utf8open_w(profile_result))
     return relevant_testmethods
 
 
-def getd4jcmdline(proj: str, id: str) -> List[str]:
-    metadata = getmetainfo(proj, id)
+def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
+    metadata = getmetainfo(proj, id, debug)
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     classes_relevant = metadata['classes.relevant'].strip()
 
-    relevant_testmethods = getd4jtestprofile(metadata, proj, id)
+    relevant_testmethods = getd4jtestprofile(metadata, proj, id, debug)
 
     reltest_dict = {}  # {classname : [methodnames]}
     for (cname, mname) in relevant_testmethods:
@@ -245,15 +259,14 @@ def getd4jcmdline(proj: str, id: str) -> List[str]:
 
     instclasses = classes_relevant + ';' + ';'.join(reltest_dict.keys())
 
-    print('writing relevant insts')
+    if debug:
+        print('writing relevant insts')
     instclasses_cache = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}/{id}.inst.log')
     utf8open_w(instclasses_cache).write(instclasses)
 
     instclasses = instclasses.replace(";", ":")
-
-    print(
-        f'relevant tests:{relevant_testclass_number} classes, {relevant_method_number} methods')
+    print(f'{proj}{id} relevant tests:{relevant_testclass_number} classes, {relevant_method_number} methods')
     # print(reltest_dict)
     # input()
 
@@ -298,15 +311,15 @@ def clearcache(proj: str, id: str):
     os.system('rm '+cachepath)
 
 
-def rund4j(proj: str, id: str):
+def rund4j(proj: str, id: str, debug=True):
     time_start = time.time()
     checkout(proj, id)
-    cmdlines = getd4jcmdline(proj, id)
+    cmdlines = getd4jcmdline(proj, id, debug)
     checkoutdir = f'tmp_checkout/{proj}/{id}'
     # cleanup previous log
     previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
     if os.path.exists(previouslog):
-        print('removing previous trace logs.')
+        #print('removing previous trace logs.')
         os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
     cdcmd = f'cd {checkoutdir} && '
     cmdlines = [cdcmd + cmdline for cmdline in cmdlines]
@@ -342,11 +355,12 @@ def parse(proj: str, id: str, debug=True):
 def fl(proj: str, id: str, debug=True):
     cleanupcheckout(proj, id)
     clearcache(proj, id)
-    rund4j(proj, id)
+    rund4j(proj, id, debug)
     parse(proj, id, debug)
 
 
-def fl_wrap(proj: str, id: str):
+def fl_wrap(arg):
+    (proj, id) = arg
     print(f'running {proj}{id}')
     try:
         fl(proj, id, False)
@@ -361,7 +375,8 @@ def fl_wrap(proj: str, id: str):
 def testproj(proj: str):
     time_start = time.time()
 
-    cmdlines = [(proj, i)for i in range(1, project_bug_nums[proj]+1)]
+    cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
+    # print(cmdlines)
     with Pool(processes=8) as pool:
         pool.map(fl_wrap, cmdlines)
         pool.close()
