@@ -334,7 +334,8 @@ def rund4j(proj: str, id: str, debug=True):
     #     # input()
     #     os.system(cdcmd + cmdline)
     time_end = time.time()
-    print('d4j tracing complete after', time_end-time_start, 'sec')
+    if debug:
+        print('d4j tracing complete after', time_end-time_start, 'sec')
 
 
 def rerun(proj: str, id: str):
@@ -351,7 +352,7 @@ def parse(proj: str, id: str, debug=True):
     os.system(cmdline)
 
 
-@func_set_timeout(1800)
+# @func_set_timeout(1800)
 def fl(proj: str, id: str, debug=True):
     cleanupcheckout(proj, id)
     clearcache(proj, id)
@@ -359,13 +360,12 @@ def fl(proj: str, id: str, debug=True):
     parse(proj, id, debug)
 
 
-def fl_wrap(arg):
-    (proj, id) = arg
+def fl_wrap(proj: str, id: str):
     print(f'running {proj}{id}')
     try:
         fl(proj, id, False)
-    except func_timeout.exceptions.FunctionTimedOut:
-        print(f'timeout at {proj}-{id}')
+    # except func_timeout.exceptions.FunctionTimedOut:
+    #     print(f'timeout at {proj}-{id}')
     except:
         print(f'{proj}{id} failed.')
     deletecheckout(proj, id)
@@ -375,10 +375,12 @@ def fl_wrap(arg):
 def testproj(proj: str):
     time_start = time.time()
 
-    cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
+    #cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
+    cmdlines = [f'python3 s.py flw {proj} {i}' for i in range(
+        1, project_bug_nums[proj]+1)]
     # print(cmdlines)
     with Pool(processes=8) as pool:
-        pool.map(fl_wrap, cmdlines)
+        pool.map(os.system, cmdlines)
         pool.close()
         pool.join()
 
