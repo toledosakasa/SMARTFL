@@ -347,22 +347,21 @@ def fl(proj: str, id: str, debug=True):
 
 
 def fl_wrap(proj: str, id: str):
-    print(f'running {name}{i}')
+    print(f'running {proj}{id}')
     try:
-        fl(name, i, False)
+        fl(proj, id, False)
     except func_timeout.exceptions.FunctionTimedOut:
-        print(f'timeout at {name}-{i}')
+        print(f'timeout at {proj}-{id}')
     except:
-        print(f'{name}{i} failed.')
-    deletecheckout(name, i)
-    eval(name, i)
+        print(f'{proj}{id} failed.')
+    deletecheckout(proj, id)
+    eval(proj, id)
 
 
 def testproj(proj: str):
     time_start = time.time()
-    name = proj
 
-    cmdlines = [(name, i)for i in range(1, d4j.project_bug_nums[name]+1)]
+    cmdlines = [(proj, i)for i in range(1, project_bug_nums[proj]+1)]
     with Pool(processes=8) as pool:
         pool.map(fl_wrap, cmdlines)
         pool.close()
@@ -373,7 +372,7 @@ def testproj(proj: str):
     time_end = time.time()
     totaltime = time_end-time_start
     print(f'total time: {totaltime/60}min')
-    d4j.evalproj(name)
+    evalproj(proj)
 
 
 def evalproj_method(proj: str):
