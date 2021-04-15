@@ -140,7 +140,8 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     # TODO use relevant_cnt for filtering
     # relevant = list(set(relevant))
     # return sorted(relevant)
-    return relevant_cnt.filter(trigger_tests_map)
+    # return relevant_cnt.filter(trigger_tests_map)
+    return relevant_cnt.method_filter(trigger_tests_map, testmethods_set)
 
 
 def get_fail_coverage(profile, trigger_tests_set, testmethods_set):
@@ -352,7 +353,7 @@ def parse(proj: str, id: str, debug=True):
     os.system(cmdline)
 
 
-# @func_set_timeout(1800)
+@func_set_timeout(1800)
 def fl(proj: str, id: str, debug=True):
     cleanupcheckout(proj, id)
     clearcache(proj, id)
