@@ -62,13 +62,14 @@ def getmetainfo(proj: str, id: str) -> Dict[str, str]:
     for field in fields:
         tmp_logfieldfile = f'{workdir}/{field}.log'
         cmdline = f'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}'
-        cmdline += f' > trace/runtimelog/{proj}{id}d4j.export.log'
+        cmdline += f' >/dev/null 2>&1'
+        #cmdline += f' > trace/runtimelog/{proj}{id}d4j.export.log 2>&1'
         os.system(cmdline)
         ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
     print('Instrumenting all test methods')
     cmdline_getallmethods = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.Instrumenter" "-Dexec.args={proj} {id}"'
-    cmdline_getallmethods += f' > trace/runtimelog/{proj}{id}.instrumenter.log'
+    cmdline_getallmethods += f' > trace/runtimelog/{proj}{id}.instrumenter.log 2>&1'
     os.system(cmdline_getallmethods)
     allmethodslog = f'./d4j_resources/metadata_cached/{proj}/{id}.alltests.log'
     ret['methods.test.all'] = utf8open(
@@ -212,7 +213,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str):
         print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
-        simplelogcmd += f' > ../../../trace/runtimelog/{proj}{id}.profile.log'
+        simplelogcmd += f' > ../../../trace/runtimelog/{proj}{id}.profile.log 2>&1'
         os.system(cdcmd + simplelogcmd)
     else:
         print('found')
@@ -275,7 +276,7 @@ def checkout(proj: str, id: str):
         os.makedirs(checkoutpath)
     if not(os.path.exists(checkoutpath + '/.defects4j.config')):
         os.system(
-            f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id}')
+            f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id} >/dev/null 2>&1')
 
 
 def deletecheckout(proj: str, id: str):
@@ -330,17 +331,48 @@ def rerun(proj: str, id: str):
     rund4j(proj, id)
 
 
-def parse(proj: str, id: str):
+def parse(proj: str, id: str, debug=True):
     cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"'
+    if(not debug):
+        cmdline += '>/dev/null 2>&1'
     os.system(cmdline)
 
 
 @func_set_timeout(1800)
-def fl(proj: str, id: str):
+def fl(proj: str, id: str, debug=True):
     cleanupcheckout(proj, id)
     clearcache(proj, id)
     rund4j(proj, id)
-    parse(proj, id)
+    parse(proj, id, debug)
+
+
+def fl_wrap(proj: str, id: str):
+    print(f'running {name}{i}')
+    try:
+        d4j.fl(name, i, False)
+    except func_timeout.exceptions.FunctionTimedOut:
+        print(f'timeout at {name}-{i}')
+    except:
+        print(f'{name}{i} failed.')
+    d4j.deletecheckout(name, i)
+
+
+def testproj(proj: str):
+    time_start = time.time()
+    name = proj
+
+    cmdlines = [(name, i)for i in range(1, d4j.project_bug_nums[name]+1)]
+    with Pool(processes=8) as pool:
+        pool.map(fl_wrap, cmdlines)
+        pool.close()
+        pool.join()
+
+    # for i in range(1, d4j.project_bug_nums[name]+1):
+    #     fl_wrap(name, i)
+    time_end = time.time()
+    totaltime = time_end-time_start
+    print(f'total time: {totaltime/60}min')
+    d4j.evalproj(name)
 
 
 def evalproj_method(proj: str):

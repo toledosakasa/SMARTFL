@@ -76,18 +76,4 @@ if __name__ == '__main__':
         if(len(args) == 4):
             d4j.eval_method(args[2], args[3])
     if args[1] == 'testproj':
-        time_start = time.time()
-        name = args[2]
-        for i in range(1, d4j.project_bug_nums[name]+1):
-            print(f'running {name}{i}')
-            try:
-                d4j.fl(name, i)
-            except func_timeout.exceptions.FunctionTimedOut:
-                print(f'timeout at {name}-{i}')
-            except:
-                print(f'{name}{i} failed.')
-            d4j.deletecheckout(name, i)
-        time_end = time.time()
-        totaltime = time_end-time_start
-        print(f'total time: {totaltime/60}min')
-        d4j.evalproj(name)
+        d4j.testproj(args[2])
