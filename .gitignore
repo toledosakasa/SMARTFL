@@ -10,3 +10,4 @@ target/
 /result/
 *.pyc
 trace/runtimelog/
+d4j_resources/metadata_cached/*
