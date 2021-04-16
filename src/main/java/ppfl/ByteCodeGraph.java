@@ -79,6 +79,7 @@ public class ByteCodeGraph {
 
 	public boolean useD4jTest = false;
 	public Set<String> d4jMethodNames = new HashSet<>();
+	public Set<String> d4jTestClasses = new HashSet<>();
 	public Set<String> d4jTriggerTestNames = new HashSet<>();
 
 	private boolean isD4jTestMethod(String className, String methodName) {

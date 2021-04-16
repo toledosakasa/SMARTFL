@@ -19,6 +19,7 @@ public class GraphBuilder {
     String triggerTests = null;
     String relevantClasses = null;
     String allTestMethods = null;
+    String allTestClasses = null;
     String configpath = String.format("d4j_resources/metadata_cached/%s/%d.log", project, id);
     try (BufferedReader reader = new BufferedReader(new FileReader(configpath))) {
       String tmp;
@@ -27,9 +28,9 @@ public class GraphBuilder {
         // if (splt[0].equals("classes.relevant")) {
         // relevantClasses = splt[1];
         // }
-        // if (splt[0].equals("tests.all")) {
-        // allTestClasses = splt[1];
-        // }
+        if (splt[0].equals("tests.all")) {
+          allTestClasses = splt[1];
+        }
         if (splt[0].equals("tests.trigger")) {
           triggerTests = splt[1];
         }
@@ -57,6 +58,12 @@ public class GraphBuilder {
           // pgraph.addTracedDomain(s);
           pgraph.parseD4jSource(project, id, s);
         }
+      }
+    }
+    if (allTestClasses != null) {
+      for (String s : allTestClasses.split(";")) {
+        if (!s.isEmpty())
+          pgraph.d4jTestClasses.add(s);
       }
     }
 
