@@ -522,6 +522,8 @@ def eval(proj: str, id: str):
         fullname = f'{classname}.{methodname}:{linenumber}'
         if fullname in lines:
             continue
+        if classname.lower().startswith('test') or classname.lower().endswith('test'):
+            continue
         lines.add(fullname)
         i += 1
         if fullname in oracle_lines:
