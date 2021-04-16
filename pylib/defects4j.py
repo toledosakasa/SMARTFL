@@ -140,7 +140,8 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     # TODO use relevant_cnt for filtering
     # relevant = list(set(relevant))
     # return sorted(relevant)
-    return relevant_cnt.filter(trigger_tests_map)
+    # return relevant_cnt.filter(trigger_tests_map)
+    return relevant_cnt.method_filter(trigger_tests_map, testmethods_set)
 
 
 def get_fail_coverage(profile, trigger_tests_set, testmethods_set):
@@ -334,7 +335,8 @@ def rund4j(proj: str, id: str, debug=True):
     #     # input()
     #     os.system(cdcmd + cmdline)
     time_end = time.time()
-    print('d4j tracing complete after', time_end-time_start, 'sec')
+    if debug:
+        print('d4j tracing complete after', time_end-time_start, 'sec')
 
 
 def rerun(proj: str, id: str):
@@ -359,13 +361,12 @@ def fl(proj: str, id: str, debug=True):
     parse(proj, id, debug)
 
 
-def fl_wrap(arg):
-    (proj, id) = arg
+def fl_wrap(proj: str, id: str):
     print(f'running {proj}{id}')
     try:
         fl(proj, id, False)
-    except func_timeout.exceptions.FunctionTimedOut:
-        print(f'timeout at {proj}-{id}')
+    # except func_timeout.exceptions.FunctionTimedOut:
+    #     print(f'timeout at {proj}-{id}')
     except:
         print(f'{proj}{id} failed.')
     deletecheckout(proj, id)
@@ -375,10 +376,12 @@ def fl_wrap(arg):
 def testproj(proj: str):
     time_start = time.time()
 
-    cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
+    #cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
+    cmdlines = [f'python3 s.py flw {proj} {i}' for i in range(
+        1, project_bug_nums[proj]+1)]
     # print(cmdlines)
     with Pool(processes=8) as pool:
-        pool.map(fl_wrap, cmdlines)
+        pool.map(os.system, cmdlines)
         pool.close()
         pool.join()
 

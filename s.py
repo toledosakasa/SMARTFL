@@ -55,6 +55,9 @@ if __name__ == '__main__':
         #d4j.rund4j(args[2], args[3])
         #d4j.parse(args[2], args[3])
 
+    if args[1] == 'flw':
+        d4j.fl_wrap(args[2], args[3])
+
     if args[1] == 'rund4j':
         d4j.rund4j(args[2], args[3])
 

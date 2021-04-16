@@ -42,6 +42,8 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
+	private boolean useCachedClass = true;
+
 	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger_trace");
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
@@ -213,19 +215,21 @@ public class TraceTransformer implements ClassFileTransformer {
 		// debugLogger.write(String.format("[Agent] Transforming class %s",
 		// this.targetClassName));
 
-		String classcachefolder = "trace/classcache/";
-		File file = new File(classcachefolder);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		File classcache = new File(classcachefolder, this.targetClassName + ".log");
-		if (!this.simpleLog && classcache.exists()) {
-			// debugLogger.writeln("Cache loaded:" + this.targetClassName);
-			try {
-				return java.nio.file.Files.readAllBytes(classcache.toPath());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		if (useCachedClass) {
+			String classcachefolder = "trace/classcache/";
+			File file = new File(classcachefolder);
+			if (!file.exists()) {
+				file.mkdirs();
+			}
+			File classcache = new File(classcachefolder, this.targetClassName + ".log");
+			if (!this.simpleLog && classcache.exists()) {
+				// debugLogger.writeln("Cache loaded:" + this.targetClassName);
+				try {
+					return java.nio.file.Files.readAllBytes(classcache.toPath());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -280,8 +284,9 @@ public class TraceTransformer implements ClassFileTransformer {
 			System.out.println(e);
 			// debugLogger.error("[Bug]bytecode error", e);
 		}
-		if (!this.simpleLog) {
+		if (!this.simpleLog && useCachedClass) {
 			try {
+				String classcachefolder = "trace/classcache/";
 				java.nio.file.Files.write(Paths.get(classcachefolder, this.targetClassName + ".log"), byteCode);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
