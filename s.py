@@ -73,6 +73,11 @@ if __name__ == '__main__':
             d4j.evalproj(args[2])
         if(len(args) == 4):
             d4j.eval(args[2], args[3])
+    if args[1] == 'zeval':
+        if(len(args) == 3):
+            d4j.zevalproj(args[2])
+        if(len(args) == 4):
+            d4j.zeval(args[2], args[3])
     if args[1] == 'meval':
         if(len(args) == 3):
             d4j.evalproj_method(args[2])

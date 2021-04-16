@@ -411,6 +411,24 @@ def evalproj_method(proj: str):
     print(f'top1={top[1]},top3={top[3]},top10={top[10]},failed={no_result}')
 
 
+def zevalproj(proj: str):
+    no_oracle = 0
+    no_result = 0
+    not_listed = 0
+    top = []
+    for i in range(11):
+        top.append(0)
+    allbugs = project_bug_nums[proj]
+    for i in range(1, allbugs+1):
+        result = zeval(proj, str(i))
+        if(result > 0 and result <= 10):
+            for j in range(result, 11):
+                top[j] += 1
+        if result == -3:
+            no_result += 1
+    print(f'top1={top[1]},top3={top[3]},top10={top[10]},failed={no_result}')
+
+
 def evalproj(proj: str):
     no_oracle = 0
     no_result = 0
@@ -505,6 +523,40 @@ def eval(proj: str, id: str):
         if fullname in lines:
             continue
         lines.add(fullname)
+        i += 1
+        if fullname in oracle_lines:
+            ret = i
+            break
+    print(f'{proj}{id} result ranking: {ret}')
+    return ret
+
+
+def zeval(proj: str, id: str):
+    try:
+        oraclefile = utf8open(f'oracle/ActualFaultStatement/{proj}/{id}')
+    except IOError:
+        print(f'{proj}{id} has no oracle')
+        return -1
+    oracle_lines = set()
+    for line in oraclefile.readlines():
+        sp = line.split('||')
+        for oracle in sp:
+            oraclesp = oracle.rindex('.')
+            neworacle = oracle[:oraclesp]+':'+oracle[oraclesp+1:].split(':')[1]
+            oracle_lines.add(neworacle.strip())
+    # print(oracle_lines)
+    try:
+        resultfile = utf8open(
+            f'TSE19_result/{proj.lower()}{id}')
+    except IOError:
+        print(f'{proj}{id} has failed.')
+        return -2
+    i = 0
+    ret = -3
+    for line in resultfile.readlines():
+        sp = line.split(' ')
+        fullname = sp[0].strip()
+        # print(fullname)
         i += 1
         if fullname in oracle_lines:
             ret = i
