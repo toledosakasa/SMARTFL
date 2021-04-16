@@ -304,7 +304,7 @@ public class OpcodeInst {
 
 		// auto-assigned observation: test function always true
 		if (graph.auto_oracle) {
-			if (tDomain.tracemethod.contentEquals(graph.testname)) {
+			if (tDomain.tracemethod.contentEquals(graph.testname) || graph.d4jTestClasses.contains(tDomain.traceclass)) {
 				stmt.observe(true);
 				// debugWriter.writeln(String.format("Observe %s as true", stmt.getName()));
 			}
