@@ -1,0 +1,10 @@
+org.apache.commons.math.linear.AbstractRealMatrix:57 score: 1.52806915
+org.apache.commons.math.linear.AbstractRealMatrix:54 score: 1.52474343
+org.apache.commons.math.linear.OpenMapRealMatrix:52 score: 1.32602358
+org.apache.commons.math.linear.OpenMapRealMatrix:53 score: 1.32602358
+org.apache.commons.math.linear.OpenMapRealMatrix:50 score: 1.32602358
+org.apache.commons.math.linear.OpenMapRealMatrix:51 score: 1.32602358
+org.apache.commons.math.linear.OpenMapRealMatrix:49 score: 1.32602358
+org.apache.commons.math.linear.AbstractRealMatrix:60 score: 0.1737584
+org.apache.commons.math.linear.AbstractRealMatrix:53 score: 0.17043268
+org.apache.commons.math.linear.RealLinearOperator:52 score: 0.0
