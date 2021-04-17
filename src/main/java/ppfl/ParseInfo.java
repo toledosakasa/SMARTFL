@@ -1,6 +1,5 @@
 package ppfl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -85,7 +84,15 @@ public class ParseInfo {
 			// e.printStackTrace();
 			// }
 			// }
-			return this.getCallDomain().equals(oth.domain);
+			return this.getCallDomain().equals(oth.domain) || this.matchSimpleReturn(oth);
+		}
+		return false;
+	}
+
+	public boolean matchSimpleReturn(ParseInfo returnMsg) {
+		if (returnMsg.isReturnMsg) {
+			return this.matchDomain(returnMsg) && this.linenumber == returnMsg.linenumber
+					&& this.byteindex == returnMsg.byteindex;
 		}
 		return false;
 	}

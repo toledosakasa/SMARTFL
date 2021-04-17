@@ -119,6 +119,9 @@ public class ByteCodeGraph {
 
 	// to prevent lazy-evaluation on static initializers.
 	private boolean solveTracedInvoke = true;
+	public StmtNode tracedStmt;
+	public List<Node> traceduse;
+	public List<Node> tracedpred;
 	public ParseInfo tracedInvoke = null;
 
 	public StmtNode untracedStmt;
@@ -754,6 +757,15 @@ public class ByteCodeGraph {
 		// solve traced invoke
 		if (this.solveTracedInvoke && this.tracedInvoke != null) {
 			if (tracedInvoke.matchTracedInvoke(pInfo)) {
+				if (pInfo.isReturnMsg) {
+					// actually untraced due to instrumentation bug.
+					String desc = this.tracedInvoke.getvalue("calltype");
+					if (!OpcodeInst.isVoidMethodByDesc(desc)) {
+						Node defnode = this.addNewStackNode(this.untracedStmt);
+						buildFactor(defnode, this.tracedpred, this.traceduse, null, this.tracedStmt);
+					}
+					return;
+				}
 				this.tracedInvoke = null;
 				// return;
 			} else {
