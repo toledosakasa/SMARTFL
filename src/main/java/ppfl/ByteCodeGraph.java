@@ -134,6 +134,7 @@ public class ByteCodeGraph {
 	public List<Node> throwpred;
 	public ParseInfo unsolvedThrow = null;
 
+	private boolean solveStatic = false;
 	public StmtNode staticStmt;
 	public List<Node> staticuse;
 	public List<Node> staticpred;
@@ -759,16 +760,23 @@ public class ByteCodeGraph {
 			if (tracedInvoke.matchTracedInvoke(pInfo)) {
 				if (pInfo.isReturnMsg) {
 					// actually untraced due to instrumentation bug.
+					// pop stackframe that is pushed for nothing.
+					this.popStackFrame();
+					// System.out.println(tracedInvoke.getCallDomain());
 					String desc = this.tracedInvoke.getvalue("calltype");
 					if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 						Node defnode = this.addNewStackNode(this.untracedStmt);
 						buildFactor(defnode, this.tracedpred, this.traceduse, null, this.tracedStmt);
 					}
+					this.tracedInvoke = null;
 					return;
 				}
 				this.tracedInvoke = null;
 				// return;
 			} else {
+				// if (pInfo.domain.traceclass.contains("MutableDateTime")) {
+				// System.out.println("skipped,traced=" + this.tracedInvoke.getCallDomain());
+				// }
 				// System.out.println("skipped" + linec);
 				// System.out.println(this.tracedInvoke.getCallDomain());
 				// System.out.println(pInfo.domain);
@@ -843,7 +851,7 @@ public class ByteCodeGraph {
 			}
 		}
 
-		if (this.unsolvedStatic != null) {
+		if (solveStatic && this.unsolvedStatic != null) {
 			if (unsolvedStatic.matchStaticReturn(pInfo)) {
 				this.unsolvedStatic = null;
 				return;
@@ -921,6 +929,19 @@ public class ByteCodeGraph {
 				// System.exit(0);
 				throw (e);
 			}
+		}
+		// if crash occurs, lastDefinedVar should be modified with last call
+		if (untracedInvoke != null) {
+			System.out.println("end in untraced crash at" + tChunk.fullname);
+			untracedInvoke.debugprint();
+			Node exceptDef = addNewExceptionNode(untracedStmt);
+			buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
+		}
+		if (tracedInvoke != null) {
+			System.out.println("end in traced crash at" + tChunk.fullname);
+			tracedInvoke.debugprint();
+			Node exceptDef = addNewExceptionNode(tracedStmt);
+			buildFactor(exceptDef, tracedpred, traceduse, null, tracedStmt);
 		}
 		// after all lines are parsed, auto-assign oracle for the last defined var
 		// with test state(pass = true,fail = false)
@@ -1374,6 +1395,11 @@ public class ByteCodeGraph {
 
 	private boolean hasNode(String name) {
 		return nodemap.containsKey(getNodeName(name)) || stmtmap.containsKey(name);
+	}
+
+	public Node addNewExceptionNode(StmtNode stmt) {
+		Node ret = this.addNewStackNode(stmt);
+		return ret;
 	}
 
 	public Node addNewExceptionNode() {
