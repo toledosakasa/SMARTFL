@@ -25,8 +25,6 @@ import java.util.Set;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
@@ -241,41 +239,41 @@ public class TraceTransformer implements ClassFileTransformer {
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(targetClassName);
-			if (cc.getGenericSignature() != null) {
-				return cc.toBytecode();
-			}
+			// if (cc.getGenericSignature() != null) {
+			// return cc.toBytecode();
+			// }
 			writeWhatIsTraced("\n");
 			writeWhatIsTraced(this.targetClassName + "::");
 
 			List<MethodInfo> methods = new ArrayList<>();
 			// methods.addAll(cc.getClassFile().getMethods());
 
-			for (CtMethod cm : cc.getDeclaredMethods()) {
-				methods.add(cm.getMethodInfo());
+			for (MethodInfo m : cc.getClassFile().getMethods()) {
+				writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
+				transformBehavior(m, cc);
 			}
-			for (CtConstructor ccon : cc.getDeclaredConstructors()) {
-				methods.add(ccon.getMethodInfo());
-			}
-			for (MethodInfo m : methods) {
-				// if (!this.simpleLog && m.isStaticInitializer()) {
-				// continue;
-				// }
-				String longname = m.getName() + "#" + m.getDescriptor();
-				if (!transformedMethods.contains(longname)) {
-					transformedMethods.add(longname);
-					writeWhatIsTraced(longname + ",");
-					transformBehavior(m, cc);
-				}
-			}
-			MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
-			if (staticInit != null) {
-				writeWhatIsTraced(staticInit.getName() + "#" + staticInit.getDescriptor() + ",");
-				transformBehavior(staticInit, cc);
-			}
-
-			// for (CtBehavior m : cc.getDeclaredBehaviors()) {
-			// writeWhatIsTraced(m.getName() + "#" + m.getSignature() + ",");
+			// for (CtMethod cm : cc.getDeclaredMethods()) {
+			// methods.add(cm.getMethodInfo());
+			// }
+			// for (CtConstructor ccon : cc.getDeclaredConstructors()) {
+			// methods.add(ccon.getMethodInfo());
+			// }
+			// for (MethodInfo m : methods) {
+			// // if (!this.simpleLog && m.isStaticInitializer()) {
+			// // continue;
+			// // }
+			// String longname = m.getName() + "#" + m.getDescriptor();
+			// if (!transformedMethods.contains(longname)) {
+			// transformedMethods.add(longname);
+			// writeWhatIsTraced(longname + ",");
 			// transformBehavior(m, cc);
+			// }
+			// }
+			// MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
+			// if (staticInit != null) {
+			// writeWhatIsTraced(staticInit.getName() + "#" + staticInit.getDescriptor() +
+			// ",");
+			// transformBehavior(staticInit, cc);
 			// }
 			byteCode = cc.toBytecode();
 			cc.detach();
