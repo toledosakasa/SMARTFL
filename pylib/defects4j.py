@@ -67,7 +67,7 @@ def getmetainfo(proj: str, id: str, debug=True) -> Dict[str, str]:
         tmp_logfieldfile = f'{workdir}/{field}.log'
         cmdline = f'defects4j export -p {field} -w {workdir} -o {tmp_logfieldfile}'
         cmdline += f' >/dev/null 2>&1'
-        #cmdline += f' > trace/runtimelog/{proj}{id}d4j.export.log 2>&1'
+        # cmdline += f' > trace/runtimelog/{proj}{id}d4j.export.log 2>&1'
         os.system(cmdline)
         ret[field] = utf8open(tmp_logfieldfile).read().replace('\n', ';')
 
@@ -153,7 +153,7 @@ def get_fail_coverage(profile, trigger_tests_set, testmethods_set):
         class_name, method_name, is_trigger, is_test = parseprofile(
             line, trigger_tests_set, testmethods_set)
         if is_test:
-            #curclass, curmethod = class_name, method_name
+            # curclass, curmethod = class_name, method_name
             curtrigger = is_trigger
             continue
         if curtrigger:
@@ -320,7 +320,7 @@ def rund4j(proj: str, id: str, debug=True):
     # cleanup previous log
     previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
     if os.path.exists(previouslog):
-        #print('removing previous trace logs.')
+        # print('removing previous trace logs.')
         os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
     cdcmd = f'cd {checkoutdir} && '
     cmdlines = [cdcmd + cmdline for cmdline in cmdlines]
@@ -376,7 +376,7 @@ def fl_wrap(proj: str, id: str):
 def testproj(proj: str):
     time_start = time.time()
 
-    #cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
+    # cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
     cmdlines = [f'python3 s.py flw {proj} {i}' for i in range(
         1, project_bug_nums[proj]+1)]
     # print(cmdlines)
