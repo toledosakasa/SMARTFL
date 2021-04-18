@@ -87,6 +87,9 @@ public class JoinedTrace {
       name = name.substring(0, name.length() - suffix.length());
     int index = name.lastIndexOf('.');
     String fullname = name.substring(0, index) + "::" + name.substring(index + 1);
+    // Lang-6
+    // if (!fullname.endsWith("testEscapeSurrogatePairs"))
+    // return;
     this.addTraceChunk(fullname);
     try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
       String delimiterPrefix = "###";
