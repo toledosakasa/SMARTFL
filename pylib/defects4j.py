@@ -415,6 +415,7 @@ def zevalproj(proj: str):
     no_oracle = 0
     no_result = 0
     not_listed = 0
+    crashed = 0
     top = []
     for i in range(11):
         top.append(0)
@@ -426,13 +427,16 @@ def zevalproj(proj: str):
                 top[j] += 1
         if result == -3:
             no_result += 1
-    print(f'top1={top[1]},top3={top[3]},top10={top[10]},failed={no_result}')
+        if result == -2:
+            crashed+=1
+    print(f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
 
 
 def evalproj(proj: str):
     no_oracle = 0
     no_result = 0
     not_listed = 0
+    crashed = 0
     top = []
     for i in range(11):
         top.append(0)
@@ -444,7 +448,9 @@ def evalproj(proj: str):
                 top[j] += 1
         if result == -3:
             no_result += 1
-    print(f'top1={top[1]},top3={top[3]},top10={top[10]},failed={no_result}')
+        if result == -2:
+            crashed+=1
+    print(f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
 
 
 def eval_method(proj: str, id: str):
