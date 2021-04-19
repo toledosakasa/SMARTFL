@@ -20,7 +20,7 @@ class CountMap:
             self.class_relevant_cnt[curclass] = 1
 
     def method_filter(self, triggertests, testmethods):
-        max_method_count = 70
+        max_method_count = 50
         ret = []
         # always keep trigger tests.
         for triggerclass in triggertests:
