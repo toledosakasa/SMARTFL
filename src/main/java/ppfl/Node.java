@@ -134,8 +134,12 @@ public class Node {
 		this.obsvalue = obsvalue;
 	}
 
+	private boolean onlyfalse = true;
 	public boolean getobs() {
-		return obs;
+		if(onlyfalse)
+			return obs && (!obsvalue);
+		else
+			return obs;
 	}
 
 	public void setdedge(Edge e) {
