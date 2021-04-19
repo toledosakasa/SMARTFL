@@ -62,8 +62,11 @@ if __name__ == '__main__':
         d4j.rund4j(args[2], args[3])
 
     if args[1] == 'parsed4j':
-        d4j.parse(args[2], args[3])
-        d4j.eval(args[2], args[3])
+        if(len(args) == 4):
+            d4j.parse(args[2], args[3])
+            d4j.eval(args[2], args[3])
+        if(len(args) == 3):
+            d4j.parseproj(args[2])
     if args[1] == 'clearcache':
         d4j.clearcache(args[2], args[3])
         d4j.cleanupcheckout(args[2], args[3])

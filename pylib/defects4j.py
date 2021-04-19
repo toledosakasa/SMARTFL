@@ -352,6 +352,17 @@ def parse(proj: str, id: str, debug=True):
         cmdline += '>/dev/null 2>&1'
     os.system(cmdline)
 
+def parseproj(proj:str,debug = True):
+    cmdlines = [f'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
+        1, project_bug_nums[proj]+1)]
+    if(not debug):
+        for cmdline in cmdlines:
+            cmdline = cmdline + '>/dev/null 2>&1' 
+    with Pool(processes=8) as pool:
+        pool.map(os.system, cmdlines)
+        pool.close()
+        pool.join()
+    evalproj(proj)
 
 @func_set_timeout(1800)
 def fl(proj: str, id: str, debug=True):
