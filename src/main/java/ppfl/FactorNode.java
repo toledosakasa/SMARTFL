@@ -132,35 +132,29 @@ public class FactorNode {
 						if (mm == j)
 							continue;
 
-						if (bit0 == 0)
-						{
+						if (bit0 == 0) {
 							// double tmp00 = tmp0* (1 - tmpvlist.get(mm));
 							// if(Double.isNaN(tmp00))
-							// 	System.out.println("in 0 , tmp0 = "+tmp0+", val = "+(1 - tmpvlist.get(mm)));
+							// System.out.println("in 0 , tmp0 = "+tmp0+", val = "+(1 - tmpvlist.get(mm)));
 							tmp0 *= (1 - tmpvlist.get(mm));
 
-						}
-						else
-						{
+						} else {
 							// double tmp01 = tmp0* tmpvlist.get(mm);
 							// if(Double.isNaN(tmp01))
-							// 	System.out.println("in 1 , tmp0 = "+tmp0+", val = "+tmpvlist.get(mm));
+							// System.out.println("in 1 , tmp0 = "+tmp0+", val = "+tmpvlist.get(mm));
 							tmp0 *= tmpvlist.get(mm);
 						}
 
-						if (bit1 == 0)
-						{
+						if (bit1 == 0) {
 							// double tmp10 = tmp1* (1 - tmpvlist.get(mm));
 							// if(Double.isNaN(tmp10))
-							// 	System.out.println("in 0 , tmp1 = "+tmp1+", val = "+(1 - tmpvlist.get(mm)));
+							// System.out.println("in 0 , tmp1 = "+tmp1+", val = "+(1 - tmpvlist.get(mm)));
 							tmp1 *= (1 - tmpvlist.get(mm));
 
-						}
-						else
-						{
+						} else {
 							// double tmp11 = tmp1*tmpvlist.get(mm);
 							// if(Double.isNaN(tmp11))
-							// 	System.out.println("in 0 , tmp1 = "+tmp1+", val = "+tmpvlist.get(mm));
+							// System.out.println("in 0 , tmp1 = "+tmp1+", val = "+tmpvlist.get(mm));
 							tmp1 *= tmpvlist.get(mm);
 						}
 					}
@@ -170,14 +164,14 @@ public class FactorNode {
 				}
 			}
 			// if(v1 + v0 == 0.0){
-			// 	System.out.println("one 0 detected");
-			// 	alledges.get(j).set_fton(0.0);
+			// System.out.println("one 0 detected");
+			// alledges.get(j).set_fton(0.0);
 			// }
 			// else
 			// if(Double.isNaN(v1 / (v1 + v0))){
-			// 	System.out.println("find nan , v1 = "+v1+", v0 = "+v0);
+			// System.out.println("find nan , v1 = "+v1+", v0 = "+v0);
 			// }
-				alledges.get(j).set_fton(v1 / (v1 + v0));
+			alledges.get(j).set_fton(v1 / (v1 + v0));
 		}
 	}
 
