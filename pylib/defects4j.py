@@ -353,7 +353,7 @@ def parse(proj: str, id: str, debug=True):
     os.system(cmdline)
 
 def parseproj(proj:str,debug = True):
-    cmdlines = [f'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
+    cmdlines = [f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
         1, project_bug_nums[proj]+1)]
     if(not debug):
         for cmdline in cmdlines:
