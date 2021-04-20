@@ -31,6 +31,7 @@ public class ByteCodeGraph {
 
 	private MyWriter graphLogger = WriterUtils.getWriter("Debugger");
 	private MyWriter resultLogger = WriterUtils.getWriter("Debugger");
+	private MyWriter reduceLogger = WriterUtils.getWriter("Debugger");
 
 	private boolean debug_logger_switch = false;
 
@@ -44,6 +45,12 @@ public class ByteCodeGraph {
 		// MDC.put("resultfile", resultfile);
 		WriterUtils.setPath("trace/logs/mytrace/");
 		resultLogger = WriterUtils.getWriter(resultfile);
+	}
+
+	public void setReduceLogger(String resultfile) {
+		// MDC.put("resultfile", resultfile);
+		WriterUtils.setPath("trace/logs/mytrace/");
+		reduceLogger = WriterUtils.getWriter(resultfile);
 	}
 
 	private static Set<TraceDomain> tracedDomain = new HashSet<>();
@@ -115,7 +122,7 @@ public class ByteCodeGraph {
 	public Map<String, Set<Integer>> branch_stores;
 	private boolean shouldview;
 
-	private boolean resultFilter = false;
+	private boolean resultFilter = true;
 
 	// to prevent lazy-evaluation on static initializers.
 	private boolean solveTracedInvoke = true;
@@ -1642,6 +1649,19 @@ public class ByteCodeGraph {
 					n.print(graphLogger);
 			}
 			graphLogger.writeln("\n");
+		}
+
+		if (outreduced) {
+			reduceLogger.writeln("\nReduced Nodes: ");
+			for (Node n : stmts) {
+				if (n.getreduced())
+					n.print(reduceLogger);
+			}
+			// for (Node n : nodes) {
+			// 	if (n.getreduced())
+			// 		n.print(reduceLogger);
+			// }
+			reduceLogger.writeln("\n");
 		}
 
 		for (int i = 0; i < bp_times; i++) {

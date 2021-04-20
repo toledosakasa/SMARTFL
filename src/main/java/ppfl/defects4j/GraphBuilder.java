@@ -14,6 +14,8 @@ public class GraphBuilder {
     pgraph.setResultLogger(resultfile);
     String graphfile = String.format("ProbGraph-%s%d", project, id);
     pgraph.setGraphLogger(graphfile);
+    String reducefile = String.format("ReduceStmt-%s%d", project, id);
+    pgraph.setReduceLogger(reducefile);
 
     pgraph.useD4jTest = true;
     String triggerTests = null;
