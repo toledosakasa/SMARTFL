@@ -1601,29 +1601,46 @@ public class ByteCodeGraph {
 	}
 
 	public void mark_reduce(Node node) {
-		if (node.getreduced() == false)
-			return;
+		Deque<Node> reducestack = new ArrayDeque<>();
+		reducestack.push(node);
 		node.setreduced();
-		if (node.isStmt)
-			return;
-		FactorNode deffactor = (node.getdedge()).getfactor();
-		List<Node> pulist = deffactor.getpunodes();
-		for (Node n : pulist) {
-			mark_reduce(n);
+		while(!reducestack.isEmpty()){
+			Node reducNode = reducestack.pop();
+			FactorNode deffactor = (reducNode.getdedge()).getfactor();
+			deffactor.getstmt().setreduced();
+			List<Node> pulist = deffactor.getpunodes();
+			for (Node n : pulist) {
+				if(n.getreduced() == true &&!n.isStmt)
+				{
+					n.setreduced();
+					reducestack.push(n);
+				}
+			}
 		}
-		deffactor.getstmt().setreduced();
+		// if (node.getreduced() == false)
+		// 	return;
+		// node.setreduced();
+		// if (node.isStmt)
+		// 	return;
+		// FactorNode deffactor = (node.getdedge()).getfactor();
+		// List<Node> pulist = deffactor.getpunodes();
+		// for (Node n : pulist) {
+		// 	mark_reduce(n);
+		// }
+		// deffactor.getstmt().setreduced();
 	}
 
 	public void path_reduce() {
 		for (Node n : nodes) {
 			if (n.getobs()) {
-				mark_reduce(n);
+				if(n.getreduced())
+					mark_reduce(n);
 			}
 		}
 		// maybe won't be used?
 		for (Node n : stmts) {
 			if (n.getobs()) {
-				mark_reduce(n);
+				n.setreduced();
 			}
 		}
 	}
