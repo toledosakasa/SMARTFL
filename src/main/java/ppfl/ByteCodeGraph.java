@@ -17,6 +17,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
 import org.graphstream.graph.implementations.SingleGraph;
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
@@ -1681,6 +1683,7 @@ public class ByteCodeGraph {
 			reduceLogger.writeln("\n");
 		}
 
+		boolean loopend = false;
 		for (int i = 0; i < bp_times; i++) {
 			boolean isend = true;
 			for (FactorNode n : factornodes) {
@@ -1697,10 +1700,19 @@ public class ByteCodeGraph {
 			if (isend) {
 				if (debug_logger_switch)
 					graphLogger.writeln("\n\n%d\n\n", i);
+				resultLogger.writeln("Belief propagation time: %d\n", i);
+				loopend = true;
 				break;
 			}
 		}
-		Comparator<Node> comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
+		if(!loopend)
+			resultLogger.writeln("Belief propagation time: %d\n", bp_times);
+		boolean use_ap = false;
+		Comparator<Node> comp;
+		if(!use_ap)
+			comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
+		else
+			comp = (arg0, arg1) -> (arg0.ap_bp_getprob().compareTo(arg1.ap_bp_getprob()));
 		nodes.sort(comp);
 		stmts.sort(comp);
 
