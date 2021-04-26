@@ -46,6 +46,9 @@ public class DupInst extends OpcodeInst {
 		assert (top.getSize() == 1);
 		usenodes.add(top);
 		defnode = graph.addNewStackNode(stmt);
+		if (top.isHeapObject()) {
+			defnode.setAddress(top.getAddress());
+		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
