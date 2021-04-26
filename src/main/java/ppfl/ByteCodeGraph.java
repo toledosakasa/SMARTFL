@@ -132,11 +132,13 @@ public class ByteCodeGraph {
 	public List<Node> traceduse;
 	public List<Node> tracedpred;
 	public ParseInfo tracedInvoke = null;
+	public int tracedObj = 0;
 
 	public StmtNode untracedStmt;
 	public List<Node> untraceduse;
 	public List<Node> untracedpred;
 	public ParseInfo untracedInvoke = null;
+	public int untracedObj = 0;
 
 	public StmtNode throwStmt;
 	public List<Node> throwuse;
@@ -722,11 +724,41 @@ public class ByteCodeGraph {
 		System.out.print("\n");
 	}
 
-	private void cleanupOnChunkSwitch() {
-		this.untracedInvoke = null;
-		this.unsolvedThrow = null;
+	private void cleanTraced() {
 		this.tracedInvoke = null;
+		this.tracedStmt = null;
+		this.traceduse = null;
+		this.tracedpred = null;
+		this.tracedObj = 0;
+	}
+
+	private void cleanUntraced() {
+		this.untracedInvoke = null;
+		this.untracedStmt = null;
+		this.untraceduse = null;
+		this.untracedpred = null;
+		this.untracedObj = 0;
+	}
+
+	private void cleanThrow() {
+		this.unsolvedThrow = null;
+		this.throwStmt = null;
+		this.throwuse = null;
+		this.throwpred = null;
+	}
+
+	private void cleanStatic() {
 		this.unsolvedStatic = null;
+		this.staticStmt = null;
+		this.staticuse = null;
+		this.staticpred = null;
+	}
+
+	private void cleanupOnChunkSwitch() {
+		this.cleanUntraced();
+		this.cleanThrow();
+		this.cleanTraced();
+		this.cleanStatic();
 		this.initmaps();
 	}
 
@@ -772,16 +804,11 @@ public class ByteCodeGraph {
 					// pop stackframe that is pushed for nothing.
 					this.popStackFrame();
 					// System.out.println(tracedInvoke.getCallDomain());
-					String desc = this.tracedInvoke.getvalue("calltype");
-					if (!OpcodeInst.isVoidMethodByDesc(desc)) {
-						Node defnode = this.addNewStackNode(this.untracedStmt);
-						buildFactor(defnode, this.tracedpred, this.traceduse, null, this.tracedStmt);
-					}
-					this.tracedInvoke = null;
+					buildTracedInvoke();
 					return;
 				}
-				this.tracedInvoke = null;
-				// return;
+				this.cleanTraced();
+				// this.tracedInvoke = null;
 			} else {
 				// if (pInfo.domain.traceclass.contains("MutableDateTime")) {
 				// System.out.println("skipped,traced=" + this.tracedInvoke.getCallDomain());
@@ -802,20 +829,13 @@ public class ByteCodeGraph {
 					// normally returned
 					if (debugswitch)
 						System.out.println("normally returned");
-					String desc = this.untracedInvoke.getvalue("calltype");
-					if (!OpcodeInst.isVoidMethodByDesc(desc)) {
-						Node defnode = this.addNewStackNode(this.untracedStmt);
-						buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
-					}
-					this.untracedInvoke = null;
+					buildUntracedInvoke();
 					return;
 				} else {
 					if (debugswitch)
 						System.out.println("normally catched");
 					// catched
-					Node exceptDef = addNewExceptionNode();
-					buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
-					this.untracedInvoke = null;
+					buildUntracedInvokeException();
 				}
 			} else {
 				// check if the control flow had already been thrown upward
@@ -824,15 +844,8 @@ public class ByteCodeGraph {
 						System.out.println("thrown");
 						pInfo.debugprint();
 					}
-					TraceDomain curDomain = pInfo.domain;
-					TraceDomain frameDomain = this.getFrame().domain;
-					while (!curDomain.equals(frameDomain)) {
-						this.stackframe.pop();
-						frameDomain = this.getFrame().domain;
-					}
-					Node exceptDef = addNewExceptionNode();
-					buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
-					this.untracedInvoke = null;
+					maintainStackframeUpward(pInfo);
+					buildUntracedInvokeException();
 				} else {
 					// is inside untraced call. should skip
 					return;
@@ -843,15 +856,8 @@ public class ByteCodeGraph {
 		// solve current throw.
 		if (this.unsolvedThrow != null) {
 			if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
-				TraceDomain curDomain = pInfo.domain;
-				TraceDomain frameDomain = this.getFrame().domain;
-				while (!curDomain.equals(frameDomain)) {
-					this.stackframe.pop();
-					frameDomain = this.getFrame().domain;
-				}
-				Node exceptDef = addNewExceptionNode();
-				buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
-				this.unsolvedThrow = null;
+				maintainStackframeUpward(pInfo);
+				buildThrowException();
 			} else {
 				// should not happen
 				// maybe quit on crash.
@@ -908,6 +914,47 @@ public class ByteCodeGraph {
 			pInfo.debugprint();
 			debugStack(this.stackframe);
 		}
+	}
+
+	private void buildThrowException() {
+		Node exceptDef = addNewExceptionNode();
+		buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
+		this.cleanThrow();
+	}
+
+	private void maintainStackframeUpward(ParseInfo pInfo) {
+		TraceDomain curDomain = pInfo.domain;
+		TraceDomain frameDomain = this.getFrame().domain;
+		while (!curDomain.equals(frameDomain)) {
+			this.stackframe.pop();
+			frameDomain = this.getFrame().domain;
+		}
+	}
+
+	private void buildUntracedInvokeException() {
+		Node exceptDef = addNewExceptionNode();
+		buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
+		this.cleanUntraced();
+	}
+
+	private void buildUntracedInvoke() {
+		String desc = this.untracedInvoke.getvalue("calltype");
+		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
+			Node defnode = this.addNewStackNode(this.untracedStmt);
+			buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
+		}
+		this.cleanUntraced();
+	}
+
+	private void buildTracedInvoke() {
+		String desc = this.tracedInvoke.getvalue("calltype");
+		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
+			Node defnode = this.addNewStackNode(this.tracedStmt);
+			buildFactor(defnode, this.tracedpred, this.traceduse, null, this.tracedStmt);
+		}else{
+			Node defnode = this.get
+		}
+		this.cleanTraced();
 	}
 
 	private void parseChunk(TraceChunk tChunk) {
@@ -1606,28 +1653,27 @@ public class ByteCodeGraph {
 		Deque<Node> reducestack = new ArrayDeque<>();
 		reducestack.push(node);
 		node.setreduced();
-		while(!reducestack.isEmpty()){
+		while (!reducestack.isEmpty()) {
 			Node reducNode = reducestack.pop();
 			FactorNode deffactor = (reducNode.getdedge()).getfactor();
 			deffactor.getstmt().setreduced();
 			List<Node> pulist = deffactor.getpunodes();
 			for (Node n : pulist) {
-				if(n.getreduced() == true &&!n.isStmt)
-				{
+				if (n.getreduced() == true && !n.isStmt) {
 					n.setreduced();
 					reducestack.push(n);
 				}
 			}
 		}
 		// if (node.getreduced() == false)
-		// 	return;
+		// return;
 		// node.setreduced();
 		// if (node.isStmt)
-		// 	return;
+		// return;
 		// FactorNode deffactor = (node.getdedge()).getfactor();
 		// List<Node> pulist = deffactor.getpunodes();
 		// for (Node n : pulist) {
-		// 	mark_reduce(n);
+		// mark_reduce(n);
 		// }
 		// deffactor.getstmt().setreduced();
 	}
@@ -1635,7 +1681,7 @@ public class ByteCodeGraph {
 	public void path_reduce() {
 		for (Node n : nodes) {
 			if (n.getobs()) {
-				if(n.getreduced())
+				if (n.getreduced())
 					mark_reduce(n);
 			}
 		}
@@ -1677,8 +1723,8 @@ public class ByteCodeGraph {
 					n.print(reduceLogger);
 			}
 			// for (Node n : nodes) {
-			// 	if (n.getreduced())
-			// 		n.print(reduceLogger);
+			// if (n.getreduced())
+			// n.print(reduceLogger);
 			// }
 			reduceLogger.writeln("\n");
 		}
@@ -1705,11 +1751,11 @@ public class ByteCodeGraph {
 				break;
 			}
 		}
-		if(!loopend)
+		if (!loopend)
 			resultLogger.writeln("Belief propagation time: %d\n", bp_times);
 		boolean use_ap = false;
 		Comparator<Node> comp;
-		if(!use_ap)
+		if (!use_ap)
 			comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
 		else
 			comp = (arg0, arg1) -> (arg0.ap_bp_getprob().compareTo(arg1.ap_bp_getprob()));
