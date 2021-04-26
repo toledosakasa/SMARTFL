@@ -394,7 +394,8 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 
 			if (oi != null) {
-				oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+				if (!mi.isStaticInitializer())
+					oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
 			}
 			int previndex = index;
 			// move to the next inst. everything below this will be inserted after the inst.
@@ -405,9 +406,11 @@ public class TraceTransformer implements ClassFileTransformer {
 				// getstatic should be treated like invocation,
 				// in the case that static-initializer may be called.
 				if (oi instanceof InvokeInst || oi.form == 178) {
-					oi.insertReturnSite(ci, index, constp, instinfo, cbi);
+					if (!mi.isStaticInitializer())
+						oi.insertReturnSite(ci, index, constp, instinfo, cbi);
 				} else {
-					oi.insertByteCodeAfter(ci, index, constp, cbi);
+					if (!mi.isStaticInitializer())
+						oi.insertByteCodeAfter(ci, index, constp, cbi);
 				}
 			}
 		}
