@@ -1439,7 +1439,7 @@ public class ByteCodeGraph {
 		String nodename = this.getFormalStackNameWithIndex();
 		Node node = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, node);
-		this.getRuntimeStack().add(node);
+		this.getRuntimeStack().push(node);
 		return node;
 	}
 
