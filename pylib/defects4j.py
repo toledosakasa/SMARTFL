@@ -388,6 +388,25 @@ def testproj(proj: str):
     time_start = time.time()
 
     # cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
+    cmdlines = [f'python3 s.py fl {proj} {i}' for i in range(
+        1, project_bug_nums[proj]+1)]
+    # print(cmdlines)
+    with Pool(processes=8) as pool:
+        pool.map(os.system, cmdlines)
+        pool.close()
+        pool.join()
+
+    # for i in range(1, d4j.project_bug_nums[name]+1):
+    #     fl_wrap(name, i)
+    time_end = time.time()
+    totaltime = time_end-time_start
+    print(f'total time: {totaltime/60}min')
+    evalproj(proj)
+
+def testprojw(proj: str):
+    time_start = time.time()
+
+    # cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
     cmdlines = [f'python3 s.py flw {proj} {i}' for i in range(
         1, project_bug_nums[proj]+1)]
     # print(cmdlines)

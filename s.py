@@ -89,3 +89,5 @@ if __name__ == '__main__':
             d4j.eval_method(args[2], args[3])
     if args[1] == 'testproj':
         d4j.testproj(args[2])
+    if args[1] == 'testprojw':
+        d4j.testprojw(args[2])
