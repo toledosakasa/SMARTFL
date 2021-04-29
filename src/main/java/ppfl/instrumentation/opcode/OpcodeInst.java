@@ -82,6 +82,17 @@ public class OpcodeInst {
 		return rettype.contentEquals("V");
 	}
 
+    public static boolean isBooleanMethodByDesc(String desc) {
+		int endIndex = desc.lastIndexOf(')');
+		if (endIndex == -1) {
+			// System.err.println(beginIndex);
+			// System.err.println(endIndex);
+			throw new IllegalArgumentException("bracket mismatch in descriptor");
+		}
+		String rettype = desc.substring(endIndex + 1);
+		return rettype.contentEquals("Z");
+	}
+
 	public static List<String> splitMethodDesc(String desc) {
 		// \[*L[^;]+;|\[[ZBCSIFDJ]|[ZBCSIFDJ]
 		int beginIndex = desc.indexOf('(');

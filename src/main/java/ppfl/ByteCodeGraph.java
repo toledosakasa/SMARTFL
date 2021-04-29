@@ -805,7 +805,14 @@ public class ByteCodeGraph {
 					String desc = this.untracedInvoke.getvalue("calltype");
 					if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 						Node defnode = this.addNewStackNode(this.untracedStmt);
-						buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
+                        // if(OpcodeInst.isBooleanMethodByDesc(desc))
+                        // {
+                        //     List<String> ops = new ArrayList<>();
+                        //     ops.add("<");
+                        //     buildFactor(defnode, this.untracedpred, this.untraceduse, ops, this.untracedStmt);
+                        // }
+                        // else
+						    buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
 					}
 					this.untracedInvoke = null;
 					return;
