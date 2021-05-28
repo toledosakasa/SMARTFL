@@ -534,16 +534,39 @@ public class ByteCodeGraph {
     private int cnt;
 
     private void dfssearch(String inst) {
+        // visited.add(inst);
+        // List<String> thesuccs = postdataflowmap.get(inst);
+        // for (String succ : thesuccs) {
+        //     if (!visited.contains(succ)) {
+        //         dfssearch(succ);
+        //     }
+        // }
+        // reverse_postorder.addFirst(inst);
+        // postorder.put(inst, new Integer(cnt));
+        // cnt++;
+
+        Deque<String> searchstack = new ArrayDeque<>();
+        searchstack.push(inst);
         visited.add(inst);
-        List<String> thesuccs = postdataflowmap.get(inst);
-        for (String succ : thesuccs) {
-            if (!visited.contains(succ)) {
-                dfssearch(succ);
+        while (!searchstack.isEmpty()) {
+            String theinst = searchstack.peek();
+            List<String> thesuccs = postdataflowmap.get(theinst);
+            boolean isleaf = true;
+            for (String succ : thesuccs) {
+                if (!visited.contains(succ)) {
+                    visited.add(succ);
+                    searchstack.push(succ);
+                    isleaf = false;
+                }
+            }
+            if(isleaf)
+            {
+                reverse_postorder.addFirst(theinst);
+                postorder.put(theinst, cnt);
+                cnt++;
+                searchstack.pop();
             }
         }
-        reverse_postorder.addFirst(inst);
-        postorder.put(inst, new Integer(cnt));
-        cnt++;
     }
 
     private String intersect(String b1, String b2) {
