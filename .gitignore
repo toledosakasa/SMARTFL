@@ -13,3 +13,5 @@ trace/runtimelog/
 d4j_resources/metadata_cached/*
 tmp_checkout/*
 trace/logs/mytrace/ProbGraph*
+trace/logs/*
+triggertest/*

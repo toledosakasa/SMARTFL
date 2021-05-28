@@ -289,6 +289,7 @@ def checkout(proj: str, id: str):
     if not(os.path.exists(checkoutpath)):
         os.makedirs(checkoutpath)
     if not(os.path.exists(checkoutpath + '/.defects4j.config')):
+        print("in checkout")
         os.system(
             f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id} >/dev/null 2>&1')
 
@@ -601,3 +602,87 @@ def zeval(proj: str, id: str):
             break
     print(f'{proj}{id} result ranking: {ret}')
     return ret
+
+def gentrigger(proj:str):
+    allbugs = project_bug_nums[proj]
+    for i in range(1, allbugs+1):
+        try:
+            cleanupcheckout(proj, i)
+            clearcache(proj, i)
+            checkout(proj, i)
+            metadata = getmetainfo(proj, i)
+        except FileNotFoundError:
+            print(f'{proj}{i} has no trigger.')
+            continue
+            # cleanupcheckout(proj, i)
+            # clearcache(proj, i)
+            # checkout(proj, i)
+            # try:
+            #     metadata = getmetainfo(proj, i)
+            # except FileNotFoundError:
+            #     print(f'{proj}{i} has no trigger.')
+        trigger_tests = metadata['tests.trigger'].strip()
+        utf8open_w(f'./triggertest/{proj}/{i}').write(trigger_tests)
+        # print(f'{proj}{i} triggertest: {trigger_tests}')
+
+def match(proj:str, id:str):
+    oraclepath = f'./oracle/ActualFaultStatement/{proj}/{id}'
+    try:
+        oraclefile = utf8open(oraclepath)
+    except IOError:
+        print(f'{proj}{id} has no oracle')
+        return -1
+    oracle_lines = set()
+    for line in oraclefile.readlines():
+        sp = line.split('||')
+        for oracle in sp:
+            oracle_lines.add(oracle.strip())
+    
+    triggerpath = f'./triggertest/{proj}/{id}'
+    try:
+        triggertests = utf8open(triggerpath).read().strip().split(';')
+    except IOError:
+        print(f'{proj}{id} has no trigger')
+        return -2
+    for testlog in triggertests:
+        testlog = testlog.replace('::','.')
+        logpath = f'./tmp_checkout/{proj}/{id}/trace/logs/run/{testlog}.log'
+        try:
+            logfile = utf8open(logpath)
+        except IOError:
+            print(f'{proj}{id} has no trigger log')
+            return -3
+        for line in logfile.readlines():
+            sp = line.split(',')
+            for instinfo in sp:
+                spinfo = instinfo.split('=')
+                if spinfo[0] == 'lineinfo':
+                    sporacle = spinfo[1].split('#')
+                    compare_oracle = sporacle[0]+'.'+sporacle[1]+':'+sporacle[3]
+                    if compare_oracle in oracle_lines:
+                        print(f'{proj}{id}-{testlog} log has oracle')
+                        return 1
+    print(f'{proj}{id} has no oracle in log')
+    return 0
+
+def matchproj(proj: str):
+    no_oracle = 0
+    no_trigger = 0
+    in_log = 0
+    not_in_log = 0
+    no_trigger_log = 0
+    allbugs = project_bug_nums[proj]
+    for i in range(1, allbugs+1):
+        result = match(proj, str(i))
+        if result == 1:
+            in_log += 1
+        elif result == 0:
+            not_in_log += 1
+        elif result == -1:
+            no_oracle += 1
+        elif result == -2:
+            no_trigger += 1
+        else:
+            no_trigger_log += 1
+
+    print(f'in_log = {in_log}, not_in_log = {not_in_log}, no_oracle = {no_oracle}, no trigger = {no_trigger}, no_trigger_log = {no_trigger_log}')

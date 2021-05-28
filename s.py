@@ -91,3 +91,10 @@ if __name__ == '__main__':
         d4j.testproj(args[2])
     if args[1] == 'testprojw':
         d4j.testprojw(args[2])
+    if args[1] == 'gentrigger':
+        d4j.gentrigger(args[2])
+    if args[1] == 'match':
+        if(len(args) == 3):
+            d4j.matchproj(args[2])
+        if(len(args) == 4):
+            d4j.match(args[2], args[3])
