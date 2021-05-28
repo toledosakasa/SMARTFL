@@ -607,9 +607,9 @@ def gentrigger(proj:str):
     allbugs = project_bug_nums[proj]
     for i in range(1, allbugs+1):
         try:
-            cleanupcheckout(proj, i)
-            clearcache(proj, i)
-            checkout(proj, i)
+            # cleanupcheckout(proj, i)
+            # clearcache(proj, i)
+            # checkout(proj, i)
             metadata = getmetainfo(proj, i)
         except FileNotFoundError:
             print(f'{proj}{i} has no trigger.')
@@ -650,7 +650,7 @@ def match(proj:str, id:str):
         try:
             logfile = utf8open(logpath)
         except IOError:
-            print(f'{proj}{id} has no trigger log')
+            print(f'{proj}{id} misses log of triggertest    {testlog}')
             return -3
         for line in logfile.readlines():
             sp = line.split(',')
@@ -660,9 +660,9 @@ def match(proj:str, id:str):
                     sporacle = spinfo[1].split('#')
                     compare_oracle = sporacle[0]+'.'+sporacle[1]+':'+sporacle[3]
                     if compare_oracle in oracle_lines:
-                        print(f'{proj}{id}-{testlog} log has oracle')
+                        print(f'{proj}{id} log has oracle,              in {testlog}')
                         return 1
-    print(f'{proj}{id} has no oracle in log')
+    print(f'{proj}{id} has no oracle in trigger log')
     return 0
 
 def matchproj(proj: str):
