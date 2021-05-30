@@ -9,7 +9,7 @@ import ppfl.WriterUtils;
 
 public class GraphBuilder {
 
-  private static void setupD4jProject(ByteCodeGraph pgraph, String project, int id) {
+  private static void setupD4jProject(ByteCodeGraph pgraph, String project, int id, boolean usesimple) {
     String resultfile = String.format("InfResult-%s%d", project, id);
     pgraph.setResultLogger(resultfile);
     String graphfile = String.format("ProbGraph-%s%d", project, id);
@@ -99,7 +99,7 @@ public class GraphBuilder {
     String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
     // pgraph.pruneAndParse(tracefilename);
     String folder = String.format("tmp_checkout/%s/%s/trace/logs/run/", project, id);
-    pgraph.parseFolder(folder);
+    pgraph.parseFolder(folder, usesimple);
     System.out.println("Parse complete");
     // this.parseD4jTrace(tracefilename);
   }
@@ -112,10 +112,11 @@ public class GraphBuilder {
 
     pgraph.setAutoOracle(true);
     pgraph.setTraceAllClassed(false);
+    boolean usesimple = false;
     if (args.length >= 2) {
-      setupD4jProject(pgraph, args[0], Integer.parseInt(args[1]));
+      setupD4jProject(pgraph, args[0], Integer.parseInt(args[1]), usesimple);
     } else {
-      setupD4jProject(pgraph, "Lang", 7);
+      setupD4jProject(pgraph, "Lang", 7, false);
     }
     // pgraph.initD4jProject();
     // pgraph.printgraph();

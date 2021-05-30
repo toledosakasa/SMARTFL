@@ -17,8 +17,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
 import org.graphstream.graph.implementations.SingleGraph;
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
@@ -753,7 +751,7 @@ public class ByteCodeGraph {
         this.initmaps();
     }
 
-    public void parseFolder(String folder) {
+    public void parseFolder(String folder, boolean usesimple) {
         JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
         try {
             jTrace.parseFolder(folder);
@@ -761,7 +759,7 @@ public class ByteCodeGraph {
             e.printStackTrace();
             System.err.println("parse failed.");
         }
-        parseJoinedTracePruned(jTrace);
+        parseJoinedTracePruned(jTrace, usesimple);
     }
 
     public void pruneAndParse(String tracefilename) {
@@ -772,7 +770,17 @@ public class ByteCodeGraph {
             e.printStackTrace();
             System.err.println("parse failed.");
         }
-        parseJoinedTracePruned(jTrace);
+        parseJoinedTracePruned(jTrace, false);
+    }
+
+    private void parseSimpleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
+        this.parseinfo = pInfo;
+        String instname = this.parseinfo.getvalue("lineinfo");
+        if (this.parseinfo.isReturnMsg) {
+            return;
+        }
+        this.getFrame();
+        Interpreter.map[255].buildtrace_simple(this);
     }
 
     private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
@@ -941,6 +949,37 @@ public class ByteCodeGraph {
         }
     }
 
+    private void parseSimpleChunk(TraceChunk tChunk) {
+        this.cleanupOnChunkSwitch();
+        int tracelength = tChunk.parsedTraces.size();
+        System.out.println("parsing trace,length=" + tracelength + ":");
+        System.out.println("\t" + tChunk.fullname);
+        boolean testpass = tChunk.testpass;
+        this.testname = tChunk.getTestName();
+        boolean debugswitch = false;
+        int linec = 0;
+        for (ParseInfo pInfo : tChunk.parsedTraces) {
+            try {
+                linec++;
+                parseSimpleTrace(pInfo, debugswitch, linec);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("parse trace crashed");
+                System.out.println("Test name is: " + tChunk.fullname);
+                pInfo.debugprint();
+                // System.exit(0);
+                throw (e);
+            }
+        }
+        if (auto_oracle) {
+            for (Node i : lastDefinedVar) {
+                i.observe(testpass);
+                if (debug_logger_switch)
+                    graphLogger.writeln("Observe %s as %b", i.name, testpass);
+            }
+        }
+    }
+
     private void parseChunk(TraceChunk tChunk) {
         this.cleanupOnChunkSwitch();
         int tracelength = tChunk.parsedTraces.size();
@@ -994,12 +1033,15 @@ public class ByteCodeGraph {
         }
     }
 
-    public void parseJoinedTracePruned(JoinedTrace jTrace) {
+    public void parseJoinedTracePruned(JoinedTrace jTrace, boolean usesimple) {
         this.predstack.clear();
         this.initmaps();
         for (TraceChunk tChunk : jTrace.traceList) {
             try {
-                parseChunk(tChunk);
+                if (usesimple)
+                    parseSimpleChunk(tChunk);
+                else
+                    parseChunk(tChunk);
             } catch (Exception e) {
                 System.err.println("parse " + tChunk.fullname + " failed");
                 // e.printStackTrace();

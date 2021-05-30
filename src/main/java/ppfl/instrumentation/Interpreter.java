@@ -183,5 +183,7 @@ public class Interpreter {
 		map[200] = new Goto_wInst(200);
 		map[201] = new Jsr_wInst(201);
 
+		// for compromising
+		map[255] = new OpcodeInst(255, 1, 1);
 	}
 }

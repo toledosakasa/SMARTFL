@@ -62,7 +62,8 @@ public class OpcodeInst {
 
 	public OpcodeInst(int form, int pushnum, int popnum) {
 		this.form = form;
-		this.opcode = Mnemonic.OPCODE[form];
+		if (form != 255)
+			this.opcode = Mnemonic.OPCODE[form];
 		this.pushnum = pushnum;
 		this.popnum = popnum;
 	}
@@ -82,7 +83,7 @@ public class OpcodeInst {
 		return rettype.contentEquals("V");
 	}
 
-    public static boolean isBooleanMethodByDesc(String desc) {
+	public static boolean isBooleanMethodByDesc(String desc) {
 		int endIndex = desc.lastIndexOf(')');
 		if (endIndex == -1) {
 			// System.err.println(beginIndex);
@@ -321,6 +322,20 @@ public class OpcodeInst {
 			}
 		}
 
+	}
+
+	public void buildtrace_simple(ByteCodeGraph graph) {
+		buildstmt(graph);
+		this.prednodes = new ArrayList<>();
+		this.usenodes = new ArrayList<>();
+		this.defnode = null;
+		if (!graph.getRuntimeStack().isEmpty())
+			usenodes.add(graph.getRuntimeStack().pop());
+		defnode = graph.addNewStackNode(stmt);
+		if (this.doBuild && defnode != null) {
+			// TODO should consider ops.
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		}
 	}
 
 	// override needed.
