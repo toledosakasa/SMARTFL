@@ -11,7 +11,7 @@ alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "C
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 project_bug_nums = {"Lang": 65, "Math": 106,
                     "Time": 27, "Closure": 176, "Chart": 26}
-
+use_simple_filter = False
 
 def utf8open(filename):
     return open(filename, encoding='utf-8', errors='ignore')
@@ -140,8 +140,11 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     # TODO use relevant_cnt for filtering
     # relevant = list(set(relevant))
     # return sorted(relevant)
-    # return relevant_cnt.filter(trigger_tests_map)
-    return relevant_cnt.method_filter(trigger_tests_map, testmethods_set)
+
+    if use_simple_filter:
+        return relevant_cnt.method_filter_simple(trigger_tests_map,testmethods_set)
+    else:
+        return relevant_cnt.method_filter(trigger_tests_map, testmethods_set)
 
 
 def get_fail_coverage(profile, trigger_tests_set, testmethods_set):
@@ -392,7 +395,11 @@ def testproj(proj: str):
     cmdlines = [f'python3 s.py fl {proj} {i}' for i in range(
         1, project_bug_nums[proj]+1)]
     # print(cmdlines)
-    with Pool(processes=8) as pool:
+    if use_simple_filter:
+        processesnum = 64
+    else:
+        processesnum = 8
+    with Pool(processes=processesnum) as pool:
         pool.map(os.system, cmdlines)
         pool.close()
         pool.join()

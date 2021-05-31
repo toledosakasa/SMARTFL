@@ -19,6 +19,15 @@ class CountMap:
             self.class_method_cnt[curclass] = 1
             self.class_relevant_cnt[curclass] = 1
 
+    def method_filter_simple(self, triggertests, testmethods):
+        ret = []
+        # always keep trigger tests.
+        for triggerclass in triggertests:
+            for triggermethod in triggertests[triggerclass]:
+                ret.append((triggerclass, triggermethod))
+
+        return ret
+
     def method_filter(self, triggertests, testmethods):
         max_method_count = 50
         ret = []
