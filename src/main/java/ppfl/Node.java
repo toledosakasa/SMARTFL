@@ -103,7 +103,7 @@ public class Node {
 	}
 
 	public void setAddress(Integer add) {
-		// this.setHeapObject();
+		this.setHeapObject();
 		this.address = add;
 	}
 

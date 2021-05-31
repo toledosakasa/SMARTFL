@@ -11,6 +11,7 @@ public class NewInst extends OpcodeInst {
 
 	public NewInst(int _form) {
 		super(_form, 1, 0);
+		this.doBuild = false;
 	}
 
 	@Override
@@ -30,8 +31,8 @@ public class NewInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		// FIXME this could be buggy(NPE). returning zero-address for temporary
-		// solution.
-		defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		if (defnode != null)
+			defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 }

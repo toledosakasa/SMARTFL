@@ -13,6 +13,7 @@ public class MultiAnewArrayInst extends OpcodeInst {
 
 	public MultiAnewArrayInst(int _form) {
 		super(_form, -1, 1);
+		this.doBuild = false;
 	}
 
 	@Override
@@ -34,6 +35,8 @@ public class MultiAnewArrayInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		if (defnode != null)
+			defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 }
