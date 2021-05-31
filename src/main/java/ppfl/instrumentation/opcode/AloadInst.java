@@ -13,6 +13,7 @@ public class AloadInst extends OpcodeInst {
 
 	public AloadInst(int _form) {
 		super(_form, 1, 0);
+		this.doBuild = false;
 	}
 
 	@Override
@@ -39,7 +40,9 @@ public class AloadInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		if (defnode != null)
+			defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 }

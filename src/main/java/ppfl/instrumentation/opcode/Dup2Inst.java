@@ -1,5 +1,7 @@
 package ppfl.instrumentation.opcode;
 
+import java.util.ArrayList;
+
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -45,7 +47,10 @@ public class Dup2Inst extends OpcodeInst {
 		if (top.getSize() == 2) {
 			usenodes.add(top);
 			defnode = graph.addNewStackNode(stmt);
-			defnode.setSize(usenodes.get(0).getSize());
+			if (top.isHeapObject()) {
+				defnode.setAddress(top.getAddress());
+			}
+			defnode.setSize(2);
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		} else if (top.getSize() == 1) {
 			top = graph.getRuntimeStack().pop();
@@ -55,11 +60,17 @@ public class Dup2Inst extends OpcodeInst {
 
 			usenodes.add(nextTop);
 			defnode = graph.addNewStackNode(stmt);
+			if (nextTop.isHeapObject()) {
+				defnode.setAddress(nextTop.getAddress());
+			}
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 
-			usenodes.clear();
+			usenodes = new ArrayList<>();
 			usenodes.add(top);
 			defnode = graph.addNewStackNode(stmt);
+			if (top.isHeapObject()) {
+				defnode.setAddress(top.getAddress());
+			}
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
 

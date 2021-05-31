@@ -38,69 +38,69 @@ public class Dup2_x2Inst extends OpcodeInst {
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
+		// FIXME sure this is buggy, I'll fix this later.
 		// build the stmtnode(common)
 		super.buildtrace(graph);
 
-        Node top = graph.getRuntimeStack().peek();
+		Node top = graph.getRuntimeStack().peek();
 		if (top.getSize() == 4) {
 			top = graph.getRuntimeStack().pop();
-            Node nextTop = graph.getRuntimeStack().pop();
-		    //assert (nextTop.getSize() == 1);
-		    usenodes.add(top);
-		    defnode = graph.addNewStackNode(stmt);
-            graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-            graph.getRuntimeStack().push(nextTop);
-            graph.getRuntimeStack().push(top);
+			Node nextTop = graph.getRuntimeStack().pop();
+			// assert (nextTop.getSize() == 1);
+			usenodes.add(top);
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			graph.getRuntimeStack().push(nextTop);
+			graph.getRuntimeStack().push(top);
 		} else if (top.getSize() == 3) {
 			top = graph.getRuntimeStack().pop();
-            Node nextTop = graph.getRuntimeStack().pop();
-            Node ThirdTop = graph.getRuntimeStack().pop();
-		    //assert (ThirdTop.getSize() == 1);
-		    usenodes.add(nextTop);
-		    defnode = graph.addNewStackNode(stmt);
-            graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			Node nextTop = graph.getRuntimeStack().pop();
+			Node ThirdTop = graph.getRuntimeStack().pop();
+			// assert (ThirdTop.getSize() == 1);
+			usenodes.add(nextTop);
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 
-            usenodes.clear();
+			usenodes.clear();
 			usenodes.add(top);
 			defnode = graph.addNewStackNode(stmt);
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 
-            graph.getRuntimeStack().push(ThirdTop);
-            graph.getRuntimeStack().push(nextTop);
-            graph.getRuntimeStack().push(top);
-		}else if (top.getSize() == 2){
-            top = graph.getRuntimeStack().pop();
-            Node nextTop = graph.getRuntimeStack().pop();
-            Node ThirdTop = graph.getRuntimeStack().pop();
-		    //assert (ThirdTop.getSize() == 1);
-		    usenodes.add(top);
-		    defnode = graph.addNewStackNode(stmt);
-            graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-            graph.getRuntimeStack().push(ThirdTop);
-            graph.getRuntimeStack().push(nextTop);
-            graph.getRuntimeStack().push(top);
-        }else if (top.getSize() == 1){
-            top = graph.getRuntimeStack().pop();
-            Node nextTop = graph.getRuntimeStack().pop();
-            Node ThirdTop = graph.getRuntimeStack().pop();
-            Node FourthTop = graph.getRuntimeStack().pop();
-		    //assert (ThirdTop.getSize() == 1);
-		    usenodes.add(nextTop);
-		    defnode = graph.addNewStackNode(stmt);
-            graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-
-            usenodes.clear();
+			graph.getRuntimeStack().push(ThirdTop);
+			graph.getRuntimeStack().push(nextTop);
+			graph.getRuntimeStack().push(top);
+		} else if (top.getSize() == 2) {
+			top = graph.getRuntimeStack().pop();
+			Node nextTop = graph.getRuntimeStack().pop();
+			Node ThirdTop = graph.getRuntimeStack().pop();
+			// assert (ThirdTop.getSize() == 1);
 			usenodes.add(top);
 			defnode = graph.addNewStackNode(stmt);
-            graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-            
-            graph.getRuntimeStack().push(FourthTop);
-            graph.getRuntimeStack().push(ThirdTop);
-            graph.getRuntimeStack().push(nextTop);
-            graph.getRuntimeStack().push(top);
-        }
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			graph.getRuntimeStack().push(ThirdTop);
+			graph.getRuntimeStack().push(nextTop);
+			graph.getRuntimeStack().push(top);
+		} else if (top.getSize() == 1) {
+			top = graph.getRuntimeStack().pop();
+			Node nextTop = graph.getRuntimeStack().pop();
+			Node ThirdTop = graph.getRuntimeStack().pop();
+			Node FourthTop = graph.getRuntimeStack().pop();
+			// assert (ThirdTop.getSize() == 1);
+			usenodes.add(nextTop);
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+
+			usenodes.clear();
+			usenodes.add(top);
+			defnode = graph.addNewStackNode(stmt);
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+
+			graph.getRuntimeStack().push(FourthTop);
+			graph.getRuntimeStack().push(ThirdTop);
+			graph.getRuntimeStack().push(nextTop);
+			graph.getRuntimeStack().push(top);
+		}
 
 	}
-	
 
 }

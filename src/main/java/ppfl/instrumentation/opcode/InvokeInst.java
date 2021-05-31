@@ -62,6 +62,9 @@ public class InvokeInst extends OpcodeInst {
 		// for non-static invokes.
 		argcnt += this.argadd;
 
+		// if argadd avail.
+		Node objectAddress = null;
+
 		// collect arguments
 		if (graph.getRuntimeStack().size() < argcnt) {
 			System.err.println(String.format("%d stacks is not enough for %d args", graph.getRuntimeStack().size(), argcnt));
@@ -69,6 +72,10 @@ public class InvokeInst extends OpcodeInst {
 		for (int i = 0; i < argcnt; i++) {
 			Node node = graph.getRuntimeStack().pop();
 			usenodes.add(node);
+			// System.out.println(node.getStmtName());
+			if (i == argcnt - 1 && this.argadd == 1) {
+				objectAddress = node;
+			}
 		}
 
 		// mark untraced invokes
@@ -77,11 +84,21 @@ public class InvokeInst extends OpcodeInst {
 			graph.untracedStmt = stmt;
 			graph.untraceduse = usenodes;
 			graph.untracedpred = prednodes;
+			if (this.argadd == 1) {
+				if (!objectAddress.isHeapObject()) {
+					System.out.println("not a object:" + objectAddress.getStmtName());
+				}
+				graph.untracedObj = objectAddress;
+			}
 		} else {
 			graph.tracedInvoke = graph.parseinfo;
 			graph.tracedStmt = stmt;
 			graph.traceduse = usenodes;
 			graph.tracedpred = prednodes;
+			if (this.argadd == 1) {
+				assert (objectAddress.isHeapObject());
+				graph.tracedObj = objectAddress;
+			}
 		}
 
 		// // if not traced

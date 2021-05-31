@@ -14,6 +14,7 @@ public class Aload_NInst extends OpcodeInst {
 	public Aload_NInst(int _form, int _loadindex) {
 		super(_form, 1, 0);
 		loadindex = _loadindex;
+		this.doBuild = false;
 	}
 
 	@Override
@@ -33,7 +34,14 @@ public class Aload_NInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		if (defnode != null)
-			defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		if (defnode != null) {
+			int addr = graph.parseinfo.getAddressFromStack();
+			if (addr == 0) {
+				System.out.println("set zero addr:");
+				graph.parseinfo.debugprint();
+			}
+			defnode.setAddress(addr);
+		}
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 }
