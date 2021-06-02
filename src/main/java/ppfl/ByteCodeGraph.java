@@ -982,6 +982,7 @@ public class ByteCodeGraph {
 					graphLogger.writeln("Observe %s as %b", i.name, testpass);
 			}
 		}
+	}
 	private void buildThrowException() {
 		Node exceptDef = addNewExceptionNode();
 		buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
