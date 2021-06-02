@@ -26,6 +26,7 @@ import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
 import ppfl.instrumentation.TraceDomain;
 import ppfl.instrumentation.opcode.OpcodeInst;
+import ppfl.defects4j.GraphBuilder;
 
 public class ByteCodeGraph {
 
@@ -414,7 +415,8 @@ public class ByteCodeGraph {
 	}
 
 	public void parseD4jSource(String project, int id, String classname) {
-		String fullname = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/%s.source.log", project, id, classname);
+		String checkoutbase = GraphBuilder.getCheckoutBase();
+		String fullname = String.format("%s/%s/%s/trace/logs/mytrace/%s.source.log",checkoutbase, project, id, classname);
 		try {
 			parsesource(fullname);
 		} catch (Exception e) {
@@ -2129,7 +2131,8 @@ public class ByteCodeGraph {
 		// long endTime = System.currentTimeMillis();
 		// long thetime = endTime-startTime;
 		// System.out.println("idom time is "+ thetime);
-		String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
+		String checkoutbase = GraphBuilder.getCheckoutBase();
+		String tracefilename = String.format("%s/%s/%s/trace/logs/mytrace/all.log",checkoutbase, project, id);
 		this.parseJoinedTrace(tracefilename);
 		// this.parseD4jTrace(tracefilename);
 	}

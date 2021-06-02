@@ -9,6 +9,16 @@ import ppfl.WriterUtils;
 
 public class GraphBuilder {
 
+  public static String getCheckoutBase(){
+    String checkoutbase = null;
+		try (BufferedReader reader = new BufferedReader(new FileReader("checkout.config"))) {
+			checkoutbase = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return checkoutbase.trim();
+  }
+
   private static void setupD4jProject(ByteCodeGraph pgraph, String project, int id, boolean usesimple) {
     String resultfile = String.format("InfResult-%s%d", project, id);
     pgraph.setResultLogger(resultfile);
@@ -51,7 +61,8 @@ public class GraphBuilder {
       e.printStackTrace();
     }
 
-    String whatIsTracedLog = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/traced.source.log", project, id);
+    String checkoutbase = getCheckoutBase();
+    String whatIsTracedLog = String.format("%s/%s/%s/trace/logs/mytrace/traced.source.log",checkoutbase, project, id);
     pgraph.parseWhatIsTracedLog(whatIsTracedLog);
 
     if (relevantClasses != null) {
@@ -96,9 +107,9 @@ public class GraphBuilder {
     // long endTime = System.currentTimeMillis();
     // long thetime = endTime-startTime;
     // System.out.println("idom time is "+ thetime);
-    String tracefilename = String.format("tmp_checkout/%s/%s/trace/logs/mytrace/all.log", project, id);
+    String tracefilename = String.format("%s/%s/%s/trace/logs/mytrace/all.log",checkoutbase, project, id);
     // pgraph.pruneAndParse(tracefilename);
-    String folder = String.format("tmp_checkout/%s/%s/trace/logs/run/", project, id);
+    String folder = String.format("%s/%s/%s/trace/logs/run/",checkoutbase, project, id);
     pgraph.parseFolder(folder, usesimple);
     System.out.println("Parse complete");
     // this.parseD4jTrace(tracefilename);

@@ -20,6 +20,8 @@ def utf8open(filename):
 def utf8open_w(filename):
     return open(filename, 'w+', encoding='utf-8', errors='ignore')
 
+checkoutbase = utf8open('checkout.config').readline().strip()
+projectbase = os.path.abspath(".")
 
 def getd4jprojinfo():
     for proj in alld4jprojs:
@@ -56,7 +58,7 @@ def getmetainfo(proj: str, id: str, debug=True) -> Dict[str, str]:
         print('not found. Generating metadata.')
     # if not cached, generate metadata
     workdir = os.path.abspath(
-        f'./tmp_checkout/{proj}/{id}')
+        f'{checkoutbase}/{proj}/{id}')
     checkout(proj, id)
     fields = ['tests.all', 'classes.relevant',
               'tests.trigger', 'tests.relevant']
@@ -208,7 +210,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
     trigger_tests = metadata['tests.trigger'].strip()
     d4jdatafile = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}/{id}.log')
-    checkoutdir = f'tmp_checkout/{proj}/{id}'
+    checkoutdir = f'{checkoutbase}/{proj}/{id}'
 
     profile_result = os.path.abspath(
         f'./d4j_resources/metadata_cached/{proj}/{id}.profile.log')
@@ -229,7 +231,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
             print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
-        simplelogcmd += f' > ../../../trace/runtimelog/{proj}{id}.profile.log 2>&1'
+        simplelogcmd += f' > {projectbase}/trace/runtimelog/{proj}{id}.profile.log 2>&1'
         os.system(cdcmd + simplelogcmd)
     else:
         if debug:
@@ -288,23 +290,23 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
 
 
 def checkout(proj: str, id: str):
-    checkoutpath = f'./tmp_checkout/{proj}/{id}'
+    checkoutpath = f'{checkoutbase}/{proj}/{id}'
     if not(os.path.exists(checkoutpath)):
         os.makedirs(checkoutpath)
     if not(os.path.exists(checkoutpath + '/.defects4j.config')):
         print("in checkout")
         os.system(
-            f'defects4j checkout -p {proj} -v {id}b -w ./tmp_checkout/{proj}/{id} >/dev/null 2>&1')
+            f'defects4j checkout -p {proj} -v {id}b -w {checkoutbase}/{proj}/{id} >/dev/null 2>&1')
 
 
 def deletecheckout(proj: str, id: str):
-    checkoutpath = f'./tmp_checkout/{proj}/{id}'
+    checkoutpath = f'{checkoutbase}/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
-        os.system(f'rm -rf ./tmp_checkout/{proj}/{id}')
+        os.system(f'rm -rf {checkoutbase}/{proj}/{id}')
 
 
 def cleanupcheckout(proj: str, id: str):
-    checkoutpath = f'./tmp_checkout/{proj}/{id}'
+    checkoutpath = f'{checkoutbase}/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
         os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/run/')
@@ -320,7 +322,7 @@ def rund4j(proj: str, id: str, debug=True):
     time_start = time.time()
     checkout(proj, id)
     cmdlines = getd4jcmdline(proj, id, debug)
-    checkoutdir = f'tmp_checkout/{proj}/{id}'
+    checkoutdir = f'{checkoutbase}/{proj}/{id}'
     # cleanup previous log
     previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
     if os.path.exists(previouslog):
@@ -653,7 +655,7 @@ def match(proj:str, id:str):
         return -2
     for testlog in triggertests:
         testlog = testlog.replace('::','.')
-        logpath = f'./tmp_checkout/{proj}/{id}/trace/logs/run/{testlog}.log'
+        logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
         try:
             logfile = utf8open(logpath)
         except IOError:
