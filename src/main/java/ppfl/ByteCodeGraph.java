@@ -17,8 +17,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
 import org.graphstream.graph.implementations.SingleGraph;
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
@@ -112,6 +110,7 @@ public class ByteCodeGraph {
 	public Map<String, Integer> varcountmap;
 	public Map<String, Integer> stmtcountmap;
 	public Map<String, Integer> heapcountmap;
+	public Map<String, Integer> objectcountmap;
 	public Map<String, Integer> staticheapcountmap;
 	public org.graphstream.graph.Graph viewgraph;
 	public Set<String> instset;
@@ -132,13 +131,13 @@ public class ByteCodeGraph {
 	public List<Node> traceduse;
 	public List<Node> tracedpred;
 	public ParseInfo tracedInvoke = null;
-	public int tracedObj = 0;
+	public Node tracedObj = null;
 
 	public StmtNode untracedStmt;
 	public List<Node> untraceduse;
 	public List<Node> untracedpred;
 	public ParseInfo untracedInvoke = null;
-	public int untracedObj = 0;
+	public Node untracedObj = null;
 
 	public StmtNode throwStmt;
 	public List<Node> throwuse;
@@ -302,6 +301,7 @@ public class ByteCodeGraph {
 		varcountmap = new HashMap<>();
 		stmtcountmap = new HashMap<>();
 		heapcountmap = new HashMap<>();
+		objectcountmap = new HashMap<>();
 		staticheapcountmap = new HashMap<>();
 		instset = new HashSet<>();
 		outset = new HashSet<>();
@@ -379,6 +379,10 @@ public class ByteCodeGraph {
 		this.varcountmap = new HashMap<>();
 		this.stackframe = new ArrayDeque<>();
 		this.predicates.clear();
+		stmtcountmap = new HashMap<>();
+		heapcountmap = new HashMap<>();
+		objectcountmap = new HashMap<>();
+		staticheapcountmap = new HashMap<>();
 	}
 
 	public void parseWhatIsTracedLog(String logfilename) {
@@ -729,7 +733,7 @@ public class ByteCodeGraph {
 		this.tracedStmt = null;
 		this.traceduse = null;
 		this.tracedpred = null;
-		this.tracedObj = 0;
+		this.tracedObj = null;
 	}
 
 	private void cleanUntraced() {
@@ -737,7 +741,7 @@ public class ByteCodeGraph {
 		this.untracedStmt = null;
 		this.untraceduse = null;
 		this.untracedpred = null;
-		this.untracedObj = 0;
+		this.untracedObj = null;
 	}
 
 	private void cleanThrow() {
@@ -942,6 +946,16 @@ public class ByteCodeGraph {
 		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 			Node defnode = this.addNewStackNode(this.untracedStmt);
 			buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
+		} else {
+			// if (this.untracedObj != null) {
+			// Node defnode = this.getObjectNode(this.untracedObj);
+			// if (defnode == null) {
+			// System.out.println("null defnode:" + this.untracedObj.isHeapObject() +
+			// this.untracedObj.getAddress());
+			// }
+			// buildFactor(defnode, this.untracedpred, this.untraceduse, null,
+			// this.untracedStmt);
+			// }
 		}
 		this.cleanUntraced();
 	}
@@ -951,13 +965,19 @@ public class ByteCodeGraph {
 		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 			Node defnode = this.addNewStackNode(this.tracedStmt);
 			buildFactor(defnode, this.tracedpred, this.traceduse, null, this.tracedStmt);
-		}else{
-			Node defnode = this.get
+		} else {
+			// if (this.tracedObj != null) {
+			// Node defnode = this.getObjectNode(this.tracedObj);
+			// buildFactor(defnode, this.tracedpred, this.traceduse, null, this.tracedStmt);
+			// }
 		}
 		this.cleanTraced();
 	}
 
 	private void parseChunk(TraceChunk tChunk) {
+		// if (!tChunk.fullname.contains("testDateISO")) {
+		// return;
+		// }
 		this.cleanupOnChunkSwitch();
 		int tracelength = tChunk.parsedTraces.size();
 		System.out.println("parsing trace,length=" + tracelength + ":");
@@ -979,7 +999,7 @@ public class ByteCodeGraph {
 				parseSingleTrace(pInfo, debugswitch, linec);
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("parse trace crashed");
+				System.out.println("parse trace crashed at line " + linec);
 				System.out.println("Test name is: " + tChunk.fullname);
 				pInfo.debugprint();
 				// System.exit(0);
@@ -1225,6 +1245,21 @@ public class ByteCodeGraph {
 	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
 			StmtNode stmt) {
 
+		// substitution for heap object
+		// for (int i = 0; i < usenodes.size(); i++) {
+		// Node n = usenodes.get(i);
+		// if (n.isHeapObject()) {
+		// Node newNode = this.getObjectNode(n);
+		// if (newNode == null) {
+		// System.out.println("addr not found:" + n.getAddress());
+		// }
+		// usenodes.set(i, newNode);
+		// }
+		// }
+		// if (defnode.isHeapObject()) {
+		// defnode = this.addNewObjectNode(defnode, stmt);
+		// }
+
 		if (auto_oracle && !stmt.getMethod().contentEquals(this.testname) && !stmt.isUnexe()) {
 			int ln = stmt.getLineNumber();
 			if (this.lastDefinedLine != ln) {
@@ -1338,6 +1373,15 @@ public class ByteCodeGraph {
 		}
 	}
 
+	private void incObjectIndex(Node objectAddress) {
+		String def = getFormalObjectName(objectAddress);
+		if (!objectcountmap.containsKey(def)) {
+			objectcountmap.put(def, 1);
+		} else {
+			objectcountmap.put(def, objectcountmap.get(def) + 1);
+		}
+	}
+
 	private void incVarIndex(int varindex, TraceDomain domain) {
 		assert (this.getFrame().domain.equals(domain));
 		// assert (traceclass.equals(this.getFrame().traceclass));
@@ -1410,6 +1454,10 @@ public class ByteCodeGraph {
 		return field;
 	}
 
+	private String getFormalObjectName(Node objectAddress) {
+		return String.format("%x", objectAddress.getAddress());
+	}
+
 	private String getFormalHeapName(Node objectAddress, String field) {
 		return String.format("%x.%s", objectAddress.getAddress(), field);
 	}
@@ -1428,6 +1476,10 @@ public class ByteCodeGraph {
 
 	private String getFormalHeapNameWithIndex(Node objectAddress, String field) {
 		return getVarName(getFormalHeapName(objectAddress, field), this.heapcountmap);
+	}
+
+	private String getFormalObjectNameWithIndex(Node objectAddress) {
+		return getVarName(getFormalObjectName(objectAddress), this.objectcountmap);
 	}
 
 	private String getVarName(String name, Integer count) {
@@ -1480,13 +1532,23 @@ public class ByteCodeGraph {
 		return node;
 	}
 
+	public Node addNewObjectNode(Node objectAddress, StmtNode stmt) {
+		assert (objectAddress.isHeapObject());
+		this.incObjectIndex(objectAddress);
+		String nodename = this.getFormalObjectNameWithIndex(objectAddress);
+		Node node = new Node(nodename, this.testname, stmt);
+		node.setAddress(objectAddress.getAddress());
+		this.addNode(nodename, node);
+		return node;
+	}
+
 	public Node addNewStackNode(StmtNode stmt) {
 		// TODO stack node's name may get confused(same name, different node).
 		// TODO currently works fine, but may bring difficulty to debugging.
 		String nodename = this.getFormalStackNameWithIndex();
 		Node node = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, node);
-		this.getRuntimeStack().add(node);
+		this.getRuntimeStack().push(node);
 		return node;
 	}
 
@@ -1554,11 +1616,15 @@ public class ByteCodeGraph {
 	}
 
 	public Node getStaticHeapNode(String field) {
-		return this.getNode(this.getFormalStaticHeapName(field));
+		return this.getNode(this.getFormalStaticHeapNameWithIndex(field));
 	}
 
 	public Node getHeapNode(Node objectAddress, String field) {
-		return this.getNode(this.getFormalHeapName(objectAddress, field));
+		return this.getNode(this.getFormalHeapNameWithIndex(objectAddress, field));
+	}
+
+	public Node getObjectNode(Node objectAddress) {
+		return this.getNode(this.getFormalObjectNameWithIndex(objectAddress));
 	}
 
 	public Node getLoadNodeAsUse(int loadvar) {
@@ -1570,8 +1636,11 @@ public class ByteCodeGraph {
 			return nodemap.get(getNodeName(name));
 		else if (stmtmap.containsKey(name))
 			return stmtmap.get(name);
-		else
+		else {
+			// System.out.println("getnode return null:" + name);
 			return null;
+		}
+
 	}
 
 	public void solve(List<Node> allnodes, int cur, int tot) {
