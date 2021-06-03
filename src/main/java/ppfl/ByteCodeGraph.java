@@ -986,7 +986,7 @@ public class ByteCodeGraph {
 		}
 	}
 	private void buildThrowException() {
-		Node exceptDef = addNewExceptionNode();
+		Node exceptDef = addNewExceptionNode(throwStmt);
 		buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
 		this.cleanThrow();
 	}
@@ -1001,7 +1001,7 @@ public class ByteCodeGraph {
 	}
 
 	private void buildUntracedInvokeException() {
-		Node exceptDef = addNewExceptionNode();
+		Node exceptDef = addNewExceptionNode(untracedStmt);
 		buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
 		this.cleanUntraced();
 	}
