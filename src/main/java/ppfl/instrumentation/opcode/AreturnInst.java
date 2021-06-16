@@ -26,10 +26,24 @@ public class AreturnInst extends OpcodeInst {
 	}
 
 	@Override
-	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
-		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
-		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.tsindex_object, instpos + 1);
+	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
+			throws BadBytecode {
+		if (inst != null && !inst.equals("")) {
+			// insertmap.get(ln).append(inst);
+			int instpos = ci.insertGap(9);
+			// inst = encode(inst);
+			int instindex = constp.addStringInfo(inst);
+			// System.out.println(constp.getStringInfo(instindex));
+
+			ci.writeByte(19, instpos);// ldc_w
+			ci.write16bit(instindex, instpos + 1);
+
+			ci.writeByte(184, instpos + 3);// invokestatic
+			ci.write16bit(cbi.logstringindex, instpos + 4);
+
+			ci.writeByte(184, instpos + 6);// invokestatic
+			ci.write16bit(cbi.tsindex_object, instpos + 7);
+		}
 	}
 
 	@Override
@@ -41,6 +55,11 @@ public class AreturnInst extends OpcodeInst {
 		graph.popStackFrame();
 		// def in caller frame
 		Node defnode = graph.addNewStackNode(stmt);
+		if (defnode != null) {
+			Integer addr = graph.parseinfo.getAddressFromStack();
+			if (addr != null)
+				defnode.setAddress(addr);
+		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		graph.killPredStack("OUT_" + stmt.getClassMethod());
 	}
