@@ -50,7 +50,7 @@ public class IincInst extends OpcodeInst {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
 		int incVar = getu16bitpara(ci, index);
 		ret.append(",store=" + incVar);
-		ret.append(",CONST=" + getu16bitpara(ci, index + 2));
+		ret.append(",CONST=" + gets16bitpara(ci, index + 2));
 		return ret.toString();
 	}
 
