@@ -37,9 +37,10 @@ public class MultiAnewArrayInst extends OpcodeInst {
 		super.buildtrace(graph);
 		if (defnode != null) {
 			Integer addr = graph.parseinfo.getAddressFromStack();
-			if(addr != null)
+			if (addr != null)
 				defnode.setAddress(addr);
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
+
 }
