@@ -132,6 +132,35 @@ public class OpcodeInst {
 		return constp.getLdcValue(ci.byteAt(cindex + paraindex)).toString();
 	}
 
+	int dispatchByDesc(String desc, CallBackIndex cbi) {
+		if (desc.length() < 1) {
+			return 0;
+		}
+		switch (desc.charAt(0)) {
+			case 'L':
+			case '[':
+				return cbi.tsindex_object;
+			case 'B':
+				return cbi.tsindex_byte;
+			case 'C':
+				return cbi.tsindex_char;
+			case 'D':
+				return cbi.tsindex_double;
+			case 'F':
+				return cbi.tsindex_float;
+			case 'I':
+				return cbi.tsindex_int;
+			case 'J':
+				return cbi.tsindex_long;
+			case 'S':
+				return cbi.tsindex_short;
+			case 'Z':
+				return cbi.tsindex_boolean;
+			default:
+				return 0;
+		}
+	}
+
 	int get1para(CodeIterator ci, int index) {
 		if (ci == null)
 			return 0;
