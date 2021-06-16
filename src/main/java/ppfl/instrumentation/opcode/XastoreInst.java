@@ -16,4 +16,6 @@ public class XastoreInst extends OpcodeInst {
 		return ret.toString();
 	}
 
+    // TODO: build trace
+
 }
