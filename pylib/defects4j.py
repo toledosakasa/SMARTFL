@@ -13,6 +13,7 @@ project_bug_nums = {"Lang": 65, "Math": 106,
                     "Time": 27, "Closure": 176, "Chart": 26}
 use_simple_filter = False
 
+
 def utf8open(filename):
     return open(filename, encoding='utf-8', errors='ignore')
 
@@ -20,8 +21,10 @@ def utf8open(filename):
 def utf8open_w(filename):
     return open(filename, 'w+', encoding='utf-8', errors='ignore')
 
+
 checkoutbase = utf8open('checkout.config').readline().strip()
 projectbase = os.path.abspath(".")
+
 
 def getd4jprojinfo():
     for proj in alld4jprojs:
@@ -144,7 +147,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     # return sorted(relevant)
 
     if use_simple_filter:
-        return relevant_cnt.method_filter_simple(trigger_tests_map,testmethods_set)
+        return relevant_cnt.method_filter_simple(trigger_tests_map, testmethods_set)
     else:
         return relevant_cnt.method_filter(trigger_tests_map, testmethods_set)
 
@@ -358,17 +361,19 @@ def parse(proj: str, id: str, debug=True):
         cmdline += '>/dev/null 2>&1'
     os.system(cmdline)
 
-def parseproj(proj:str,debug = True):
+
+def parseproj(proj: str, debug=True):
     cmdlines = [f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
         1, project_bug_nums[proj]+1)]
     if(not debug):
         for cmdline in cmdlines:
-            cmdline = cmdline + '>/dev/null 2>&1' 
-    with Pool(processes=8) as pool:
+            cmdline = cmdline + '>/dev/null 2>&1'
+    with Pool(processes=16) as pool:
         pool.map(os.system, cmdlines)
         pool.close()
         pool.join()
     evalproj(proj)
+
 
 @func_set_timeout(1800)
 def fl(proj: str, id: str, debug=True):
@@ -412,6 +417,7 @@ def testproj(proj: str):
     totaltime = time_end-time_start
     print(f'total time: {totaltime/60}min')
     evalproj(proj)
+
 
 def testprojw(proj: str):
     time_start = time.time()
@@ -468,8 +474,9 @@ def zevalproj(proj: str):
         if result == -3:
             no_result += 1
         if result == -2:
-            crashed+=1
-    print(f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
+            crashed += 1
+    print(
+        f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
 
 
 def evalproj(proj: str):
@@ -489,8 +496,9 @@ def evalproj(proj: str):
         if result == -3:
             no_result += 1
         if result == -2:
-            crashed+=1
-    print(f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
+            crashed += 1
+    print(
+        f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
 
 
 def eval_method(proj: str, id: str):
@@ -612,7 +620,8 @@ def zeval(proj: str, id: str):
     print(f'{proj}{id} result ranking: {ret}')
     return ret
 
-def gentrigger(proj:str):
+
+def gentrigger(proj: str):
     allbugs = project_bug_nums[proj]
     for i in range(1, allbugs+1):
         try:
@@ -634,7 +643,8 @@ def gentrigger(proj:str):
         utf8open_w(f'./triggertest/{proj}/{i}').write(trigger_tests)
         # print(f'{proj}{i} triggertest: {trigger_tests}')
 
-def match(proj:str, id:str):
+
+def match(proj: str, id: str):
     oraclepath = f'./oracle/ActualFaultStatement/{proj}/{id}'
     try:
         oraclefile = utf8open(oraclepath)
@@ -646,7 +656,7 @@ def match(proj:str, id:str):
         sp = line.split('||')
         for oracle in sp:
             oracle_lines.add(oracle.strip())
-    
+
     triggerpath = f'./triggertest/{proj}/{id}'
     try:
         triggertests = utf8open(triggerpath).read().strip().split(';')
@@ -654,7 +664,7 @@ def match(proj:str, id:str):
         print(f'{proj}{id} has no trigger')
         return -2
     for testlog in triggertests:
-        testlog = testlog.replace('::','.')
+        testlog = testlog.replace('::', '.')
         logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
         try:
             logfile = utf8open(logpath)
@@ -667,12 +677,15 @@ def match(proj:str, id:str):
                 spinfo = instinfo.split('=')
                 if spinfo[0] == 'lineinfo':
                     sporacle = spinfo[1].split('#')
-                    compare_oracle = sporacle[0]+'.'+sporacle[1]+':'+sporacle[3]
+                    compare_oracle = sporacle[0] + \
+                        '.'+sporacle[1]+':'+sporacle[3]
                     if compare_oracle in oracle_lines:
-                        print(f'{proj}{id} log has oracle,              in {testlog}')
+                        print(
+                            f'{proj}{id} log has oracle,              in {testlog}')
                         return 1
     print(f'{proj}{id} has no oracle in trigger log')
     return 0
+
 
 def matchproj(proj: str):
     no_oracle = 0
