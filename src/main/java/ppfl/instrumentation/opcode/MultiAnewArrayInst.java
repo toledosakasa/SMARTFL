@@ -35,8 +35,11 @@ public class MultiAnewArrayInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		if (defnode != null)
-			defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		if (defnode != null) {
+			Integer addr = graph.parseinfo.getAddressFromStack();
+			if(addr != null)
+				defnode.setAddress(addr);
+		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 }

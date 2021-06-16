@@ -35,12 +35,9 @@ public class Aload_NInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		if (defnode != null) {
-			int addr = graph.parseinfo.getAddressFromStack();
-			if (addr == 0) {
-				System.out.println("set zero addr:");
-				graph.parseinfo.debugprint();
-			}
-			defnode.setAddress(addr);
+			Integer addr = graph.parseinfo.getAddressFromStack();
+			if(addr != null)
+				defnode.setAddress(addr);
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
