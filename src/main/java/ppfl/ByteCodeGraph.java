@@ -22,11 +22,11 @@ import org.graphstream.graph.implementations.SingleGraph;
 // import org.slf4j.LoggerFactory;
 // import org.slf4j.MDC;
 
+import ppfl.defects4j.GraphBuilder;
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
 import ppfl.instrumentation.TraceDomain;
 import ppfl.instrumentation.opcode.OpcodeInst;
-import ppfl.defects4j.GraphBuilder;
 
 public class ByteCodeGraph {
 
@@ -326,8 +326,8 @@ public class ByteCodeGraph {
 		shouldview = false;
 		String styleSheet = "node {" +
 		// " text-background-mode: rounded-box;"+
-				"	text-alignment: at-right;" + "	text-offset: 5px, 0px;" + "	text-style: italic;"
-				+ "	size: 15px, 15px;" + "}" +
+				"	text-alignment: at-right;" + "	text-offset: 5px, 0px;" + "	text-style: italic;" + "	size: 15px, 15px;" + "}"
+				+
 				// "node.thenode {" +
 				// // " shape: box;"+
 				// " size: 15px, 15px;"+
@@ -342,8 +342,8 @@ public class ByteCodeGraph {
 				// " shape: box;"+
 				"	size: 10px, 10px;" + "	fill-color: brown;" + "}" + "edge {" + "	fill-color: red;" +
 				// " layout.weight: 10;"+
-				"}" + "edge.def {" + "	fill-color: green;" + "}" + "edge.use {" + "	fill-color: blue;" + "}"
-				+ "edge.pred {" + "	fill-color: yellow;" + "}" + "edge.stmt {" + "	fill-color: black;" + "}";
+				"}" + "edge.def {" + "	fill-color: green;" + "}" + "edge.use {" + "	fill-color: blue;" + "}" + "edge.pred {"
+				+ "	fill-color: yellow;" + "}" + "edge.stmt {" + "	fill-color: black;" + "}";
 		viewgraph.setAttribute("ui.stylesheet", styleSheet);
 		viewgraph.setAttribute("ui.quality");
 		viewgraph.setAttribute("ui.antialias");
@@ -416,7 +416,7 @@ public class ByteCodeGraph {
 
 	public void parseD4jSource(String project, int id, String classname) {
 		String checkoutbase = GraphBuilder.getCheckoutBase();
-		String fullname = String.format("%s/%s/%s/trace/logs/mytrace/%s.source.log",checkoutbase, project, id, classname);
+		String fullname = String.format("%s/%s/%s/trace/logs/mytrace/%s.source.log", checkoutbase, project, id, classname);
 		try {
 			parsesource(fullname);
 		} catch (Exception e) {
@@ -545,9 +545,9 @@ public class ByteCodeGraph {
 		// visited.add(inst);
 		// List<String> thesuccs = postdataflowmap.get(inst);
 		// for (String succ : thesuccs) {
-		//	 if (!visited.contains(succ)) {
-		//		 dfssearch(succ);
-		//	 }
+		// if (!visited.contains(succ)) {
+		// dfssearch(succ);
+		// }
 		// }
 		// reverse_postorder.addFirst(inst);
 		// postorder.put(inst, new Integer(cnt));
@@ -567,8 +567,7 @@ public class ByteCodeGraph {
 					isleaf = false;
 				}
 			}
-			if(isleaf)
-			{
+			if (isleaf) {
 				reverse_postorder.addFirst(theinst);
 				postorder.put(theinst, cnt);
 				cnt++;
@@ -985,6 +984,7 @@ public class ByteCodeGraph {
 			}
 		}
 	}
+
 	private void buildThrowException() {
 		Node exceptDef = addNewExceptionNode(throwStmt);
 		buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
@@ -1591,6 +1591,10 @@ public class ByteCodeGraph {
 		return node;
 	}
 
+	public Node getStaticHeapNode(String field) {
+		return this.getNode(this.getFormalStaticHeapNameWithIndex(field));
+	}
+
 	public Node addNewHeapNode(Node objectAddress, String field, StmtNode stmt) {
 		assert (objectAddress.isHeapObject());
 		this.incHeapIndex(objectAddress, field);
@@ -1681,10 +1685,6 @@ public class ByteCodeGraph {
 			nodemap.put(getNodeName(name), node);
 			nodes.add(node);
 		}
-	}
-
-	public Node getStaticHeapNode(String field) {
-		return this.getNode(this.getFormalStaticHeapNameWithIndex(field));
 	}
 
 	public Node getHeapNode(Node objectAddress, String field) {
@@ -2132,7 +2132,7 @@ public class ByteCodeGraph {
 		// long thetime = endTime-startTime;
 		// System.out.println("idom time is "+ thetime);
 		String checkoutbase = GraphBuilder.getCheckoutBase();
-		String tracefilename = String.format("%s/%s/%s/trace/logs/mytrace/all.log",checkoutbase, project, id);
+		String tracefilename = String.format("%s/%s/%s/trace/logs/mytrace/all.log", checkoutbase, project, id);
 		this.parseJoinedTrace(tracefilename);
 		// this.parseD4jTrace(tracefilename);
 	}
