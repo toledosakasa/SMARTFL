@@ -94,9 +94,8 @@ public class Instrumenter {
 
 		String checkoutbase = GraphBuilder.getCheckoutBase();
 		// consistent with s.py
-		String dirPath = String.format("%s/%s/%s/",checkoutbase, proj, id);
+		String dirPath = String.format("%s/%s/%s/", checkoutbase, proj, id);
 		String outputPath = String.format("./d4j_resources/metadata_cached/%s/%s.alltests.log", proj, id);
-
 		List<String> filelist = new ArrayList<>();
 		getFilelist(getTestDir(dirPath), filelist);
 
