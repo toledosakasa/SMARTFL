@@ -397,7 +397,7 @@ def fl_wrap(proj: str, id: str):
 
 def testproj(proj: str):
     time_start = time.time()
-
+    os.system('mvn package -DskipTests')
     # cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
     cmdlines = [f'python3 s.py fl {proj} {i}' for i in range(
         1, project_bug_nums[proj]+1)]
@@ -421,7 +421,7 @@ def testproj(proj: str):
 
 def testprojw(proj: str):
     time_start = time.time()
-
+    os.system('mvn package -DskipTests')
     # cmdlines = [(proj, str(i))for i in range(1, project_bug_nums[proj]+1)]
     cmdlines = [f'python3 s.py flw {proj} {i}' for i in range(
         1, project_bug_nums[proj]+1)]
