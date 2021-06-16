@@ -41,10 +41,13 @@ public class GetFieldInst extends OpcodeInst {
 
 	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
-		// int instpos = ci.insertExGap(3);// the gap must be long enough for the
-		// following instrumentation
-		// ci.writeByte(184, instpos);// invokestatic
-		// ci.write16bit(cbi.tsindex_object, instpos + 1);
+		int fieldid = getu16bitpara(ci, index);
+		String desc = constp.getFieldrefType(fieldid);
+
+		int callback = dispatchByDesc(desc, cbi);
+		int instpos = ci.insertExGap(3);
+		ci.writeByte(184, instpos);// invokestatic
+		ci.write16bit(callback, instpos + 1);
 	}
 
 }
