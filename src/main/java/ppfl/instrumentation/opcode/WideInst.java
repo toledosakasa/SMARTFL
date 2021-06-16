@@ -17,7 +17,7 @@ public class WideInst extends OpcodeInst {
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		int realform = Integer.parseInt(getpara(ci, index, 1));
-		return Interpreter.map[realform].getinst_wide(ci, index, constp);
+		return Interpreter.map[realform].getinst_wide(ci, index + 1, constp);
 	}
 
 	@Override
