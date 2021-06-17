@@ -405,7 +405,7 @@ def testproj(proj: str):
     if use_simple_filter:
         processesnum = 64
     else:
-        processesnum = 8
+        processesnum = 16
     with Pool(processes=processesnum) as pool:
         pool.map(os.system, cmdlines)
         pool.close()
@@ -426,7 +426,7 @@ def testprojw(proj: str):
     cmdlines = [f'python3 s.py flw {proj} {i}' for i in range(
         1, project_bug_nums[proj]+1)]
     # print(cmdlines)
-    with Pool(processes=8) as pool:
+    with Pool(processes=16) as pool:
         pool.map(os.system, cmdlines)
         pool.close()
         pool.join()
