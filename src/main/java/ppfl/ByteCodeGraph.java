@@ -113,6 +113,7 @@ public class ByteCodeGraph {
 	public Map<String, Integer> heapcountmap;
 	public Map<String, Integer> objectcountmap;
 	public Map<String, Integer> staticheapcountmap;
+	public Map<Integer, Set<String>> objectFieldMap;
 	public org.graphstream.graph.Graph viewgraph;
 	public Set<String> instset;
 	public Set<String> outset;
@@ -304,6 +305,7 @@ public class ByteCodeGraph {
 		heapcountmap = new HashMap<>();
 		objectcountmap = new HashMap<>();
 		staticheapcountmap = new HashMap<>();
+		objectFieldMap = new HashMap<>();
 		instset = new HashSet<>();
 		outset = new HashSet<>();
 		predataflowmap = new HashMap<>();
@@ -384,6 +386,7 @@ public class ByteCodeGraph {
 		heapcountmap = new HashMap<>();
 		objectcountmap = new HashMap<>();
 		staticheapcountmap = new HashMap<>();
+		objectFieldMap = new HashMap<>();
 	}
 
 	public void parseWhatIsTracedLog(String logfilename) {
@@ -1011,16 +1014,11 @@ public class ByteCodeGraph {
 		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 			Node defnode = this.addNewStackNode(this.untracedStmt);
 			buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
-		} else {
-			// if (this.untracedObj != null) {
-			// Node defnode = this.getObjectNode(this.untracedObj);
-			// if (defnode == null) {
-			// System.out.println("null defnode:" + this.untracedObj.isHeapObject() +
-			// this.untracedObj.getAddress());
-			// }
-			// buildFactor(defnode, this.untracedpred, this.untraceduse, null,
-			// this.untracedStmt);
-			// }
+		}
+		for (Node n : this.untraceduse) {
+			if (n.isHeapObject()) {
+				buildFactorForAllField(n, this.untracedpred, this.untraceduse, null, this.untracedStmt);
+			}
 		}
 		this.cleanUntraced();
 	}
@@ -1526,7 +1524,31 @@ public class ByteCodeGraph {
 		return String.format("%x", objectAddress.getAddress());
 	}
 
+	private void buildFactorForAllField(Node objectNode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
+			StmtNode stmt) {
+		int addr = objectNode.getAddress();
+		if (!objectFieldMap.containsKey(addr)) {
+			return;
+		}
+		Set<String> allfields = objectFieldMap.get(addr);
+		for (String field : allfields) {
+			Node defnode = addNewHeapNode(objectNode, field, stmt);
+			buildFactor(defnode, prednodes, usenodes, null, stmt);
+		}
+	}
+
+	private void addField(int addr, String field) {
+		if (objectFieldMap.containsKey(addr)) {
+			objectFieldMap.get(addr).add(field);
+		} else {
+			Set<String> sset = new HashSet<>();
+			sset.add(field);
+			objectFieldMap.put(addr, sset);
+		}
+	}
+
 	private String getFormalHeapName(Node objectAddress, String field) {
+		addField(objectAddress.getAddress(), field);
 		return String.format("%x.%s", objectAddress.getAddress(), field);
 	}
 
