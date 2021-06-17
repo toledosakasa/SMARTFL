@@ -30,6 +30,7 @@ public class GetFieldInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		Node objectAddress = graph.getRuntimeStack().pop();
+		usenodes.add(objectAddress);
 		String field = graph.parseinfo.getvalue("field");
 		Node usenode = graph.getHeapNode(objectAddress, field);
 		if (usenode != null)
