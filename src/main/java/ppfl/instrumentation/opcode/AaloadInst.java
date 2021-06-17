@@ -6,10 +6,10 @@ import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 
 //50
-public class AaloadInst extends OpcodeInst {
+public class AaloadInst extends XaloadInst {
 
 	public AaloadInst(int _form) {
-		super(_form, 1, 2);
+		super(_form);
 	}
 
 	@Override
@@ -19,8 +19,7 @@ public class AaloadInst extends OpcodeInst {
 	}
 
 	@Override
-	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
-			throws BadBytecode {
+	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(cbi.tsindex_object, instpos + 1);

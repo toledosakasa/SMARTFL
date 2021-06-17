@@ -7,10 +7,10 @@ import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //47
-public class LaloadInst extends OpcodeInst {
+public class LaloadInst extends XaloadInst {
 
 	public LaloadInst(int _form) {
-		super(_form, 1, 2);
+		super(_form);
 	}
 
 	@Override
