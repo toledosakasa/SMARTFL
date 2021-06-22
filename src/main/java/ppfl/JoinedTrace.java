@@ -20,6 +20,7 @@ public class JoinedTrace {
   private static final double MAX_FILE_LIMIT = 3e7;
 
   public List<TraceChunk> traceList = new ArrayList<>();
+  public TraceChunk staticInits = new TraceChunk("<init>");
 
   private List<String> setUpTraces = null;
 
@@ -66,6 +67,33 @@ public class JoinedTrace {
     this.d4jMethodNames = d4jMethodNames;
     this.d4jTriggerTestNames = d4jTriggerTestNames;
     this.tracedDomain = tracedDomain;
+  }
+
+  public void parseSourceFolder(String path) {
+    File folder = new File(path);
+    File[] fs = folder.listFiles();
+    for (File f : fs) {
+      if (!f.getName().endsWith(".init.log"))
+        continue;
+      if (f.length() < MAX_FILE_LIMIT) {
+        parseStaticFile(f);
+      }
+    }
+    parseStaticInfo();
+  }
+
+  private void parseStaticFile(File f) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
+      String t = null;
+      while ((t = reader.readLine()) != null) {
+        if (t.isEmpty()) {
+          continue;
+        }
+        staticInits.add(t);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public void parseFolder(String path) {
@@ -158,6 +186,14 @@ public class JoinedTrace {
       e.printStackTrace();
     }
     parseToInfo();
+  }
+
+  private void parseStaticInfo() {
+    try {
+      this.staticInits.pruneInit(this.tracedDomain);
+    } catch (Exception e) {
+      System.err.println("prune at <init> failed");
+    }
   }
 
   private void parseToInfo() {

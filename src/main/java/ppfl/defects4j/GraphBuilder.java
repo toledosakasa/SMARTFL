@@ -9,14 +9,14 @@ import ppfl.WriterUtils;
 
 public class GraphBuilder {
 
-  public static String getCheckoutBase(){
+  public static String getCheckoutBase() {
     String checkoutbase = null;
-		try (BufferedReader reader = new BufferedReader(new FileReader("checkout.config"))) {
-			checkoutbase = reader.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return checkoutbase.trim();
+    try (BufferedReader reader = new BufferedReader(new FileReader("checkout.config"))) {
+      checkoutbase = reader.readLine();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return checkoutbase.trim();
   }
 
   private static void setupD4jProject(ByteCodeGraph pgraph, String project, int id, boolean usesimple) {
@@ -62,7 +62,7 @@ public class GraphBuilder {
     }
 
     String checkoutbase = getCheckoutBase();
-    String whatIsTracedLog = String.format("%s/%s/%s/trace/logs/mytrace/traced.source.log",checkoutbase, project, id);
+    String whatIsTracedLog = String.format("%s/%s/%s/trace/logs/mytrace/traced.source.log", checkoutbase, project, id);
     pgraph.parseWhatIsTracedLog(whatIsTracedLog);
 
     if (relevantClasses != null) {
@@ -107,10 +107,11 @@ public class GraphBuilder {
     // long endTime = System.currentTimeMillis();
     // long thetime = endTime-startTime;
     // System.out.println("idom time is "+ thetime);
-    String tracefilename = String.format("%s/%s/%s/trace/logs/mytrace/all.log",checkoutbase, project, id);
+    String tracefilename = String.format("%s/%s/%s/trace/logs/mytrace/all.log", checkoutbase, project, id);
     // pgraph.pruneAndParse(tracefilename);
-    String folder = String.format("%s/%s/%s/trace/logs/run/",checkoutbase, project, id);
-    pgraph.parseFolder(folder, usesimple);
+    String folder = String.format("%s/%s/%s/trace/logs/run/", checkoutbase, project, id);
+    String sourcefolder = String.format("%s/%s/%s/trace/logs/mytrace/", checkoutbase, project, id);
+    pgraph.parseFolder(folder, sourcefolder, usesimple);
     System.out.println("Parse complete");
     // this.parseD4jTrace(tracefilename);
   }

@@ -793,10 +793,11 @@ public class ByteCodeGraph {
 		this.initmaps();
 	}
 
-	public void parseFolder(String folder, boolean usesimple) {
+	public void parseFolder(String folder, String sourcefolder, boolean usesimple) {
 		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
 		try {
 			jTrace.parseFolder(folder);
+			jTrace.parseSourceFolder(sourcefolder);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("parse failed.");
@@ -823,6 +824,14 @@ public class ByteCodeGraph {
 		}
 		this.getFrame();
 		Interpreter.map[255].buildtrace_simple(this);
+	}
+
+	private void parseInitTrace(ParseInfo pInfo, boolean debugswitch) {
+		// FIXME
+		this.parseinfo = pInfo;
+		this.getFrame();
+		Interpreter.map[this.parseinfo.form].buildinit(this);
+		// Interpreter.map[this.parseinfo.form].buildtrace(this);
 	}
 
 	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
@@ -1037,10 +1046,7 @@ public class ByteCodeGraph {
 		this.cleanTraced();
 	}
 
-	private void parseChunk(TraceChunk tChunk) {
-		// if (!tChunk.fullname.contains("testDateISO")) {
-		// return;
-		// }
+	private void parseChunk(TraceChunk tChunk, TraceChunk inits) {
 		this.cleanupOnChunkSwitch();
 		int tracelength = tChunk.parsedTraces.size();
 		System.out.println("parsing trace,length=" + tracelength + ":");
@@ -1049,9 +1055,22 @@ public class ByteCodeGraph {
 			System.out.println("Trace is too long, skipping");
 			return;
 		}
+		boolean debugswitch = false;
 		boolean testpass = tChunk.testpass;
 		this.testname = tChunk.getTestName();
-		boolean debugswitch = false;
+
+		// prepare static inits
+		for (ParseInfo pInfo : inits.parsedTraces) {
+			try {
+				parseInitTrace(pInfo, debugswitch);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("parse trace crashed at init");
+				pInfo.debugprint();
+				throw (e);
+			}
+		}
+
 		int linec = 0;
 		for (ParseInfo pInfo : tChunk.parsedTraces) {
 			try {
@@ -1101,7 +1120,7 @@ public class ByteCodeGraph {
 				if (usesimple)
 					parseSimpleChunk(tChunk);
 				else
-					parseChunk(tChunk);
+					parseChunk(tChunk, jTrace.staticInits);
 			} catch (Exception e) {
 				System.err.println("parse " + tChunk.fullname + " failed");
 				// e.printStackTrace();

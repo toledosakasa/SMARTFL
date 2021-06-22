@@ -372,6 +372,11 @@ public class OpcodeInst {
 		buildtrace(graph);
 	}
 
+	// override only by putstatic
+	public void buildinit(ByteCodeGraph graph) {
+		// do nothing
+	}
+
 	// override needed.
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)

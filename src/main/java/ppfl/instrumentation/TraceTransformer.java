@@ -54,6 +54,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	// LoggerFactory.getLogger(SOURCELOGGERNAME);
 	private static final int BUFFERSIZE = 1 << 20;
 	private static BufferedWriter sourceWriter = null;
+	private static BufferedWriter staticInitWriter = null;
 	private static Writer traceWriter = null;
 	private static BufferedWriter whatIsTracedWriter = null;
 	/** The internal form class name of the class to transform */
@@ -98,6 +99,20 @@ public class TraceTransformer implements ClassFileTransformer {
 				}
 			}
 		});
+	}
+
+	private static void setStaticInitFile(String clazzname) {
+		setStaticInitWriterFile(String.format("trace/logs/mytrace/%s.init.log", clazzname));
+	}
+
+	private static void setStaticInitWriterFile(String filename) {
+		FileWriter file = null;
+		try {
+			file = new FileWriter(filename);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		staticInitWriter = new BufferedWriter(file, BUFFERSIZE);
 	}
 
 	private static void setSourceFile(String clazzname) {
@@ -234,6 +249,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		if (!this.simpleLog) {
 			this.setLogger(this.targetClassName);
 			setSourceFile(this.targetClassName);
+			setStaticInitFile(this.targetClassName);
 		}
 
 		try {
@@ -248,10 +264,19 @@ public class TraceTransformer implements ClassFileTransformer {
 			List<MethodInfo> methods = new ArrayList<>();
 			// methods.addAll(cc.getClassFile().getMethods());
 
+			if (!this.simpleLog) {
+				MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
+				if (staticInit != null) {
+					getStaticInitializerInfo(staticInit, cc);
+				}
+			}
 			for (MethodInfo m : cc.getClassFile().getMethods()) {
 				writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
-				transformBehavior(m, cc);
+				if (!m.isStaticInitializer()) {
+					transformBehavior(m, cc);
+				}
 			}
+
 			// for (CtMethod cm : cc.getDeclaredMethods()) {
 			// methods.add(cm.getMethodInfo());
 			// }
@@ -269,12 +294,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			// transformBehavior(m, cc);
 			// }
 			// }
-			// MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
-			// if (staticInit != null) {
-			// writeWhatIsTraced(staticInit.getName() + "#" + staticInit.getDescriptor() +
-			// ",");
-			// transformBehavior(staticInit, cc);
-			// }
+
 			byteCode = cc.toBytecode();
 			cc.detach();
 
@@ -292,6 +312,41 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 		}
 		return byteCode;
+	}
+
+	private void getStaticInitializerInfo(MethodInfo m, CtClass cc) throws BadBytecode {
+		MethodInfo mi = m;
+		CodeAttribute ca = mi.getCodeAttribute();
+
+		ConstPool constp = mi.getConstPool();
+		CodeIterator tempci = ca.iterator();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; tempci.hasNext(); i++) {
+			int index = tempci.lookAhead();
+			int ln = mi.getLineNumber(index);
+			String getinst = getInstMap(tempci, index, constp);
+			String sig = mi.getDescriptor();
+			// ExceptionTable eTable =
+			// m.getMethodInfo().getCodeAttribute().getExceptionTable();
+			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + mi.getName() + "#" + sig + "#" + ln + "#" + index
+					+ ",nextinst=";
+
+			tempci.next();
+			if (!tempci.hasNext()) {
+				linenumberinfo = linenumberinfo + "-1";
+			} else {
+				linenumberinfo = linenumberinfo + String.valueOf(tempci.lookAhead());
+			}
+			String instinfo = getinst + linenumberinfo;
+			sb.append(instinfo);
+		}
+		try {
+			staticInitWriter.write(sb.toString());
+			staticInitWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void transformBehavior(MethodInfo m, CtClass cc) throws NotFoundException, BadBytecode {
@@ -323,7 +378,6 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			ci.writeByte(19, instpos);// ldc_w
 			ci.write16bit(instindex, instpos + 1);
-
 			ci.writeByte(184, instpos + 3);// invokestatic
 			ci.write16bit(cbi.logstringindex, instpos + 4);
 		}
@@ -331,9 +385,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			ProfileUtils.init(constp, traceWriter);
 			CodeIterator ci = ca.iterator();
 			String longname = String.format("%s::%s", cc.getName(), m.getName());
-
 			ProfileUtils.logMethodName(ci, longname, constp);
-
 		}
 
 		// not sure if this is necessary.

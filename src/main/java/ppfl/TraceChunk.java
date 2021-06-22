@@ -1,6 +1,5 @@
 package ppfl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +40,22 @@ public class TraceChunk {
 
   public void addSetUp(List<String> s) {
     this.traces.addAll(s);
+  }
+
+  public void pruneInit(Set<TraceDomain> TracedDomain) {
+    for (int i = 0; i < traces.size(); i++) {
+      ParseInfo parsed = null;
+      try {
+        parsed = new ParseInfo(traces.get(i));
+      } catch (Exception e) {
+        System.out.println(this.fullname + " " + i);
+        System.out.println(traces.get(i));
+        throw (e);
+      }
+      if (parsed.form == 179)// putstatic
+        parsedTraces.add(parsed);
+    }
+    this.traces.clear();
   }
 
   public void prune(Set<TraceDomain> TracedDomain) {
