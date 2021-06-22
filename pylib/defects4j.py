@@ -571,6 +571,8 @@ def eval(proj: str, id: str):
             print(line)
         classname = sp[0]
         methodname = sp[1]
+        if methodname == '<clinit>':
+            methodname = '<init>'
         sp = sp[2].split('#')
         linenumber = sp[1]
         fullname = f'{classname}.{methodname}:{linenumber}'
