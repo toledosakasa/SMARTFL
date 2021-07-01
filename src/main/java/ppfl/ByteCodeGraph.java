@@ -897,6 +897,10 @@ public class ByteCodeGraph {
 					maintainStackframeUpward(pInfo);
 					buildUntracedInvokeException();
 				} else {
+					if (debugswitch) {
+						System.out.println("skipped:");
+						pInfo.debugprint();
+					}
 					// is inside untraced call. should skip
 					return;
 				}
@@ -1020,6 +1024,15 @@ public class ByteCodeGraph {
 
 	private void buildUntracedInvoke() {
 		String desc = this.untracedInvoke.getvalue("calltype");
+		List<Node> toadd = new ArrayList<>();
+		for (Node n : this.untraceduse) {
+			if (n.isHeapObject()) {
+				Node nd = getObjectNode(n);
+				if (nd != null)
+					toadd.add(nd);
+			}
+		}
+		this.untraceduse.addAll(toadd);
 		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 			Node defnode = this.addNewStackNode(this.untracedStmt);
 			buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
@@ -1028,6 +1041,11 @@ public class ByteCodeGraph {
 			if (n.isHeapObject()) {
 				buildFactorForAllField(n, this.untracedpred, this.untraceduse, null, this.untracedStmt);
 			}
+		}
+		// build untraced object
+		if (this.untracedObj != null && untracedObj.isHeapObject()) {
+			Node obj = addNewObjectNode(this.untracedObj, this.untracedStmt);
+			buildFactor(obj, this.untracedpred, this.untraceduse, null, this.untracedStmt);
 		}
 		this.cleanUntraced();
 	}
@@ -1049,6 +1067,9 @@ public class ByteCodeGraph {
 	private void parseChunk(TraceChunk tChunk, TraceChunk inits) {
 		this.cleanupOnChunkSwitch();
 		int tracelength = tChunk.parsedTraces.size();
+		// if (!tChunk.fullname.endsWith("testSupplementaryUnescaping")) {
+		// return;
+		// }
 		System.out.println("parsing trace,length=" + tracelength + ":");
 		System.out.println("\t" + tChunk.fullname);
 		if (tracelength > 100000) {
@@ -1059,15 +1080,18 @@ public class ByteCodeGraph {
 		boolean testpass = tChunk.testpass;
 		this.testname = tChunk.getTestName();
 
+		boolean useStaticInit = false;
 		// prepare static inits
-		for (ParseInfo pInfo : inits.parsedTraces) {
-			try {
-				parseInitTrace(pInfo, debugswitch);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println("parse trace crashed at init");
-				pInfo.debugprint();
-				throw (e);
+		if (useStaticInit) {
+			for (ParseInfo pInfo : inits.parsedTraces) {
+				try {
+					parseInitTrace(pInfo, debugswitch);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("parse trace crashed at init");
+					pInfo.debugprint();
+					throw (e);
+				}
 			}
 		}
 
@@ -1546,6 +1570,7 @@ public class ByteCodeGraph {
 	private void buildFactorForAllField(Node objectNode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
 			StmtNode stmt) {
 		int addr = objectNode.getAddress();
+		// System.out.println("building factor for addr:" + addr);
 		if (!objectFieldMap.containsKey(addr)) {
 			return;
 		}
