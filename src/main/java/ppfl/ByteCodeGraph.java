@@ -1080,7 +1080,7 @@ public class ByteCodeGraph {
 		boolean testpass = tChunk.testpass;
 		this.testname = tChunk.getTestName();
 
-		boolean useStaticInit = false;
+		boolean useStaticInit = true;
 		// prepare static inits
 		if (useStaticInit) {
 			for (ParseInfo pInfo : inits.parsedTraces) {
