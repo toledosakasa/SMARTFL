@@ -278,16 +278,16 @@ public class Instrumenter {
 								// try {
 								if (the_type.isPrimitiveType()) {
 									if (type_name.equals("boolean")) {
-										printMSG = String.format("Method_%s_%s_%s#", node.getStartPosition(), lastindex, "{return true;}");
+										printMSG = String.format("Method_%s_%s_%s#", modifier.getStartPosition(), lastindex, "{return true;}");
 									} else if (type_name.equals("void")) {
-										printMSG = String.format("Method_%s_%s_%s#", node.getStartPosition(), lastindex, "{return;}");
+										printMSG = String.format("Method_%s_%s_%s#", modifier.getStartPosition(), lastindex, "{return;}");
 									} else if (type_name.equals("char")) {
-										printMSG = String.format("Method_%s_%s_%s#", node.getStartPosition(), lastindex, "{return '0';}");
+										printMSG = String.format("Method_%s_%s_%s#", modifier.getStartPosition(), lastindex, "{return '0';}");
 									} else {
-										printMSG = String.format("Method_%s_%s_%s#", node.getStartPosition(), lastindex, "{return 0;}");
+										printMSG = String.format("Method_%s_%s_%s#", modifier.getStartPosition(), lastindex, "{return 0;}");
 									}
 								} else {
-									printMSG = String.format("Method_%s_%s_%s#", node.getStartPosition(), lastindex, "{return null;}");
+									printMSG = String.format("Method_%s_%s_%s#", modifier.getStartPosition(), lastindex, "{return null;}");
 								}
 								handlers_Builder.append(printMSG);
 							}
