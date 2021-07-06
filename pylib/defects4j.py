@@ -6,6 +6,7 @@ import func_timeout
 from typing import Any, Dict, List, Set
 import json
 from multiprocessing import Pool, TimeoutError
+import re
 
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
@@ -553,7 +554,10 @@ def eval(proj: str, id: str):
     for line in oraclefile.readlines():
         sp = line.split('||')
         for oracle in sp:
-            oracle_lines.add(oracle.strip())
+            oracle = oracle.strip()
+            oracle = re.sub(pattern=r"\$[^\.]*\.", repl=".", string= oracle)
+            oracle = re.sub(pattern=r"\.[^.]*:", repl=":", string= oracle)
+            oracle_lines.add(oracle)
     try:
         resultfile = utf8open(
             f'trace/logs/mytrace/InfResult-{proj}{id}.log')
@@ -575,7 +579,7 @@ def eval(proj: str, id: str):
             methodname = '<init>'
         sp = sp[2].split('#')
         linenumber = sp[1]
-        fullname = f'{classname}.{methodname}:{linenumber}'
+        fullname = f'{classname}:{linenumber}'
         if fullname in lines:
             continue
         if classname.lower().startswith('test') or classname.lower().endswith('test'):
