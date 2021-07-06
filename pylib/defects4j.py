@@ -392,7 +392,7 @@ def fl_wrap(proj: str, id: str):
     #     print(f'timeout at {proj}-{id}')
     except:
         print(f'{proj}{id} failed.')
-    deletecheckout(proj, id)
+    cleanupcheckout(proj, id)
     eval(proj, id)
 
 
