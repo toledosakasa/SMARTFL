@@ -786,6 +786,7 @@ public class ByteCodeGraph {
 	}
 
 	private void cleanupOnChunkSwitch() {
+		this.predstack.clear();
 		this.cleanUntraced();
 		this.cleanThrow();
 		this.cleanTraced();
