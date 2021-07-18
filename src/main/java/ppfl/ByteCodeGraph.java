@@ -17,7 +17,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.graphstream.graph.implementations.SingleGraph;
+// import org.graphstream.graph.implementations.SingleGraph;
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
 // import org.slf4j.MDC;
@@ -114,7 +114,7 @@ public class ByteCodeGraph {
 	public Map<String, Integer> objectcountmap;
 	public Map<String, Integer> staticheapcountmap;
 	public Map<Integer, Set<String>> objectFieldMap;
-	public org.graphstream.graph.Graph viewgraph;
+	// public org.graphstream.graph.Graph viewgraph;
 	public Set<String> instset;
 	public Set<String> outset;
 	public Map<String, List<String>> predataflowmap;
@@ -320,11 +320,11 @@ public class ByteCodeGraph {
 		stackframe = new ArrayDeque<>();
 		predstack = new ArrayDeque<>();
 		store_stack = new ArrayDeque<>();
-		viewgraph = new SingleGraph("Outgraph");
-		viewgraph.setStrict(false);
-		viewgraph.setAutoCreate(true);
-		viewgraph.setAttribute("layout.quality", 4);
-		viewgraph.setAttribute("layout.force");
+		// viewgraph = new SingleGraph("Outgraph");
+		// viewgraph.setStrict(false);
+		// viewgraph.setAutoCreate(true);
+		// viewgraph.setAttribute("layout.quality", 4);
+		// viewgraph.setAttribute("layout.force");
 		shouldview = false;
 		String styleSheet = "node {" +
 		// " text-background-mode: rounded-box;"+
@@ -346,28 +346,30 @@ public class ByteCodeGraph {
 				// " layout.weight: 10;"+
 				"}" + "edge.def {" + "	fill-color: green;" + "}" + "edge.use {" + "	fill-color: blue;" + "}" + "edge.pred {"
 				+ "	fill-color: yellow;" + "}" + "edge.stmt {" + "	fill-color: black;" + "}";
-		viewgraph.setAttribute("ui.stylesheet", styleSheet);
-		viewgraph.setAttribute("ui.quality");
-		viewgraph.setAttribute("ui.antialias");
+		// viewgraph.setAttribute("ui.stylesheet", styleSheet);
+		// viewgraph.setAttribute("ui.quality");
+		// viewgraph.setAttribute("ui.antialias");
 		Interpreter.init();
 	}
 
-	public void addviewlabel() {
-		for (Node n : nodes) {
-			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
-			if (thenode != null)
-				thenode.setAttribute("ui.label", " prob_bp = " + (double) Math.round(n.bp_getprob() * 1000) / 1000);
-			// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " +
-			// n.bp_getprob());
-		}
-		for (StmtNode n : stmts) {
-			org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
-			if (thenode != null)
-				thenode.setAttribute("ui.label", " prob_bp = " + (double) Math.round(n.bp_getprob() * 1000) / 1000);
-			// thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " +
-			// n.bp_getprob());
-		}
-	}
+	// public void addviewlabel() {
+	// for (Node n : nodes) {
+	// // org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
+	// if (thenode != null)
+	// thenode.setAttribute("ui.label", " prob_bp = " + (double)
+	// Math.round(n.bp_getprob() * 1000) / 1000);
+	// // thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " +
+	// // n.bp_getprob());
+	// }
+	// for (StmtNode n : stmts) {
+	// // org.graphstream.graph.Node thenode = viewgraph.getNode(n.getPrintName());
+	// if (thenode != null)
+	// thenode.setAttribute("ui.label", " prob_bp = " + (double)
+	// Math.round(n.bp_getprob() * 1000) / 1000);
+	// // thenode.setAttribute("ui.label", n.getPrintName() + " prob_bp = " +
+	// // n.bp_getprob());
+	// }
+	// }
 
 	public void setMaxLoop(int i) {
 		this.max_loop = i;
@@ -1333,14 +1335,16 @@ public class ByteCodeGraph {
 		if (!shouldview)
 			return ret;
 		String factorname = "Factor" + factornodes.size();
-		viewgraph.addEdge(factorname + stmt.getPrintName(), factorname, stmt.getPrintName());
-		org.graphstream.graph.Node outfactor = viewgraph.getNode(factorname);
-		outfactor.setAttribute("ui.class", "factor");
-		org.graphstream.graph.Node outstmt = viewgraph.getNode(stmt.getPrintName());
-		outstmt.setAttribute("ui.class", "stmt");
-		org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname + stmt.getPrintName());
-		outedge.setAttribute("ui.class", "stmt");
-		outedge.setAttribute("layout.weight", 3);
+		// viewgraph.addEdge(factorname + stmt.getPrintName(), factorname,
+		// stmt.getPrintName());
+		// org.graphstream.graph.Node outfactor = viewgraph.getNode(factorname);
+		// outfactor.setAttribute("ui.class", "factor");
+		// org.graphstream.graph.Node outstmt = viewgraph.getNode(stmt.getPrintName());
+		// outstmt.setAttribute("ui.class", "stmt");
+		// org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname +
+		// stmt.getPrintName());
+		// outedge.setAttribute("ui.class", "stmt");
+		// outedge.setAttribute("layout.weight", 3);
 		return ret;
 	}
 
@@ -1413,39 +1417,45 @@ public class ByteCodeGraph {
 		if (!shouldview)
 			return ret;
 		String factorname = "Factor" + factornodes.size();
-		viewgraph.addEdge(factorname + stmt.getPrintName(), factorname, stmt.getPrintName());
-		org.graphstream.graph.Node outfactor = viewgraph.getNode(factorname);
-		outfactor.setAttribute("ui.class", "factor");
-		org.graphstream.graph.Node outstmt = viewgraph.getNode(stmt.getPrintName());
-		outstmt.setAttribute("ui.class", "stmt");
-		org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname + stmt.getPrintName());
-		outedge.setAttribute("ui.class", "stmt");
-		outedge.setAttribute("layout.weight", 3);
+		// viewgraph.addEdge(factorname + stmt.getPrintName(), factorname,
+		// stmt.getPrintName());
+		// org.graphstream.graph.Node outfactor = viewgraph.getNode(factorname);
+		// outfactor.setAttribute("ui.class", "factor");
+		// org.graphstream.graph.Node outstmt = viewgraph.getNode(stmt.getPrintName());
+		// outstmt.setAttribute("ui.class", "stmt");
+		// org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname +
+		// stmt.getPrintName());
+		// outedge.setAttribute("ui.class", "stmt");
+		// outedge.setAttribute("layout.weight", 3);
 
-		viewgraph.addEdge(factorname + defnode.getPrintName(), factorname, defnode.getPrintName());
-		org.graphstream.graph.Node outdef = viewgraph.getNode(defnode.getPrintName());
+		// viewgraph.addEdge(factorname + defnode.getPrintName(), factorname,
+		// defnode.getPrintName());
+		// org.graphstream.graph.Node outdef =
+		// viewgraph.getNode(defnode.getPrintName());
 
 		// debugLogger.info("hhhhhhhhhhhui"+outdef.getId());
-		outdef.setAttribute("ui.class", "thenode");
-		outedge = viewgraph.getEdge(factorname + defnode.getPrintName());
-		outedge.setAttribute("ui.class", "def");
-		outedge.setAttribute("layout.weight", 2);
-		for (Node node : prednodes) {
-			viewgraph.addEdge(factorname + node.getPrintName(), factorname, node.getPrintName());
-			org.graphstream.graph.Node outpred = viewgraph.getNode(node.getPrintName());
-			outpred.setAttribute("ui.class", "thenode");
-			outedge = viewgraph.getEdge(factorname + node.getPrintName());
-			outedge.setAttribute("ui.class", "pred");
-			outedge.setAttribute("layout.weight", 3);
-		}
-		for (Node node : usenodes) {
-			viewgraph.addEdge(factorname + node.getPrintName(), factorname, node.getPrintName());
-			org.graphstream.graph.Node outuse = viewgraph.getNode(node.getPrintName());
-			outuse.setAttribute("ui.class", "thenode");
-			outedge = viewgraph.getEdge(factorname + node.getPrintName());
-			outedge.setAttribute("ui.class", "use");
-			outedge.setAttribute("layout.weight", 3);
-		}
+		// outdef.setAttribute("ui.class", "thenode");
+		// outedge = viewgraph.getEdge(factorname + defnode.getPrintName());
+		// outedge.setAttribute("ui.class", "def");
+		// outedge.setAttribute("layout.weight", 2);
+		// for (Node node : prednodes) {
+		// viewgraph.addEdge(factorname + node.getPrintName(), factorname,
+		// node.getPrintName());
+		// org.graphstream.graph.Node outpred = viewgraph.getNode(node.getPrintName());
+		// outpred.setAttribute("ui.class", "thenode");
+		// outedge = viewgraph.getEdge(factorname + node.getPrintName());
+		// outedge.setAttribute("ui.class", "pred");
+		// outedge.setAttribute("layout.weight", 3);
+		// }
+		// for (Node node : usenodes) {
+		// viewgraph.addEdge(factorname + node.getPrintName(), factorname,
+		// node.getPrintName());
+		// org.graphstream.graph.Node outuse = viewgraph.getNode(node.getPrintName());
+		// outuse.setAttribute("ui.class", "thenode");
+		// outedge = viewgraph.getEdge(factorname + node.getPrintName());
+		// outedge.setAttribute("ui.class", "use");
+		// outedge.setAttribute("layout.weight", 3);
+		// }
 		return ret;
 	}
 
