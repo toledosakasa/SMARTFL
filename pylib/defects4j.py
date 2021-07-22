@@ -335,7 +335,7 @@ def rund4j(proj: str, id: str, debug=True):
     cdcmd = f'cd {checkoutdir} && '
     cmdlines = [cdcmd + cmdline for cmdline in cmdlines]
     os.system(cmdlines[0])
-    with Pool(processes=16) as pool:
+    with Pool(processes=1) as pool:
         pool.map(os.system, cmdlines[1:])
         pool.close()
         pool.join()
