@@ -714,3 +714,66 @@ def matchproj(proj: str):
             no_trigger_log += 1
 
     print(f'in_log = {in_log}, not_in_log = {not_in_log}, no_oracle = {no_oracle}, no trigger = {no_trigger}, no_trigger_log = {no_trigger_log}')
+
+def extract(proj: str, id: str):
+    # path = f'/data/mhzeng/ppfl/tmp_checkout/{proj}/{id}/trace/logs/run/'
+    # logs = os.listdir(path)
+    extract_dir = os.path.abspath(f'./extract_message/{proj}/{id}')
+    if not os.path.exists(extract_dir):
+        os.mkdir(extract_dir)
+    triggerpath = f'./triggertest/{proj}/{id}'
+    try:
+        triggertests = utf8open(triggerpath).read().strip().split(';')
+    except IOError:
+        print(f'{proj}{id} has no trigger')
+        return -2
+    for testlog in triggertests:
+        testlog = testlog.replace('::', '.')
+        logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
+        try:
+            each_line = utf8open(logpath).readlines()
+        except IOError:
+            print(f'{proj}{id} misses log of triggertest    {testlog}')
+            continue
+            # return -3
+        wf = utf8open_w(f'{extract_dir}/{testlog}')
+        wf.write(f'begin: {testlog}\n')
+        wf.write(f'log lengh: {each_line.__len__()}\n\n')
+        line_number = 0
+        last_number = 0
+        method = ''
+        stack_tab = 0
+        total_number = each_line.__len__()
+        for i in range(total_number):
+            line = each_line[i]
+            if(not line.startswith("opcode")):
+                continue
+            # print(line)
+            split = line.split(",")
+            tracemap = {}
+            for instinfo in split:
+                splitinstinfo = instinfo.split("=")
+                infotype = splitinstinfo[0]
+                infovalue = splitinstinfo[1]
+                tracemap[infotype] = infovalue
+            opcode_infos = tracemap["opcode"].split("(")
+            opcode_number = int(opcode_infos[0])
+            if opcode_number >= 182 and opcode_number <= 186:
+                next_line = each_line[i+1]
+                if(not line.startswith("opcode")):
+                    pass
+
+            lineinfos = tracemap["lineinfo"].split("#")
+            this_method = lineinfos[0]+"#"+lineinfos[1]
+            if this_method != method:
+                wf.write(f'{line_number}:{this_method}   {line_number-last_number}\n')
+                method = this_method
+                last_number = line_number
+            line_number += 1
+    return 0 
+
+def extractproj(proj: str):
+    allbugs = project_bug_nums[proj]
+    for i in range(1, allbugs+1):
+        result = extract(proj, str(i))
+    

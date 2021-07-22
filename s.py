@@ -98,3 +98,8 @@ if __name__ == '__main__':
             d4j.matchproj(args[2])
         if(len(args) == 4):
             d4j.match(args[2], args[3])
+    if args[1] == 'extract':
+        if(len(args) == 3):
+            d4j.extractproj(args[2])
+        if(len(args) == 4):
+            d4j.extract(args[2], args[3])
