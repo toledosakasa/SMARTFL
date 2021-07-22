@@ -1867,14 +1867,18 @@ public class ByteCodeGraph {
 		Deque<Node> reducestack = new ArrayDeque<>();
 		reducestack.push(node);
 		node.setreduced();
+		// resultLogger.writeln("node %s\n", node.getPrintName());
 		while (!reducestack.isEmpty()) {
 			Node reducNode = reducestack.pop();
+			// resultLogger.writeln("pop %s\n", reducNode.getPrintName());
 			FactorNode deffactor = (reducNode.getdedge()).getfactor();
 			deffactor.getstmt().setreduced();
+			// resultLogger.writeln("stmt %s\n", deffactor.getstmt().getPrintName());
 			List<Node> pulist = deffactor.getpunodes();
 			for (Node n : pulist) {
 				if (n.getreduced() == true && !n.isStmt) {
 					n.setreduced();
+					// resultLogger.writeln("node %s\n", n.getPrintName());
 					reducestack.push(n);
 				}
 			}
