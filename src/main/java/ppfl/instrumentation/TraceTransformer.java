@@ -276,6 +276,10 @@ public class TraceTransformer implements ClassFileTransformer {
 					transformBehavior(m, cc);
 				}
 			}
+			// dump class inheritance
+			String superClassName = cc.getClassFile().getSuperclass();
+			if (superClassName != null)
+				writeWhatIsTraced(superClassName + "#" + "SuperClass");
 
 			// for (CtMethod cm : cc.getDeclaredMethods()) {
 			// methods.add(cm.getMethodInfo());

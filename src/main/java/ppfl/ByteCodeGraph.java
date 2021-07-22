@@ -55,6 +55,7 @@ public class ByteCodeGraph {
 	}
 
 	private static Set<TraceDomain> tracedDomain = new HashSet<>();
+	private static Map<String, String> superClassMap = new HashMap<>();
 	private boolean traceAllClasses = true;
 	String currentTestMethod = null;
 
@@ -74,7 +75,23 @@ public class ByteCodeGraph {
 		return p.isInvoke() && (!isTraced(p.getCallDomain()));
 	}
 
+	public TraceDomain resolveMethod(TraceDomain domain) {
+		if (domain == null)
+			return null;
+		String traceclass = domain.traceclass;
+		String tracemethod = domain.tracemethod;
+		String signature = domain.signature;
+		while (!isTraced(domain)) {
+			traceclass = superClassMap.get(traceclass);
+			if (traceclass == null)
+				return null;
+			domain = new TraceDomain(traceclass, tracemethod, signature);
+		}
+		return domain;
+	}
+
 	public boolean isTraced(TraceDomain domain) {
+		// FIXME: lookup class inheritance
 		if (this.traceAllClasses)
 			return true;
 		boolean ret = tracedDomain.contains(domain);
@@ -410,8 +427,12 @@ public class ByteCodeGraph {
 						System.out.println(t);
 					}
 					String signature = splt[1];
-					TraceDomain tDomain = new TraceDomain(traceclass, tracemethod, signature);
-					tracedDomain.add(tDomain);
+					if (signature.equals("SuperClass")) {
+						superClassMap.put(traceclass, tracemethod);
+					} else {
+						TraceDomain tDomain = new TraceDomain(traceclass, tracemethod, signature);
+						tracedDomain.add(tDomain);
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -837,39 +858,46 @@ public class ByteCodeGraph {
 		// Interpreter.map[this.parseinfo.form].buildtrace(this);
 	}
 
-	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
-		if (debugswitch) {
-			try {
-				System.in.read();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	private boolean matchTracedInvoke(ParseInfo oth) {
+		if (oth.isReturnMsg) {
+			return this.tracedInvoke.matchDomain(oth) && this.tracedInvoke.linenumber == oth.linenumber
+					&& this.tracedInvoke.byteindex == oth.byteindex;
+		} else {
+			TraceDomain td = this.tracedInvoke.getCallDomain();
+			td = resolveMethod(td);
+			if (td == null)
+				return false;
+			// FIXME consider polymorphism
+			return td.signature.equals(oth.domain.signature) && td.tracemethod.equals(oth.domain.tracemethod);
 		}
+	}
+
+	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
+		// if (debugswitch) {
+		// try {
+		// System.in.read();
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// }
 		this.parseinfo = pInfo;
 		String instname = this.parseinfo.getvalue("lineinfo");
 
 		// solve traced invoke
 		if (this.solveTracedInvoke && this.tracedInvoke != null) {
-			if (tracedInvoke.matchTracedInvoke(pInfo)) {
+			if (matchTracedInvoke(pInfo)) {
 				if (pInfo.isReturnMsg) {
 					// actually untraced due to instrumentation bug.
 					// pop stackframe that is pushed for nothing.
 					this.popStackFrame();
-					// System.out.println(tracedInvoke.getCallDomain());
 					buildTracedInvoke();
 					return;
 				}
 				this.cleanTraced();
-				// this.tracedInvoke = null;
 			} else {
-				// if (pInfo.domain.traceclass.contains("MutableDateTime")) {
-				// System.out.println("skipped,traced=" + this.tracedInvoke.getCallDomain());
-				// }
 				// System.out.println("skipped" + linec);
 				// System.out.println(this.tracedInvoke.getCallDomain());
-				// System.out.println(pInfo.domain);
-				// int a = 1 / 0;
 				// skip
 				return;
 			}
@@ -1075,7 +1103,7 @@ public class ByteCodeGraph {
 		// }
 		System.out.println("parsing trace,length=" + tracelength + ":");
 		System.out.println("\t" + tChunk.fullname);
-		if (tracelength > 100000) {
+		if (tracelength > 100000 && tChunk.testpass) {
 			System.out.println("Trace is too long, skipping");
 			return;
 		}

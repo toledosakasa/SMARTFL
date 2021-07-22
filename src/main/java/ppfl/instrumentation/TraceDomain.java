@@ -29,8 +29,8 @@ public class TraceDomain {
 
   @Override
   public int hashCode() {
-    int result = this.traceclass.hashCode();
-    result = result * 31 + this.tracemethod.hashCode();
+    int result = this.tracemethod.hashCode();
+    result = result * 31 + this.traceclass.hashCode();
     result = result * 31 + this.signature.hashCode();
     return result;
   }

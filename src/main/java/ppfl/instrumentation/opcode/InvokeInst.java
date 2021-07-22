@@ -54,7 +54,19 @@ public class InvokeInst extends OpcodeInst {
 		String tracemethod = info.getvalue("callname");
 		String signature = info.getvalue("calltype");
 		TraceDomain callDomain = new TraceDomain(traceclass, tracemethod, signature);
-		// defs
+		Boolean istraced = true;
+
+		TraceDomain newDomain = graph.resolveMethod(callDomain);
+		if (newDomain == null) {
+			istraced = false;
+		} else {
+			if (!callDomain.equals(newDomain)) {
+				// System.out.println(callDomain);
+				// System.out.println(newDomain);
+				callDomain = newDomain;
+			}
+		}
+
 		String desc = info.getvalue("calltype");
 		int argcnt = OpcodeInst.getArgNumByDesc(desc);
 
@@ -79,14 +91,14 @@ public class InvokeInst extends OpcodeInst {
 		}
 
 		// mark untraced invokes
-		if (!graph.isTraced(callDomain)) {
+		if (!istraced) {
 			graph.untracedInvoke = graph.parseinfo;
 			graph.untracedStmt = stmt;
 			graph.untraceduse = usenodes;
 			graph.untracedpred = prednodes;
 			if (this.argadd == 1) {
 				if (!objectAddress.isHeapObject()) {
-					System.out.println("not a object:" + objectAddress.getStmtName());
+					// System.out.println("not a object:" + objectAddress.getStmtName());
 				}
 				graph.untracedObj = objectAddress;
 			}
@@ -96,7 +108,7 @@ public class InvokeInst extends OpcodeInst {
 			graph.traceduse = usenodes;
 			graph.tracedpred = prednodes;
 			if (this.argadd == 1) {
-				assert (objectAddress.isHeapObject());
+				// assert (objectAddress.isHeapObject());
 				graph.tracedObj = objectAddress;
 			}
 		}
@@ -115,7 +127,7 @@ public class InvokeInst extends OpcodeInst {
 		// }
 
 		// switch stack frame
-		if (graph.isTraced(callDomain))
+		if (istraced)
 			graph.pushStackFrame(callDomain);
 
 		// static arguments starts with 0
