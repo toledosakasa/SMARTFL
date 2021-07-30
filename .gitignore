@@ -15,3 +15,6 @@ tmp_checkout/*
 trace/logs/mytrace/ProbGraph*
 trace/logs/*
 triggertest/*
+abstract_message/*
+combinefl/*
+extract_message/*

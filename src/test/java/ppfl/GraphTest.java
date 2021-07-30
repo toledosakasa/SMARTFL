@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.graphstream.ui.view.Viewer;
 import org.junit.jupiter.api.Test;
 
 class GraphTest {
@@ -299,14 +298,14 @@ class GraphTest {
 		// });
 		// }
 		pgraph.check_bp(true);
-		pgraph.addviewlabel();
-		Viewer viewer = pgraph.viewgraph.display();
-		try {
-			Thread.sleep(8000);
-		} catch (Exception e) {
-			System.exit(0);
-		}
-		pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test1.png");
+		// pgraph.addviewlabel();
+		// Viewer viewer = pgraph.viewgraph.display();
+		// try {
+		// Thread.sleep(8000);
+		// } catch (Exception e) {
+		// System.exit(0);
+		// }
+		// pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\test1.png");
 		try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
@@ -413,14 +412,14 @@ class GraphTest {
 
 		System.setProperty("org.graphstream.ui", "swing");
 		pgraph.check_bp(true);
-		pgraph.addviewlabel();
-		Viewer viewer = pgraph.viewgraph.display();
-		try {
-			Thread.sleep(8000);
-		} catch (Exception e) {
-			System.exit(0);
-		}
-		pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\predtest.png");
+		// pgraph.addviewlabel();
+		// Viewer viewer = pgraph.viewgraph.display();
+		// try {
+		// Thread.sleep(8000);
+		// } catch (Exception e) {
+		// System.exit(0);
+		// }
+		// pgraph.viewgraph.setAttribute("ui.screenshot", ".\\view\\predtest.png");
 		try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
