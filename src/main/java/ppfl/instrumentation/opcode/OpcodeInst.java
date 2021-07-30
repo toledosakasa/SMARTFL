@@ -330,7 +330,7 @@ public class OpcodeInst {
 		// stmt = (StmtNode) graph.getNode(stmtname);
 		// assert (stmt.isStmt());
 		// }
-		this.stmt = graph.getStmt(stmtname);
+		this.stmt = graph.getStmt(stmtname, this.info.form);
 
 		// count how many times this statment has been executed
 		if (graph.stmtcountmap.containsKey(stmtname)) {

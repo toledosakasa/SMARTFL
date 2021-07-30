@@ -6,6 +6,7 @@ import java.util.Map;
 public class StmtNode extends Node {
 	private boolean isUnexe = false;
 	private Map<Integer, StmtNode> unexeStmtMap = new HashMap<>();
+	int form;// unexe stmt:-1
 
 	public void setUnexe() {
 		this.isUnexe = true;
@@ -27,8 +28,9 @@ public class StmtNode extends Node {
 		unexeStmtMap.put(id, stmt);
 	}
 
-	public StmtNode(String sname) {
+	public StmtNode(String sname, int form) {
 		super(sname);
+		this.form = form;
 		this.isStmt = true;
 	}
 
