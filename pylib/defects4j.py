@@ -234,7 +234,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
         if debug:
             print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
-        simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile}\""
+        simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile},project={proj}\""
         simplelogcmd += f' > {projectbase}/trace/runtimelog/{proj}{id}.profile.log 2>&1'
         os.system(cdcmd + simplelogcmd)
     else:
@@ -287,7 +287,7 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     #     ret.append(app)
     for testclass_rel in reltest_dict:
         for testmethod_rel in reltest_dict[testclass_rel]:
-            app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log\""
+            app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log,project={proj}\""
             app += '>/dev/null 2>&1'
             ret.append(app)
     return ret
@@ -364,7 +364,8 @@ def parse(proj: str, id: str, debug=True):
 
 
 def parseproj(proj: str, debug=True):
-    cmdlines = [f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
+    os.system('mvn compile')
+    cmdlines = [f'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
         1, project_bug_nums[proj]+1)]
     if(not debug):
         for cmdline in cmdlines:
@@ -406,7 +407,7 @@ def testproj(proj: str):
     if use_simple_filter:
         processesnum = 64
     else:
-        processesnum = 16
+        processesnum = 64
     with Pool(processes=processesnum) as pool:
         pool.map(os.system, cmdlines)
         pool.close()
