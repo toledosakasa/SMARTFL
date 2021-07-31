@@ -98,7 +98,7 @@ public class ParseInfo {
 	}
 
 	public boolean matchStaticReturn(ParseInfo returnMsg) {
-		if (returnMsg.isReturnMsg && this.form == 178) {
+		if (returnMsg.isReturnMsg && (this.form == 178 || this.form == 187)) {
 			return this.matchDomain(returnMsg) && this.linenumber == returnMsg.linenumber
 					&& this.byteindex == returnMsg.byteindex;
 		}
