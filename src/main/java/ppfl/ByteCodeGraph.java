@@ -134,9 +134,11 @@ public class ByteCodeGraph {
 	// public org.graphstream.graph.Graph viewgraph;
 	public Set<String> instset;
 	public Set<String> outset;
+	public Set<String> inset;
 	public Map<String, List<String>> predataflowmap;
 	public Map<String, List<String>> postdataflowmap;
 	public Map<String, Set<String>> dataflowsets;
+	public Map<String, String> pre_idom;
 	public Map<String, String> post_idom;
 	public Map<String, Integer> store_num;
 	public Map<String, Set<Integer>> branch_stores;
@@ -163,7 +165,7 @@ public class ByteCodeGraph {
 	public List<Node> throwpred;
 	public ParseInfo unsolvedThrow = null;
 
-	private boolean solveStatic = false;
+	private boolean solveStatic = true;
 	public StmtNode staticStmt;
 	public List<Node> staticuse;
 	public List<Node> staticpred;
@@ -325,9 +327,11 @@ public class ByteCodeGraph {
 		objectFieldMap = new HashMap<>();
 		instset = new HashSet<>();
 		outset = new HashSet<>();
+		inset = new HashSet<>();
 		predataflowmap = new HashMap<>();
 		postdataflowmap = new HashMap<>();
 		dataflowsets = new TreeMap<>();
+		pre_idom = new TreeMap<>();
 		post_idom = new TreeMap<>();
 		branch_stores = new TreeMap<>();
 		store_num = new HashMap<>();
@@ -478,6 +482,10 @@ public class ByteCodeGraph {
 					continue;
 				ParseInfo info = new ParseInfo(t);
 				String thisinst = info.getvalue("lineinfo");
+				// the entry of a method
+				if (info.byteindex == 0) {
+					inset.add(thisinst);
+				}
 				Integer storen = info.getintvalue("store");
 				if (storen != null)
 					store_num.put(thisinst, storen);
@@ -519,6 +527,7 @@ public class ByteCodeGraph {
 					String outname = "OUT_" + classandmethod;
 					theedges.add(outname);
 					_instset.add(outname);
+					_predataflowmap.put(outname, new ArrayList<>());
 					outset.add(outname);
 				}
 				_predataflowmap.put(thisinst, theedges);
@@ -619,6 +628,9 @@ public class ByteCodeGraph {
 	// Keith D. Cooper algorithm
 	public void get_idom() {
 		cnt = 1;
+		reverse_postorder = new ArrayDeque<>();
+		visited = new HashSet<>();
+		postorder = new HashMap<>();
 		for (String outname : outset) {
 			dfssearch(outname);
 		}
@@ -640,6 +652,20 @@ public class ByteCodeGraph {
 				int tmpindex = 0;
 				// seems should get the pred with the max postorder
 				for (int i = 0; i < predsnum; i++) {
+					// to deal with pre_idom, some nodes can not be visited in pre order in the
+					// graph
+					// so it has no order after dfs
+					if (postorder.get(thepreds.get(i)) == null) {
+						continue;
+
+						// resultLogger.writeln("null at inst %s, pred %s\n", inst, thepreds.get(i));
+						// for(Map.Entry<String, Integer> entry : postorder.entrySet())
+						// resultLogger.writeln("key = " + entry.getKey() + ", value = " +
+						// entry.getValue());
+
+						// for(String tmps: outset)
+						// resultLogger.writeln("outset0 %s\n", tmps);
+					}
 					if (tmpmax < postorder.get(thepreds.get(i)).intValue()) {
 						tmpmax = postorder.get(thepreds.get(i)).intValue();
 						tmpindex = i;
@@ -650,6 +676,11 @@ public class ByteCodeGraph {
 					if (i == tmpindex)
 						continue;
 					String otherpred = thepreds.get(i);
+					// to deal with pre_idom, some nodes can not be visited in pre order in the
+					// graph
+					// so it has no order after dfs
+					if (post_idom.get(otherpred) == null)
+						continue;
 					if (!post_idom.get(otherpred).equals("Undefined")) {
 						new_idom = intersect(otherpred, new_idom);
 					}
@@ -665,6 +696,38 @@ public class ByteCodeGraph {
 		// System.out.println("key_" + key);
 		// System.out.println("post_idom = " + post_idom.get(key));
 		// }
+	}
+
+	public void get_pre_idom() {
+		// for (String tmp :
+		// predataflowmap.get("org.apache.commons.lang3.ValidateTest#testNoNullElementsArray1#()V#558#60"))
+		// resultLogger.writeln("the next"+tmp);
+
+		// for(Map.Entry<String, List<String>> entry : postdataflowmap.entrySet())
+		// if(!inset.contains(entry.getKey()) && entry.getValue().size() == 0)
+		// resultLogger.writeln("key = " + entry.getKey() + ", value = " +
+		// entry.getValue().size());
+
+		Map<String, List<String>> tmp_map1 = this.predataflowmap;
+		this.predataflowmap = this.postdataflowmap;
+		this.postdataflowmap = tmp_map1;
+		Set<String> tmp_set = this.outset;
+		// for(String instname : this.inset)
+		// resultLogger.writeln("inset %s\n", instname);
+		// for(String instname : this.outset)
+		// resultLogger.writeln("out %s\n", instname);
+		this.outset = this.inset;
+		this.inset = tmp_set;
+		Map<String, String> tmp_map2 = this.post_idom;
+		this.get_idom();
+		this.pre_idom = this.post_idom;
+		this.post_idom = tmp_map2;
+		tmp_map1 = this.predataflowmap;
+		this.predataflowmap = this.postdataflowmap;
+		this.postdataflowmap = tmp_map1;
+		tmp_set = this.outset;
+		this.outset = this.inset;
+		this.inset = tmp_set;
 	}
 
 	public void dataflow() {
@@ -953,7 +1016,7 @@ public class ByteCodeGraph {
 
 		if (solveStatic && this.unsolvedStatic != null) {
 			if (unsolvedStatic.matchStaticReturn(pInfo)) {
-				this.unsolvedStatic = null;
+				this.cleanStatic();
 				return;
 			} else {
 				// skip
@@ -1098,12 +1161,13 @@ public class ByteCodeGraph {
 	private void parseChunk(TraceChunk tChunk, TraceChunk inits) {
 		this.cleanupOnChunkSwitch();
 		int tracelength = tChunk.parsedTraces.size();
-		// if (!tChunk.fullname.endsWith("testSupplementaryUnescaping")) {
+		// if (!tChunk.fullname.endsWith("testKeepInitIfBest")) {
 		// return;
 		// }
 		System.out.println("parsing trace,length=" + tracelength + ":");
 		System.out.println("\t" + tChunk.fullname);
-		if (tracelength > 100000 && tChunk.testpass) {
+		boolean limitSingleTrace = false;
+		if (limitSingleTrace && tracelength > 100000 && tChunk.testpass) {
 			System.out.println("Trace is too long, skipping");
 			return;
 		}
@@ -1170,16 +1234,24 @@ public class ByteCodeGraph {
 	public void parseJoinedTracePruned(JoinedTrace jTrace, boolean usesimple) {
 		this.predstack.clear();
 		this.initmaps();
+		jTrace.sortChunk();
+		int totalSize = 0;
+		int thres = 1000000;// 1M lines
 		for (TraceChunk tChunk : jTrace.traceList) {
 			try {
 				if (usesimple)
 					parseSimpleChunk(tChunk);
-				else
+				else {
 					parseChunk(tChunk, jTrace.staticInits);
+					totalSize += tChunk.parsedTraces.size();
+				}
 			} catch (Exception e) {
 				System.err.println("parse " + tChunk.fullname + " failed");
 				// e.printStackTrace();
 				// throw (e);
+			}
+			if (totalSize > thres) {
+				break;
 			}
 		}
 	}
@@ -1755,10 +1827,10 @@ public class ByteCodeGraph {
 		return defnode;
 	}
 
-	public StmtNode getStmt(String stmtname) {
+	public StmtNode getStmt(String stmtname, int form) {
 		StmtNode stmt;
 		if (!this.hasNode(stmtname)) {
-			stmt = this.addNewStmt(stmtname);
+			stmt = this.addNewStmt(stmtname, form);
 		} else {
 			stmt = (StmtNode) this.getNode(stmtname);
 			assert (stmt != null && stmt.isStmt());
@@ -1769,15 +1841,15 @@ public class ByteCodeGraph {
 	private StmtNode getUnexeStmt(StmtNode predstmt, int storeid) {
 		StmtNode ret = predstmt.getUnexeStmtFromMap(storeid);
 		if (ret == null) {
-			ret = this.addNewStmt(predstmt.getUnexeName(storeid));
+			ret = this.addNewStmt(predstmt.getUnexeName(storeid), -1);
 			ret.setUnexe();
 			predstmt.addUnexeStmt(storeid, ret);
 		}
 		return ret;
 	}
 
-	private StmtNode addNewStmt(String name) {
-		StmtNode stmt = new StmtNode(name);
+	private StmtNode addNewStmt(String name, int form) {
+		StmtNode stmt = new StmtNode(name, form);
 		this.addNode(name, stmt);
 		return stmt;
 	}

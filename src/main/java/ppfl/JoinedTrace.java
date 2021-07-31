@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -17,12 +18,25 @@ public class JoinedTrace {
   private Set<String> d4jMethodNames = new HashSet<>();
   private Set<String> d4jTriggerTestNames = new HashSet<>();
   private Set<TraceDomain> tracedDomain = new HashSet<>();
-  private static final double MAX_FILE_LIMIT = 3e7;
+  private static final double MAX_FILE_LIMIT = 2e8;// 200M
 
   public List<TraceChunk> traceList = new ArrayList<>();
   public TraceChunk staticInits = new TraceChunk("<init>");
 
   private List<String> setUpTraces = null;
+
+  public void sortChunk() {
+    this.traceList.sort(new Comparator<TraceChunk>() {
+      @Override
+      public int compare(TraceChunk arg0, TraceChunk arg1) {
+        if (arg0.testpass == arg1.testpass) {
+          return arg0.parsedTraces.size() - arg1.parsedTraces.size();
+        } else {
+          return arg0.testpass ? 1 : -1;
+        }
+      }
+    });
+  }
 
   private void addTraceChunk(String fullname) {
     TraceChunk toadd = new TraceChunk(fullname);
