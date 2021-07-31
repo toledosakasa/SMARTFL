@@ -142,10 +142,6 @@ public class TraceTransformer implements ClassFileTransformer {
 		whatIsTracedWriter = new BufferedWriter(file, BUFFERSIZE);
 	}
 
-	public void setTargetClassName(String s) {
-		this.targetClassName = s;
-	}
-
 	public void setLogSourceToScreen(boolean b) {
 		this.logSourceToScreen = b;
 	}
@@ -223,10 +219,10 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 	}
 
-	private byte[] transformBody(byte[] classfileBuffer) {
-		byte[] byteCode = classfileBuffer;
-		// debugLogger.write(String.format("[Agent] Transforming class %s",
-		// this.targetClassName));
+	protected byte[] transformBody(String classname) {
+		byte[] byteCode = null;
+		classname = classname.replace("/", ".");
+		debugLogger.write(String.format("[Agent] Transforming class %s", this.targetClassName));
 
 		if (useCachedClass) {
 			String classcachefolder = "trace/classcache/";
@@ -234,7 +230,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			if (!file.exists()) {
 				file.mkdirs();
 			}
-			File classcache = new File(classcachefolder, this.targetClassName + ".log");
+			File classcache = new File(classcachefolder, classname + ".log");
 			if (!this.simpleLog && classcache.exists()) {
 				// debugLogger.writeln("Cache loaded:" + this.targetClassName);
 				try {
@@ -247,19 +243,19 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 
 		if (!this.simpleLog) {
-			this.setLogger(this.targetClassName);
-			setSourceFile(this.targetClassName);
-			setStaticInitFile(this.targetClassName);
+			this.setLogger(classname);
+			setSourceFile(classname);
+			setStaticInitFile(classname);
 		}
 
 		try {
 			ClassPool cp = ClassPool.getDefault();
-			CtClass cc = cp.get(targetClassName);
+			CtClass cc = cp.get(classname);
 			// if (cc.getGenericSignature() != null) {
 			// return cc.toBytecode();
 			// }
 			writeWhatIsTraced("\n");
-			writeWhatIsTraced(this.targetClassName + "::");
+			writeWhatIsTraced(classname + "::");
 
 			List<MethodInfo> methods = new ArrayList<>();
 			// methods.addAll(cc.getClassFile().getMethods());
@@ -309,7 +305,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		if (!this.simpleLog && useCachedClass) {
 			try {
 				String classcachefolder = "trace/classcache/";
-				java.nio.file.Files.write(Paths.get(classcachefolder, this.targetClassName + ".log"), byteCode);
+				java.nio.file.Files.write(Paths.get(classcachefolder, classname + ".log"), byteCode);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -461,7 +457,7 @@ public class TraceTransformer implements ClassFileTransformer {
 				// if (oi.form > 42)
 				// getstatic should be treated like invocation,
 				// in the case that static-initializer may be called.
-				if (oi instanceof InvokeInst || oi.form == 178) {
+				if (oi instanceof InvokeInst || oi.form == 178 || oi.form == 187) {// getstatic and new
 					if (!mi.isStaticInitializer())
 						oi.insertReturnSite(ci, index, constp, instinfo, cbi);
 				} else {
@@ -477,12 +473,13 @@ public class TraceTransformer implements ClassFileTransformer {
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
 		try {
 			byte[] byteCode = classfileBuffer;
+			// TODO modify here to transform all classes.
 			String finalTargetClassName = this.targetClassName.replace(".", "/"); // replace . with /
 			if (className == null || !className.equals(finalTargetClassName) || loader == null
 					|| !loader.equals(targetClassLoader)) {
 				return byteCode;
 			}
-			return transformBody(classfileBuffer);
+			return transformBody(className);
 			// return transformBody(loader, className, classBeingRedefined,
 			// protectionDomain, classfileBuffer);
 		} catch (Exception e) {

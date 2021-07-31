@@ -21,6 +21,7 @@ public class InstrumentationAgent {
 	private static String d4jdatafile = null;
 	private static boolean logSourceToScreen = false;
 	private static boolean simpleLog = false;
+	private static String project = null;
 
 	private InstrumentationAgent() {
 		throw new IllegalStateException("Agent class");
@@ -65,6 +66,9 @@ public class InstrumentationAgent {
 			if (s.startsWith("simplelog=")) {
 				simpleLog = Boolean.parseBoolean(s.split("=")[1]);
 			}
+			if (s.startsWith("project=")) {
+				project = s.split("=")[1];
+			}
 		}
 		if (logFile == null && className == null && classNames == null && d4jdatafile == null)
 			return;
@@ -83,6 +87,11 @@ public class InstrumentationAgent {
 
 	private static void transformClass(Instrumentation instrumentation) {
 		// debugLogger.info("[Agent] In transformClass method");
+		boolean transformAllClasses = false;
+		if (transformAllClasses) {
+			transformAll(instrumentation);
+			return;
+		}
 		Class<?> targetCls = null;
 		ClassLoader targetClassLoader = null;
 		if (d4jdatafile != null) {
@@ -128,6 +137,12 @@ public class InstrumentationAgent {
 				targetCls = Class.forName(classname);
 				targetClassLoader = targetCls.getClassLoader();
 				transform(targetCls, targetClassLoader, instrumentation);
+				// retransform nested classes.
+				Class<?> children[] = targetCls.getDeclaredClasses();
+				if (children != null && children.length > 0) {
+					for (Class<?> chdclazz : children)
+						transform(chdclazz, targetClassLoader, instrumentation);
+				}
 				continue;
 			} catch (Exception ex) {
 				// debugLogger.error("Class [{}] not found with Class.forName", classname);
@@ -143,6 +158,21 @@ public class InstrumentationAgent {
 			throw new RuntimeException("Failed to find class [" + classname + "]");
 		}
 
+	}
+
+	private static void transformAll(Instrumentation inst) {
+		String logfilename = "all.log";
+		if (logFile != null) {
+			logfilename = logFile;
+		}
+		AllClassTransformer dt = new AllClassTransformer(logfilename, project);
+		if (d4jdatafile != null) {
+			dt.setD4jDataFile(d4jdatafile);
+		}
+		if (simpleLog) {
+			dt.setSimpleLog(true);
+		}
+		inst.addTransformer(dt, true);
 	}
 
 	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
