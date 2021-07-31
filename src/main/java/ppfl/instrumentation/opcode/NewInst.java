@@ -21,6 +21,20 @@ public class NewInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
+			throws BadBytecode {
+		int instpos = ci.insertExGap(8);
+		String msg = "\n###RET@" + instinfo.trim();
+		int instindex = constp.addStringInfo(msg);
+
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.logstringindex, instpos + 4);
+	}
+
+	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		// FIXME this could be buggy, as sometimes new inst will be an invoke-like inst.
 		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
@@ -33,9 +47,14 @@ public class NewInst extends OpcodeInst {
 		super.buildtrace(graph);
 		if (defnode != null) {
 			Integer addr = graph.parseinfo.getAddressFromStack();
-			if(addr != null)
+			if (addr != null)
 				defnode.setAddress(addr);
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+
+		graph.unsolvedStatic = graph.parseinfo;
+		graph.staticStmt = stmt;
+		graph.staticuse = usenodes;
+		graph.staticpred = prednodes;
 	}
 }
