@@ -1,6 +1,7 @@
 package ppfl.defects4j;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -65,14 +66,23 @@ public class GraphBuilder {
     String whatIsTracedLog = String.format("%s/%s/%s/trace/logs/mytrace/traced.source.log", checkoutbase, project, id);
     pgraph.parseWhatIsTracedLog(whatIsTracedLog);
 
-    if (relevantClasses != null) {
-      for (String s : relevantClasses.split(";")) {
-        if (!s.isEmpty()) {
-          // pgraph.addTracedDomain(s);
-          pgraph.parseD4jSource(project, id, s);
-        }
-      }
+    // if (relevantClasses != null) {
+    // for (String s : relevantClasses.split(";")) {
+    // if (!s.isEmpty()) {
+    // // pgraph.addTracedDomain(s);
+    // pgraph.parseD4jSource(project, id, s);
+    // }
+    // }
+    // }
+    String sourcebase = String.format("%s/%s/%s/trace/logs/mytrace/", checkoutbase, project, id);
+    File tracefolder = new File(sourcebase);
+    File[] fs = tracefolder.listFiles();
+    for (File f : fs) {
+      if (!f.getName().endsWith(".source.log") || f.getName().endsWith("traced.source.log"))
+        continue;
+      pgraph.parsesource(f.getAbsolutePath());
     }
+
     if (allTestClasses != null) {
       for (String s : allTestClasses.split(";")) {
         if (!s.isEmpty())
@@ -101,14 +111,13 @@ public class GraphBuilder {
     }
     System.out.println("Parse source complete");
     // long startTime = System.currentTimeMillis();
+    // pgraph.get_pre_idom();
     pgraph.get_idom();
     pgraph.get_stores();
     System.out.println("Static analyze complete");
     // long endTime = System.currentTimeMillis();
     // long thetime = endTime-startTime;
     // System.out.println("idom time is "+ thetime);
-    String tracefilename = String.format("%s/%s/%s/trace/logs/mytrace/all.log", checkoutbase, project, id);
-    // pgraph.pruneAndParse(tracefilename);
     String folder = String.format("%s/%s/%s/trace/logs/run/", checkoutbase, project, id);
     String sourcefolder = String.format("%s/%s/%s/trace/logs/mytrace/", checkoutbase, project, id);
     pgraph.parseFolder(folder, sourcefolder, usesimple);
