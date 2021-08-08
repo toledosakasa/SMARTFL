@@ -3,8 +3,8 @@ package ppfl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
+// import org.apfloat.Apfloat;
+// import org.apfloat.ApfloatMath;
 
 public class Node {
 
@@ -20,14 +20,14 @@ public class Node {
 	protected boolean isStmt;
 	private double p;// inferred chance to be correct
 	private boolean use_ap = false;
-	private Apfloat ap_p;
+	// private Apfloat ap_p;
 	protected String name;
 	private double impT;
 	private double impF;// importance for True and False in importance sampling.
 	private String testname;
 	private List<Edge> edges;
 	private double epsilon = 1e-8;
-	private Apfloat ap_epsilon = new Apfloat(String.valueOf(1e-8), 100);
+	// private Apfloat ap_epsilon = new Apfloat(String.valueOf(1e-8), 100);
 	private Edge degde;
 	protected boolean reduced;// should be reduced in the slice if val is true
 
@@ -41,7 +41,7 @@ public class Node {
 	public Node(String name) {
 		this.obs = false;
 		this.p = 0.5;
-		this.ap_p = new Apfloat("0.5", 100);
+		// this.ap_p = new Apfloat("0.5", 100);
 		this.name = name;
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
@@ -55,7 +55,7 @@ public class Node {
 		this.testname = testname;
 		this.obs = false;
 		this.p = 0.5;
-		this.ap_p = new Apfloat("0.5", 100);
+		// this.ap_p = new Apfloat("0.5", 100);
 		this.name = name;
 		isStmt = false;
 		tempvalue = true;// TODO init by statistics
@@ -206,7 +206,7 @@ public class Node {
 	}
 
 	public boolean send_message() {
-		if (!use_ap) {
+		// if (!use_ap) {
 			if (obs) {
 				double val = obsvalue ? 1.0 : 0.0;
 				for (Edge n : edges) {
@@ -268,83 +268,83 @@ public class Node {
 				n.set_ntof(tv1);
 			}
 			return delta > epsilon;
-		} else {
-			if (obs) {
-				Apfloat val = obsvalue ? new Apfloat("1.0", 100) : new Apfloat("0.0", 100);
-				for (Edge n : edges) {
-					n.ap_set_ntof(val);
-				}
-				Apfloat delta = val.subtract(this.ap_p);
-				if (delta.compareTo(new Apfloat("0.0", 100)) == -1)
-					delta = delta.negate();
-				this.ap_p = val;
-				return (delta.compareTo(ap_epsilon) == 1);
-			}
+		// } else {
+			// if (obs) {
+			// 	Apfloat val = obsvalue ? new Apfloat("1.0", 100) : new Apfloat("0.0", 100);
+			// 	for (Edge n : edges) {
+			// 		n.ap_set_ntof(val);
+			// 	}
+			// 	Apfloat delta = val.subtract(this.ap_p);
+			// 	if (delta.compareTo(new Apfloat("0.0", 100)) == -1)
+			// 		delta = delta.negate();
+			// 	this.ap_p = val;
+			// 	return (delta.compareTo(ap_epsilon) == 1);
+			// }
 
-			Apfloat ratio = new Apfloat("1.0", 100);
-			int countnan = 0;
-			for (Edge n : edges) {
-				Apfloat divisor = new Apfloat("1.0", 100).subtract(n.ap_get_fton());
-				if (n.ap_get_fton().equals(new Apfloat("0.0", 100)))
-					countnan--;
-				try {
-					Apfloat tmpratio = n.ap_get_fton().divide(divisor);
-					ratio = ratio.multiply(tmpratio);
-				} catch (Exception ApfloatRuntimeException) {
-					countnan++;
-				}
-			}
-			Apfloat result = ratio.divide(ratio.add(new Apfloat("1.0", 100)));
-			if (countnan != 0) {
-				if (countnan > 0)
-					result = new Apfloat("1.0", 100);
-				else if (countnan < 0)
-					result = new Apfloat("0.0", 100);
-			}
-			Apfloat delta = result.subtract(this.ap_p);
-			if (delta.compareTo(new Apfloat("0.0", 100)) == -1)
-				delta = delta.negate();
-			this.ap_p = result;
+			// Apfloat ratio = new Apfloat("1.0", 100);
+			// int countnan = 0;
+			// for (Edge n : edges) {
+			// 	Apfloat divisor = new Apfloat("1.0", 100).subtract(n.ap_get_fton());
+			// 	if (n.ap_get_fton().equals(new Apfloat("0.0", 100)))
+			// 		countnan--;
+			// 	try {
+			// 		Apfloat tmpratio = n.ap_get_fton().divide(divisor);
+			// 		ratio = ratio.multiply(tmpratio);
+			// 	} catch (Exception ApfloatRuntimeException) {
+			// 		countnan++;
+			// 	}
+			// }
+			// Apfloat result = ratio.divide(ratio.add(new Apfloat("1.0", 100)));
+			// if (countnan != 0) {
+			// 	if (countnan > 0)
+			// 		result = new Apfloat("1.0", 100);
+			// 	else if (countnan < 0)
+			// 		result = new Apfloat("0.0", 100);
+			// }
+			// Apfloat delta = result.subtract(this.ap_p);
+			// if (delta.compareTo(new Apfloat("0.0", 100)) == -1)
+			// 	delta = delta.negate();
+			// this.ap_p = result;
 
-			for (Edge n : edges) {
-				Apfloat b = new Apfloat("1.0", 100).subtract(n.ap_get_fton());
-				Apfloat a = n.ap_get_fton();
-				// double tv1 = b/(b+a/result);
-				Apfloat tv1;
-				if (countnan != 0) {
-					if (countnan > 0)
-						tv1 = new Apfloat("1.0", 100);
-					else
-						tv1 = new Apfloat("0.0", 100);
-					// else{
-					// tv1 = 1-b;
-					// }
-				}
-				// else if (Double.isNaN(a / ratio)||Double.isInfinite(a/ratio))
-				// tv1 = 0;
-				else {
-					try {
-						tv1 = b.divide(b.add(a.divide(ratio)));
-					} catch (Exception ApfloatRuntimeException) {
-						tv1 = new Apfloat("0.0", 100);
-					}
-				}
-				// if(Double.isNaN(tv1))
-				// System.out.println("here is bug nan + a/ratio = "+ a/ratio+ ", b = "+ b+ ",
-				// ratio = " + ratio);
-				n.ap_set_ntof(tv1);
-			}
-			return (delta.compareTo(ap_epsilon) == 1);
-		}
+			// for (Edge n : edges) {
+			// 	Apfloat b = new Apfloat("1.0", 100).subtract(n.ap_get_fton());
+			// 	Apfloat a = n.ap_get_fton();
+			// 	// double tv1 = b/(b+a/result);
+			// 	Apfloat tv1;
+			// 	if (countnan != 0) {
+			// 		if (countnan > 0)
+			// 			tv1 = new Apfloat("1.0", 100);
+			// 		else
+			// 			tv1 = new Apfloat("0.0", 100);
+			// 		// else{
+			// 		// tv1 = 1-b;
+			// 		// }
+			// 	}
+			// 	// else if (Double.isNaN(a / ratio)||Double.isInfinite(a/ratio))
+			// 	// tv1 = 0;
+			// 	else {
+			// 		try {
+			// 			tv1 = b.divide(b.add(a.divide(ratio)));
+			// 		} catch (Exception ApfloatRuntimeException) {
+			// 			tv1 = new Apfloat("0.0", 100);
+			// 		}
+			// 	}
+			// 	// if(Double.isNaN(tv1))
+			// 	// System.out.println("here is bug nan + a/ratio = "+ a/ratio+ ", b = "+ b+ ",
+			// 	// ratio = " + ratio);
+			// 	n.ap_set_ntof(tv1);
+			// }
+			// return (delta.compareTo(ap_epsilon) == 1);
+		// }
 	}
 
 	public double bp_getprob() {
 		return p;
 	}
 
-	public Apfloat ap_bp_getprob() {
-		return ap_p;
-	}
+	// public Apfloat ap_bp_getprob() {
+	// 	return ap_p;
+	// }
 
 	public static void setLogger(MyWriter lgr) {
 		// printLogger = lgr;
@@ -391,17 +391,17 @@ public class Node {
 	}
 
 	public void bpPrintProb() {
-		if (!use_ap)
+		// if (!use_ap)
 			printLogger.writeln("%s prob_bp = %f", this.getPrintName(), bp_getprob());
-		else
-			printLogger.writeln("%s prob_bp = %s", this.getPrintName(), ap_bp_getprob());
+		// else
+		// 	printLogger.writeln("%s prob_bp = %s", this.getPrintName(), ap_bp_getprob());
 	}
 
 	public void bpPrintProb(MyWriter lgr) {
-		if (!use_ap)
+		// if (!use_ap)
 			lgr.writeln("%s prob_bp = %.20f", this.getPrintName(), bp_getprob());
-		else
-			lgr.writeln("%s prob_bp = %.20s", this.getPrintName(), ap_bp_getprob());
+		// else
+		// 	lgr.writeln("%s prob_bp = %.20s", this.getPrintName(), ap_bp_getprob());
 	}
 
 }

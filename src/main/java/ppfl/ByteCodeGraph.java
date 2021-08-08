@@ -2073,10 +2073,10 @@ public class ByteCodeGraph {
 			resultLogger.writeln("Belief propagation time: %d\n", bp_times);
 		boolean use_ap = false;
 		Comparator<Node> comp;
-		if (!use_ap)
+		// if (!use_ap)
 			comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
-		else
-			comp = (arg0, arg1) -> (arg0.ap_bp_getprob().compareTo(arg1.ap_bp_getprob()));
+		// else
+		// 	comp = (arg0, arg1) -> (arg0.ap_bp_getprob().compareTo(arg1.ap_bp_getprob()));
 		nodes.sort(comp);
 		stmts.sort(comp);
 
