@@ -1129,6 +1129,9 @@ public class ByteCodeGraph {
 		this.untraceduse.addAll(toadd);
 		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 			Node defnode = this.addNewStackNode(this.untracedStmt);
+			if (OpcodeInst.isLongReturnMethodByDesc(desc)) {
+				defnode.setSize(2);
+			}
 			buildFactor(defnode, this.untracedpred, this.untraceduse, null, this.untracedStmt);
 		}
 		for (Node n : this.untraceduse) {
