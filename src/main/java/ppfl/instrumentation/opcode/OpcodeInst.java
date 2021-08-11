@@ -72,6 +72,17 @@ public class OpcodeInst {
 		return splitMethodDesc(desc).size();
 	}
 
+	public static boolean isLongReturnMethodByDesc(String desc) {
+		int endIndex = desc.lastIndexOf(')');
+		if (endIndex == -1) {
+			// System.err.println(beginIndex);
+			// System.err.println(endIndex);
+			throw new IllegalArgumentException("bracket mismatch in descriptor");
+		}
+		String rettype = desc.substring(endIndex + 1);
+		return rettype.contains("J") || rettype.contains("D");
+	}
+
 	public static boolean isVoidMethodByDesc(String desc) {
 		int endIndex = desc.lastIndexOf(')');
 		if (endIndex == -1) {
