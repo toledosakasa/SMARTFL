@@ -653,8 +653,7 @@ public class ByteCodeGraph {
 				// seems should get the pred with the max postorder
 				for (int i = 0; i < predsnum; i++) {
 					// to deal with pre_idom, some nodes can not be visited in pre order in the
-					// graph
-					// so it has no order after dfs
+					// graph so it has no order after dfs
 					if (postorder.get(thepreds.get(i)) == null) {
 						continue;
 
@@ -677,8 +676,7 @@ public class ByteCodeGraph {
 						continue;
 					String otherpred = thepreds.get(i);
 					// to deal with pre_idom, some nodes can not be visited in pre order in the
-					// graph
-					// so it has no order after dfs
+					// graph so it has no order after dfs
 					if (post_idom.get(otherpred) == null)
 						continue;
 					if (!post_idom.get(otherpred).equals("Undefined")) {
@@ -835,7 +833,7 @@ public class ByteCodeGraph {
 		}
 		System.out.print("\n");
 		for (RuntimeFrame r : s) {
-			System.out.print(r.domain.tracemethod);
+			System.out.print(r.domain.traceclass + ":" + r.domain.tracemethod);
 			System.out.print("-");
 		}
 		System.out.print("\n");
@@ -927,6 +925,10 @@ public class ByteCodeGraph {
 					&& this.tracedInvoke.byteindex == oth.byteindex;
 		} else {
 			TraceDomain td = this.tracedInvoke.getCallDomain();
+			if (!compareCallClass) {
+				return td.signature.equals(oth.domain.signature) && td.tracemethod.equals(oth.domain.tracemethod);
+			}
+
 			td = resolveMethod(td);
 			if (td == null)
 				return false;
@@ -963,6 +965,18 @@ public class ByteCodeGraph {
 				// System.out.println(this.tracedInvoke.getCallDomain());
 				// skip
 				return;
+			}
+		}
+
+		//
+		if (this.untracedInvoke != null) {
+			if (!compareCallClass && !pInfo.isReturnMsg) {// compare only signature and method name
+				TraceDomain td = this.untracedInvoke.getCallDomain();
+				// if fit
+				if (td.signature.equals(pInfo.domain.signature) && td.tracemethod.equals(pInfo.domain.tracemethod)) {
+					this.pushStackFrame(pInfo.domain);
+					this.cleanUntraced();
+				}
 			}
 		}
 
