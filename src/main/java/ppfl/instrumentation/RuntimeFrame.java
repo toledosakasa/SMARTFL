@@ -1,24 +1,24 @@
 package ppfl.instrumentation;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import ppfl.Node;
+
+import ppfl.SafeRunTimeStack;
 
 public class RuntimeFrame {
 	public int entercnt;
-	public Deque<Node> runtimestack;
+	// public Deque<Node> runtimestack;
+	public SafeRunTimeStack runtimestack;
 	public TraceDomain domain;
 
 	public RuntimeFrame() {
 		entercnt = 0;
-		runtimestack = new ArrayDeque<>();
+		runtimestack = new SafeRunTimeStack();
 	}
 
 	private RuntimeFrame(TraceDomain domain) {
 		entercnt = 0;
-		runtimestack = new ArrayDeque<>();
+		runtimestack = new SafeRunTimeStack();
 		this.domain = domain;
 	}
 
