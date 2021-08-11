@@ -221,7 +221,7 @@ public class ByteCodeGraph {
 		return ret;
 	}
 
-	public Deque<Node> getRuntimeStack() {
+	public SafeRunTimeStack getRuntimeStack() {
 		return getFrame().runtimestack;
 	}
 
@@ -1474,6 +1474,18 @@ public class ByteCodeGraph {
 		// defnode = this.addNewObjectNode(defnode, stmt);
 		// }
 
+		// FIXME this may conceal bugs in various insts.
+		// temporary solution.
+		if (compromise) {
+			Iterator<Node> iter = usenodes.iterator();
+			while (iter.hasNext()) {
+				Node tmp = iter.next();
+				if (tmp == null) {
+					iter.remove();
+				}
+			}
+		}
+
 		if (auto_oracle && !stmt.getMethod().contentEquals(this.testname) && !stmt.isUnexe()) {
 			int ln = stmt.getLineNumber();
 			if (this.lastDefinedLine != ln) {
@@ -2074,9 +2086,10 @@ public class ByteCodeGraph {
 		boolean use_ap = false;
 		Comparator<Node> comp;
 		// if (!use_ap)
-			comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
+		comp = (arg0, arg1) -> Double.compare(arg0.bp_getprob(), arg1.bp_getprob());
 		// else
-		// 	comp = (arg0, arg1) -> (arg0.ap_bp_getprob().compareTo(arg1.ap_bp_getprob()));
+		// comp = (arg0, arg1) ->
+		// (arg0.ap_bp_getprob().compareTo(arg1.ap_bp_getprob()));
 		nodes.sort(comp);
 		stmts.sort(comp);
 
