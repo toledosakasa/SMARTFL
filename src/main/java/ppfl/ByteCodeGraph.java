@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -171,6 +172,11 @@ public class ByteCodeGraph {
 	public List<Node> staticpred;
 	public ParseInfo unsolvedStatic = null;
 
+	boolean compareCallClass = false;
+
+	// compromise on minor faults.
+	boolean compromise = true;
+
 	public void stopview() {
 		shouldview = false;
 	}
@@ -210,6 +216,10 @@ public class ByteCodeGraph {
 			stackframe.push(RuntimeFrame.getFrame(parseinfo.domain));
 		}
 		return stackframe.peek();
+	}
+
+	private void emptyFrame() {
+		this.stackframe.clear();
 	}
 
 	public RuntimeFrame getPrevFrame() {
