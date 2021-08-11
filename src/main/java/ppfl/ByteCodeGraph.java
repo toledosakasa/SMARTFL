@@ -1190,6 +1190,8 @@ public class ByteCodeGraph {
 			}
 		}
 
+		this.emptyFrame();
+
 		int linec = 0;
 		for (ParseInfo pInfo : tChunk.parsedTraces) {
 			try {
@@ -1203,6 +1205,7 @@ public class ByteCodeGraph {
 				System.out.println("parse trace crashed at line " + linec);
 				System.out.println("Test name is: " + tChunk.fullname);
 				pInfo.debugprint();
+				// System.out.println(this.getDomain());
 				// System.exit(0);
 				throw (e);
 			}
