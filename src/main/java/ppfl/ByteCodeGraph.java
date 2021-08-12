@@ -2233,14 +2233,14 @@ public class ByteCodeGraph {
 		// Node.setLogger(resultLogger);
 
 		int cnt = 0;
-		for (Node n : nodes) {
-			if (!verbose) {
-				cnt++;
-				if (cnt > 10)
-					break;
-			}
-			n.bpPrintProb();
-		}
+		// for (Node n : nodes) {
+		// if (!verbose) {
+		// cnt++;
+		// if (cnt > 10)
+		// break;
+		// }
+		// // n.bpPrintProb();
+		// }
 		resultLogger.writeln("Stmts:%d", stmts.size());
 		for (StmtNode n : stmts) {
 			if (!this.resultFilter || !n.getreduced())
