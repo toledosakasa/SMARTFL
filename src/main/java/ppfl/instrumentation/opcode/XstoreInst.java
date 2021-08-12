@@ -17,4 +17,11 @@ public class XstoreInst extends OpcodeInst {
 		return ret.toString();
 	}
 
+	@Override
+	public String getinst_wide(CodeIterator ci, int index, ConstPool constp) {
+		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		ret.append(",store=" + getu16bitpara(ci, index));
+		return ret.toString();
+	}
+
 }

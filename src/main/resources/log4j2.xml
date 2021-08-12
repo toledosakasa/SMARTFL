@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- xml file for log4j2 -->
 <Configuration status="WARN">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
@@ -8,9 +9,9 @@
       <PatternLayout pattern="%msg%n" />
     </Console>
 
-    <RandomAccessFile name="TraceAppender_simple" fileName="trace/logs/mytrace/all.log" Append="false" immediateFlush="false" bufferSize="1048576">
+    <!-- <RandomAccessFile name="TraceAppender_simple" fileName="trace/logs/mytrace/all.log" Append="false" immediateFlush="false" bufferSize="1048576">
       <PatternLayout pattern="%msg" />
-    </RandomAccessFile>
+    </RandomAccessFile> -->
 
     <RandomAccessFile name="SourceAppender_simple" fileName="trace/logs/mytrace/all.source.log" Append="false" immediateFlush="false" bufferSize="1048576">
       <PatternLayout pattern="%msg" />
@@ -27,7 +28,7 @@
         </Route>
       </Routes>
       <!-- Created appender TTL -->
-      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
+      <!-- <IdlePurgePolicy timeToLive="15" timeUnit="minutes" /> -->
     </Routing>
     <Routing name="SourceAppender" ignoreExceptions="false">
       <Routes pattern="${ctx:sourcefile}">
@@ -40,7 +41,7 @@
         </Route>
       </Routes>
       <!-- Created appender TTL -->
-      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
+      <!-- <IdlePurgePolicy timeToLive="15" timeUnit="minutes" /> -->
     </Routing>
     <Routing name="ResultAppender" ignoreExceptions="false">
       <Routes pattern="${ctx:resultfile}">
@@ -53,7 +54,7 @@
         </Route>
       </Routes>
       <!-- Created appender TTL -->
-      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
+      <!-- <IdlePurgePolicy timeToLive="15" timeUnit="minutes" /> -->
     </Routing>
     <Routing name="GraphAppender" ignoreExceptions="false">
       <Routes pattern="${ctx:graphfile}">
@@ -66,7 +67,7 @@
         </Route>
       </Routes>
       <!-- Created appender TTL -->
-      <IdlePurgePolicy timeToLive="15" timeUnit="minutes" />
+      <!-- <IdlePurgePolicy timeToLive="15" timeUnit="minutes" /> -->
     </Routing>
   </Appenders>
   <Loggers>
@@ -76,7 +77,7 @@
     <Logger name="ResultLogger" level="trace" additivity="false">
       <AppenderRef ref="ResultAppender" />
     </Logger>
-    <Logger name="GraphLogger" level="trace" additivity="false">
+    <Logger name="GraphLogger" level="warn" additivity="false">
       <AppenderRef ref="GraphAppender" />
     </Logger>
     <Logger name="Debugger" level="warn" additivity="false">

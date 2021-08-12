@@ -1,5 +1,8 @@
 # ppfl
 
+## Requiring
+pip install func_timeout
+
 ## Run Tracing
 ```
 python s.py trace MergeTest#fail
@@ -26,28 +29,14 @@ Modify defects4j with the following:
 git fetch https://github.com/Ultimanecat/defects4j
 ```
 
-Look at relevant information:
-
+Localize a single bug:
 ```
-defects4j query -p Lang -q "bug.id,classes.relevant.src,classes.relevant.test,tests.relevant,tests.trigger"  -o langtest.csv
-```
-
-The instrumented classes should be "classes.relevant.src"+"tests.relevant"
-
-Test methods to run should be all test methods in "tests.relevant"
-
-Commandline tracing example:
-
-```
-defects4j checkout -p Lang -v 3b -w ./lang3b
-
-cd lang3b
-
-defects4j compile
-
-defects4j test -t org.apache.commons.lang3.math.NumberUtilsTest::testStringCreateNumberEnsureNoPrecisionLoss -a "-Djvmargs=-noverify -Djvmargs=-javaagent:[pathToAssembledTracer.jar]=logfile=[logfilename],instrumentingclass=org.apache.commons.lang3.math.NumberUtils:org.apache.commons.lang3.StringUtils:org.apache.commons.lang3.math.NumberUtilsTest"
+python s.py fl Lang 1
 ```
 
-for debugging use, copy the ant commandline (you should see that by running the instructions above) and run it.
+Test a project:
+```
+python s.py testproj Lang
+```
 
 

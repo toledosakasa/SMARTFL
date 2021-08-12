@@ -8,21 +8,25 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.Mnemonic;
 import ppfl.ByteCodeGraph;
+import ppfl.MyWriter;
 import ppfl.Node;
 import ppfl.ParseInfo;
 import ppfl.StmtNode;
+import ppfl.WriterUtils;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.instrumentation.TraceDomain;
 
 public class OpcodeInst {
-	private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
+	private static MyWriter debugWriter = WriterUtils.getWriter("Debugger");
+	// private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 
 	public int form;
 	String opcode;
@@ -58,13 +62,51 @@ public class OpcodeInst {
 
 	public OpcodeInst(int form, int pushnum, int popnum) {
 		this.form = form;
-		this.opcode = Mnemonic.OPCODE[form];
+		if (form != 255)
+			this.opcode = Mnemonic.OPCODE[form];
 		this.pushnum = pushnum;
 		this.popnum = popnum;
 	}
 
 	public static int getArgNumByDesc(String desc) {
 		return splitMethodDesc(desc).size();
+	}
+
+	public static String getCurrDomainType(ByteCodeGraph graph) {
+		return graph.parseinfo.domain.signature;
+	}
+
+	public static boolean isLongReturnMethodByDesc(String desc) {
+		int endIndex = desc.lastIndexOf(')');
+		if (endIndex == -1) {
+			// System.err.println(beginIndex);
+			// System.err.println(endIndex);
+			throw new IllegalArgumentException("bracket mismatch in descriptor");
+		}
+		String rettype = desc.substring(endIndex + 1);
+		return rettype.contains("J") || rettype.contains("D");
+	}
+
+	public static boolean isVoidMethodByDesc(String desc) {
+		int endIndex = desc.lastIndexOf(')');
+		if (endIndex == -1) {
+			// System.err.println(beginIndex);
+			// System.err.println(endIndex);
+			throw new IllegalArgumentException("bracket mismatch in descriptor");
+		}
+		String rettype = desc.substring(endIndex + 1);
+		return rettype.contentEquals("V");
+	}
+
+	public static boolean isBooleanMethodByDesc(String desc) {
+		int endIndex = desc.lastIndexOf(')');
+		if (endIndex == -1) {
+			// System.err.println(beginIndex);
+			// System.err.println(endIndex);
+			throw new IllegalArgumentException("bracket mismatch in descriptor");
+		}
+		String rettype = desc.substring(endIndex + 1);
+		return rettype.contentEquals("Z");
 	}
 
 	public static List<String> splitMethodDesc(String desc) {
@@ -105,6 +147,35 @@ public class OpcodeInst {
 		return constp.getLdcValue(ci.byteAt(cindex + paraindex)).toString();
 	}
 
+	int dispatchByDesc(String desc, CallBackIndex cbi) {
+		if (desc.length() < 1) {
+			return 0;
+		}
+		switch (desc.charAt(0)) {
+			case 'L':
+			case '[':
+				return cbi.tsindex_object;
+			case 'B':
+				return cbi.tsindex_byte;
+			case 'C':
+				return cbi.tsindex_char;
+			case 'D':
+				return cbi.tsindex_double;
+			case 'F':
+				return cbi.tsindex_float;
+			case 'I':
+				return cbi.tsindex_int;
+			case 'J':
+				return cbi.tsindex_long;
+			case 'S':
+				return cbi.tsindex_short;
+			case 'Z':
+				return cbi.tsindex_boolean;
+			default:
+				return 0;
+		}
+	}
+
 	int get1para(CodeIterator ci, int index) {
 		if (ci == null)
 			return 0;
@@ -135,15 +206,29 @@ public class OpcodeInst {
 		String calltype = constp.getMethodrefType(callindex);
 		String callclass = constp.getMethodrefClassName(callindex);
 		String callname = constp.getMethodrefName(callindex);
+		// String callname = null;
+		// if (constp.isConstructor(callclass, callindex) == 0) {
+		// callname = "init";
+		// } else {
+		// callname = constp.getMethodrefName(callindex);
+		// }
 		return ",calltype=" + calltype + ",callclass=" + callclass + ",callname=" + callname;
 	}
 
-	String getfieldinfo(CodeIterator ci, int index, ConstPool constp) {
+	String getStaticFieldInfo(CodeIterator ci, int index, ConstPool constp) {
 		int num = this.getu16bitpara(ci, index);
 		StringBuilder ret = new StringBuilder();
 		ret.append(",field=");
 		ret.append(constp.getFieldrefClassName(num));
-		ret.append(".");
+		ret.append("#");
+		ret.append(constp.getFieldrefName(num));
+		return ret.toString();
+	}
+
+	String getFieldInfo(CodeIterator ci, int index, ConstPool constp) {
+		int num = this.getu16bitpara(ci, index);
+		StringBuilder ret = new StringBuilder();
+		ret.append(",field=");
 		ret.append(constp.getFieldrefName(num));
 		return ret.toString();
 	}
@@ -208,10 +293,14 @@ public class OpcodeInst {
 		return ret.toString();
 	}
 
+	// extended class should override this method. (wide index)
+	public String getinst_wide(CodeIterator ci, int index, ConstPool constp) {
+		return getinst(ci, index, constp);
+	}
+
 	// there's no need to override this.
 	public void insertByteCodeBefore(CodeIterator ci, int index, ConstPool constp, String inst, CallBackIndex cbi)
 			throws BadBytecode {
-
 		if (inst != null && !inst.equals("")) {
 			// insertmap.get(ln).append(inst);
 			int instpos = ci.insertGap(6);
@@ -225,6 +314,12 @@ public class OpcodeInst {
 			ci.writeByte(184, instpos + 3);// invokestatic
 			ci.write16bit(cbi.logstringindex, instpos + 4);
 		}
+	}
+
+	// only for invoke insts.
+	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
+			throws BadBytecode {
+		// doing nothing
 	}
 
 	// extended class should override this method.
@@ -243,12 +338,11 @@ public class OpcodeInst {
 
 	public void buildstmt(ByteCodeGraph graph) {
 		this.info = graph.parseinfo;
-		String traceclass = info.traceclass;
-		String tracemethod = info.tracemethod;
+		TraceDomain tDomain = info.domain;
 		int linenumber = info.linenumber;
 		int byteindex = info.byteindex;
 
-		String stmtname = traceclass + ":" + tracemethod + "#" + linenumber;
+		String stmtname = tDomain.toString() + "#" + linenumber;
 		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + byteindex;
 		// if (!graph.hasNode(stmtname)) {
@@ -259,7 +353,7 @@ public class OpcodeInst {
 		// stmt = (StmtNode) graph.getNode(stmtname);
 		// assert (stmt.isStmt());
 		// }
-		this.stmt = graph.getStmt(stmtname);
+		this.stmt = graph.getStmt(stmtname, this.info.form);
 
 		// count how many times this statment has been executed
 		if (graph.stmtcountmap.containsKey(stmtname)) {
@@ -274,12 +368,36 @@ public class OpcodeInst {
 
 		// auto-assigned observation: test function always true
 		if (graph.auto_oracle) {
-			if (tracemethod.contentEquals(graph.testname)) {
+			if (tDomain.tracemethod.contentEquals(graph.testname) || graph.d4jTestClasses.contains(tDomain.traceclass)) {
 				stmt.observe(true);
-				debugLogger.info("Observe {} as true", stmt.getName());
+				// debugWriter.writeln(String.format("Observe %s as true", stmt.getName()));
 			}
 		}
 
+	}
+
+	public void buildtrace_simple(ByteCodeGraph graph) {
+		buildstmt(graph);
+		this.prednodes = new ArrayList<>();
+		this.usenodes = new ArrayList<>();
+		this.defnode = null;
+		if (!graph.getRuntimeStack().isEmpty())
+			usenodes.add(graph.getRuntimeStack().pop());
+		defnode = graph.addNewStackNode(stmt);
+		if (this.doBuild && defnode != null) {
+			// TODO should consider ops.
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		}
+	}
+
+	// override needed.
+	public void buildtrace_wide(ByteCodeGraph graph) {
+		buildtrace(graph);
+	}
+
+	// override only by putstatic
+	public void buildinit(ByteCodeGraph graph) {
+		// do nothing
 	}
 
 	// override needed.

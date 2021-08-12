@@ -14,16 +14,19 @@ public class AloadInst extends OpcodeInst {
 	public AloadInst(int _form) {
 		super(_form, 1, 0);
 		this.doBuild = false;
-		this.doPop = false;
-		this.doPush = false;
-		this.doLoad = false;
-		this.doStore = false;
 	}
 
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
 		ret.append(",load=" + getpara(ci, index, 1));
+		return ret.toString();
+	}
+
+	@Override
+	public String getinst_wide(CodeIterator ci, int index, ConstPool constp) {
+		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		ret.append(",load=" + getu16bitpara(ci, index));
 		return ret.toString();
 	}
 
@@ -37,7 +40,12 @@ public class AloadInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		defnode.setAddress(graph.parseinfo.getAddressFromStack());
+		if (defnode != null) {
+			Integer addr = graph.parseinfo.getAddressFromStack();
+			if(addr != null)
+				defnode.setAddress(addr);
+		}
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 }

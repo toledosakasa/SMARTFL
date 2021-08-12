@@ -41,14 +41,17 @@ public class Dup_x1Inst extends OpcodeInst {
 		// build the stmtnode(common)
 		super.buildtrace(graph);
 
-        Node top = graph.getRuntimeStack().pop();
-        Node nextTop = graph.getRuntimeStack().pop();
+		Node top = graph.getRuntimeStack().pop();
+		Node nextTop = graph.getRuntimeStack().pop();
 		assert (nextTop.getSize() == 1);
 		usenodes.add(top);
 		defnode = graph.addNewStackNode(stmt);
-        graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
-        graph.getRuntimeStack().push(nextTop);
-        graph.getRuntimeStack().push(top);
+		if (top.isHeapObject()) {
+			defnode.setAddress(top.getAddress());
+		}
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		graph.getRuntimeStack().push(nextTop);
+		graph.getRuntimeStack().push(top);
 	}
 
 }

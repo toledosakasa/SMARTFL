@@ -32,6 +32,9 @@ public class FreturnInst extends OpcodeInst {
 		graph.popStackFrame();
 		// def in caller frame
 		Node defnode = graph.addNewStackNode(stmt);
+		if (isLongReturnMethodByDesc(getCurrDomainType(graph))) {
+			defnode.setSize(2);
+		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		graph.killPredStack("OUT_" + stmt.getClassMethod());
 	}

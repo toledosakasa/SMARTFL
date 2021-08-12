@@ -81,20 +81,21 @@ public class SimpleProbGraph {
 		this.lineinfomap = new HashMap<String, LineInfo>();
 	}
 
-//	public Graph(String tracefilename, String testname, boolean testpass, boolean _auto_oracle) {
-//		this.testname = testname;
-//		factornodes = new ArrayList<FactorNode>();
-//		nodes = new ArrayList<Node>();
-//		stmts = new ArrayList<StmtNode>();
-//		nodemap = new HashMap<String, Node>();
-//		stmtmap = new HashMap<String, Node>();
-//		varcountmap = new HashMap<String, Integer>();
-//		stmtcountmap = new HashMap<String, Integer>();
-//		max_loop = -1;
-//		random = new Random();
-//		auto_oracle = _auto_oracle;
-//		parsetrace(tracefilename, testname, testpass);
-//	}
+	// public Graph(String tracefilename, String testname, boolean testpass, boolean
+	// _auto_oracle) {
+	// this.testname = testname;
+	// factornodes = new ArrayList<FactorNode>();
+	// nodes = new ArrayList<Node>();
+	// stmts = new ArrayList<StmtNode>();
+	// nodemap = new HashMap<String, Node>();
+	// stmtmap = new HashMap<String, Node>();
+	// varcountmap = new HashMap<String, Integer>();
+	// stmtcountmap = new HashMap<String, Integer>();
+	// max_loop = -1;
+	// random = new Random();
+	// auto_oracle = _auto_oracle;
+	// parsetrace(tracefilename, testname, testpass);
+	// }
 
 	public void setMaxLoop(int i) {
 		this.max_loop = i;
@@ -194,7 +195,7 @@ public class SimpleProbGraph {
 				String stmtname = domain + "#" + String.valueOf(line);
 				// System.out.println("At line " + stmtname);
 				if (!hasNode(stmtname)) {
-					stmt = new StmtNode(stmtname);
+					stmt = new StmtNode(stmtname, 0);
 					addNode(stmtname, stmt);
 
 				} else {
@@ -243,8 +244,7 @@ public class SimpleProbGraph {
 					// curline.print();
 					if (!returnDef.isEmpty()) {
 						String retdef = returnDef.pop();
-						FactorNode factor = buildFactor(retdef, curline.preds, curline.retuses, curline.retops,
-								callernode);
+						FactorNode factor = buildFactor(retdef, curline.preds, curline.retuses, curline.retops, callernode);
 						// record last defined value(used in auto-oracle)
 						last_defined_var = retdef;
 						last_defined_stmt = callernode;
@@ -268,8 +268,8 @@ public class SimpleProbGraph {
 						// add this factor to deal with libraries.
 						// when no library method is used, this factor could be ignored.
 						if (add_return_arg_factor) {
-							FactorNode factor = buildFactorWithArgUses(curline.def, curline.preds, curline.arguses,
-									curline.ops, stmt);
+							FactorNode factor = buildFactorWithArgUses(curline.def, curline.preds, curline.arguses, curline.ops,
+									stmt);
 						}
 					} else {
 						FactorNode factor = buildFactor(curline.def, curline.preds, curline.uses, curline.ops, stmt);
@@ -285,8 +285,7 @@ public class SimpleProbGraph {
 				if (curline.preddef != null) {
 					// System.out.println("printing curline.preddef");
 					// curline.print();
-					FactorNode factor = buildFactor(curline.preddef, curline.preds, curline.preduses, curline.predops,
-							stmt);
+					FactorNode factor = buildFactor(curline.preddef, curline.preds, curline.preduses, curline.predops, stmt);
 					// record last defined value(used in auto-oracle)
 					last_defined_var = curline.preddef;
 					last_defined_stmt = stmt;

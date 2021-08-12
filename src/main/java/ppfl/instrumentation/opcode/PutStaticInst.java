@@ -21,16 +21,22 @@ public class PutStaticInst extends OpcodeInst {
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
-		ret.append(getfieldinfo(ci, index, constp));
+		ret.append(getStaticFieldInfo(ci, index, constp));
 		return ret.toString();
+	}
+
+	@Override
+	public void buildinit(ByteCodeGraph graph) {
+		super.buildtrace(graph);
+		String field = graph.parseinfo.getvalue("field");
+		defnode = graph.addNewStaticHeapNode(field, stmt);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		for (int i = 0; i < 1; i++) {
-			usenodes.add(graph.getRuntimeStack().pop());
-		}
+		usenodes.add(graph.getRuntimeStack().pop());
 		String field = graph.parseinfo.getvalue("field");
 		defnode = graph.addNewStaticHeapNode(field, stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);

@@ -1,37 +1,35 @@
 package ppfl.instrumentation;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import ppfl.Node;
+
+import ppfl.SafeRunTimeStack;
 
 public class RuntimeFrame {
 	public int entercnt;
-	public Deque<Node> runtimestack;
-	public String traceclass;
-	public String tracemethod;
+	// public Deque<Node> runtimestack;
+	public SafeRunTimeStack runtimestack;
+	public TraceDomain domain;
 
 	public RuntimeFrame() {
 		entercnt = 0;
-		runtimestack = new ArrayDeque<>();
+		runtimestack = new SafeRunTimeStack();
 	}
 
-	private RuntimeFrame(String tclass, String tmethod) {
+	private RuntimeFrame(TraceDomain domain) {
 		entercnt = 0;
-		runtimestack = new ArrayDeque<>();
-		traceclass = tclass;
-		tracemethod = tmethod;
+		runtimestack = new SafeRunTimeStack();
+		this.domain = domain;
 	}
 
 	public String getDomain() {
-		return this.traceclass + ":" + this.tracemethod + "#" + entercnt + ":";
+		return domain.toString() + "#" + entercnt + ":";
 	}
 
-	public static RuntimeFrame getFrame(String tclass, String tmethod) {
-		String id = tclass + ":" + tmethod;
+	public static RuntimeFrame getFrame(TraceDomain domain) {
+		String id = domain.toString();
 		if (!framemap.containsKey(id)) {
-			framemap.put(id, new RuntimeFrame(tclass, tmethod));
+			framemap.put(id, new RuntimeFrame(domain));
 		}
 		return framemap.get(id);
 	}

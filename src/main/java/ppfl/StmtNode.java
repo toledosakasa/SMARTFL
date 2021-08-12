@@ -3,11 +3,10 @@ package ppfl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 public class StmtNode extends Node {
 	private boolean isUnexe = false;
 	private Map<Integer, StmtNode> unexeStmtMap = new HashMap<>();
+	int form;// unexe stmt:-1
 
 	public void setUnexe() {
 		this.isUnexe = true;
@@ -29,44 +28,45 @@ public class StmtNode extends Node {
 		unexeStmtMap.put(id, stmt);
 	}
 
-	public StmtNode(String sname) {
+	public StmtNode(String sname, int form) {
 		super(sname);
+		this.form = form;
 		this.isStmt = true;
 	}
 
 	@Override
-	public void print(Logger lgr, String prefix) {
+	public void print(MyWriter lgr, String prefix) {
 		if (this.obs) {
-			lgr.info("{}{}(Statement) observed = {}", prefix, this.name, this.obsvalue);
+			lgr.writeln("%s%s(Statement) observed = %b", prefix, this.name, this.obsvalue);
 		} else {
-			lgr.info("{}{}(Statement)", prefix, this.name);
+			lgr.writeln("%s%s(Statement)", prefix, this.name);
 		}
 	}
 
 	@Override
-	public void print(Logger lgr) {
+	public void print(MyWriter lgr) {
 		if (this.obs) {
-			lgr.info("{}(Statement) observed = {}", this.name, this.obsvalue);
+			lgr.writeln("%s(Statement) observed = %b", this.name, this.obsvalue);
 		} else {
-			lgr.info("{}(Statement)", this.name);
+			lgr.writeln("%s(Statement)", this.name);
 		}
 	}
 
 	@Override
 	public void print(String prefix) {
 		if (this.obs) {
-			printLogger.info("{}{}(Statement) observed = {}", prefix, this.name, this.obsvalue);
+			printLogger.writeln("%s%s(Statement) observed = %b", prefix, this.name, this.obsvalue);
 		} else {
-			printLogger.info("{}{}(Statement)", prefix, this.name);
+			printLogger.writeln("%s%s(Statement)", prefix, this.name);
 		}
 	}
 
 	@Override
 	public void print() {
 		if (this.obs) {
-			printLogger.info("{}(Statement) observed = {}", this.name, this.obsvalue);
+			printLogger.writeln("%s(Statement) observed = %b", this.name, this.obsvalue);
 		} else {
-			printLogger.info("{}(Statement)", this.name);
+			printLogger.writeln("%s(Statement)", this.name);
 		}
 	}
 
@@ -87,8 +87,14 @@ public class StmtNode extends Node {
 
 	public String getClassMethod() {
 		String[] lineinfos = this.name.split(":");
-		String classandmethod = lineinfos[0] + "#" + lineinfos[1].split("#")[0];
-		return classandmethod;
+		StringBuilder sb = new StringBuilder(lineinfos[0]);
+		for (int i = 1; i < lineinfos.length - 2; i++) {
+			sb.append("#");
+			sb.append(lineinfos[i]);
+		}
+		// String classandmethod = lineinfos[0] + "#" + lineinfos[1].split("#")[0];
+
+		return sb.toString();
 	}
 
 	public String getMethod() {

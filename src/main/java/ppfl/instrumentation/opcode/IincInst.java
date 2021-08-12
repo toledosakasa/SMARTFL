@@ -3,6 +3,7 @@ package ppfl.instrumentation.opcode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.Node;
 
 //132
 public class IincInst extends OpcodeInst {
@@ -26,8 +27,8 @@ public class IincInst extends OpcodeInst {
 
 		int varindex = info.getintvalue("store");
 		// int incconst = info.getintvalue("CONST");
-
-		usenodes.add(graph.getLoadNodeAsUse(varindex));
+		Node changed = graph.getLoadNodeAsUse(varindex);
+		usenodes.add(changed);
 		defnode = graph.addNewVarNode(varindex, stmt);
 
 		// build factor.
@@ -42,6 +43,15 @@ public class IincInst extends OpcodeInst {
 		String incVar = getpara(ci, index, 1);
 		ret.append(",store=" + incVar);
 		ret.append(",CONST=" + getpara(ci, index, 2));
+		return ret.toString();
+	}
+
+	@Override
+	public String getinst_wide(CodeIterator ci, int index, ConstPool constp) {
+		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
+		int incVar = getu16bitpara(ci, index);
+		ret.append(",store=" + incVar);
+		ret.append(",CONST=" + gets16bitpara(ci, index + 2));
 		return ret.toString();
 	}
 

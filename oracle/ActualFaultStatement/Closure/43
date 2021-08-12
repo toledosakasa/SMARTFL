@@ -1,0 +1,3 @@
+com.google.javascript.jscomp.TypedScopeCreator.<init>:400||com.google.javascript.jscomp.TypedScopeCreator.<init>:402||com.google.javascript.jscomp.TypedScopeCreator.<init>:408||com.google.javascript.jscomp.TypedScopeCreator.<init>:427||com.google.javascript.jscomp.TypedScopeCreator.<init>:433||com.google.javascript.jscomp.TypedScopeCreator.<init>:438
+com.google.javascript.jscomp.TypedScopeCreator.visit:502
+com.google.javascript.jscomp.TypedScopeCreator.attachLiteralTypes:579||com.google.javascript.jscomp.TypedScopeCreator.attachLiteralTypes:580
