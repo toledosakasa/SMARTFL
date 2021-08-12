@@ -174,6 +174,8 @@ public class ByteCodeGraph {
 	public List<Node> staticpred;
 	public ParseInfo unsolvedStatic = null;
 
+	public boolean gotoNoBranch = true;
+
 	boolean compareCallClass = false;
 
 	// compromise on minor faults.
@@ -477,8 +479,10 @@ public class ByteCodeGraph {
 		try (BufferedReader reader = new BufferedReader(new FileReader(sourcefilename))) {
 			String t;
 			Set<String> nonextinsts = new HashSet<>();
-			nonextinsts.add("goto_w");
-			nonextinsts.add("goto");
+			if (gotoNoBranch) {
+				nonextinsts.add("goto_w");
+				nonextinsts.add("goto");
+			}
 			nonextinsts.add("return");
 			nonextinsts.add("areturn");
 			nonextinsts.add("dreturn");
@@ -527,7 +531,8 @@ public class ByteCodeGraph {
 					_instset.add(thisinst);
 					continue;
 				}
-				if (!(nonextinsts.contains(info.opcode))) {
+				if (!((nonextinsts.contains(info.opcode)) || ((info.opcode.equals("goto") || info.opcode.equals("goto_w"))
+						&& info.getvalue("nextinst").equals("-1")))) {
 					String nextinst = classandmethod + info.getvalue("nextinst");
 					theedges.add(nextinst);
 				}
