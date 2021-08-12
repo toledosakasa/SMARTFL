@@ -21,7 +21,7 @@ public class PutStaticInst extends OpcodeInst {
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
-		ret.append(getfieldinfo(ci, index, constp));
+		ret.append(getStaticFieldInfo(ci, index, constp));
 		return ret.toString();
 	}
 

@@ -215,12 +215,20 @@ public class OpcodeInst {
 		return ",calltype=" + calltype + ",callclass=" + callclass + ",callname=" + callname;
 	}
 
-	String getfieldinfo(CodeIterator ci, int index, ConstPool constp) {
+	String getStaticFieldInfo(CodeIterator ci, int index, ConstPool constp) {
 		int num = this.getu16bitpara(ci, index);
 		StringBuilder ret = new StringBuilder();
 		ret.append(",field=");
 		ret.append(constp.getFieldrefClassName(num));
-		ret.append(".");
+		ret.append("#");
+		ret.append(constp.getFieldrefName(num));
+		return ret.toString();
+	}
+
+	String getFieldInfo(CodeIterator ci, int index, ConstPool constp) {
+		int num = this.getu16bitpara(ci, index);
+		StringBuilder ret = new StringBuilder();
+		ret.append(",field=");
 		ret.append(constp.getFieldrefName(num));
 		return ret.toString();
 	}
