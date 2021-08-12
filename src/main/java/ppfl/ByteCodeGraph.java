@@ -168,6 +168,7 @@ public class ByteCodeGraph {
 	public List<Node> throwuse;
 	public List<Node> throwpred;
 	public ParseInfo unsolvedThrow = null;
+	public boolean crashedByThrow = false;
 
 	private boolean solveStatic = true;
 	public StmtNode staticStmt;
@@ -1082,6 +1083,11 @@ public class ByteCodeGraph {
 				maintainStackframeUpward(pInfo);
 				buildThrowException();
 			} else {
+				boolean strictThrow = true; // evaluation switch
+				if (strictThrow) {
+					this.crashedByThrow = true;
+					return;
+				}
 				// should not happen
 				// maybe quit on crash.
 				// System.out.println("Athrow is not catched!");
@@ -1278,6 +1284,16 @@ public class ByteCodeGraph {
 				// }
 				linec++;
 				parseSingleTrace(pInfo, debugswitch, linec);
+				if (this.crashedByThrow) {
+					crashedByThrow = false;
+					if (unsolvedThrow != null) {
+						System.out.println("end in throw crash at" + tChunk.fullname);
+						unsolvedThrow.debugprint();
+						Node exceptDef = addNewExceptionNode(throwStmt);
+						buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
+					}
+					break;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("parse trace crashed at line " + linec);
