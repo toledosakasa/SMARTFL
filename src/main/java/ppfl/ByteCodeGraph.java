@@ -128,6 +128,7 @@ public class ByteCodeGraph {
 	public Map<String, Node> nodemap;
 	public Map<String, Node> stmtmap;
 	public Map<String, Integer> varcountmap;
+	public Map<String, Integer> stackcountmap;
 	public Map<String, Integer> stmtcountmap;
 	public Map<String, Integer> heapcountmap;
 	public Map<String, Integer> objectcountmap;
@@ -179,7 +180,7 @@ public class ByteCodeGraph {
 	boolean compareCallClass = false;
 
 	// compromise on minor faults.
-	boolean compromise = true;
+	boolean compromise = false;
 
 	public void stopview() {
 		shouldview = false;
@@ -334,6 +335,7 @@ public class ByteCodeGraph {
 		nodemap = new HashMap<>();
 		stmtmap = new HashMap<>();
 		varcountmap = new HashMap<>();
+		stackcountmap = new HashMap<>();
 		stmtcountmap = new HashMap<>();
 		heapcountmap = new HashMap<>();
 		objectcountmap = new HashMap<>();
@@ -418,6 +420,7 @@ public class ByteCodeGraph {
 	public void initmaps() {
 		// TODO this could be incomplete...
 		this.varcountmap = new HashMap<>();
+		this.stackcountmap = new HashMap<>();
 		this.stackframe = new ArrayDeque<>();
 		this.predicates.clear();
 		stmtcountmap = new HashMap<>();
@@ -1732,9 +1735,18 @@ public class ByteCodeGraph {
 		return domain + "#Stack";
 	}
 
+	private void incStackIndex() {
+		String def = this.getFormalStackName();
+		if (!stackcountmap.containsKey(def)) {
+			stackcountmap.put(def, 1);
+		} else {
+			stackcountmap.put(def, stackcountmap.get(def) + 1);
+		}
+	}
+
 	private String getFormalStackNameWithIndex() {
 		// FIXME
-		return getVarName(this.getFormalStackName(), this.getRuntimeStack().size());
+		return getVarName(this.getFormalStackName(), this.stackcountmap);
 	}
 
 	private String getFormalVarName(int varindex, TraceDomain domain) {
@@ -1884,6 +1896,7 @@ public class ByteCodeGraph {
 	public Node addNewStackNode(StmtNode stmt) {
 		// TODO stack node's name may get confused(same name, different node).
 		// TODO currently works fine, but may bring difficulty to debugging.
+		this.incStackIndex();
 		String nodename = this.getFormalStackNameWithIndex();
 		Node node = new Node(nodename, this.testname, stmt);
 		this.addNode(nodename, node);
