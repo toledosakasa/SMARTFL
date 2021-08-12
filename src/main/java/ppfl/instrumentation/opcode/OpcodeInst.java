@@ -72,6 +72,10 @@ public class OpcodeInst {
 		return splitMethodDesc(desc).size();
 	}
 
+	public static String getCurrDomainType(ByteCodeGraph graph) {
+		return graph.parseinfo.domain.signature;
+	}
+
 	public static boolean isLongReturnMethodByDesc(String desc) {
 		int endIndex = desc.lastIndexOf(')');
 		if (endIndex == -1) {

@@ -27,7 +27,8 @@ public class Pop2Inst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		Node poped1 = graph.getRuntimeStack().pop();
 		if (poped1.getSize() == 1) {
-			graph.getRuntimeStack().pop();
+			if (!graph.getRuntimeStack().isEmpty())
+				graph.getRuntimeStack().pop();
 		}
 
 	}
