@@ -18,7 +18,7 @@ public class JoinedTrace {
   private Set<String> d4jMethodNames = new HashSet<>();
   private Set<String> d4jTriggerTestNames = new HashSet<>();
   private Set<TraceDomain> tracedDomain = new HashSet<>();
-  private static final double MAX_FILE_LIMIT = 2e8;// 200M
+  private static final double MAX_FILE_LIMIT = 2e8;// threshold for maximum pass trace : 200M
 
   public List<TraceChunk> traceList = new ArrayList<>();
   public TraceChunk staticInits = new TraceChunk("<init>");
@@ -116,9 +116,7 @@ public class JoinedTrace {
     for (File f : fs) {
       if (f.getName().equals("all.log"))
         continue;
-      if (f.length() < MAX_FILE_LIMIT) {
-        parseSepFile(f, f.getName());
-      }
+      parseSepFile(f, f.getName());
     }
     parseToInfo();
   }
@@ -129,8 +127,11 @@ public class JoinedTrace {
       name = name.substring(0, name.length() - suffix.length());
     int index = name.lastIndexOf('.');
     String fullname = name.substring(0, index) + "::" + name.substring(index + 1);
+    if (getD4jTestState(fullname) && f.length() > MAX_FILE_LIMIT) {
+      return;
+    }
     // Lang-6
-    // if (!fullname.endsWith("testEscapeSurrogatePairs"))
+    // if (!fullname.endsWith("testRootEndpoints"))
     // return;
     this.addTraceChunk(fullname);
     try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
