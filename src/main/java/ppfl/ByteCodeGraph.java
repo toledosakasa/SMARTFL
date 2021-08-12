@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 // import org.graphstream.graph.implementations.SingleGraph;
 // import org.slf4j.Logger;
@@ -143,6 +144,7 @@ public class ByteCodeGraph {
 	public Map<String, String> post_idom;
 	public Map<String, Integer> store_num;
 	public Map<String, Set<Integer>> branch_stores;
+	public Set<LoopEdge> loopset;
 	private boolean shouldview;
 
 	private boolean resultFilter = true;
@@ -351,6 +353,7 @@ public class ByteCodeGraph {
 		stackframe = new ArrayDeque<>();
 		predstack = new ArrayDeque<>();
 		store_stack = new ArrayDeque<>();
+		loopset = new TreeSet<>();
 		// viewgraph = new SingleGraph("Outgraph");
 		// viewgraph.setStrict(false);
 		// viewgraph.setAutoCreate(true);
@@ -738,6 +741,36 @@ public class ByteCodeGraph {
 		this.inset = tmp_set;
 	}
 
+	public void find_loop() {
+		for (Map.Entry<String, List<String>> entry : predataflowmap.entrySet()) {
+			String edge_start = entry.getKey();
+			for (String edge_end : entry.getValue()) {
+				String end_dom = pre_idom.get(edge_end);
+				if (end_dom != null && end_dom.equals(edge_start))
+					continue;
+				String dominator = pre_idom.get(edge_start);
+				boolean isloop = false;
+				while (dominator != null && !inset.contains(dominator)) {
+					if (dominator.equals(edge_end)) {
+						isloop = true;
+						break;
+					}
+					dominator = pre_idom.get(dominator);
+				}
+				if (isloop) {
+					LoopEdge theloop = new LoopEdge(edge_start, edge_end);
+					loopset.add(theloop);
+					// reduceLogger.writeln("start "+ edge_start + ", end " + edge_end +
+					// ", length = " + theloop.length + "\n");
+				}
+			}
+		}
+		// for(LoopEdge theloop : loopset)
+		// reduceLogger.writeln("start "+ theloop.start + ", end " + theloop.end +
+		// ", length = " + theloop.length + "\n");
+
+	}
+
 	public void dataflow() {
 		// init the dataflow set
 		Set<String> changedset = new HashSet<>();
@@ -897,6 +930,16 @@ public class ByteCodeGraph {
 			e.printStackTrace();
 			System.err.println("parse failed.");
 		}
+		boolean debug_compress = false;
+		for (TraceChunk tChunk : jTrace.traceList) {
+			if (debug_compress) {
+				reduceLogger.writeln("\n" + "start " + tChunk.fullname + "\n");
+				tChunk.loop_compress(loopset, reduceLogger);
+			} else {
+				tChunk.loop_compress(loopset, null);
+			}
+		}
+
 		parseJoinedTracePruned(jTrace, usesimple);
 	}
 

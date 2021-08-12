@@ -111,7 +111,8 @@ public class GraphBuilder {
     }
     System.out.println("Parse source complete");
     // long startTime = System.currentTimeMillis();
-    // pgraph.get_pre_idom();
+    pgraph.get_pre_idom();
+    pgraph.find_loop();
     pgraph.get_idom();
     pgraph.get_stores();
     System.out.println("Static analyze complete");
