@@ -156,12 +156,14 @@ public class ByteCodeGraph {
 	public List<Node> traceduse;
 	public List<Node> tracedpred;
 	public ParseInfo tracedInvoke = null;
+	public int tracedargcnt = 0;
 	public Node tracedObj = null;
 
 	public StmtNode untracedStmt;
 	public List<Node> untraceduse;
 	public List<Node> untracedpred;
 	public ParseInfo untracedInvoke = null;
+	public int untracedargcnt = 0;
 	public Node untracedObj = null;
 
 	public StmtNode throwStmt;
@@ -251,6 +253,10 @@ public class ByteCodeGraph {
 		return false;
 	}
 
+	public void setStackForNode(Node n) {
+		n.setStackValue(this.parseinfo.getStackValue());
+	}
+
 	// local vars used by parsing
 	public ParseInfo parseinfo = new ParseInfo();
 
@@ -306,7 +312,7 @@ public class ByteCodeGraph {
 					// if (!this.store_stack.isEmpty())
 					stores = this.store_stack.pop();
 					// System.out.println("kill "+stores);
-					boolean unexecuted_complement = true;
+					boolean unexecuted_complement = true; //evaluation switch
 					if (unexecuted_complement) {
 						if (stores != null) {
 							// StmtNode curStmt = curPred.stmt;
@@ -897,6 +903,7 @@ public class ByteCodeGraph {
 		this.traceduse = null;
 		this.tracedpred = null;
 		this.tracedObj = null;
+		this.tracedargcnt = 0;
 	}
 
 	private void cleanUntraced() {
@@ -905,6 +912,7 @@ public class ByteCodeGraph {
 		this.untraceduse = null;
 		this.untracedpred = null;
 		this.untracedObj = null;
+		this.untracedargcnt = 0;
 	}
 
 	private void cleanThrow() {
@@ -999,6 +1007,46 @@ public class ByteCodeGraph {
 		}
 	}
 
+	private void resolveUntracedArgs(ParseInfo pInfo) {
+		// switch stack frame
+		pushStackFrame(pInfo.domain);
+		int argcnt = this.untracedargcnt;
+		// static arguments starts with 0
+		int paravarindex = 0;
+		// non-static
+		// paravarindex = 1;
+		for (int i = 0; i < argcnt; i++) {
+
+			List<Node> adduse = new ArrayList<>();
+			Node curArgument = untraceduse.get(argcnt - i - 1);
+			adduse.add(curArgument);
+
+			Node defnode = addNewVarNode(paravarindex, untracedStmt);
+			buildFactor(defnode, untracedpred, adduse, null, untracedStmt);
+			paravarindex += curArgument.getSize();
+		}
+	}
+
+	private void resolveTracedArgs(ParseInfo pInfo) {
+		// switch stack frame
+		pushStackFrame(pInfo.domain);
+		int argcnt = this.tracedargcnt;
+		// static arguments starts with 0
+		int paravarindex = 0;
+		// non-static
+		// paravarindex = 1;
+		for (int i = 0; i < argcnt; i++) {
+
+			List<Node> adduse = new ArrayList<>();
+			Node curArgument = traceduse.get(argcnt - i - 1);
+			adduse.add(curArgument);
+
+			Node defnode = addNewVarNode(paravarindex, tracedStmt);
+			buildFactor(defnode, tracedpred, adduse, null, tracedStmt);
+			paravarindex += curArgument.getSize();
+		}
+	}
+
 	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
 		// if (debugswitch) {
 		// try {
@@ -1017,10 +1065,13 @@ public class ByteCodeGraph {
 				if (pInfo.isReturnMsg) {
 					// actually untraced due to instrumentation bug.
 					// pop stackframe that is pushed for nothing.
-					this.popStackFrame();
+					// System.out.println("frame poped at " + linec);
+					// pInfo.debugprint();
+					// this.popStackFrame();
 					buildTracedInvoke();
 					return;
 				}
+				this.resolveTracedArgs(pInfo);
 				this.cleanTraced();
 			} else {
 				// System.out.println("skipped" + linec);
@@ -1036,7 +1087,7 @@ public class ByteCodeGraph {
 				TraceDomain td = this.untracedInvoke.getCallDomain();
 				// if fit
 				if (td.signature.equals(pInfo.domain.signature) && td.tracemethod.equals(pInfo.domain.tracemethod)) {
-					this.pushStackFrame(pInfo.domain);
+					this.resolveUntracedArgs(pInfo);
 					this.cleanUntraced();
 				}
 			}
@@ -1083,7 +1134,7 @@ public class ByteCodeGraph {
 				maintainStackframeUpward(pInfo);
 				buildThrowException();
 			} else {
-				boolean strictThrow = true; // evaluation switch
+				boolean strictThrow = false; // evaluation switch
 				if (strictThrow) {
 					this.crashedByThrow = true;
 					return;
@@ -1110,8 +1161,12 @@ public class ByteCodeGraph {
 			return;
 		}
 
+		boolean skipFaultyFrame = false;// evaluation switch
 		// Begin with the initial testmethod.
 		this.getFrame();
+		if (skipFaultyFrame && !this.getFrame().domain.equals(this.parseinfo.domain)) {
+			return;
+		}
 		// if (!this.getFrame().domain.equals(this.parseinfo.domain)) {
 		// try {
 		// System.out.println(linec);
@@ -1305,13 +1360,24 @@ public class ByteCodeGraph {
 			}
 		}
 		// if crash occurs, lastDefinedVar should be modified with last call
-		if (untracedInvoke != null) {
+		boolean buildCrashForPassTest = false;// evaluation switch
+		if (untracedInvoke != null && (buildCrashForPassTest || !testpass)) {
 			System.out.println("end in untraced crash at" + tChunk.fullname);
 			untracedInvoke.debugprint();
 			Node exceptDef = addNewExceptionNode(untracedStmt);
 			buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
+			boolean observeAssertCrash = true;//// evaluation switch
+			if (observeAssertCrash) {
+				int ln = untracedStmt.getLineNumber();
+				if (this.lastDefinedLine != ln) {
+					this.lastDefinedLine = ln;
+					this.lastDefinedVar.clear();
+				}
+				this.lastDefinedVar.add(exceptDef);
+			}
 		}
-		if (tracedInvoke != null) {
+
+		if (tracedInvoke != null && (buildCrashForPassTest || !testpass)) {
 			System.out.println("end in traced crash at" + tChunk.fullname);
 			tracedInvoke.debugprint();
 			Node exceptDef = addNewExceptionNode(tracedStmt);
@@ -1333,7 +1399,7 @@ public class ByteCodeGraph {
 		this.initmaps();
 		jTrace.sortChunk();
 		int totalSize = 0;
-		int thres = 1000000;// 1M lines
+		int thres = 1000000;// threshold : 1M lines for all traces
 		for (TraceChunk tChunk : jTrace.traceList) {
 			try {
 				if (usesimple)
@@ -1348,6 +1414,8 @@ public class ByteCodeGraph {
 				// throw (e);
 			}
 			if (totalSize > thres) {
+				// resultLogger.writeln("out scale \n");
+				// System.exit(0);
 				break;
 			}
 		}
@@ -1556,20 +1624,8 @@ public class ByteCodeGraph {
 	public FactorNode buildFactor(Node defnode, List<Node> prednodes, List<Node> usenodes, List<String> ops,
 			StmtNode stmt) {
 
-		// substitution for heap object
-		// for (int i = 0; i < usenodes.size(); i++) {
-		// Node n = usenodes.get(i);
-		// if (n.isHeapObject()) {
-		// Node newNode = this.getObjectNode(n);
-		// if (newNode == null) {
-		// System.out.println("addr not found:" + n.getAddress());
-		// }
-		// usenodes.set(i, newNode);
-		// }
-		// }
-		// if (defnode.isHeapObject()) {
-		// defnode = this.addNewObjectNode(defnode, stmt);
-		// }
+		// evaluation switch
+		this.setStackForNode(defnode);
 
 		// FIXME this may conceal bugs in various insts.
 		// temporary solution.
@@ -1742,7 +1798,7 @@ public class ByteCodeGraph {
 		}
 	}
 
-	private String getDomain() {
+	public String getDomain() {
 		return getFrame().getDomain();
 	}
 
@@ -2139,7 +2195,7 @@ public class ByteCodeGraph {
 	public long bp_inference() {
 		long startTime = System.currentTimeMillis();
 		path_reduce();
-		boolean outreduced = true;
+		boolean outreduced = false;
 		if (outreduced && debug_logger_switch) {
 			graphLogger.writeln("\nReduced Nodes: ");
 			for (Node n : stmts) {

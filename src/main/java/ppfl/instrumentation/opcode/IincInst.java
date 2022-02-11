@@ -27,8 +27,12 @@ public class IincInst extends OpcodeInst {
 
 		int varindex = info.getintvalue("store");
 		// int incconst = info.getintvalue("CONST");
+		// if (varindex == 31) {
+		// System.out.println("iinc:" + graph.getDomain());
+		// }
 		Node changed = graph.getLoadNodeAsUse(varindex);
-		usenodes.add(changed);
+		if (changed != null) // evaluation switch
+			usenodes.add(changed);
 		defnode = graph.addNewVarNode(varindex, stmt);
 
 		// build factor.

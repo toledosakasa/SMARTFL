@@ -368,7 +368,8 @@ public class OpcodeInst {
 
 		// auto-assigned observation: test function always true
 		if (graph.auto_oracle) {
-			if (tDomain.tracemethod.contentEquals(graph.testname) || graph.d4jTestClasses.contains(tDomain.traceclass)) {
+			if (tDomain.tracemethod.contentEquals(graph.testname) || graph.d4jTestClasses.contains(tDomain.traceclass)
+					|| stmtname.startsWith("junit")) {
 				stmt.observe(true);
 				// debugWriter.writeln(String.format("Observe %s as true", stmt.getName()));
 			}
@@ -436,6 +437,9 @@ public class OpcodeInst {
 		}
 		if (this.doStore && info.getintvalue("store") != null) {
 			int storevar = info.getintvalue("store");
+			// if (storevar == 31) {
+			// System.out.println(graph.getDomain());
+			// }
 			defnode = graph.addNewVarNode(storevar, stmt);
 		}
 

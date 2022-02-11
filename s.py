@@ -1,8 +1,11 @@
 import os
+from re import template
 import sys
 import pylib.defects4j as d4j
 import time
 import func_timeout
+import random
+import numpy as np
 
 
 def runtesttrace(cmdarg):
@@ -27,6 +30,119 @@ def makedirs():
         if not(os.path.exists(dir)):
             os.makedirs(dir)
 
+def modify(decay,site):
+    changes = 0.5*(0.9**(decay))#0.25 0.5
+    data = np.loadtxt('infer.txt',delimiter=',')
+    f = open('infer.txt', 'w+', encoding='utf-8', errors='ignore')
+    s = ''
+    a = []
+
+    ori = data[site]
+    #data[site] = data[site] + changes*(random.random()*2-1)
+    #if data[site] > 1:
+    #    data[site] = 1.0
+    #if data[site] < 0:
+    #    data[site] = 0.0
+    while ori == data[site]:
+        data[site] = data[site] + changes*(random.random()*2-1)
+        if data[site] > 1:
+            data[site] = 1.0
+        if data[site] < 0:
+            data[site] = 0.0
+
+    #data[site+4] = data[site+4] + changes*(random.random()*2-1)
+    #if data[site+4] > 1:
+    #    data[site+4] = 1.0
+    #if data[site+4] < 0:
+    #    data[site+4] = 0.0
+    #part_a1 = sorted(data[0:4])
+    #part_a2 = sorted(data[4:8])
+    #a[0:4]=part_a1
+    #a[4:8]=part_a2
+    a = data
+    for i in range(len(a)):
+        if i<len(a)-1:
+            s = s + str(a[i])+','
+        else:
+            s = s + str(a[i])
+    f.write(s)
+    f.close()
+
+def modifyback(data):
+    f = open('infer.txt', 'w+', encoding='utf-8', errors='ignore')
+    s = ''
+    for i in range (len(data)):
+        if i<len(data)-1:
+            s = s + str(data[i])+','
+        else:
+            s = s + str(data[i])
+    f.write(s)
+    f.close()
+
+def train(proj, looptime):
+    d4j.parseproj(proj)
+    score = d4j.pevalproj(proj)
+    assert(score>0)
+    bestscore = score
+    bestprob = np.loadtxt('infer.txt',delimiter=',')
+
+    iters = int(looptime)
+    for i in range(iters):
+        for j in range(len(bestprob)):#para
+            data = np.loadtxt('infer.txt',delimiter=',')
+            modify(i,j)
+            d4j.parseproj(proj)
+            tmpscore = d4j.pevalproj(proj)
+            tmpdata = np.loadtxt('infer.txt',delimiter=',')
+
+            delta_T = tmpscore - score
+
+            f = open('spylog.txt', 'a+', encoding='utf-8', errors='ignore')
+            s = ''
+            s = s + "score:" + str(score) + ", tmpscore:" + str(tmpscore) + "\n" + "tmpprob:"
+            for i in range (len(tmpdata)):
+                    s = s + str(tmpdata[i]) + ','
+            s = s + "\n"
+            f.write(s)
+            f.close()
+
+            if delta_T > 0:
+                score = tmpscore
+                if score > bestscore:
+                    bestscore = score
+                    bestprob = np.loadtxt('infer.txt',delimiter=',')
+            else:
+                prob = min(tmpscore/(score+2**int(i)),0.05)
+                if prob > random.random():
+                    score = tmpscore
+                    f = open('spylog.txt', 'a+', encoding='utf-8', errors='ignore')
+                    f.write("prob:"+ str(prob)+"\n")
+                    f.close()
+                else:
+                    modifyback(data)
+
+    f = open('spylog.txt', 'a+', encoding='utf-8', errors='ignore')
+    s = ''
+    s = s + "score:" + str(score) + ", bestscore:" + str(bestscore) + "\n" 
+    f.write(s)
+    f.close()
+
+    if score < bestscore:
+        modifyback(bestprob)
+            
+
+def resetp():
+    f = open('infer.txt', 'w+', encoding='utf-8', errors='ignore')
+    #data = [0.32799097751396117,0.5838037049393161,0.5838037049393161,1.0,0.02932532074716611,0.4982062243886685,0.4982062243886685,1.0]
+    data = [0.01,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4]
+    s = ''
+    for i in range (len(data)):
+        if i<len(data)-1:
+            s = s + str(data[i])+','
+        else:
+            s = s + str(data[i])
+    f.write(s)
+    f.close()
 
 if __name__ == '__main__':
     makedirs()
@@ -59,7 +175,15 @@ if __name__ == '__main__':
         d4j.fl_wrap(args[2], args[3])
 
     if args[1] == 'rund4j':
-        d4j.rund4j(args[2], args[3])
+        if (len(args) == 5):
+            if args[4] == '-nb':
+                d4j.traceproj(args[2], args[3],False)
+            else:
+                d4j.traceproj(args[2], args[3])
+        if(len(args) == 4):
+            d4j.traceproj(args[2], args[3])
+        if(len(args) == 3):
+            d4j.traceproj(args[2],'all')
 
     if args[1] == 'parsed4j':
         if(len(args) == 4):
@@ -77,11 +201,14 @@ if __name__ == '__main__':
             d4j.evalproj(args[2])
         if(len(args) == 4):
             d4j.eval(args[2], args[3])
-    if args[1] == 'zeval':
-        if(len(args) == 3):
-            d4j.zevalproj(args[2])
-        if(len(args) == 4):
-            d4j.zeval(args[2], args[3])
+    # if args[1] == 'zeval':
+    #     if(len(args) == 3):
+    #         d4j.zevalproj(args[2])
+    #     if(len(args) == 4):
+    #         d4j.zeval(args[2], args[3])
+    # if args[1] == 'zcompare':
+    #     if(len(args) == 3):
+    #         d4j.zcompare(args[2])
     if args[1] == 'meval':
         if(len(args) == 3):
             d4j.evalproj_method(args[2])
@@ -103,3 +230,8 @@ if __name__ == '__main__':
             d4j.extractproj(args[2])
         if(len(args) == 4):
             d4j.extract(args[2], args[3])
+    if args[1] == 'peval':
+        if(len(args) == 4):
+            train(args[2],args[3])
+    if args[1] == 'resetp':
+        resetp()

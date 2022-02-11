@@ -1,8 +1,10 @@
 package ppfl.defects4j;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import ppfl.ByteCodeGraph;
@@ -129,23 +131,38 @@ public class GraphBuilder {
   public static void main(String args[]) {
 
     // Runtime.getRuntime().addShutdownHook(WriterUtils.cleanup());
-
+    long startTime = System.currentTimeMillis();
     ByteCodeGraph pgraph = new ByteCodeGraph();
 
     pgraph.setAutoOracle(true);
     pgraph.setTraceAllClassed(false);
     boolean usesimple = false;
     if (args.length >= 2) {
+      System.out.println("Start parsing for " + args[0] + args[1]);
       setupD4jProject(pgraph, args[0], Integer.parseInt(args[1]), usesimple);
     } else {
       setupD4jProject(pgraph, "Lang", 7, false);
     }
     // pgraph.initD4jProject();
+    //
     // pgraph.printgraph();
     pgraph.check_bp(true);
-    System.out.println("BP finished");
+    System.out.println("BP finished for " + args[0] + args[1]);
 
     // shutdownhook not working when using exec:java.
     WriterUtils.cleanup().run();
+    boolean logparsetime = true;
+    if(logparsetime){
+      long endTime = System.currentTimeMillis();
+      long thetime = endTime - startTime;
+      File f = new File(String.format("./tracetime/parsetime_%s.log", args[0]));
+      try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(f, true))) {
+        bWriter.write(args[1] + ":" + thetime / 1000.0 + "\n");
+        bWriter.flush();
+      } catch (IOException e) {
+  
+      }
+    }
+
   }
 }

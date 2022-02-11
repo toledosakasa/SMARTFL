@@ -1,7 +1,5 @@
 package ppfl.instrumentation;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -30,6 +28,10 @@ public class CallBackIndex {
 	// private int tsindex_ldc;// use constp.getLdcValue to get type.
 	public int tsindex_string;
 	public int tsindex_object;
+
+	// threshold
+	static int loglimit = 1200000;
+	static int logcount = 0;
 
 	// logger
 	private static Writer writer = null;
@@ -216,6 +218,10 @@ public class CallBackIndex {
 	}
 
 	public static void logString(String s) {
+		logcount++;
+		if (logcount > loglimit) {
+			System.exit(0);
+		}
 		try {
 			writer.write(s);
 			writer.flush();

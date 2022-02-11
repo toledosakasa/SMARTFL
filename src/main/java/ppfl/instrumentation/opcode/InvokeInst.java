@@ -1,8 +1,5 @@
 package ppfl.instrumentation.opcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
@@ -96,6 +93,7 @@ public class InvokeInst extends OpcodeInst {
 			graph.untracedStmt = stmt;
 			graph.untraceduse = usenodes;
 			graph.untracedpred = prednodes;
+			graph.untracedargcnt = argcnt;
 			if (this.argadd == 1) {
 				if (!objectAddress.isHeapObject()) {
 					// System.out.println("not a object:" + objectAddress.getStmtName());
@@ -107,6 +105,7 @@ public class InvokeInst extends OpcodeInst {
 			graph.tracedStmt = stmt;
 			graph.traceduse = usenodes;
 			graph.tracedpred = prednodes;
+			graph.tracedargcnt = argcnt;
 			if (this.argadd == 1) {
 				// assert (objectAddress.isHeapObject());
 				graph.tracedObj = objectAddress;
@@ -127,22 +126,22 @@ public class InvokeInst extends OpcodeInst {
 		// }
 
 		// switch stack frame
-		if (istraced)
-			graph.pushStackFrame(callDomain);
+		// if (istraced)
+		// graph.pushStackFrame(callDomain);
 
-		// static arguments starts with 0
-		int paravarindex = 0;
-		// non-static
-		// paravarindex = 1;
-		for (int i = 0; i < argcnt; i++) {
+		// // static arguments starts with 0
+		// int paravarindex = 0;
+		// // non-static
+		// // paravarindex = 1;
+		// for (int i = 0; i < argcnt; i++) {
 
-			List<Node> adduse = new ArrayList<>();
-			Node curArgument = usenodes.get(argcnt - i - 1);
-			adduse.add(curArgument);
+		// List<Node> adduse = new ArrayList<>();
+		// Node curArgument = usenodes.get(argcnt - i - 1);
+		// adduse.add(curArgument);
 
-			Node defnode = graph.addNewVarNode(paravarindex, stmt, callDomain);
-			graph.buildFactor(defnode, prednodes, adduse, null, stmt);
-			paravarindex += curArgument.getSize();
-		}
+		// Node defnode = graph.addNewVarNode(paravarindex, stmt, callDomain);
+		// graph.buildFactor(defnode, prednodes, adduse, null, stmt);
+		// paravarindex += curArgument.getSize();
+		// }
 	}
 }

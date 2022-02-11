@@ -254,9 +254,6 @@ public class TraceTransformer implements ClassFileTransformer {
 			// if (cc.getGenericSignature() != null) {
 			// return cc.toBytecode();
 			// }
-			writeWhatIsTraced("\n");
-			writeWhatIsTraced(classname + "::");
-
 			List<MethodInfo> methods = new ArrayList<>();
 			// methods.addAll(cc.getClassFile().getMethods());
 
@@ -266,9 +263,17 @@ public class TraceTransformer implements ClassFileTransformer {
 					getStaticInitializerInfo(staticInit, cc);
 				}
 			}
+			if (!cc.getClassFile().getMethods().isEmpty() || cc.getClassFile().getSuperclass() != null) {
+				writeWhatIsTraced("\n" + classname + "::");
+			}
+
+			boolean instrumentJunit = true;// evaluation switch
 			for (MethodInfo m : cc.getClassFile().getMethods()) {
-				writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
+				if (instrumentJunit && cc.getName().startsWith("junit") && !m.getName().startsWith("assert")) {
+					continue;
+				}
 				if (!m.isStaticInitializer()) {
+					writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
 					transformBehavior(m, cc);
 				}
 			}

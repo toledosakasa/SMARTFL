@@ -4,6 +4,7 @@ public class TraceDomain {
   public String traceclass;
   public String tracemethod;
   public String signature;
+  static boolean compareCallClass = true;// evaluation switch
 
   public TraceDomain(String traceclass, String tracemethod, String signature) {
     this.traceclass = traceclass.trim();
@@ -23,14 +24,18 @@ public class TraceDomain {
     if (this == oth)
       return true;
     TraceDomain instance = (TraceDomain) oth;
-    return traceclass.equals(instance.traceclass) && tracemethod.equals(instance.tracemethod)
-        && signature.equals(instance.signature);
+
+    if (compareCallClass)
+      return traceclass.equals(instance.traceclass) && tracemethod.equals(instance.tracemethod)
+          && signature.equals(instance.signature);
+    return tracemethod.equals(instance.tracemethod) && signature.equals(instance.signature);
   }
 
   @Override
   public int hashCode() {
     int result = this.tracemethod.hashCode();
-    result = result * 31 + this.traceclass.hashCode();
+    if (compareCallClass)
+      result = result * 31 + this.traceclass.hashCode();
     result = result * 31 + this.signature.hashCode();
     return result;
   }

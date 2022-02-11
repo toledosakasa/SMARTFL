@@ -2,6 +2,7 @@ package ppfl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
 
 // import org.apfloat.Apfloat;
 // import org.apfloat.ApfloatMath;
@@ -20,10 +21,12 @@ public class FactorNode {
 	private List<Node> uses;
 	private List<String> ops;// TODO consider operators
 	private static final String[] unkops = { "%", "<", "<=", ">", ">=", "==", "!=" };
-	private double HIGH = 1; // can change to 1-1e-10
+	private double HIGH = 1.0; // can change to 1-1e-10
 	private double VHIGH = 0.99999;
+	private double MEDIUM_HIGH = 0.5;
 	private double MEDIUM = 0.5;
-	private double LOW = 0; // can change to 1e-10
+	private double MEDIUM_LOW=0.5;
+	private double LOW = 0.0; // can change to 1e-10
 	private List<Double> tensor;
 	// private Apfloat ap_HIGH = new Apfloat("1.0", 100);
 	// private Apfloat ap_MEDIUM = new Apfloat("0.5", 100);
@@ -34,11 +37,39 @@ public class FactorNode {
 	private List<Edge> alledges;
 	private int nnodes;
 	private double stmtvalue;
+	boolean hasUNKoperator = true;
 
 	private Edge dedge;
 	private Edge sedge;
 	private List<Edge> pedges;
 	private List<Edge> uedges;
+	//private static List<Double> numbersArray2 = {0,2.3283064365e-10,5.4210108624e-20,0.00390625,1.5258789063e-5,0.3333333333,0.5};
+	// private static List<Double> numbersArray2;
+	private static List<Double> numbersArray;
+	static {
+		// numbersArray2 = new ArrayList<>();
+		// numbersArray2.add(0.0);
+		// numbersArray2.add(2.3283064365e-10);
+		// numbersArray2.add(5.4210108624e-20);
+		// numbersArray2.add(0.00390625);
+		// numbersArray2.add(1.5258789063e-5);
+		// numbersArray2.add(0.3333333333);
+		// numbersArray2.add(0.5);
+
+		try {
+			BufferedReader readTxt=new BufferedReader(new FileReader("./infer.txt"));
+			String str = readTxt.readLine();
+			String[] numbersArray_s=str.split(",");
+			numbersArray = new ArrayList<>();
+			for(String tmp : numbersArray_s)
+				numbersArray.add(Double.parseDouble(tmp));
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+	private static final int[][] spopcodes = {{108,109,110,111},{112,113,114,115},{126,127,128,129,130,131},{136,139,140,142,143,144,147},{148,149,150,151,152},{153,154,155,156,157,158},{159,160,161,162,163,164},{165,166},{198,199}}; 
+	//private static final int[][] spopcodes ={{96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,137,139,142,144},{97,99,101,103,105,107,109,111,113,115,117,119,121,123,125,127,129,131,135,138,140,141,143},{145},{146,147},{148,149,150,151,152},{153,154,155,156,157,158,159,160,161,162,163,164,165,166,198,199}};
 
 	public FactorNode() {
 		this.stmt = null;
@@ -92,6 +123,15 @@ public class FactorNode {
 		alledges.addAll(pedges);
 		alledges.addAll(uedges);
 		this.nnodes = allnodes.size();
+		if (this.ops != null)
+			for (String op : this.ops) {
+				for (String unk : unkops) {
+					if (op.contentEquals(unk))
+					this.hasUNKoperator = true;
+				}
+			}
+		change_parameters();
+		
 		// if (use_ap)
 		// 	ap_gettensor(allnodes, nnodes - 1);
 		// else
@@ -288,23 +328,44 @@ public class FactorNode {
 		}
 	}
 
-
+	private void change_parameters(){
+		StmtNode tstmt = (StmtNode)stmt;
+		int tform = tstmt.form;
+		//boolean special = false;
+		//for (int i : spopcodes){
+		//	if (tform == i)
+		//		special = true;
+		//}
+		int special = 0;
+		for (int group=0; group < spopcodes.length; group++){
+			for (int i: spopcodes[group]){
+				if (tform == i)
+					special = group + 1; //0 for determined instruction
+			}
+			if(special != 0)
+				break;
+		}
+		MEDIUM_LOW = numbersArray.get(special);
+		//MEDIUM_LOW = numbersArray2.get(special);
+		MEDIUM_HIGH = 1-MEDIUM_LOW;	
+	}
 
 	public double getProb() {
-		boolean hasUNKoperator = false;
-		if (ops != null)
-			for (String op : ops) {
-				for (String unk : unkops) {
-					if (op.contentEquals(unk))
-						hasUNKoperator = true;
-				}
-			}
+		// boolean hasUNKoperator = false;
+		// if (ops != null)
+		// 	for (String op : ops) {
+		// 		for (String unk : unkops) {
+		// 			if (op.contentEquals(unk))
+		// 				hasUNKoperator = true;
+		// 		}
+		// 	}
 		// if(hasUNKoperator)return MEDIUM;
 		// hasUNKoperator = false;
 		boolean defv = def.getCurrentValue();
 		boolean predv = true;
 		boolean usev = true;
 		boolean stmtv = stmt.getCurrentValue();
+
 		if (preds != null)
 			for (Node p : preds) {
 				if (!p.getCurrentValue()) {
@@ -325,35 +386,35 @@ public class FactorNode {
 				return HIGH;
 			if (!defv && !pu) {
 				if (hasUNKoperator)
-					return MEDIUM;
+					return MEDIUM_HIGH;
 				return HIGH;
 			}
 			if (!defv && pu)
 				return LOW;
 			if (defv && !pu) {
 				if (hasUNKoperator)
-					return MEDIUM;
+					return MEDIUM_LOW;
 				return LOW;
 			}
 		} else {
 			if (defv && pu) {
 				if (hasUNKoperator)
-					return MEDIUM;
+					return MEDIUM_LOW;
 				return LOW;
 			}
 			if (!defv && !pu) {
 				if (hasUNKoperator)
-					return MEDIUM;
+					return MEDIUM_HIGH;
 				return HIGH;
 			}
 			if (!defv && pu) {
 				if (hasUNKoperator)
-					return MEDIUM;
+					return MEDIUM_HIGH;
 				return HIGH;
 			}
 			if (defv && !pu) {
 				if (hasUNKoperator)
-					return MEDIUM;
+					return MEDIUM_LOW;
 				return LOW;
 			}
 			// if (!defv) {

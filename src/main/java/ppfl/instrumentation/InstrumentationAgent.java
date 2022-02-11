@@ -7,7 +7,9 @@ import java.lang.instrument.Instrumentation;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ public class InstrumentationAgent {
 	private static boolean logSourceToScreen = false;
 	private static boolean simpleLog = false;
 	private static String project = null;
+	private static boolean instrumentNested = false; // evaluation switch
 
 	private InstrumentationAgent() {
 		throw new IllegalStateException("Agent class");
@@ -137,11 +140,13 @@ public class InstrumentationAgent {
 				targetCls = Class.forName(classname);
 				targetClassLoader = targetCls.getClassLoader();
 				transform(targetCls, targetClassLoader, instrumentation);
-				// retransform nested classes.
-				Class<?> children[] = targetCls.getDeclaredClasses();
-				if (children != null && children.length > 0) {
-					for (Class<?> chdclazz : children)
-						transform(chdclazz, targetClassLoader, instrumentation);
+				if (!instrumentNested) {
+					// retransform child classes.
+					Class<?> children[] = targetCls.getDeclaredClasses();
+					if (children != null && children.length > 0) {
+						for (Class<?> chdclazz : children)
+							transform(chdclazz, targetClassLoader, instrumentation);
+					}
 				}
 				continue;
 			} catch (Exception ex) {
@@ -175,7 +180,30 @@ public class InstrumentationAgent {
 		inst.addTransformer(dt, true);
 	}
 
+	static Set<String> transformedclazz = new HashSet<>();
+
 	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
+		if (transformedclazz.contains(clazz.getName())) {
+			return;
+		}
+		transformedclazz.add(clazz.getName());
+
+		if (instrumentNested) {
+			// retransform nested classes.
+			Class<?> children[] = clazz.getDeclaredClasses();
+			if (children != null && children.length > 0) {
+				for (Class<?> chdclazz : children)
+					transform(chdclazz, classLoader, instrumentation);
+			}
+		}
+
+		boolean retransformSuper = false;// evaluation switch
+		// retransform super class.
+		if (retransformSuper) {
+			Class<?> superCl = clazz.getSuperclass();
+			if (superCl != null)
+				transform(superCl, classLoader, instrumentation);
+		}
 		String logfilename = "all.log";
 		if (logFile != null) {
 			logfilename = logFile;
