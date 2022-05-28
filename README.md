@@ -17,6 +17,11 @@ cd "Path2D4j"
 git patch "Path2ThisRepo"/defects4j-mod/diff.patch
 ```
 
+Build
+```
+mvn package -DskipTests
+```
+
 Localize a single bug:
 ```
 python3 s.py fl {proj} {id}
