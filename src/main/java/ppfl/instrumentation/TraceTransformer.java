@@ -38,6 +38,8 @@ import ppfl.WriterUtils;
 import ppfl.instrumentation.opcode.InvokeInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
 
+// import java.lang.management.ManagementFactory;
+
 public class TraceTransformer implements ClassFileTransformer {
 
 	private boolean useCachedClass = true;
@@ -69,6 +71,12 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	private Set<String> transformedMethods = new HashSet<>();
 
+	private static int howmanytimes = 0;
+	private int copytimes;
+
+	private static boolean first_addShutdownHook = true;
+
+	private static List<String> stackwriter;
 	/** filename for logging */
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader, String logfilename) {
 		this.targetClassName = targetClassName;
@@ -84,21 +92,20 @@ public class TraceTransformer implements ClassFileTransformer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		// TODO: 加一段代码，在这里初始化CallBackIndex需要的保存信息的序列化数据结构，还需要把多个transformer改成一个来处理的格式
+
+
 		traceWriter = file;
-		CallBackIndex.setWriter(traceWriter);
 		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				try {
-					TraceTransformer.traceWriter.flush();
-					// closing the stream may trigger double-close bug.
-					// TraceTransformer.traceWriter.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		CallBackIndex.setWriter(traceWriter);
+
+		stackwriter = new ArrayList<>();
+		CallBackIndex.stackwriter = stackwriter;
+
+		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
+		howmanytimes+=1;
+		copytimes = howmanytimes;
 	}
 
 	private static void setStaticInitFile(String clazzname) {
@@ -251,6 +258,8 @@ public class TraceTransformer implements ClassFileTransformer {
 		try {
 			ClassPool cp = ClassPool.getDefault();
 			CtClass cc = cp.get(classname);
+			ConstPool constp = cc.getClassFile().getConstPool();
+			CallBackIndex cbi = new CallBackIndex(constp, traceWriter);
 			// if (cc.getGenericSignature() != null) {
 			// return cc.toBytecode();
 			// }
@@ -260,7 +269,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			if (!this.simpleLog) {
 				MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
 				if (staticInit != null) {
-					getStaticInitializerInfo(staticInit, cc);
+					getStaticInitializerInfo(staticInit, cc, constp);
 				}
 			}
 			if (!cc.getClassFile().getMethods().isEmpty() || cc.getClassFile().getSuperclass() != null) {
@@ -274,7 +283,7 @@ public class TraceTransformer implements ClassFileTransformer {
 				}
 				if (!m.isStaticInitializer()) {
 					writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
-					transformBehavior(m, cc);
+					transformBehavior(m, cc, constp, cbi);
 				}
 			}
 			// dump class inheritance
@@ -319,11 +328,11 @@ public class TraceTransformer implements ClassFileTransformer {
 		return byteCode;
 	}
 
-	private void getStaticInitializerInfo(MethodInfo m, CtClass cc) throws BadBytecode {
+	private void getStaticInitializerInfo(MethodInfo m, CtClass cc, ConstPool constp) throws BadBytecode {
 		MethodInfo mi = m;
 		CodeAttribute ca = mi.getCodeAttribute();
 
-		ConstPool constp = mi.getConstPool();
+		// ConstPool constp = mi.getConstPool();
 		CodeIterator tempci = ca.iterator();
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; tempci.hasNext(); i++) {
@@ -354,7 +363,7 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	}
 
-	private void transformBehavior(MethodInfo m, CtClass cc) throws NotFoundException, BadBytecode {
+	private void transformBehavior(MethodInfo m, CtClass cc, ConstPool constp, CallBackIndex cbi) throws NotFoundException, BadBytecode {
 		// hello in console
 		// debugLogger.writeln("%s::%s", cc.getName(), m.getName());
 
@@ -369,8 +378,8 @@ public class TraceTransformer implements ClassFileTransformer {
 
 		// add constants to constpool.
 		// index will be used during instrumentation.
-		ConstPool constp = mi.getConstPool();
-		CallBackIndex cbi = new CallBackIndex(constp, traceWriter);
+		// ConstPool constp = mi.getConstPool();
+		// CallBackIndex cbi = new CallBackIndex(constp, traceWriter);
 
 		if (!this.simpleLog)
 			instrumentByteCode(cc, mi, ca, constp, cbi);
@@ -476,6 +485,25 @@ public class TraceTransformer implements ClassFileTransformer {
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
 			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+		if(first_addShutdownHook){
+			first_addShutdownHook = false;
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				@Override
+				public void run() {
+					try {
+						// String pid = ManagementFactory.getRuntimeMXBean().getName();
+						TraceTransformer.traceWriter.write(",Over Now!"+"@"+copytimes+"@"+targetClassName+"\n");
+						for(String s : stackwriter)
+							TraceTransformer.traceWriter.write(s);
+						TraceTransformer.traceWriter.close();
+						// closing the stream may trigger double-close bug.
+						// TraceTransformer.traceWriter.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
 		try {
 			byte[] byteCode = classfileBuffer;
 			// TODO modify here to transform all classes.

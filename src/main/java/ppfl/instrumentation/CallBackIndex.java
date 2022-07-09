@@ -8,6 +8,9 @@ import javassist.CtClass;
 import javassist.NotFoundException;
 import javassist.bytecode.ConstPool;
 
+import java.util.List;
+import java.util.ArrayList;;
+
 public class CallBackIndex {
 
 	/**
@@ -35,6 +38,8 @@ public class CallBackIndex {
 
 	// logger
 	private static Writer writer = null;
+
+	public static List<String> stackwriter = null;
 
 	public int getLdcCallBack(Object o) {
 		// decide v's type using instanceof
@@ -93,125 +98,127 @@ public class CallBackIndex {
 	// callbacks.
 	// will be called by bytecode instrumentation
 	public static int printTopStack1(int i) {
-		try {
-			writer.write(",stack=I:");
-			writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=I:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		stackwriter.add(",stack=I:"+String.valueOf(i)+"\n");
 		// TraceTransformer.traceLogger.info(",pushtype=int,pushvalue={}", i);
 		return i;
 	}
 
 	public static double printTopStack1(double i) {
-		try {
-			writer.write(",stack=D:");
-			writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		stackwriter.add(",stack=D:"+String.valueOf(i)+"\n");
+		// try {
+		// 	writer.write(",stack=D:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=double,pushvalue={}", i);
 		return i;
 	}
 
 	public static short printTopStack1(short i) {
-		try {
-			writer.write(",stack=S:");
-			writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=S:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=short,pushvalue={}", i);
 		return i;
 	}
 
 	public static char printTopStack1(char i) {
-		try {
-			writer.write(",stack=C:");
-			// FIXME this is currently buggy if the string include \n or other special
-			// character.
-			// writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=C:");
+		// 	// FIXME this is currently buggy if the string include \n or other special
+		// 	// character.
+		// 	// writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=char,pushvalue={}", i);
 		return i;
 	}
 
 	public static byte printTopStack1(byte i) {
-		try {
-			writer.write(",stack=B:");
-			writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=B:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=byte,pushvalue={}", i);
 		return i;
 	}
 
 	public static boolean printTopStack1(boolean i) {
-		try {
-			writer.write(",stack=Z:");
-			writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=Z:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=boolean,pushvalue={}", i);
 		return i;
 	}
 
 	public static float printTopStack1(float i) {
-		try {
-			writer.write(",stack=F:");
-			writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=F:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=float,pushvalue={}", i);
 		return i;
 	}
 
 	public static long printTopStack1(long i) {
-		try {
-			writer.write(",stack=J:");
-			writer.write(String.valueOf(i));
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=J:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=long,pushvalue={}", i);
 		return i;
 	}
 
 	public static String printTopStack1(String i) {
-		try {
-			writer.write(",stack=Str:");
-			// FIXME this is currently buggy if the string include \n.
-			// writer.write(i);
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	writer.write(",stack=Str:");
+		// 	// FIXME this is currently buggy if the string include \n.
+		// 	// writer.write(i);
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=String,pushvalue=\"{}\"", i);
 		return i;
 	}
 
 	public static Object printTopStack1(Object i) {
-		// call system hashcode (jvm address)
-		try {
-			writer.write(",stack=Obj:");
-			writer.write(String.valueOf(java.lang.System.identityHashCode(i)));
-			writer.flush();
-		} catch (IOException e) {
-			// e.printStackTrace();
-		}
+		// // call system hashcode (jvm address)
+		// try {
+		// 	writer.write(",stack=Obj:");
+		// 	writer.write(String.valueOf(java.lang.System.identityHashCode(i)));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 		// TraceTransformer.traceLogger.info(",pushtype=object,pushvalue={}",
 		// java.lang.System.identityHashCode(i));
 		return i;
@@ -224,7 +231,7 @@ public class CallBackIndex {
 		}
 		try {
 			writer.write(s);
-			writer.flush();
+			// writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
