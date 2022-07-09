@@ -45,7 +45,7 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 public class TraceTransformer implements ClassFileTransformer {
 
 	private boolean useCachedClass = false;
-	private boolean useNewTrace = true;
+	public static boolean useNewTrace = true;
 
 	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger_trace");
 	// LoggerFactory.getLogger(TraceTransformer.class);
@@ -554,8 +554,6 @@ public class TraceTransformer implements ClassFileTransformer {
 					if (!mi.isStaticInitializer()){
 						if(useNewTrace)
 						{
-							debugLogger.write(TracePool.get(poolindex).toString());
-							debugLogger.write("		insert, " + "poolindex = " + poolindex);
 							oi.insertReturn(ci, constp, poolindex, cbi);
 						}
 						else
@@ -565,9 +563,7 @@ public class TraceTransformer implements ClassFileTransformer {
 					if (!mi.isStaticInitializer()){
 						if(useNewTrace)
 						{
-							// debugLogger.write(TracePool.get(poolindex).toString());
-							// debugLogger.write("		insert, " + "poolindex = " + poolindex);
-							// oi.insertBefore(ci, constp, poolindex, cbi);
+							oi.insertAfter(ci, constp, cbi);
 						}
 						else
 							oi.insertByteCodeAfter(ci, index, constp, cbi);

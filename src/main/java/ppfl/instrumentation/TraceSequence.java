@@ -25,6 +25,10 @@ public class TraceSequence implements Serializable {
         return tracelist.get(index);
     }
 
+    public DynamicTrace top(){
+        return tracelist.get(tracelist.size() - 1);
+    }
+
     public int size(){
         return tracelist.size();
     }

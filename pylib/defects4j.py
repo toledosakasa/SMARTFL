@@ -896,5 +896,5 @@ def extractproj(proj: str):
         result = extract(proj, str(i))
 
 def decoder():
-    cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder" > trace.log'
+    cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder"'
     os.system(cmdline)

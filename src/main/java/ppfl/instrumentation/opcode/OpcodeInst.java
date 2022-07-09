@@ -355,6 +355,11 @@ public class OpcodeInst {
 		// }
 	}
 
+	// extended class should override this method.
+	public void insertAfter(CodeIterator ci, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+
+	}
+
 	public void buildstmt(ByteCodeGraph graph) {
 		this.info = graph.parseinfo;
 		TraceDomain tDomain = info.domain;

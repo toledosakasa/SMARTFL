@@ -25,12 +25,21 @@ public class TraceDecoder {
             c.printStackTrace();
             return;
         }
-        int size = traceseq.size();
-        for(int i=0;i<size;i++){
-            DynamicTrace trace = traceseq.get(i);
-            System.out.print(trace.toString());
+        try{
+            FileWriter writer = new FileWriter("trace.log");
+            int size = traceseq.size();
+            for(int i=0;i<size;i++){
+                DynamicTrace trace = traceseq.get(i);
+                writer.write(trace.toString());
+                // System.out.print(trace.toString());
+            }
+            writer.close();
         }
-
+        catch(IOException i)
+        {
+            i.printStackTrace();
+            return;
+        }
 	}
 
 }

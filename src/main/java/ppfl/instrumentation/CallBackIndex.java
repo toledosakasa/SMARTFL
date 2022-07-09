@@ -17,10 +17,22 @@ public class CallBackIndex {
 	 *
 	 */
 	private static final String PRINT_CALLBACK_NAME = "printTopStack1";
+	private static final String TRACE_CALLBACK_NAME = "traceTopStack1";
 	private static final int BUFFERSIZE = 1024;
 	// use the logger set by TraceTransformer
 	public int logtraceindex;
 	public int rettraceindex;
+	public int traceindex_int;
+	public int traceindex_short;
+	public int traceindex_byte;
+	public int traceindex_char;
+	public int traceindex_boolean;
+	public int traceindex_long;
+	public int traceindex_float;
+	public int traceindex_double;
+	public int traceindex_string;
+	public int traceindex_object;
+
 	public int logstringindex;
 	public int tsindex_int;
 	public int tsindex_short;
@@ -47,26 +59,50 @@ public class CallBackIndex {
 
 	public int getLdcCallBack(Object o) {
 		// decide v's type using instanceof
-		if (o instanceof String)
-			return tsindex_string;
-		else if (o instanceof Short)
-			return tsindex_short;
-		else if (o instanceof Long)
-			return tsindex_long;
-		else if (o instanceof Integer)
-			return tsindex_int;
-		else if (o instanceof Byte)
-			return tsindex_byte;
-		else if (o instanceof Character)
-			return tsindex_char;
-		else if (o instanceof Boolean)
-			return tsindex_boolean;
-		else if (o instanceof Float)
-			return tsindex_float;
-		else if (o instanceof Double) {
-			return tsindex_double;
-		} else
-			return tsindex_object;
+		if(TraceTransformer.useNewTrace){
+			if (o instanceof String)
+				return traceindex_string;
+			else if (o instanceof Short)
+				return traceindex_short;
+			else if (o instanceof Long)
+				return traceindex_long;
+			else if (o instanceof Integer)
+				return traceindex_int;
+			else if (o instanceof Byte)
+				return traceindex_byte;
+			else if (o instanceof Character)
+				return traceindex_char;
+			else if (o instanceof Boolean)
+				return traceindex_boolean;
+			else if (o instanceof Float)
+				return traceindex_float;
+			else if (o instanceof Double)
+				return traceindex_double;
+			else
+				return traceindex_object;
+		}
+		else{
+			if (o instanceof String)
+				return tsindex_string;
+			else if (o instanceof Short)
+				return tsindex_short;
+			else if (o instanceof Long)
+				return tsindex_long;
+			else if (o instanceof Integer)
+				return tsindex_int;
+			else if (o instanceof Byte)
+				return tsindex_byte;
+			else if (o instanceof Character)
+				return tsindex_char;
+			else if (o instanceof Boolean)
+				return tsindex_boolean;
+			else if (o instanceof Float)
+				return tsindex_float;
+			else if (o instanceof Double)
+				return tsindex_double;
+			else
+				return tsindex_object;
+		}
 	}
 
 	public static void setWriter(Writer w) {
@@ -88,6 +124,17 @@ public class CallBackIndex {
 
 		logtraceindex = constp.addMethodrefInfo(classindex, "logTrace", "(I)V");
 		rettraceindex = constp.addMethodrefInfo(classindex, "retTrace", "(I)V");
+		traceindex_int = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(I)I");
+		traceindex_long = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(J)J");
+		traceindex_double = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(D)D");
+		traceindex_short = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(S)S");
+		traceindex_byte = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(B)B");
+		traceindex_char = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(C)C");
+		traceindex_boolean = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Z)Z");
+		traceindex_float = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(F)F");
+		traceindex_string = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/String;)Ljava/lang/String;");
+		traceindex_object = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/Object;)Ljava/lang/Object;");
+		
 		logstringindex = constp.addMethodrefInfo(classindex, "logString", "(Ljava/lang/String;)V");
 		tsindex_int = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(I)I");
 		tsindex_long = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(J)J");
@@ -227,6 +274,88 @@ public class CallBackIndex {
 		// }
 		// TraceTransformer.traceLogger.info(",pushtype=object,pushvalue={}",
 		// java.lang.System.identityHashCode(i));
+		return i;
+	}
+
+
+	// callbacks.
+	// will be called by bytecode instrumentation
+	public static int traceTopStack1(int i) {
+		String stackType = "I";
+		tracewriter.top().addDynamicInfo(stackType, i);
+		return i;
+	}
+
+	public static double traceTopStack1(double i) {
+		String stackType = "D";
+		tracewriter.top().addDynamicInfo(stackType, i);
+		return i;
+	}
+
+	public static short traceTopStack1(short i) {
+		// try {
+		// 	writer.write(",stack=S:");
+		// 	writer.write(String.valueOf(i));
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		// TraceTransformer.traceLogger.info(",pushtype=short,pushvalue={}", i);
+		String stackType = "S";
+		tracewriter.top().addDynamicInfo(stackType, i);
+		return i;
+	}
+
+	public static char traceTopStack1(char i) {
+		String stackType = "C";
+		tracewriter.top().addDynamicInfo(stackType, i);
+		return i;
+	}
+
+	public static byte traceTopStack1(byte i) {
+		String stackType = "B";
+		tracewriter.top().addDynamicInfo(stackType, i);
+		return i;
+	}
+
+	public static boolean traceTopStack1(boolean i) {
+		String stackType = "Z";
+		int value = i? 1 : 0;
+		tracewriter.top().addDynamicInfo(stackType, value);
+		return i;
+	}
+
+	public static float traceTopStack1(float i) {
+		String stackType = "F";
+		tracewriter.top().addDynamicInfo(stackType, i);
+		return i;
+	}
+
+	public static long traceTopStack1(long i) {
+		String stackType = "J";
+		tracewriter.top().addDynamicInfo(stackType, i);
+		return i;
+	}
+
+	public static String traceTopStack1(String i) {
+		// try {
+		// 	writer.write(",stack=Str:");
+		// 	// FIXME this is currently buggy if the string include \n.
+		// 	// writer.write(i);
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		// TraceTransformer.traceLogger.info(",pushtype=String,pushvalue=\"{}\"", i);
+		return i;
+	}
+
+
+	public static Object traceTopStack1(Object i) {
+		// call system hashcode (jvm address)
+		String stackType = "Obj";
+		int value = java.lang.System.identityHashCode(i);
+		tracewriter.top().addDynamicInfo(stackType, value);
 		return i;
 	}
 

@@ -5,7 +5,8 @@ import java.io.Serializable;
 public class DynamicTrace implements Serializable {
     public Trace trace;
     public String stackType;
-    public int stackValue;
+    public long stackValue;
+    public double fstackValue;
     public boolean isret;
 
     public DynamicTrace(Trace trace){
@@ -18,9 +19,14 @@ public class DynamicTrace implements Serializable {
         this.isret = true;
     }
 
-    public void addDynamicInfo(String stackType, int stackValue) {
+    public void addDynamicInfo(String stackType, long stackValue) {
         this.stackType = stackType;
         this.stackValue = stackValue;
+    }
+
+    public void addDynamicInfo(String stackType, double stackValue) {
+        this.stackType = stackType;
+        this.fstackValue = stackValue;
     }
 
     public String toString(){
