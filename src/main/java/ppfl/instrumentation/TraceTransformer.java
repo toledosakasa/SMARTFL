@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.nio.file.Paths;
@@ -42,7 +44,8 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
-	private boolean useCachedClass = true;
+	private boolean useCachedClass = false;
+	private boolean useNewTrace = true;
 
 	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger_trace");
 	// LoggerFactory.getLogger(TraceTransformer.class);
@@ -93,8 +96,8 @@ public class TraceTransformer implements ClassFileTransformer {
 			e.printStackTrace();
 		}
 
-		// TODO: 加一段代码，在这里初始化CallBackIndex需要的保存信息的序列化数据结构，还需要把多个transformer改成一个来处理的格式
-
+		// TODO: 可以尝试把多个transformer改成一个来处理的格式
+		CallBackIndex.tracewriter = new TraceSequence(logfilename);
 
 		traceWriter = file;
 		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
@@ -229,7 +232,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	protected byte[] transformBody(String classname) {
 		byte[] byteCode = null;
 		classname = classname.replace("/", ".");
-		debugLogger.write(String.format("[Agent] Transforming class %s", this.targetClassName));
+		debugLogger.write(String.format("[Agent] Transforming class %s\n", this.targetClassName));
 
 		if (useCachedClass) {
 			String classcachefolder = "trace/classcache/";
@@ -386,14 +389,28 @@ public class TraceTransformer implements ClassFileTransformer {
 		// log method name at the beginning of this method.
 		if (!this.simpleLog) {
 			CodeIterator ci = ca.iterator();
-			String longname = String.format("%n###%s::%s", cc.getName(), m.getName());
-			int instpos = ci.insertGap(6);
-			int instindex = constp.addStringInfo(longname);
+			if(useNewTrace){
+				Trace longname = new Trace(cc.getName(), m.getName());
+				int poolindex = TracePool.indexAt();
+				TracePool.add(longname);
 
-			ci.writeByte(19, instpos);// ldc_w
-			ci.write16bit(instindex, instpos + 1);
-			ci.writeByte(184, instpos + 3);// invokestatic
-			ci.write16bit(cbi.logstringindex, instpos + 4);
+				int instpos = ci.insertGap(6);
+				int instindex = constp.addIntegerInfo(poolindex);
+				ci.writeByte(19, instpos);// ldc_w
+				ci.write16bit(instindex, instpos + 1);
+				ci.writeByte(184, instpos + 3);// invokestatic
+				ci.write16bit(cbi.logtraceindex, instpos + 4);
+			}
+			else{
+				String longname = String.format("%n###%s::%s", cc.getName(), m.getName());
+				int instpos = ci.insertGap(6);
+				int instindex = constp.addStringInfo(longname);
+	
+				ci.writeByte(19, instpos);// ldc_w
+				ci.write16bit(instindex, instpos + 1);
+				ci.writeByte(184, instpos + 3);// invokestatic
+				ci.write16bit(cbi.logstringindex, instpos + 4);
+			}
 		}
 		if (this.simpleLog) {
 			ProfileUtils.init(constp, traceWriter);
@@ -420,17 +437,63 @@ public class TraceTransformer implements ClassFileTransformer {
 		// branchbyte and byte index.
 		CodeIterator tempci = ca.iterator();
 		Map<Integer, String> instmap = new HashMap<>();
+		Map<Integer, Integer> tracemap = new HashMap<>();
 		for (int i = 0; tempci.hasNext(); i++) {
 			int index = tempci.lookAhead();
 			int ln = mi.getLineNumber(index);
 			String getinst = getInstMap(tempci, index, constp);
-			String sig = mi.getDescriptor();
+
+			int opcode = tempci.byteAt(index);
+			Integer load = null, store = null, popnum = null, pushnum = null;
+			String[] split = getinst.split(",");
+			for (String instinfo : split) {
+				String[] splitinstinfo = instinfo.split("=");
+				String infotype = splitinstinfo[0];
+				String infovalue = splitinstinfo[1];
+				if (infotype.equals("load")) {
+					load = Integer.valueOf(infovalue);
+				}
+				if (infotype.equals("store")) {
+					store = Integer.valueOf(infovalue);
+				}
+				if (infotype.equals("popnum")) {
+					popnum = Integer.valueOf(infovalue);
+				}
+				if (infotype.equals("pushnum")) {
+					pushnum = Integer.valueOf(infovalue);
+				}
+			}
+
+			String calltype = null, callclass = null, callname = null;
+			if(Interpreter.map[opcode] instanceof InvokeInst){
+				int callindex = tempci.u16bitAt(index + 1);
+				calltype = constp.getMethodrefType(callindex);
+				callclass = constp.getMethodrefClassName(callindex);
+				callname = constp.getMethodrefName(callindex);
+			}
+
+			String classname = cc.getName();
+			String methodname = mi.getName();
+			String signature = mi.getDescriptor();
+			int nextinst = -1;
+			tempci.next();
+			if(tempci.hasNext())
+				nextinst = tempci.lookAhead();
+			Trace instruction = new Trace(opcode, ln, index, nextinst, load, store, popnum, pushnum, classname, methodname, signature);
+
+			if(Interpreter.map[opcode] instanceof InvokeInst){
+				instruction = new InvokeTrace(instruction, calltype, callclass, callname);
+			}
+
+			int poolindex = TracePool.indexAt();
+			TracePool.add(instruction);
+			tracemap.put(i, poolindex);
+
 			// ExceptionTable eTable =
 			// m.getMethodInfo().getCodeAttribute().getExceptionTable();
-			String linenumberinfo = ",lineinfo=" + cc.getName() + "#" + mi.getName() + "#" + sig + "#" + ln + "#" + index
+			String linenumberinfo = ",lineinfo=" + classname + "#" + methodname + "#" + signature + "#" + ln + "#" + index
 					+ ",nextinst=";
-
-			tempci.next();
+			
 			if (!tempci.hasNext()) {
 				linenumberinfo = linenumberinfo + "-1";
 			} else {
@@ -459,9 +522,25 @@ public class TraceTransformer implements ClassFileTransformer {
 				e.printStackTrace();
 			}
 
+			if(tracemap.get(i) == null)
+			{
+				debugLogger.write("Empty Trace!\n");
+				continue;
+			}
+
+			int poolindex = tracemap.get(i);
+
 			if (oi != null) {
-				if (!mi.isStaticInitializer())
-					oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+				if (!mi.isStaticInitializer()){
+					if(useNewTrace)
+					{
+						debugLogger.write(TracePool.get(poolindex).toString());
+						debugLogger.write("		insert, " + "poolindex = " + poolindex);
+						oi.insertBefore(ci, constp, poolindex, cbi);
+					}
+					else
+						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
+				}
 			}
 			int previndex = index;
 			// move to the next inst. everything below this will be inserted after the inst.
@@ -472,11 +551,27 @@ public class TraceTransformer implements ClassFileTransformer {
 				// getstatic should be treated like invocation,
 				// in the case that static-initializer may be called.
 				if (oi instanceof InvokeInst || oi.form == 178 || oi.form == 187) {// getstatic and new
-					if (!mi.isStaticInitializer())
-						oi.insertReturnSite(ci, index, constp, instinfo, cbi);
+					if (!mi.isStaticInitializer()){
+						if(useNewTrace)
+						{
+							debugLogger.write(TracePool.get(poolindex).toString());
+							debugLogger.write("		insert, " + "poolindex = " + poolindex);
+							oi.insertReturn(ci, constp, poolindex, cbi);
+						}
+						else
+							oi.insertReturnSite(ci, index, constp, instinfo, cbi);
+					}
 				} else {
-					if (!mi.isStaticInitializer())
-						oi.insertByteCodeAfter(ci, index, constp, cbi);
+					if (!mi.isStaticInitializer()){
+						if(useNewTrace)
+						{
+							// debugLogger.write(TracePool.get(poolindex).toString());
+							// debugLogger.write("		insert, " + "poolindex = " + poolindex);
+							// oi.insertBefore(ci, constp, poolindex, cbi);
+						}
+						else
+							oi.insertByteCodeAfter(ci, index, constp, cbi);
+					}
 				}
 			}
 		}
@@ -491,13 +586,29 @@ public class TraceTransformer implements ClassFileTransformer {
 				@Override
 				public void run() {
 					try {
-						// String pid = ManagementFactory.getRuntimeMXBean().getName();
-						TraceTransformer.traceWriter.write(",Over Now!"+"@"+copytimes+"@"+targetClassName+"\n");
-						for(String s : stackwriter)
-							TraceTransformer.traceWriter.write(s);
-						TraceTransformer.traceWriter.close();
-						// closing the stream may trigger double-close bug.
-						// TraceTransformer.traceWriter.close();
+						if(!useNewTrace){
+							// String pid = ManagementFactory.getRuntimeMXBean().getName();
+							TraceTransformer.traceWriter.write(",Over Now!"+"@"+copytimes+"@"+targetClassName+"\n");
+							for(String s : stackwriter)
+								TraceTransformer.traceWriter.write(s);
+							TraceTransformer.traceWriter.close();
+							// closing the stream may trigger double-close bug.
+							// TraceTransformer.traceWriter.close();
+						}
+						else{
+							// int size = CallBackIndex.tracewriter.size();
+							// for(int i=0;i<size;i++){
+							// 	DynamicTrace trace = CallBackIndex.tracewriter.get(i);
+							// 	traceWriter.write(trace.toString());
+							// }
+
+							FileOutputStream outStream = new FileOutputStream("trace/logs/run/" + CallBackIndex.tracewriter.getName()+".ser");
+							ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
+							fileObjectOut.writeObject(CallBackIndex.tracewriter);
+							fileObjectOut.close();
+							outStream.close();
+						}
+
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

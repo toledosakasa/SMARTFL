@@ -45,6 +45,17 @@ public class InvokeInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertReturn(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+		throws BadBytecode {
+		int instpos = ci.insertExGap(8);
+		int instindex = constp.addIntegerInfo(poolindex);
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.rettraceindex, instpos + 4);
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		String traceclass = info.getvalue("callclass");

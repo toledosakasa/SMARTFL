@@ -35,6 +35,17 @@ public class NewInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertReturn(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+		throws BadBytecode {
+		int instpos = ci.insertExGap(8);
+		int instindex = constp.addIntegerInfo(poolindex);
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.rettraceindex, instpos + 4);
+	}
+
+	@Override
 	public void insertByteCodeAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 		// FIXME this could be buggy, as sometimes new inst will be an invoke-like inst.
 		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation

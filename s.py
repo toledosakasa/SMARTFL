@@ -235,3 +235,6 @@ if __name__ == '__main__':
             train(args[2],args[3])
     if args[1] == 'resetp':
         resetp()
+    if args[1] == 'decoder':
+        d4j.decoder()
+    

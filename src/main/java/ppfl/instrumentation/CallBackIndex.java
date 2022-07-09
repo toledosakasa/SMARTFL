@@ -19,6 +19,8 @@ public class CallBackIndex {
 	private static final String PRINT_CALLBACK_NAME = "printTopStack1";
 	private static final int BUFFERSIZE = 1024;
 	// use the logger set by TraceTransformer
+	public int logtraceindex;
+	public int rettraceindex;
 	public int logstringindex;
 	public int tsindex_int;
 	public int tsindex_short;
@@ -40,6 +42,8 @@ public class CallBackIndex {
 	private static Writer writer = null;
 
 	public static List<String> stackwriter = null;
+
+	public static TraceSequence tracewriter = null;
 
 	public int getLdcCallBack(Object o) {
 		// decide v's type using instanceof
@@ -82,6 +86,8 @@ public class CallBackIndex {
 		CtClass thisKlass = cp.get("ppfl.instrumentation.CallBackIndex");
 		int classindex = constp.addClassInfo(thisKlass);
 
+		logtraceindex = constp.addMethodrefInfo(classindex, "logTrace", "(I)V");
+		rettraceindex = constp.addMethodrefInfo(classindex, "retTrace", "(I)V");
 		logstringindex = constp.addMethodrefInfo(classindex, "logString", "(Ljava/lang/String;)V");
 		tsindex_int = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(I)I");
 		tsindex_long = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(J)J");
@@ -236,6 +242,33 @@ public class CallBackIndex {
 			e.printStackTrace();
 		}
 		// TraceTransformer.traceLogger.info(s);
+	}
+
+	public static void logTrace(int poolindex) {
+		// try {
+		// 	writer.write(logcount);
+		// 	// writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+		logcount++;
+		if (logcount > loglimit) {
+			System.exit(0);
+		}
+		DynamicTrace inst = new DynamicTrace(TracePool.get(poolindex));
+		tracewriter.add(inst);
+
+	}
+
+	public static void retTrace(int poolindex) {
+		logcount++;
+		if (logcount > loglimit) {
+			System.exit(0);
+		}
+		DynamicTrace inst = new DynamicTrace(TracePool.get(poolindex));
+		inst.setRetInfo();
+		tracewriter.add(inst);
+
 	}
 
 	public static void flush() {

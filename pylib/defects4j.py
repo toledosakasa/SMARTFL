@@ -380,8 +380,8 @@ def rerun(proj: str, id: str):
 def parse(proj: str, id: str, debug=True):
     path = f"{checkoutbase}/{proj}/{id}/trace/logs/run"
     size = getdirsize(path)/(1024*1024)
-    if(size>3000):
-        return
+    # if(size>3000):
+    #     return
     cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"'
     if(not debug):
         cmdline += '>/dev/null 2>&1'
@@ -894,4 +894,7 @@ def extractproj(proj: str):
     allbugs = project_bug_nums[proj]
     for i in range(1, allbugs+1):
         result = extract(proj, str(i))
-    
+
+def decoder():
+    cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder" > trace.log'
+    os.system(cmdline)
