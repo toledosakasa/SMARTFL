@@ -14,7 +14,7 @@ Modify defects4j with the following:
 
 ```
 cd "Path2D4j"
-git patch "Path2ThisRepo"/defects4j-mod/diff.patch
+git apply "Path2ThisRepo"/defects4j-mod/diff.patch
 ```
 
 Build
