@@ -11,14 +11,29 @@ public class InvokeTrace extends Trace {
         this.callname = callname;
     }
 
+    // @Override
+    // public String toString(){
+    //     String ret = "opcode=" + opcode + "(" + Interpreter.map[opcode].opcode + ")\t";
+    //     ret += ",calltype=" + calltype;
+    //     ret += ",callclass=" + callclass;
+    //     ret += ",callname=" + callname;
+    //     ret += ",lineinfo=" + classname + "#" + methodname + "#" + signature + "#" + lineno + "#" + index + ",nextinst=" + nextinst;
+    //     return ret;
+    // }
+
     @Override
-    public String toString(){
-        String ret = "opcode=" + opcode + "(" + Interpreter.map[opcode].opcode + ")\t";
-        ret += ",calltype=" + calltype;
-        ret += ",callclass=" + callclass;
-        ret += ",callname=" + callname;
-        ret += ",lineinfo=" + classname + "#" + methodname + "#" + signature + "#" + lineno + "#" + index + ",nextinst=" + nextinst;
-        return ret;
+    public String getcalltype(){
+        return calltype;
+    }
+
+    @Override
+    public String getcallclass(){
+        return callclass;
+    }
+
+    @Override
+    public String getcallname(){
+        return callname;
     }
 
 }

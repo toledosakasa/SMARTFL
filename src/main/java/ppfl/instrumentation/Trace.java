@@ -35,6 +35,7 @@ public class Trace implements Serializable {
             String ret = "###" + classname + "::" + methodname;
             return ret;
         }
+
         String ret = "opcode=" + opcode + "(" + Interpreter.map[opcode].opcode + ")\t";
         if(popnum != null)
             ret += ",popnum=" + popnum;
@@ -44,8 +45,54 @@ public class Trace implements Serializable {
             ret += ",load=" + load;
         if(store != null)
             ret += ",store=" + store;
+
+        String calltype = this.getcalltype();
+        String callclass = this.getcallclass();
+        String callname = this.getcallname();
+        if(calltype != null){
+            ret += ",calltype=" + calltype;
+            ret += ",callclass=" + callclass;
+            ret += ",callname=" + callname;
+        }
+
+        String field = this.getfield();
+        if(field != null){
+            ret += ",field=" + field;
+        }
+
+        String _default = this.getdefault();
+        String _switch = this.getswitch();
+        if(_default != null){
+            ret += ",default=" + _default;
+            ret += ",switch=" + _switch;
+        }
+        
         ret += ",lineinfo=" + classname + "#" + methodname + "#" + signature + "#" + lineno + "#" + index + ",nextinst=" + nextinst;
         return ret;
+    }
+
+    public String getcalltype(){
+        return null;
+    }
+
+    public String getcallclass(){
+        return null;
+    }
+
+    public String getcallname(){
+        return null;
+    }
+
+    public String getfield(){
+        return null;
+    }
+
+    public String getdefault(){
+        return null;
+    }
+
+    public String getswitch(){
+        return null;
     }
 
 }

@@ -35,7 +35,11 @@ public class DynamicTrace implements Serializable {
             ret += "###RET@";
         ret += trace.toString();
         if(stackType != null){
-            ret +=  ",stack=" + stackType + ":" + String.valueOf(stackValue);
+            ret +=  ",stack=" + stackType + ":";
+            if(stackType.equals("D") || stackType.equals("F"))
+                ret += String.valueOf(fstackValue);
+            else
+                ret += String.valueOf(stackValue);
         }
         return ret;
     }

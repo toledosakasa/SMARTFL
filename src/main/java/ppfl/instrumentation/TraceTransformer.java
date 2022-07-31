@@ -37,8 +37,14 @@ import javassist.bytecode.Mnemonic;
 import ppfl.MyWriter;
 import ppfl.ProfileUtils;
 import ppfl.WriterUtils;
+import ppfl.instrumentation.opcode.GetFieldInst;
+import ppfl.instrumentation.opcode.GetStaticInst;
 import ppfl.instrumentation.opcode.InvokeInst;
+import ppfl.instrumentation.opcode.LookupSwitchInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
+import ppfl.instrumentation.opcode.PutFieldInst;
+import ppfl.instrumentation.opcode.PutStaticInst;
+import ppfl.instrumentation.opcode.TableSwitchInst;
 
 // import java.lang.management.ManagementFactory;
 
@@ -445,7 +451,11 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			int opcode = tempci.byteAt(index);
 			Integer load = null, store = null, popnum = null, pushnum = null;
+			// Integer _default = null;
+			// String _switch = null;
 			String[] split = getinst.split(",");
+			// now "branchbyte" and "switch" is not used in running trace
+			// still need to handle "field"
 			for (String instinfo : split) {
 				String[] splitinstinfo = instinfo.split("=");
 				String infotype = splitinstinfo[0];
@@ -462,6 +472,12 @@ public class TraceTransformer implements ClassFileTransformer {
 				if (infotype.equals("pushnum")) {
 					pushnum = Integer.valueOf(infovalue);
 				}
+				// if (infotype.equals("default")) {
+				// 	_default = Integer.valueOf(infovalue);
+				// }
+				// if (infotype.equals("switch")) {
+				// 	_switch = infovalue;
+				// }
 			}
 
 			String calltype = null, callclass = null, callname = null;
@@ -471,6 +487,25 @@ public class TraceTransformer implements ClassFileTransformer {
 				callclass = constp.getMethodrefClassName(callindex);
 				callname = constp.getMethodrefName(callindex);
 			}
+
+			String field = null;
+			if (Interpreter.map[opcode] instanceof PutFieldInst ||
+					Interpreter.map[opcode] instanceof GetFieldInst) {
+				int num = tempci.u16bitAt(index + 1);
+				field = constp.getFieldrefName(num);
+			}
+
+			if (Interpreter.map[opcode] instanceof PutStaticInst ||
+					Interpreter.map[opcode] instanceof GetStaticInst) {
+				int num = tempci.u16bitAt(index + 1);
+				field = constp.getFieldrefClassName(num) + "#" + constp.getFieldrefName(num);
+			}
+
+			// if(Interpreter.map[opcode] instanceof LookupSwitchInst ||
+			// Interpreter.map[opcode] instanceof TableSwitchInst){
+			// int num = tempci.u16bitAt(index + 1);
+			// field = constp.getFieldrefName(num);
+			// }
 
 			String classname = cc.getName();
 			String methodname = mi.getName();
@@ -484,6 +519,14 @@ public class TraceTransformer implements ClassFileTransformer {
 			if(Interpreter.map[opcode] instanceof InvokeInst){
 				instruction = new InvokeTrace(instruction, calltype, callclass, callname);
 			}
+
+			if (field != null) {
+				instruction = new FieldTrace(instruction, field);
+			}
+
+			// if (_default != null) {
+			// 	instruction = new SwitchTrace(instruction, _default, _switch);
+			// }
 
 			int poolindex = TracePool.indexAt();
 			TracePool.add(instruction);

@@ -1,12 +1,19 @@
 package ppfl.instrumentation;
 
-import java.io.*
-;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import java.io.FileWriter;
+
 public class TraceDecoder {
 
     public static void main(String args[]) {
         Interpreter.init();
-        String finename = "/data/mhzeng/ppfl/tmp_checkout/SmartFL/Lang/1/trace/logs/run/org.apache.commons.lang3.math.IEEE754rUtilsTest.testEnforceExceptions.log.ser";
+        String finename = "/data/mhzeng/ppfl/tmp_checkout/SmartFL/Math/6/trace/logs/run/org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizerTest.testAckley.log.ser";
+        //String finename = "/data/mhzeng/ppfl/tmp_checkout/SmartFL/Lang/43/trace/logs/run/org.apache.commons.lang.text.ExtendedMessageFormatTest.testEscapedQuote_LANG_477.log.ser";
+        //String finename = "/data/mhzeng/ppfl/tmp_checkout/SmartFL/Lang/4/trace/logs/run/org.apache.commons.lang3.StringEscapeUtilsTest.testEscapeJava.log.ser";
+        //String finename = "/data/mhzeng/ppfl/tmp_checkout/SmartFL/Lang/4/trace/logs/run/org.apache.commons.lang3.StringEscapeUtilsTest.testEscapeXmlSupplementaryCharacters.log.ser";
+        //String finename = "/data/mhzeng/ppfl/tmp_checkout/SmartFL/Lang/1/trace/logs/run/org.apache.commons.lang3.math.NumberUtilsTest.TestLang747.log.ser";
         TraceSequence traceseq = null;
         try{
             FileInputStream fileIn = new FileInputStream(finename);
