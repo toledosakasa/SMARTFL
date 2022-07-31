@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.nio.file.Paths;
@@ -50,7 +52,7 @@ import ppfl.instrumentation.opcode.TableSwitchInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
-	private boolean useCachedClass = false;
+	private boolean useCachedClass = true; // has to be true, otherwise writeWhatIsTraced is wrong
 	public static boolean useNewTrace = true;
 
 	private static MyWriter debugLogger = null;
@@ -253,14 +255,25 @@ public class TraceTransformer implements ClassFileTransformer {
 			if (!file.exists()) {
 				file.mkdirs();
 			}
+			File poolcache = new File(classcachefolder, "TracePool" + ".ser");
 			File classcache = new File(classcachefolder, classname + ".log");
-			if (!this.simpleLog && classcache.exists()) {
+			if (!this.simpleLog && poolcache.exists() && classcache.exists()) {
 				// debugLogger.writeln("Cache loaded:" + this.targetClassName);
 				try {
+					if(!TracePool.hsinit()){
+						FileInputStream fileIn = new FileInputStream(poolcache);
+						ObjectInputStream in = new ObjectInputStream(fileIn);
+						TracePool.setpool((List<Trace>) in.readObject());
+						TracePool.init();
+						in.close();
+						fileIn.close();
+					}
 					return java.nio.file.Files.readAllBytes(classcache.toPath());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (ClassNotFoundException c) {
+					c.printStackTrace();
 				}
 			}
 		}
@@ -336,6 +349,13 @@ public class TraceTransformer implements ClassFileTransformer {
 			try {
 				String classcachefolder = "trace/classcache/";
 				java.nio.file.Files.write(Paths.get(classcachefolder, classname + ".log"), byteCode);
+
+				// TODO: now this will write many times, change this after using one transformer
+				FileOutputStream outStream = new FileOutputStream(classcachefolder + "TracePool" + ".ser");
+				ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
+				fileObjectOut.writeObject(TracePool.getpool());
+				fileObjectOut.close();
+				outStream.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

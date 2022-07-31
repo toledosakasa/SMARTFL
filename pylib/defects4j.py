@@ -324,6 +324,7 @@ def cleanupcheckout(proj: str, id: str):
         os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/run/')
         os.system(f'rm -rf {checkoutpath}/trace/classcache/')
+        os.system(f'rm -rf {checkoutpath}/trace/debug/')
 
 
 def clearcache(proj: str, id: str):
