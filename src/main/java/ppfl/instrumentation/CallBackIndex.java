@@ -158,13 +158,13 @@ public class CallBackIndex {
 		// } catch (IOException e) {
 		// 	e.printStackTrace();
 		// }
-		stackwriter.add(",stack=I:"+String.valueOf(i)+"\n");
+		// stackwriter.add(",stack=I:"+String.valueOf(i)+"\n");
 		// TraceTransformer.traceLogger.info(",pushtype=int,pushvalue={}", i);
 		return i;
 	}
 
 	public static double printTopStack1(double i) {
-		stackwriter.add(",stack=D:"+String.valueOf(i)+"\n");
+		// stackwriter.add(",stack=D:"+String.valueOf(i)+"\n");
 		// try {
 		// 	writer.write(",stack=D:");
 		// 	writer.write(String.valueOf(i));
@@ -264,14 +264,14 @@ public class CallBackIndex {
 	}
 
 	public static Object printTopStack1(Object i) {
-		// // call system hashcode (jvm address)
-		// try {
-		// 	writer.write(",stack=Obj:");
-		// 	writer.write(String.valueOf(java.lang.System.identityHashCode(i)));
-		// 	// writer.flush();
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// }
+		// call system hashcode (jvm address)
+		try {
+			writer.write(",stack=Obj:");
+			writer.write(String.valueOf(java.lang.System.identityHashCode(i)));
+			// writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		// TraceTransformer.traceLogger.info(",pushtype=object,pushvalue={}",
 		// java.lang.System.identityHashCode(i));
 		return i;
@@ -281,59 +281,52 @@ public class CallBackIndex {
 	// callbacks.
 	// will be called by bytecode instrumentation
 	public static int traceTopStack1(int i) {
-		String stackType = "I";
-		tracewriter.top().addDynamicInfo(stackType, i);
+		// String stackType = "I";
+		// tracewriter.top().addDynamicInfo(stackType, i);
 		return i;
 	}
 
 	public static double traceTopStack1(double i) {
-		String stackType = "D";
-		tracewriter.top().addDynamicInfo(stackType, i);
+		// String stackType = "D";
+		// tracewriter.top().addDynamicInfo(stackType, i);
 		return i;
 	}
 
 	public static short traceTopStack1(short i) {
-		// try {
-		// 	writer.write(",stack=S:");
-		// 	writer.write(String.valueOf(i));
-		// 	// writer.flush();
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// }
 		// TraceTransformer.traceLogger.info(",pushtype=short,pushvalue={}", i);
-		String stackType = "S";
-		tracewriter.top().addDynamicInfo(stackType, i);
+		// String stackType = "S";
+		// tracewriter.top().addDynamicInfo(stackType, i);
 		return i;
 	}
 
 	public static char traceTopStack1(char i) {
-		String stackType = "C";
-		tracewriter.top().addDynamicInfo(stackType, i);
+		// String stackType = "C";
+		// tracewriter.top().addDynamicInfo(stackType, i);
 		return i;
 	}
 
 	public static byte traceTopStack1(byte i) {
-		String stackType = "B";
-		tracewriter.top().addDynamicInfo(stackType, i);
+		// String stackType = "B";
+		// tracewriter.top().addDynamicInfo(stackType, i);
 		return i;
 	}
 
 	public static boolean traceTopStack1(boolean i) {
-		String stackType = "Z";
-		int value = i? 1 : 0;
-		tracewriter.top().addDynamicInfo(stackType, value);
+		// String stackType = "Z";
+		// int value = i? 1 : 0;
+		// tracewriter.top().addDynamicInfo(stackType, value);
 		return i;
 	}
 
 	public static float traceTopStack1(float i) {
-		String stackType = "F";
-		tracewriter.top().addDynamicInfo(stackType, i);
+		// String stackType = "F";
+		// tracewriter.top().addDynamicInfo(stackType, i);
 		return i;
 	}
 
 	public static long traceTopStack1(long i) {
-		String stackType = "J";
-		tracewriter.top().addDynamicInfo(stackType, i);
+		// String stackType = "J";
+		// tracewriter.top().addDynamicInfo(stackType, i);
 		return i;
 	}
 
@@ -386,6 +379,14 @@ public class CallBackIndex {
 		}
 		DynamicTrace inst = new DynamicTrace(TracePool.get(poolindex));
 		tracewriter.add(inst);
+
+		// String s = TracePool.get(poolindex).toString();
+		// try {
+		// 	writer.write(String.format("%d\n", poolindex));
+		// 	writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
 
 	}
 

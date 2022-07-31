@@ -585,8 +585,9 @@ public class TraceTransformer implements ClassFileTransformer {
 					try {
 						if(!useNewTrace){
 							// String pid = ManagementFactory.getRuntimeMXBean().getName();
-							TraceTransformer.traceWriter.write(",Over Now!"+"@"+copytimes+"@"+targetClassName+"\n");
-							for(String s : stackwriter)
+							// TraceTransformer.traceWriter.write(",Over
+							// Now!"+"@"+copytimes+"@"+targetClassName+"\n");
+							for (String s : stackwriter)
 								TraceTransformer.traceWriter.write(s);
 							TraceTransformer.traceWriter.close();
 							// closing the stream may trigger double-close bug.
