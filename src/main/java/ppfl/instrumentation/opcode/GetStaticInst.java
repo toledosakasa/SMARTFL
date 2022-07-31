@@ -77,4 +77,18 @@ public class GetStaticInst extends OpcodeInst {
 		ci.writeByte(184, instpos);// invokestatic
 		ci.write16bit(callback, instpos + 1);
 	}
+
+	@Override
+	public void insertAfter(CodeIterator ci, int index,  ConstPool constp, CallBackIndex cbi)
+			throws BadBytecode {
+		int fieldid = getu16bitpara(ci, index);
+		String desc = constp.getFieldrefType(fieldid);
+		int callback = dispatchByDesc(desc, cbi);
+		// FIXME: now disable other type 
+		if(callback == cbi.traceindex_object){
+			int instpos = ci.insertExGap(3);
+			ci.writeByte(184, instpos);// invokestatic
+			ci.write16bit(callback, instpos + 1);
+		}
+	}
 }

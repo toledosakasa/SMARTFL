@@ -550,6 +550,7 @@ public class TraceTransformer implements ClassFileTransformer {
 				// if (oi.form > 42)
 				// getstatic should be treated like invocation,
 				// in the case that static-initializer may be called.
+				// FIXME: what about the loaded obj of getstatic and new
 				if (oi instanceof InvokeInst || oi.form == 178 || oi.form == 187) {// getstatic and new
 					if (!mi.isStaticInitializer()){
 						if(useNewTrace)
@@ -563,7 +564,7 @@ public class TraceTransformer implements ClassFileTransformer {
 					if (!mi.isStaticInitializer()){
 						if(useNewTrace)
 						{
-							oi.insertAfter(ci, constp, cbi);
+							oi.insertAfter(ci, index, constp, cbi);
 						}
 						else
 							oi.insertByteCodeAfter(ci, index, constp, cbi);

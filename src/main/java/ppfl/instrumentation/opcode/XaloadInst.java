@@ -31,6 +31,11 @@ public class XaloadInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+		// will be overrided.
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		Node indexNode = graph.getRuntimeStack().pop();

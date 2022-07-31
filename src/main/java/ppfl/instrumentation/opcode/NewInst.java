@@ -53,6 +53,15 @@ public class NewInst extends OpcodeInst {
 		ci.write16bit(cbi.tsindex_object, instpos + 1);
 	}
 
+	//FIXME:  now it seems that only insertReturn will be called
+	@Override
+	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+		// FIXME this could be buggy, as sometimes new inst will be an invoke-like inst.
+		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
+		ci.writeByte(184, instpos);// invokestatic
+		ci.write16bit(cbi.traceindex_object, instpos + 1);
+	}
+
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);

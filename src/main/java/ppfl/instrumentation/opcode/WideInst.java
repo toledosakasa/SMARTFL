@@ -32,4 +32,10 @@ public class WideInst extends OpcodeInst {
 		Interpreter.map[realform].insertByteCodeAfter(ci, index, constp, cbi);
 	}
 
+	@Override
+	public void insertAfter(CodeIterator ci, int index,  ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+		int realform = Integer.parseInt(getpara(ci, index, 1));
+		Interpreter.map[realform].insertAfter(ci, index, constp, cbi);
+	}
+
 }

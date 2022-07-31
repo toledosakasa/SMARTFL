@@ -15,4 +15,7 @@ public class InstanceOfInst extends OpcodeInst {
 		StringBuilder ret = new StringBuilder(super.getinst(ci, index, constp));
 		return ret.toString();
 	}
+
+	//FIXME: add InsertAfter?? though now only need to trace obj, and the push value is an int 
+
 }

@@ -151,28 +151,55 @@ public class OpcodeInst {
 		if (desc.length() < 1) {
 			return 0;
 		}
-		switch (desc.charAt(0)) {
-			case 'L':
-			case '[':
-				return cbi.tsindex_object;
-			case 'B':
-				return cbi.tsindex_byte;
-			case 'C':
-				return cbi.tsindex_char;
-			case 'D':
-				return cbi.tsindex_double;
-			case 'F':
-				return cbi.tsindex_float;
-			case 'I':
-				return cbi.tsindex_int;
-			case 'J':
-				return cbi.tsindex_long;
-			case 'S':
-				return cbi.tsindex_short;
-			case 'Z':
-				return cbi.tsindex_boolean;
-			default:
-				return 0;
+		if(ppfl.instrumentation.TraceTransformer.useNewTrace){
+			switch (desc.charAt(0)) {
+				case 'L':
+				case '[':
+					return cbi.traceindex_object;
+				case 'B':
+					return cbi.traceindex_byte;
+				case 'C':
+					return cbi.traceindex_char;
+				case 'D':
+					return cbi.traceindex_double;
+				case 'F':
+					return cbi.traceindex_float;
+				case 'I':
+					return cbi.traceindex_int;
+				case 'J':
+					return cbi.traceindex_long;
+				case 'S':
+					return cbi.traceindex_short;
+				case 'Z':
+					return cbi.traceindex_boolean;
+				default:
+					return 0;
+			}
+		}
+		else{
+			switch (desc.charAt(0)) {
+				case 'L':
+				case '[':
+					return cbi.tsindex_object;
+				case 'B':
+					return cbi.tsindex_byte;
+				case 'C':
+					return cbi.tsindex_char;
+				case 'D':
+					return cbi.tsindex_double;
+				case 'F':
+					return cbi.tsindex_float;
+				case 'I':
+					return cbi.tsindex_int;
+				case 'J':
+					return cbi.tsindex_long;
+				case 'S':
+					return cbi.tsindex_short;
+				case 'Z':
+					return cbi.tsindex_boolean;
+				default:
+					return 0;
+			}
 		}
 	}
 
@@ -316,7 +343,8 @@ public class OpcodeInst {
 		}
 	}
 
-	// there's no need to override this.
+	//FIXME: there's no need to override this, except Areturn ? 
+	// For other return insts, seems not to trace the return value now. 
 	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
 		throws BadBytecode {
 
@@ -356,7 +384,7 @@ public class OpcodeInst {
 	}
 
 	// extended class should override this method.
-	public void insertAfter(CodeIterator ci, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
 
 	}
 

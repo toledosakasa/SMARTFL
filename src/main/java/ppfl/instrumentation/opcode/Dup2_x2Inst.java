@@ -37,6 +37,11 @@ public class Dup2_x2Inst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertAfter(CodeIterator ci, int index,ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		// FIXME sure this is buggy, I'll fix this later.
 		// build the stmtnode(common)
