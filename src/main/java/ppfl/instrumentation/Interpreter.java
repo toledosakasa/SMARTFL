@@ -7,6 +7,7 @@ import ppfl.instrumentation.opcode.*;
 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5*/
 public class Interpreter {
 	public static final OpcodeInst[] map = new OpcodeInst[256];
+	private static boolean has_init = false;
 
 	static void printopcodes() {
 		init();
@@ -28,6 +29,8 @@ public class Interpreter {
 	}
 
 	public static void init() {
+		if(has_init)
+			return;
 		// construct inst map based on different opcode types.
 		map[0] = new NopInst(0);
 		map[1] = new AconstInst(1);
@@ -185,5 +188,7 @@ public class Interpreter {
 
 		// for compromising
 		map[255] = new OpcodeInst(255, 1, 1);
+
+		has_init = true;
 	}
 }

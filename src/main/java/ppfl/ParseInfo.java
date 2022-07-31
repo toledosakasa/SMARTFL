@@ -8,6 +8,8 @@ import java.util.Set;
 // import org.slf4j.LoggerFactory;
 
 import ppfl.instrumentation.TraceDomain;
+import ppfl.instrumentation.DynamicTrace;
+import ppfl.instrumentation.Interpreter;
 
 public class ParseInfo {
 
@@ -193,6 +195,62 @@ public class ParseInfo {
 		String[] opcodeinfos = this.getvalue("opcode").split("\\(|\\)");
 		this.form = Integer.valueOf(opcodeinfos[0]);
 		this.opcode = opcodeinfos[1];
+	}
+
+	public ParseInfo(DynamicTrace dtrace) {
+		tracemap = new HashMap<>();
+		// isReturnMsg
+		if (dtrace.isret) {
+			this.isReturnMsg = true;
+		}
+
+		// String opcodeVal=trace.trace.opcode + "(" +
+		// Interpreter.map[trace.trace.opcode].opcode + ")";
+		// tracemap.put("opcode", opcodeVal);
+		if (dtrace.trace.popnum != null)
+			tracemap.put("popnum", dtrace.trace.popnum.toString());
+		if (dtrace.trace.pushnum != null)
+			tracemap.put("pushnum", dtrace.trace.pushnum.toString());
+		if (dtrace.trace.load != null)
+			tracemap.put("load", dtrace.trace.load.toString());
+		if (dtrace.trace.store != null)
+			tracemap.put("store", dtrace.trace.store.toString());
+		String lineInfoVal = dtrace.trace.classname + "#" + dtrace.trace.methodname + "#" + dtrace.trace.signature + "#"
+				+ dtrace.trace.lineno + "#" + dtrace.trace.index;
+		tracemap.put("lineinfo", lineInfoVal);
+		tracemap.put("nextinst", Integer.toString(dtrace.trace.nextinst));
+		if (dtrace.stackType != null) {
+			String stackVal = dtrace.stackType + ":";
+			if (dtrace.stackType.equals("D") || dtrace.stackType.equals("F"))
+				stackVal += String.valueOf(dtrace.fstackValue);
+			else
+				stackVal += String.valueOf(dtrace.stackValue);
+			tracemap.put("stack", stackVal);
+		}
+
+		if (dtrace.trace.getcalltype() != null) {
+			tracemap.put("calltype", dtrace.trace.getcalltype());
+			tracemap.put("callclass", dtrace.trace.getcallclass());
+			tracemap.put("callname", dtrace.trace.getcallname());
+		}
+
+		if(dtrace.trace.getfield() != null){
+			tracemap.put("field", dtrace.trace.getfield());
+		}
+
+		if(dtrace.trace.getdefault() != null){
+			tracemap.put("default", dtrace.trace.getdefault());
+			tracemap.put("switch", dtrace.trace.getswitch());
+		}
+
+		// System.out.printf(1+trace.trace.classname+"\n");
+		// System.out.printf(1+trace.trace.methodname+"\n");
+		// System.out.printf(1+trace.trace.signature+"\n");
+		this.domain = new TraceDomain(dtrace.trace.classname, dtrace.trace.methodname, dtrace.trace.signature);
+		this.linenumber = Integer.valueOf(dtrace.trace.lineno);
+		this.byteindex = Integer.valueOf(dtrace.trace.index);
+		this.form = dtrace.trace.opcode;
+		this.opcode = Interpreter.map[dtrace.trace.opcode].opcode;
 	}
 
 	public String getvalue(String stype) {

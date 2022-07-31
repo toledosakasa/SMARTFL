@@ -11,7 +11,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+
 import ppfl.instrumentation.TraceDomain;
+import ppfl.instrumentation.DynamicTrace;
+import ppfl.instrumentation.TraceSequence;
+import ppfl.instrumentation.Interpreter;
+import ppfl.instrumentation.TraceTransformer;
 
 public class JoinedTrace {
 
@@ -113,12 +120,72 @@ public class JoinedTrace {
   public void parseFolder(String path) {
     File folder = new File(path);
     File[] fs = folder.listFiles();
-    for (File f : fs) {
-      if (f.getName().equals("all.log"))
-        continue;
-      parseSepFile(f, f.getName());
+    if (TraceTransformer.useNewTrace) {
+      for (File f : fs) {
+        if (f.getName().equals("all.log"))
+          continue;
+        String suffix = ".log.ser";
+        if (f.getName().endsWith(suffix))
+          parseInfo(f, f.getName());
+      }
+    } else {
+      for (File f : fs) {
+        if (f.getName().equals("all.log"))
+          continue;
+        parseSepFile(f, f.getName());
+      }
+      parseToInfo();
+
     }
-    parseToInfo();
+  }
+
+  private void parseInfo(File f, String name) {
+    // System.out.printf("dddd "+name+"\n");
+    String suffix = ".log.ser";
+
+    // if (name.endsWith(suffix))
+    name = name.substring(0, name.length() - suffix.length());
+    int index = name.lastIndexOf('.');
+    String fullname = name.substring(0, index) + "::" + name.substring(index + 1);
+    if (getD4jTestState(fullname) && f.length() > MAX_FILE_LIMIT) {
+      return;
+    }
+
+    Interpreter.init();
+    TraceSequence traceseq = null;
+    try {
+      // System.out.printf("yyyy "+f.getAbsolutePath()+"\n");
+      FileInputStream fileIn = new FileInputStream(f.getAbsolutePath());
+      ObjectInputStream in = new ObjectInputStream(fileIn);
+      traceseq = (TraceSequence) in.readObject();
+      // System.out.printf("yyyy "+traceseq.get(0).trace.classname +"\n");
+      in.close();
+      fileIn.close();
+    } catch (IOException i) {
+      // i.printStackTrace();
+      System.out.printf("IOException at " + fullname + "\n");
+      return;
+    } catch (ClassNotFoundException c) {
+      System.out.println("TraceSequence class not found at" + fullname + "\n");
+      // c.printStackTrace();
+      return;
+    }
+    this.addTraceChunk(fullname);
+    TraceChunk thischunk = traceList.get(traceList.size() - 1);
+    int size = traceseq.size();
+    // System.out.println(size);
+    for (int i = 0; i < size; i++) {
+      DynamicTrace dtrace = traceseq.get(i);
+
+      if (!dtrace.trace.ismethodlog) {
+        thischunk.parseOneTrace(dtrace);
+      }
+      // if (dtrace.isret)
+      // traceList.get(traceList.size() - 1).parseOneTrace(dtrace);
+      // } else {
+      // traceList.get(traceList.size() - 1).parseOneTrace(dtrace);
+      // }
+    }
   }
 
   private void parseSepFile(File f, String name) {
