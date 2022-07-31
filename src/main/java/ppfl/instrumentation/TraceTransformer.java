@@ -53,7 +53,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	private boolean useCachedClass = false;
 	public static boolean useNewTrace = true;
 
-	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger_trace");
+	private static MyWriter debugLogger = null;
 	// LoggerFactory.getLogger(TraceTransformer.class);
 
 	// The logger name
@@ -86,10 +86,16 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static boolean first_addShutdownHook = true;
 
 	private static List<String> stackwriter;
+
 	/** filename for logging */
 	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader, String logfilename) {
 		this.targetClassName = targetClassName;
 		this.targetClassLoader = targetClassLoader;
+
+		File debugdir = new File("trace/debug/");
+		debugdir.mkdirs();
+		WriterUtils.setPath("trace/debug/");
+		debugLogger = WriterUtils.getWriter(logfilename, true);
 
 		File logdir = new File("trace/logs/run/");
 		logdir.mkdirs();
@@ -238,7 +244,8 @@ public class TraceTransformer implements ClassFileTransformer {
 	protected byte[] transformBody(String classname) {
 		byte[] byteCode = null;
 		classname = classname.replace("/", ".");
-		debugLogger.write(String.format("[Agent] Transforming class %s\n", this.targetClassName));
+		// debugLogger.write(String.format("[Agent] Transforming class %s\n",
+		// this.targetClassName));
 
 		if (useCachedClass) {
 			String classcachefolder = "trace/classcache/";
@@ -577,8 +584,8 @@ public class TraceTransformer implements ClassFileTransformer {
 				if (!mi.isStaticInitializer()){
 					if(useNewTrace)
 					{
-						debugLogger.write(TracePool.get(poolindex).toString());
-						debugLogger.write("		insert, " + "poolindex = " + poolindex);
+						// debugLogger.write(TracePool.get(poolindex).toString());
+						// debugLogger.write("		insert, " + "poolindex = " + poolindex);
 						oi.insertBefore(ci, constp, poolindex, cbi);
 					}
 					else
@@ -664,7 +671,13 @@ public class TraceTransformer implements ClassFileTransformer {
 					|| !loader.equals(targetClassLoader)) {
 				return byteCode;
 			}
-			return transformBody(className);
+			byte[] ret = transformBody(className);
+			// debugLogger.write(String.format("\n%s\n", className));
+			// for(byte b: ret)
+			// debugLogger.write(String.format("%x ", b));
+			return ret;
+			// return transformBody(className);
+
 			// return transformBody(loader, className, classBeingRedefined,
 			// protectionDomain, classfileBuffer);
 		} catch (Exception e) {
