@@ -56,6 +56,7 @@ public class CallBackIndex {
 	public static List<String> stackwriter = null;
 
 	public static TraceSequence tracewriter = null;
+	public static TracePool tracepool = null;
 
 	public int getLdcCallBack(Object o) {
 		// decide v's type using instanceof
@@ -368,7 +369,10 @@ public class CallBackIndex {
 
 	public static void logTrace(int poolindex) {
 		// try {
-		// 	writer.write(logcount);
+		// 	writer.write(String.format("%d\n", poolindex));
+		// 	writer.flush();
+		// 	// String log = tracepool.get(poolindex).toString() + "\n";
+		// 	// writer.write(log);
 		// 	// writer.flush();
 		// } catch (IOException e) {
 		// 	e.printStackTrace();
@@ -377,7 +381,7 @@ public class CallBackIndex {
 		if (logcount > loglimit) {
 			System.exit(0);
 		}
-		DynamicTrace inst = new DynamicTrace(TracePool.get(poolindex));
+		DynamicTrace inst = new DynamicTrace(tracepool.get(poolindex));
 		tracewriter.add(inst);
 
 		// String s = TracePool.get(poolindex).toString();
@@ -395,7 +399,7 @@ public class CallBackIndex {
 		if (logcount > loglimit) {
 			System.exit(0);
 		}
-		DynamicTrace inst = new DynamicTrace(TracePool.get(poolindex));
+		DynamicTrace inst = new DynamicTrace(tracepool.get(poolindex));
 		inst.setRetInfo();
 		tracewriter.add(inst);
 

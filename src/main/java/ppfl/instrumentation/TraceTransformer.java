@@ -52,7 +52,8 @@ import ppfl.instrumentation.opcode.TableSwitchInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
-	private boolean useCachedClass = true; // has to be true, otherwise writeWhatIsTraced is wrong
+	public boolean useCachedClass = true; // has to be true, otherwise writeWhatIsTraced is wrong
+	public boolean foundCache = false;
 	public static boolean useNewTrace = true;
 
 	private static MyWriter debugLogger = null;
@@ -70,10 +71,8 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static BufferedWriter staticInitWriter = null;
 	private static Writer traceWriter = null;
 	private static BufferedWriter whatIsTracedWriter = null;
-	/** The internal form class name of the class to transform */
-	private String targetClassName;
-	/** The class loader of the class we want to transform */
-	private ClassLoader targetClassLoader;
+	// Map of transformed clazz, key: classname, value: classloader
+	private Map<String,ClassLoader> transformedclazz;
 
 	private boolean useD4jTest = false;
 	private Set<String> d4jMethodNames = new HashSet<>();
@@ -82,18 +81,13 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	private Set<String> transformedMethods = new HashSet<>();
 
-	private static int howmanytimes = 0;
-	private int copytimes;
-
-	private static boolean first_addShutdownHook = true;
+	private boolean first_addShutdownHook = true;
 
 	private static List<String> stackwriter;
 
 	/** filename for logging */
-	public TraceTransformer(String targetClassName, ClassLoader targetClassLoader, String logfilename) {
-		this.targetClassName = targetClassName;
-		this.targetClassLoader = targetClassLoader;
-
+	public TraceTransformer(Map<String,ClassLoader> transformedclazz, String logfilename){
+		this.transformedclazz = transformedclazz;
 		File debugdir = new File("trace/debug/");
 		debugdir.mkdirs();
 		WriterUtils.setPath("trace/debug/");
@@ -110,19 +104,14 @@ public class TraceTransformer implements ClassFileTransformer {
 			e.printStackTrace();
 		}
 
-		// TODO: 可以尝试把多个transformer改成一个来处理的格式
 		CallBackIndex.tracewriter = new TraceSequence(logfilename);
+		CallBackIndex.tracepool = new TracePool();
 
 		traceWriter = file;
-		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
 		CallBackIndex.setWriter(traceWriter);
 
 		stackwriter = new ArrayList<>();
 		CallBackIndex.stackwriter = stackwriter;
-
-		// traceWriter = new BufferedWriter(file, BUFFERSIZE);
-		howmanytimes+=1;
-		copytimes = howmanytimes;
 	}
 
 	private static void setStaticInitFile(String clazzname) {
@@ -243,11 +232,24 @@ public class TraceTransformer implements ClassFileTransformer {
 		}
 	}
 
+	public void writeTracePool(){
+		try {
+			String classcachefolder = "trace/classcache/";
+			FileOutputStream outStream = new FileOutputStream(classcachefolder + "TracePool" + ".ser");
+			ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
+			fileObjectOut.writeObject(CallBackIndex.tracepool);
+			// debugLogger.writeln("Write Tracepool");
+			fileObjectOut.close();
+			outStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	protected byte[] transformBody(String classname) {
 		byte[] byteCode = null;
 		classname = classname.replace("/", ".");
-		// debugLogger.write(String.format("[Agent] Transforming class %s\n",
-		// this.targetClassName));
+		// debugLogger.write(String.format("[Agent] Transforming class %s\n", classname));
 
 		if (useCachedClass) {
 			String classcachefolder = "trace/classcache/";
@@ -257,22 +259,33 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 			File poolcache = new File(classcachefolder, "TracePool" + ".ser");
 			File classcache = new File(classcachefolder, classname + ".log");
+			// debugLogger.writeln("PoolCache " + poolcache.exists());
+			// debugLogger.writeln("ClassCache " + classcache.exists());
 			if (!this.simpleLog && poolcache.exists() && classcache.exists()) {
 				// debugLogger.writeln("Cache loaded:" + this.targetClassName);
 				try {
-					if(!TracePool.hsinit()){
+					if(!CallBackIndex.tracepool.hsinit()){
 						FileInputStream fileIn = new FileInputStream(poolcache);
 						ObjectInputStream in = new ObjectInputStream(fileIn);
-						TracePool.setpool((List<Trace>) in.readObject());
-						TracePool.init();
+						CallBackIndex.tracepool = (TracePool) in.readObject();
+						// debugLogger.writeln("Pool loaded:" + classname);
+						// for(int i=0;i<tracepool.indexAt();i++)
+						// 	debugLogger.writeln(tracepool.get(i).toString());
+						CallBackIndex.tracepool.init();
 						in.close();
 						fileIn.close();
 					}
+					foundCache = true;
+					// debugLogger.writeln("Cache loaded:" + classname);
 					return java.nio.file.Files.readAllBytes(classcache.toPath());
 				} catch (IOException e) {
+					// debugLogger.writeln("IOException:" + classname);
+					// debugLogger.writeln(e.toString());
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (ClassNotFoundException c) {
+					// debugLogger.writeln("ClassNotFoundException:" + classname);
+					// debugLogger.writeln(c.toString());
 					c.printStackTrace();
 				}
 			}
@@ -349,13 +362,6 @@ public class TraceTransformer implements ClassFileTransformer {
 			try {
 				String classcachefolder = "trace/classcache/";
 				java.nio.file.Files.write(Paths.get(classcachefolder, classname + ".log"), byteCode);
-
-				// TODO: now this will write many times, change this after using one transformer
-				FileOutputStream outStream = new FileOutputStream(classcachefolder + "TracePool" + ".ser");
-				ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
-				fileObjectOut.writeObject(TracePool.getpool());
-				fileObjectOut.close();
-				outStream.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -424,8 +430,8 @@ public class TraceTransformer implements ClassFileTransformer {
 			CodeIterator ci = ca.iterator();
 			if(useNewTrace){
 				Trace longname = new Trace(cc.getName(), m.getName());
-				int poolindex = TracePool.indexAt();
-				TracePool.add(longname);
+				int poolindex = CallBackIndex.tracepool.indexAt();
+				CallBackIndex.tracepool.add(longname);
 
 				int instpos = ci.insertGap(6);
 				int instindex = constp.addIntegerInfo(poolindex);
@@ -555,8 +561,8 @@ public class TraceTransformer implements ClassFileTransformer {
 			// 	instruction = new SwitchTrace(instruction, _default, _switch);
 			// }
 
-			int poolindex = TracePool.indexAt();
-			TracePool.add(instruction);
+			int poolindex = CallBackIndex.tracepool.indexAt();
+			CallBackIndex.tracepool.add(instruction);
 			tracemap.put(i, poolindex);
 
 			// ExceptionTable eTable =
@@ -686,11 +692,12 @@ public class TraceTransformer implements ClassFileTransformer {
 		try {
 			byte[] byteCode = classfileBuffer;
 			// TODO modify here to transform all classes.
-			String finalTargetClassName = this.targetClassName.replace(".", "/"); // replace . with /
-			if (className == null || !className.equals(finalTargetClassName) || loader == null
-					|| !loader.equals(targetClassLoader)) {
+			if(className == null || !transformedclazz.containsKey(className))
 				return byteCode;
-			}
+			if(loader == null || !loader.equals(transformedclazz.get(className)))
+				return byteCode;
+			transformedclazz.remove(className);
+			
 			byte[] ret = transformBody(className);
 			// debugLogger.write(String.format("\n%s\n", className));
 			// for(byte b: ret)

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
@@ -163,30 +165,63 @@ public class InstrumentationAgent {
 			throw new RuntimeException("Failed to find class [" + classname + "]");
 		}
 
-	}
-
-	private static void transformAll(Instrumentation inst) {
 		String logfilename = "all.log";
 		if (logFile != null) {
 			logfilename = logFile;
 		}
-		AllClassTransformer dt = new AllClassTransformer(logfilename, project);
+		TraceTransformer dt = new TraceTransformer(transformedclazz, logfilename);
+
 		if (d4jdatafile != null) {
 			dt.setD4jDataFile(d4jdatafile);
+		}
+		if (logSourceToScreen) {
+			dt.setLogSourceToScreen(true);
 		}
 		if (simpleLog) {
 			dt.setSimpleLog(true);
 		}
-		inst.addTransformer(dt, true);
+		instrumentation.addTransformer(dt, true);
+		for (Class<?> clazz : clazzset) {
+			try {
+				instrumentation.retransformClasses(clazz);
+			} catch (Exception ex) {
+				throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
+			}
+		}
+		if(dt.useCachedClass && !dt.foundCache){
+			dt.writeTracePool();
+		}
 	}
 
-	static Set<String> transformedclazz = new HashSet<>();
+	private static void transformAll(Instrumentation inst) {
+		// String logfilename = "all.log";
+		// if (logFile != null) {
+		// 	logfilename = logFile;
+		// }
+		// AllClassTransformer dt = new AllClassTransformer(logfilename, project);
+		// if (d4jdatafile != null) {
+		// 	dt.setD4jDataFile(d4jdatafile);
+		// }
+		// if (simpleLog) {
+		// 	dt.setSimpleLog(true);
+		// }
+		// inst.addTransformer(dt, true);
+	}
+
+	// static Set<String> transformedclazz = new HashSet<>();
+	static Map<String, ClassLoader> transformedclazz = new HashMap<>();
+	static Set<Class<?>> clazzset = new HashSet<>();
 
 	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
-		if (transformedclazz.contains(clazz.getName())) {
+		String classname = clazz.getName().replace(".", "/"); // replace . with /
+		if (transformedclazz.containsKey(classname))
 			return;
-		}
-		transformedclazz.add(clazz.getName());
+		transformedclazz.put(classname, classLoader);
+		clazzset.add(clazz);
+		// if (transformedclazz.contains(clazz.getName())) {
+		// return;
+		// }
+		// transformedclazz.add(clazz.getName());
 
 		if (instrumentNested) {
 			// retransform nested classes.
@@ -203,27 +238,6 @@ public class InstrumentationAgent {
 			Class<?> superCl = clazz.getSuperclass();
 			if (superCl != null)
 				transform(superCl, classLoader, instrumentation);
-		}
-		String logfilename = "all.log";
-		if (logFile != null) {
-			logfilename = logFile;
-		}
-		TraceTransformer dt = new TraceTransformer(clazz.getName(), classLoader, logfilename);
-
-		if (d4jdatafile != null) {
-			dt.setD4jDataFile(d4jdatafile);
-		}
-		if (logSourceToScreen) {
-			dt.setLogSourceToScreen(true);
-		}
-		if (simpleLog) {
-			dt.setSimpleLog(true);
-		}
-		instrumentation.addTransformer(dt, true);
-		try {
-			instrumentation.retransformClasses(clazz);
-		} catch (Exception ex) {
-			throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
 		}
 	}
 
