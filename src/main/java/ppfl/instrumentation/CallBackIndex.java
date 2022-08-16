@@ -381,7 +381,11 @@ public class CallBackIndex {
 		if (logcount > loglimit) {
 			System.exit(0);
 		}
-		DynamicTrace inst = new DynamicTrace(tracepool.get(poolindex));
+		DynamicTrace inst;
+		if(TraceTransformer.useIndexTrace)
+		 	inst = new DynamicTrace(poolindex);
+		else
+			inst = new DynamicTrace(tracepool.get(poolindex));
 		tracewriter.add(inst);
 
 		// String s = TracePool.get(poolindex).toString();
@@ -399,7 +403,11 @@ public class CallBackIndex {
 		if (logcount > loglimit) {
 			System.exit(0);
 		}
-		DynamicTrace inst = new DynamicTrace(tracepool.get(poolindex));
+		DynamicTrace inst;
+		if(TraceTransformer.useIndexTrace)
+		 	inst = new DynamicTrace(poolindex);
+		else
+			inst = new DynamicTrace(tracepool.get(poolindex));
 		inst.setRetInfo();
 		tracewriter.add(inst);
 

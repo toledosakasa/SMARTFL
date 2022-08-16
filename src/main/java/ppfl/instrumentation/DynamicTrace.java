@@ -3,6 +3,7 @@ package ppfl.instrumentation;
 import java.io.Serializable;
 
 public class DynamicTrace implements Serializable {
+    public int traceindex;
     public Trace trace;
     public String stackType;
     public long stackValue;
@@ -11,6 +12,13 @@ public class DynamicTrace implements Serializable {
 
     public DynamicTrace(Trace trace){
         this.trace = trace;
+        this.stackType = null;
+        this.isret = false;
+    }
+
+    public DynamicTrace(int traceindex){
+        this.traceindex = traceindex;
+        this.trace = null;
         this.stackType = null;
         this.isret = false;
     }

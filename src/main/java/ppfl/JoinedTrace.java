@@ -14,6 +14,7 @@ import java.util.Set;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
+import ppfl.instrumentation.TracePool;
 import ppfl.instrumentation.TraceDomain;
 import ppfl.instrumentation.DynamicTrace;
 import ppfl.instrumentation.TraceSequence;
@@ -121,12 +122,34 @@ public class JoinedTrace {
     File folder = new File(path);
     File[] fs = folder.listFiles();
     if (TraceTransformer.useNewTrace) {
+
+      String poolname = path.replaceAll("logs/run/(.*)", "classcache/TracePool.ser");
+      TracePool tracepool = null;
+      if(TraceTransformer.useIndexTrace){
+        try{
+            FileInputStream fileIn = new FileInputStream(poolname);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            tracepool = (TracePool) in.readObject();
+            in.close();
+            fileIn.close();
+        }
+        catch(IOException i)
+        {
+            i.printStackTrace();
+            return;
+        }catch(ClassNotFoundException c)
+        {
+            System.out.println("TracePool class not found");
+            c.printStackTrace();
+            return;
+        }
+      }
       for (File f : fs) {
         if (f.getName().equals("all.log"))
           continue;
         String suffix = ".log.ser";
         if (f.getName().endsWith(suffix))
-          parseInfo(f, f.getName());
+          parseInfo(f, f.getName(), tracepool);
       }
     } else {
       for (File f : fs) {
@@ -139,7 +162,7 @@ public class JoinedTrace {
     }
   }
 
-  private void parseInfo(File f, String name) {
+  private void parseInfo(File f, String name, TracePool tracepool) {
     // System.out.printf("dddd "+name+"\n");
     String suffix = ".log.ser";
 
@@ -158,6 +181,7 @@ public class JoinedTrace {
       FileInputStream fileIn = new FileInputStream(f.getAbsolutePath());
       ObjectInputStream in = new ObjectInputStream(fileIn);
       traceseq = (TraceSequence) in.readObject();
+      traceseq.setTracePool(tracepool);
       // System.out.printf("yyyy "+traceseq.get(0).trace.classname +"\n");
       in.close();
       fileIn.close();

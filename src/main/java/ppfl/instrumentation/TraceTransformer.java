@@ -52,9 +52,12 @@ import ppfl.instrumentation.opcode.TableSwitchInst;
 
 public class TraceTransformer implements ClassFileTransformer {
 
+	// TODO: now the ser log is based on TracePool cache, try to find a better way
 	public boolean useCachedClass = true; // has to be true, otherwise writeWhatIsTraced is wrong
 	public boolean foundCache = false;
 	public static boolean useNewTrace = true;
+	public static boolean useIndexTrace = true;
+
 
 	private static MyWriter debugLogger = null;
 	// LoggerFactory.getLogger(TraceTransformer.class);
