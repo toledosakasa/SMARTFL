@@ -468,6 +468,36 @@ def traceproj(proj:str,id: str, doBuild = True):
     else:
         rund4j(proj,id)
 
+def rund4jtest(proj: str, id: str, test: str):
+    TestCalss = test.split('#')[0]
+    TestMethod = test.split('#')[1]
+    TestName = TestCalss + "::" + TestMethod
+    os.system('mvn package -DskipTests')
+    debug = True
+    cleanupcheckout(proj,id)
+    banlist = ['','Lang2','Time21']
+    if((proj+id).strip() in banlist):
+        return
+    time_start = time.time()
+    checkout(proj, id)
+    cmdlines = getd4jcmdline(proj, id, debug)
+    cmdline = ''
+    for line in cmdlines:
+        if TestName in line:
+            cmdline = line
+            break
+
+    checkoutdir = f'{checkoutbase}/{proj}/{id}'
+    # cleanup previous log
+    previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
+    if os.path.exists(previouslog):
+        # print('removing previous trace logs.')
+        os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
+    os.system(f'cd {checkoutdir} && {cmdline}')
+    time_end = time.time()
+    if debug:
+        print('d4j tracing complete after', time_end-time_start, 'sec')
+
 def testproj(proj: str):
     time_start = time.time()
     os.system('mvn package -DskipTests')
