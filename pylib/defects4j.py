@@ -13,6 +13,9 @@ alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "C
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 project_bug_nums = {"Lang": 65, "Math": 106,
                     "Time": 27, "Closure": 176, "Chart": 26}
+# Lang changes name from org.apache.commons.lang3 to org.apache.commons.lang after 40
+classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript'}
+
 use_simple_filter = False
 
 
@@ -260,6 +263,48 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
 
 def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     metadata = getmetainfo(proj, id, debug)
+    if not 'corrected' in metadata:
+        # correct the metainfo about classes_relevant. some loaded src classes not in metainfo.
+        # now loaded test classes also added
+        relevant_set = set()
+        checkoutdir = f'{checkoutbase}/{proj}/{id}'
+        cdcmd = f'cd {checkoutdir} && '
+        trigger_tests = metadata['tests.trigger'].strip().split(';')
+        for trigger_test in trigger_tests:
+            loadedcmd = f'defects4j test -t {trigger_test} -a "-Djvmargs=-noverify -Djvmargs=-verbose:class" >> loaded.log'
+            os.system(cdcmd + loadedcmd)
+            pattern = '[Loaded '+classprefix[proj]
+            lines = utf8open(f'{checkoutdir}/loaded.log').readlines()
+            for line in lines:
+                index = line.find(pattern)
+                if index >= 0:
+                    index_s = line.find(' ', index) + 1
+                    index_e = line.find(' ', index_s)
+                    classname = line[index_s:index_e]
+                    if classname.find('$') == -1:
+                        relevant_set.add(classname)
+                    else:
+                        relevant_set.add(classname.split('$')[0])
+        classes_relevant = ';'.join(relevant_set)
+        metadata['classes.relevant'] = classes_relevant
+
+        cachepath = os.path.abspath(
+            f'./d4j_resources/metadata_cached/{proj}/{id}.log')
+
+        # change the content of cachefile
+        tmpfile = []
+        lines = utf8open(cachepath).readlines()
+        for line in lines:
+            line = line.strip()
+            splits = line.split('=')
+            if splits[0] == 'classes.relevant':
+                splits[1] = classes_relevant
+            tmpfile.append((splits[0],splits[1]))
+        cachefile = utf8open_w(cachepath)
+        for (k, v) in tmpfile:
+            cachefile.write(f'{k}={v}\n')
+        cachefile.write(f'corrected=true\n')
+
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     classes_relevant = metadata['classes.relevant'].strip()
