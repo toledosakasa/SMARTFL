@@ -13,6 +13,9 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 
+
+import ppfl.MyWriter;
+import ppfl.WriterUtils;
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,7 @@ public class InstrumentationAgent {
 	private static boolean simpleLog = false;
 	private static String project = null;
 	private static boolean instrumentNested = false; // evaluation switch
+	private static MyWriter debugLogger;
 
 	private InstrumentationAgent() {
 		throw new IllegalStateException("Agent class");
@@ -42,6 +46,8 @@ public class InstrumentationAgent {
 	}
 
 	private static synchronized void main(String agentArgs, Instrumentation inst) {
+		WriterUtils.setPath("trace/debug/");
+		debugLogger = WriterUtils.getWriter("Agent.log", true);
 		if (agentArgs == null || agentArgs.equals(""))
 			return;
 		// debugLogger.info("[Agent] In main method");
@@ -170,6 +176,8 @@ public class InstrumentationAgent {
 			logfilename = logFile;
 		}
 		TraceTransformer dt = new TraceTransformer(transformedclazz, logfilename);
+		// for(String clazz : transformedclazz.keySet())
+		// 	debugLogger.writeln("clazz: "+clazz);
 
 		if (d4jdatafile != null) {
 			dt.setD4jDataFile(d4jdatafile);

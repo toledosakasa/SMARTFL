@@ -31,7 +31,13 @@ public class TraceSequence implements Serializable {
         DynamicTrace ret = tracelist.get(index);
         if(!TraceTransformer.useIndexTrace)
             return ret;
-        ret.trace = tracepool.get(ret.traceindex);
+        try {
+            ret.trace = tracepool.get(ret.traceindex);
+        } catch (Exception e) {
+            if(ret == null)
+                System.out.println("null");
+            System.out.println("index = " + index);
+        }
         return ret;
     }
 

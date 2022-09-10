@@ -388,6 +388,16 @@ public class CallBackIndex {
 			inst = new DynamicTrace(tracepool.get(poolindex));
 		tracewriter.add(inst);
 
+		// try {
+		// 	writer.write(inst.toString());
+		// 	writer.flush();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// }
+
+		// if(logcount > 160075 &&  tracewriter.get(160070) == null)
+		// 	System.exit(0);
+
 		// String s = TracePool.get(poolindex).toString();
 		// try {
 		// 	writer.write(String.format("%d\n", poolindex));
