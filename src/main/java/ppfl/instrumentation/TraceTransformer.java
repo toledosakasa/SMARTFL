@@ -162,12 +162,13 @@ public class TraceTransformer implements ClassFileTransformer {
 		this.logSourceToScreen = b;
 	}
 
-	private static void setSimpleLogFile() {
+	private void setSimpleLogFile() {
 		FileWriter file = null;
 		try {
-			File logdir = new File("trace/logs/mytrace/");
+			File logdir = new File("trace/logs/profile/");
 			logdir.mkdirs();
-			file = new FileWriter("trace/logs/mytrace/profile.log", true);
+			//TODO maybe change into multi files
+			file = new FileWriter("trace/logs/profile/profile.log", true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -454,6 +455,7 @@ public class TraceTransformer implements ClassFileTransformer {
 				ci.write16bit(cbi.logstringindex, instpos + 4);
 			}
 		}
+		// instrument the bytecodes for method-level profiling
 		if (this.simpleLog) {
 			ProfileUtils.init(constp, traceWriter);
 			CodeIterator ci = ca.iterator();

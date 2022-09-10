@@ -217,6 +217,16 @@ def parse_trigger_tests(trigger_tests):
             trigger_tests_map[classname] = [methodname]
     return trigger_tests_set, trigger_tests_map
 
+def joinprofile(profiledir):
+    profile = utf8open_a(profiledir + 'profile')
+    errortest = set()
+    for root, dirs, files in os.walk(profiledir):
+        for name in files:
+            if(re.match(r".*\.log",name)):
+                logfile = utf8open(join(root, name))
+                for line in logfile.readlines():
+                    profile.write(line)
+
 
 def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
     jarpath = os.path.abspath(
@@ -238,7 +248,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
         tmpstr = utf8open(profile_result).read()
         return json.loads(tmpstr)
 
-    profile = checkoutdir + '/trace/logs/mytrace/profile.log'
+    profile = checkoutdir + '/trace/logs/profile/profile.log'
     if debug:
         print('not found')
         print('checking profile...', end='')
@@ -246,9 +256,24 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
         if debug:
             print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
+        # cmdlines = []
+        # testmethods_set = parse_test_methods(testmethods)
+        # for (testclass, testmethod) in testmethods_set:
+        #         cmdline = f"defects4j test -t {testclass}::{testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile},logfile={testclass}.{testmethod}.log,project={proj}\"" 
+        #         cmdline += f"> /dev/null 2>&1"
+        #         cmdlines.append(cdcmd +cmdline)
+        # processesnum = 16
+        # with Pool(processes=processesnum) as pool:
+        #     pool.map(os.system, cmdlines)
+        #     pool.close()
+        #     pool.join()
+
+
+        # here the command is single-thread? change it to multi-thread 
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile},project={proj}\""
         simplelogcmd += f' > {projectbase}/trace/runtimelog/{proj}{id}.profile.log 2>&1'
         os.system(cdcmd + simplelogcmd)
+        # joinprofile(checkoutdir + '/trace/logs/profile/')
     else:
         if debug:
             print('found')
@@ -366,6 +391,7 @@ def deletecheckout(proj: str, id: str):
 def cleanupcheckout(proj: str, id: str):
     checkoutpath = f'{checkoutbase}/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
+        os.system(f'rm -rf {checkoutpath}/trace/logs/profile/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/run/')
         os.system(f'rm -rf {checkoutpath}/trace/classcache/')

@@ -47,6 +47,8 @@ class CountMap:
             for classname in self.relevant_cnt:
                 for methodname in self.relevant_cnt[classname]:
                     collected.append((classname, methodname))
+            # filter 0
+            collected = filter(lambda x: self.relevant_cnt[x[0]][x[1]] > 0, collected)
             sort_collected = sorted(
                 collected, key=lambda x: self.relevant_cnt[x[0]][x[1]], reverse=True)
             ret = (ret + sort_collected)[:max_method_count]
