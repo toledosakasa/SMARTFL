@@ -997,6 +997,12 @@ def extractproj(proj: str):
     for i in range(1, allbugs+1):
         result = extract(proj, str(i))
 
-def decoder():
-    cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder"'
+def decoder(incheckout = False, trace = None):
+    if trace: 
+        if incheckout:
+            cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder" "-Dexec.args={trace} incheckout"'
+        else:
+            cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder" "-Dexec.args={trace}"'
+    else:
+        cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder"'
     os.system(cmdline)

@@ -242,5 +242,10 @@ if __name__ == '__main__':
     if args[1] == 'resetp':
         resetp()
     if args[1] == 'decoder':
-        d4j.decoder()
+        if(len(args) == 4):
+            d4j.decoder(True, args[2])
+        elif(len(args) == 3):
+            d4j.decoder(False, args[2])
+        else:
+            d4j.decoder(False)
     

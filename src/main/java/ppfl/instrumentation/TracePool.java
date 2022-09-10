@@ -38,6 +38,10 @@ public class TracePool implements Serializable{
         init = true;
     }
 
+    public int size(){
+        return pool.size();
+    }
+
     // private static Map<String> classPool = new HashMap<>();
     // private static Map<String> methodPool = new HashMap<>();
     // private static Map<String> sigPool = new HashMap<>();
