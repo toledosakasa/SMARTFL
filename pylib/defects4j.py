@@ -873,6 +873,7 @@ def gentrigger(proj: str):
 
 
 def match(proj: str, id: str):
+    newTrace = True
     oraclepath = f'./oracle/ActualFaultStatement/{proj}/{id}'
     try:
         oraclefile = utf8open(oraclepath)
@@ -893,12 +894,22 @@ def match(proj: str, id: str):
         return -2
     for testlog in triggertests:
         testlog = testlog.replace('::', '.')
-        logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
-        try:
-            logfile = utf8open(logpath)
-        except IOError:
-            print(f'{proj}{id} misses log of triggertest    {testlog}')
-            return -3
+        if newTrace:
+            logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log.ser'
+            if not os.path.exists(logpath):
+                print(f'{proj}{id} misses log of triggertest   {testlog}')
+                return -3
+            os.system(f"python3 s.py decoder {logpath} True >/dev/null 2>&1")
+            traecpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
+            logfile = utf8open(traecpath)
+            
+        else:
+            logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
+            try:
+                logfile = utf8open(logpath)
+            except IOError:
+                print(f'{proj}{id} misses log of triggertest    {testlog}')
+                return -3
         for line in logfile.readlines():
             sp = line.split(',')
             for instinfo in sp:
