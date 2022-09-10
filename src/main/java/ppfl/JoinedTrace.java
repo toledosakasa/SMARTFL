@@ -145,7 +145,7 @@ public class JoinedTrace {
         }
       }
       for (File f : fs) {
-        if (f.getName().equals("all.log"))
+        if (f.getName().equals("all.log.ser"))
           continue;
         String suffix = ".log.ser";
         if (f.getName().endsWith(suffix))
