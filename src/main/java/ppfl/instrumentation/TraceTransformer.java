@@ -421,6 +421,9 @@ public class TraceTransformer implements ClassFileTransformer {
 		// MethodInfo mi = m.getMethodInfo();
 		MethodInfo mi = m;
 		CodeAttribute ca = mi.getCodeAttribute();
+		// for abstract method, the ca is null
+		if(ca == null)
+			return;
 
 		// add constants to constpool.
 		// index will be used during instrumentation.
