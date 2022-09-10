@@ -125,17 +125,18 @@ public class CallBackIndex {
 
 		logtraceindex = constp.addMethodrefInfo(classindex, "logTrace", "(I)V");
 		rettraceindex = constp.addMethodrefInfo(classindex, "retTrace", "(I)V");
-		traceindex_int = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(I)I");
-		traceindex_long = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(J)J");
-		traceindex_double = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(D)D");
-		traceindex_short = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(S)S");
-		traceindex_byte = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(B)B");
-		traceindex_char = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(C)C");
-		traceindex_boolean = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Z)Z");
-		traceindex_float = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(F)F");
-		traceindex_string = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/String;)Ljava/lang/String;");
-		traceindex_object = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/Object;)Ljava/lang/Object;");
-		
+		// traceindex_int = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(I)I");
+		// traceindex_long = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(J)J");
+		// traceindex_double = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(D)D");
+		// traceindex_short = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(S)S");
+		// traceindex_byte = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(B)B");
+		// traceindex_char = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(C)C");
+		// traceindex_boolean = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Z)Z");
+		// traceindex_float = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(F)F");
+		// traceindex_string = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/String;)Ljava/lang/String;");
+		// traceindex_object = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/Object;)Ljava/lang/Object;");
+		traceindex_object = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/Object;)V");
+
 		logstringindex = constp.addMethodrefInfo(classindex, "logString", "(Ljava/lang/String;)V");
 		tsindex_int = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(I)I");
 		tsindex_long = constp.addMethodrefInfo(classindex, PRINT_CALLBACK_NAME, "(J)J");
@@ -345,12 +346,12 @@ public class CallBackIndex {
 	}
 
 
-	public static Object traceTopStack1(Object i) {
+	public static void traceTopStack1(Object i) {
 		// call system hashcode (jvm address)
 		String stackType = "Obj";
 		int value = java.lang.System.identityHashCode(i);
 		tracewriter.top().addDynamicInfo(stackType, value);
-		return i;
+		return;
 	}
 
 	public static void logString(String s) {

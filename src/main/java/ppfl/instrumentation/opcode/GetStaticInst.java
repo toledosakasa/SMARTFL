@@ -86,9 +86,10 @@ public class GetStaticInst extends OpcodeInst {
 		int callback = dispatchByDesc(desc, cbi);
 		// FIXME: now disable other type 
 		if(callback == cbi.traceindex_object){
-			int instpos = ci.insertExGap(3);
-			ci.writeByte(184, instpos);// invokestatic
-			ci.write16bit(callback, instpos + 1);
+			int instpos = ci.insertExGap(4);// the gap must be long enough for the following instrumentation
+			ci.writeByte(89, instpos);// dup
+			ci.writeByte(184, instpos + 1);// invokestatic
+			ci.write16bit(callback, instpos + 2);
 		}
 	}
 }

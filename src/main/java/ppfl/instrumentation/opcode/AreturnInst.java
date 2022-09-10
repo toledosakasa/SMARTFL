@@ -49,14 +49,15 @@ public class AreturnInst extends OpcodeInst {
 	@Override
 	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
 			throws BadBytecode {
-		int instpos = ci.insertGap(9);
+		int instpos = ci.insertGap(10);
 		int instindex = constp.addIntegerInfo(poolindex);
 		ci.writeByte(19, instpos);// ldc_w
 		ci.write16bit(instindex, instpos + 1);
 		ci.writeByte(184, instpos + 3);// invokestatic
 		ci.write16bit(cbi.logtraceindex, instpos + 4);
-		ci.writeByte(184, instpos + 6);// invokestatic
-		ci.write16bit(cbi.traceindex_object, instpos + 7);
+		ci.writeByte(89, instpos + 6);// dup
+		ci.writeByte(184, instpos + 7);// invokestatic
+		ci.write16bit(cbi.traceindex_object, instpos + 8);
 	}
 
 	@Override

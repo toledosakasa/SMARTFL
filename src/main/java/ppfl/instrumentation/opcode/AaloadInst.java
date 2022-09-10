@@ -27,9 +27,10 @@ public class AaloadInst extends XaloadInst {
 
 	@Override
 	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
-		int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
-		ci.writeByte(184, instpos);// invokestatic
-		ci.write16bit(cbi.traceindex_object, instpos + 1);
+		int instpos = ci.insertExGap(4);// the gap must be long enough for the following instrumentation
+		ci.writeByte(89, instpos);// dup
+		ci.writeByte(184, instpos + 1);// invokestatic
+		ci.write16bit(cbi.traceindex_object, instpos + 2);
 	}
 
 }
