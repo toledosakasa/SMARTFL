@@ -21,6 +21,7 @@ public class CallBackIndex {
 	private static final int BUFFERSIZE = 1024;
 	// use the logger set by TraceTransformer
 	public int logtraceindex;
+	public int logcompressindex;
 	public int rettraceindex;
 	public int traceindex_int;
 	public int traceindex_short;
@@ -57,6 +58,30 @@ public class CallBackIndex {
 
 	public static TraceSequence tracewriter = null;
 	public static TracePool tracepool = null;
+	public static List<BackEdge> loopset = null;
+	// public static StaticAnalyzer staticAnalyzer = null;
+	public static List<LoopCompress> compressInfos = null;
+
+	public static class LoopCompress{
+		public int compressFirst;
+		public int compressLast;
+		int loopFirst;
+		int loopLast;
+		LoopCompress(){
+			compressFirst = -1;
+			compressLast = -1;
+			loopFirst = -1;
+			loopLast = -1;
+		}
+	}
+
+	public static void initCompressInfos(){
+		int size = loopset.size();
+		compressInfos = new ArrayList<>();
+		for(int i = 0; i < size; i++){
+			compressInfos.add(new LoopCompress()); 
+		}
+	}
 
 	public int getLdcCallBack(Object o) {
 		// decide v's type using instanceof
@@ -124,6 +149,7 @@ public class CallBackIndex {
 		int classindex = constp.addClassInfo(thisKlass);
 
 		logtraceindex = constp.addMethodrefInfo(classindex, "logTrace", "(I)V");
+		logcompressindex = constp.addMethodrefInfo(classindex, "logCompress", "(I)V");
 		rettraceindex = constp.addMethodrefInfo(classindex, "retTrace", "(I)V");
 		// traceindex_int = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(I)I");
 		// traceindex_long = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(J)J");
@@ -379,7 +405,12 @@ public class CallBackIndex {
 		// 	e.printStackTrace();
 		// }
 		logcount++;
-		if (logcount > loglimit) {
+		// if(logcount%10000 == 0)
+		// 	System.out.println(logcount);
+		// if (logcount > loglimit) {
+		// 	System.exit(0);
+		// }
+		if (tracewriter.size() > loglimit) {
 			System.exit(0);
 		}
 		DynamicTrace inst;
@@ -388,6 +419,22 @@ public class CallBackIndex {
 		else
 			inst = new DynamicTrace(tracepool.get(poolindex));
 		tracewriter.add(inst);
+
+		// if(logcount%100000 == 0){
+		// 	try {
+		// 		writer.write(String.format("logcount = %d, trace size %d\n", logcount, tracewriter.size()));
+		// 		writer.flush();
+		// 	} catch (Exception e) {
+	
+		// 	}
+		// }
+		// if(logcount%100000 == 0){
+		// 	try {
+		// 		writer.write(String.format("logcount = %d, trace at %d, tracesize = %d\n", logcount , tracewriter.size()));
+		// 		writer.flush();
+		// 	} catch (Exception f) {
+		// 	}
+		// }
 
 		// try {
 		// 	writer.write(inst.toString());
@@ -409,9 +456,78 @@ public class CallBackIndex {
 
 	}
 
+	public static void logCompress(int poolindex) {
+		logcount++;
+		if (tracewriter.size() > loglimit) {
+			System.exit(0);
+		}
+		DynamicTrace inst;
+		if(TraceTransformer.useIndexTrace)
+		 	inst = new DynamicTrace(poolindex);
+		else
+			inst = new DynamicTrace(tracepool.get(poolindex));
+		// loop_compress
+		if(TraceTransformer.useIndexTrace){
+			int loopID = 0;
+			for(BackEdge loopedge: loopset){
+				int lastindex = -1;
+				if(tracewriter.size() > 0)
+					lastindex = tracewriter.top().traceindex;
+				int lasttraceindex = tracewriter.size() - 1;
+				int thistraceindex = tracewriter.size();
+				if(loopedge.start == lastindex && loopedge.end == poolindex){
+					LoopCompress compressInfo = compressInfos.get(loopID);
+					if (compressInfo.compressFirst == -1) // now start the compress
+						compressInfo.compressFirst = thistraceindex;
+					else{
+						if(compressInfo.compressLast == -1){ // the first compress ends
+							compressInfo.compressLast = lasttraceindex;
+						}
+						else{ // already exits first loop
+							compressInfo.loopLast = lasttraceindex; // determine the end of this loop (the start is determined in last round)
+							boolean canPress = true;
+							int compressSize = compressInfo.compressLast - compressInfo.compressFirst;
+							if (compressInfo.loopLast - compressInfo.loopFirst != compressSize) {
+								canPress = false;
+							} 
+							else {
+								for (int j = 0; j <= compressSize; j++) {
+									int index1 = tracewriter.getRaw(j + compressInfo.compressFirst).traceindex;
+									int index2 = tracewriter.getRaw(j + compressInfo.loopFirst).traceindex;
+									if(index1 != index2){
+										canPress = false;
+										break;
+									}
+								}
+							}
+							if(canPress){
+								for(int i = compressInfo.loopLast; i >= compressInfo.loopFirst; i--)
+								{
+									tracewriter.remove(i);
+								}
+								thistraceindex = tracewriter.size();
+							}					
+							else{
+								compressInfo.compressFirst = thistraceindex;
+								compressInfo.compressLast = -1;
+							}
+						}
+					}
+					compressInfo.loopFirst = thistraceindex;
+				}
+				loopID++;
+			}
+		}
+		tracewriter.add(inst);
+	}
+
+
 	public static void retTrace(int poolindex) {
 		logcount++;
-		if (logcount > loglimit) {
+		// if (logcount > loglimit) {
+		// 	System.exit(0);
+		// }
+		if (tracewriter.size() > loglimit) {
 			System.exit(0);
 		}
 		DynamicTrace inst;

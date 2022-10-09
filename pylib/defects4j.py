@@ -366,11 +366,14 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     #     ret.append(app)
     for testclass_rel in reltest_dict:
         for testmethod_rel in reltest_dict[testclass_rel]:
-            app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log,project={proj}\""
+            app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log,project={proj},cache=GotAll\""
             app += '>/dev/null 2>&1'
             ret.append(app)
     return ret
 
+
+def changeCacheInCmd(cmd: str, arg):
+    return cmd.replace(',cache=GotAll', arg)
 
 def checkout(proj: str, id: str):
     checkoutpath = f'{checkoutbase}/{proj}/{id}'
@@ -403,7 +406,7 @@ def clearcache(proj: str, id: str):
     os.system('rm '+cachepath)
 
 
-@func_set_timeout(1200)
+# @func_set_timeout(1200)
 def rund4j(proj: str, id: str, debug=True):
     cleanupcheckout(proj,id)
     banlist = ['','Lang2','Time21']
@@ -420,10 +423,12 @@ def rund4j(proj: str, id: str, debug=True):
         os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
     cdcmd = f'cd {checkoutdir} && '
     cmdlines = [cdcmd + cmdline for cmdline in cmdlines]
-    with Pool(processes=1) as pool:
-        pool.map(os.system, cmdlines[0:1])
-        pool.close()
-        pool.join()
+    os.system(changeCacheInCmd(cmdlines[0], ',cache=GenPool'))
+    os.system(changeCacheInCmd(cmdlines[0], ',cache=GenClass'))
+    # with Pool(processes=1) as pool:
+    #     pool.map(os.system, cmdlines[0:1])
+    #     pool.close()
+    #     pool.join()
     # os.system(cmdlines[0])
     processesnum = 16
     if proj == 'Time':
@@ -467,7 +472,8 @@ def parseproj(proj: str, debug=True):
     #     1, project_bug_nums[proj]+1)]
     cmdlines = []
     banlist = []
-    banlist = ['Lang2', 'Lang8' ,'Time21','Math7','Math10','Math13','Math14','Math15','Math16','Math17','Math39','Math44','Math54','Math59','Math64','Math65','Math68','Math71','Math74','Math78','Math100','Time25', 'Chart15']
+    banlist = ['Lang2', 'Time25']
+    #banlist = ['Lang2', 'Lang8' ,'Time21','Math7','Math10','Math13','Math14','Math15','Math16','Math17','Math39','Math44','Math54','Math59','Math64','Math65','Math68','Math71','Math74','Math78','Math100','Time25', 'Chart15']
     if proj == 'MathandTime':
         proj = 'Math'
         for id in range(1, project_bug_nums[proj]+1):
@@ -557,14 +563,15 @@ def rund4jtest(proj: str, id: str, test: str):
         if TestName in line:
             cmdline = line
             break
-
     checkoutdir = f'{checkoutbase}/{proj}/{id}'
+    cmdline = f'cd {checkoutdir} && {cmdline}'
     # cleanup previous log
     previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
     if os.path.exists(previouslog):
         # print('removing previous trace logs.')
         os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
-    os.system(f'cd {checkoutdir} && {cmdline}')
+    os.system(changeCacheInCmd(cmdline, ',cache=GenPool'))
+    os.system(changeCacheInCmd(cmdline, ',cache=GenClass'))
     time_end = time.time()
     if debug:
         print('d4j tracing complete after', time_end-time_start, 'sec')

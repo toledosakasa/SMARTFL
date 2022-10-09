@@ -25,8 +25,8 @@ public class SwitchTrace extends Trace{
     // }
 
     @Override
-    public String getdefault(){
-        return _default.toString();
+    public Integer getdefault(){
+        return _default;
     }
 
     @Override

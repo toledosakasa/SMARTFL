@@ -26,11 +26,15 @@ public class InstrumentationAgent {
 	private static String[] className = null;
 	private static List<String> classNames = null;
 	private static String d4jdatafile = null;
-	private static boolean logSourceToScreen = false;
 	private static boolean simpleLog = false;
 	private static String project = null;
 	private static boolean instrumentNested = false; // evaluation switch
 	private static MyWriter debugLogger;
+
+	public enum CacheCond{
+    	GenPool, GenClass, GotAll
+    }
+	private static CacheCond cacheCond = CacheCond.GotAll;
 
 	private InstrumentationAgent() {
 		throw new IllegalStateException("Agent class");
@@ -71,14 +75,20 @@ public class InstrumentationAgent {
 			if (s.startsWith("d4jdatafile=")) {
 				d4jdatafile = s.split("=")[1];
 			}
-			if (s.startsWith("screenlog=")) {
-				logSourceToScreen = Boolean.parseBoolean(s.split("=")[1]);
-			}
 			if (s.startsWith("simplelog=")) {
 				simpleLog = Boolean.parseBoolean(s.split("=")[1]);
 			}
 			if (s.startsWith("project=")) {
 				project = s.split("=")[1];
+			}
+			if (s.startsWith("cache=")) {
+				String cacheArg = s.split("=")[1];
+				if(cacheArg.equals("GenPool"))
+					cacheCond = CacheCond.GenPool;
+				else if (cacheArg.equals("GenClass"))
+					cacheCond = CacheCond.GenClass;
+				else if (cacheArg.equals("GotAll"))
+					cacheCond = CacheCond.GotAll;
 			}
 		}
 		if (logFile == null && className == null && classNames == null && d4jdatafile == null)
@@ -175,29 +185,87 @@ public class InstrumentationAgent {
 		if (logFile != null) {
 			logfilename = logFile;
 		}
-		TraceTransformer dt = new TraceTransformer(transformedclazz, logfilename);
-		// for(String clazz : transformedclazz.keySet())
-		// 	debugLogger.writeln("clazz: "+clazz);
-
-		if (d4jdatafile != null) {
-			dt.setD4jDataFile(d4jdatafile);
-		}
-		if (logSourceToScreen) {
-			dt.setLogSourceToScreen(true);
-		}
-		if (simpleLog) {
-			dt.setSimpleLog(true);
-		}
-		instrumentation.addTransformer(dt, true);
-		for (Class<?> clazz : clazzset) {
-			try {
-				instrumentation.retransformClasses(clazz);
-			} catch (Exception ex) {
-				throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
+		if(simpleLog){
+			SimpleTransformer dt = new SimpleTransformer(transformedclazz, logfilename);
+			// d4jdatafile only used in simpleLog, and should got d4jdatafile here
+			if (d4jdatafile != null) {
+				dt.setD4jDataFile(d4jdatafile);
 			}
+			instrumentation.addTransformer(dt, true);
+			for (Class<?> clazz : clazzset) {
+				try {
+					instrumentation.retransformClasses(clazz);
+				} catch (Exception ex) {
+					throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
+				}
+			}
+			return;
 		}
-		if(dt.useCachedClass && !dt.foundCache){
-			dt.writeTracePool();
+		boolean usenewTransformer = true;
+		if(usenewTransformer){
+			Transformer dt;
+			if(cacheCond == CacheCond.GenPool)
+				dt = new GenPoolTransformer(transformedclazz, logfilename);
+			else if (cacheCond == CacheCond.GenClass)
+				dt = new GenClassTransformer(transformedclazz, logfilename);
+			else
+				dt = new GotAllTransformer(transformedclazz, logfilename);
+
+			instrumentation.addTransformer(dt, true);
+			long startTime = System.currentTimeMillis();
+			for (Class<?> clazz : clazzset) {
+				try {
+					instrumentation.retransformClasses(clazz);
+				} catch (Exception ex) {
+					throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
+				}
+			}
+			long endTime = System.currentTimeMillis();
+			double time = (endTime - startTime) / 1000.0;
+			debugLogger.write(String.format("[Agent] Transform time %f\n", time));
+			// the first test has no cache now, need to write
+			if(cacheCond == CacheCond.GenPool){
+				dt.output();
+				System.exit(0); // this time, don't run the test
+			}
+			if(cacheCond == CacheCond.GenClass || cacheCond == CacheCond.GotAll)
+				dt.addhook();
+		}
+		else{
+			// TODO: 这种情况下，或许可以考虑一个优化是GenPool和GenClass在同一次启动时处理，
+			// TODO: 第一次GenPool之后把对应的Transformer关掉，然后再加上GenClass的Transformer来处理，可能可以节省加载类的耗时
+			TraceTransformer dt = new TraceTransformer(transformedclazz, logfilename, cacheCond);
+			// for(String clazz : transformedclazz.keySet())
+			// 	debugLogger.writeln("clazz: "+clazz);
+
+			// if (d4jdatafile != null) {
+			// 	dt.setD4jDataFile(d4jdatafile);
+			// }
+			// if (logSourceToScreen) {
+			// 	dt.setLogSourceToScreen(true);
+			// }
+			// if (simpleLog) {
+			// 	dt.setSimpleLog(true);
+			// }
+			instrumentation.addTransformer(dt, true);
+			long startTime = System.currentTimeMillis();
+			for (Class<?> clazz : clazzset) {
+				try {
+					instrumentation.retransformClasses(clazz);
+				} catch (Exception ex) {
+					throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
+				}
+			}
+			long endTime = System.currentTimeMillis();
+			double time = (endTime - startTime) / 1000.0;
+			debugLogger.write(String.format("[Agent] Transform time %f\n", time));
+			// the first test has no cache now, need to write
+			if(dt.cacheCond == CacheCond.GenPool){
+				dt.writeTracePool();
+				dt.staticAnalysis();
+				dt.writeStaticAnalyzer();
+				System.exit(0); // this time, don't run the test
+			}
 		}
 	}
 

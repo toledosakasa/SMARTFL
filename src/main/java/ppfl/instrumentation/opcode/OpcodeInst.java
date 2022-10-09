@@ -357,6 +357,18 @@ public class OpcodeInst {
 		
 	}
 
+	public void insertBeforeCompress(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+	throws BadBytecode {
+
+	int instpos = ci.insertGap(6);
+	int instindex = constp.addIntegerInfo(poolindex);
+	ci.writeByte(19, instpos);// ldc_w
+	ci.write16bit(instindex, instpos + 1);
+	ci.writeByte(184, instpos + 3);// invokestatic
+	ci.write16bit(cbi.logcompressindex, instpos + 4);
+	
+}
+
 	// only for invoke insts.
 	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
 			throws BadBytecode {

@@ -6,7 +6,12 @@ public class Trace implements Serializable {
     public int opcode, lineno, index, nextinst;
     public Integer load, store, popnum, pushnum;
     public String classname, methodname, signature;
-    public boolean ismethodlog;
+
+    public enum LogType{
+        Inst, MethodLog, OutPoint
+    }
+
+    public LogType type;
 
     public Trace(int opcode, int lineno, int index, int nextinst, Integer load, Integer store,
             Integer popnum, Integer pushnum, String classname, String methodname, String signature) {
@@ -21,18 +26,31 @@ public class Trace implements Serializable {
         this.classname = classname;
         this.methodname = methodname;
         this.signature = signature;
-        this.ismethodlog = false;
+        this.type = LogType.Inst;
     }
 
     public Trace(String classname, String methodname){
-        this.ismethodlog = true;
         this.classname = classname;
         this.methodname = methodname;
+        this.type = LogType.MethodLog;
     }
 
+    public Trace(String classname, String methodname, String signature){
+        this.classname = classname;
+        this.methodname = methodname;
+        this.signature = signature;
+        this.type = LogType.OutPoint;
+    }
+
+
     public String toString(){
-        if(ismethodlog){
+        if(type == LogType.MethodLog){
             String ret = "###" + classname + "::" + methodname;
+            return ret;
+        }
+
+        if(type == LogType.OutPoint){
+            String ret = "OUT_" + getdomain();
             return ret;
         }
 
@@ -60,15 +78,24 @@ public class Trace implements Serializable {
             ret += ",field=" + field;
         }
 
-        String _default = this.getdefault();
+        Integer branchbyte = this.getbranchbyte();
+        if(branchbyte != null){
+            ret += ",branchbyte=" + branchbyte.toString();
+        }
+
+        Integer _default = this.getdefault();
         String _switch = this.getswitch();
         if(_default != null){
-            ret += ",default=" + _default;
+            ret += ",default=" + _default.toString();
             ret += ",switch=" + _switch;
         }
         
         ret += ",lineinfo=" + classname + "#" + methodname + "#" + signature + "#" + lineno + "#" + index + ",nextinst=" + nextinst;
         return ret;
+    }
+
+    public String getdomain(){
+        return this.classname + ":" + this.methodname + ":" + this.signature;
     }
 
     public String getcalltype(){
@@ -87,11 +114,15 @@ public class Trace implements Serializable {
         return null;
     }
 
-    public String getdefault(){
+    public Integer getdefault(){
         return null;
     }
 
     public String getswitch(){
+        return null;
+    }
+
+    public Integer getbranchbyte(){
         return null;
     }
 
