@@ -44,8 +44,8 @@ public class TableSwitchInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		if (info.getintvalue("popnum") != null) {
-			int instpopnum = info.getintvalue("popnum");
+		if (dtrace.trace.popnum != null) {
+			int instpopnum = dtrace.trace.popnum;
 			for (int i = 0; i < instpopnum; i++) {
 				usenodes.add(graph.getRuntimeStack().pop());
 			}

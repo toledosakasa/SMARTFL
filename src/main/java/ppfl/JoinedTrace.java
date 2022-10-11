@@ -38,7 +38,7 @@ public class JoinedTrace {
       @Override
       public int compare(TraceChunk arg0, TraceChunk arg1) {
         if (arg0.testpass == arg1.testpass) {
-          return arg0.parsedTraces.size() - arg1.parsedTraces.size();
+          return arg0.parsedDTraces.size() - arg1.parsedDTraces.size();
         } else {
           return arg0.testpass ? 1 : -1;
         }
@@ -200,6 +200,12 @@ public class JoinedTrace {
     // System.out.println(size);
     for (int i = 0; i < size; i++) {
       DynamicTrace dtrace = traceseq.get(i);
+
+      // TODO: 检测何时会发生，若没有fail test，直接丢弃这种测试
+      if(dtrace==null){
+        // System.err.println(String.format("dynamicTrace %d/%d is null in TraceThunk %s",i,size,thischunk.fullname));
+        continue;
+      }
 
       if (!dtrace.trace.ismethodlog) {
         thischunk.parseOneTrace(dtrace);

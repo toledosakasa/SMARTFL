@@ -25,7 +25,7 @@ public class AthrowInst extends OpcodeInst {
 		super.buildtrace(graph);
 		// graph.throwuse = new ArrayList<>();
 		// graph.throwuse.add(defnode);
-		graph.unsolvedThrow = graph.parseinfo;
+		graph.unsolvedThrow = graph.dynamictrace;
 		graph.throwStmt = stmt;
 		graph.throwuse = usenodes;
 		graph.throwpred = prednodes;

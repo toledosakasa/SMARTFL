@@ -30,6 +30,47 @@ public class Trace implements Serializable {
         this.methodname = methodname;
     }
 
+    public Trace(String []split) {
+
+        ismethodlog = false;
+        for (String instinfo : split) {
+            String[] splitinstinfo = instinfo.split("=");
+            String infotype = splitinstinfo[0];
+            String infovalue = splitinstinfo[1];
+            if (infotype.equals("load")) {
+                this.load = Integer.valueOf(infovalue);
+            }
+            if (infotype.equals("store")) {
+                this.store = Integer.valueOf(infovalue);
+            }
+            if (infotype.equals("popnum")) {
+                this.popnum = Integer.valueOf(infovalue);
+            }
+            if (infotype.equals("pushnum")) {
+                this.pushnum = Integer.valueOf(infovalue);
+            }
+            if (infotype.equals("lineinfo")) {
+                String[] lineinfos = infovalue.split("#");
+                if (lineinfos.length < 3) {
+                    //System.out.println(str_trace);
+                }
+                this.classname = lineinfos[0];
+                this.methodname = lineinfos[1];
+                this.signature = lineinfos[2];
+                this.lineno = Integer.valueOf(lineinfos[3]);
+                this.index = Integer.valueOf(lineinfos[4]);
+            }
+            if (infotype.equals("opcode")) {
+                String[] opcodeinfos = infovalue.split("\\(|\\)");
+                this.opcode = Integer.valueOf(opcodeinfos[0]);
+            }
+            if (infotype.equals("nextinst")) {
+                this.nextinst = Integer.valueOf(infovalue);
+            }
+        }
+
+    }
+
     public String toString(){
         if(ismethodlog){
             String ret = "###" + classname + "::" + methodname;

@@ -54,14 +54,14 @@ public class GetStaticInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		String field = graph.parseinfo.getvalue("field");
+		String field = graph.dynamictrace.trace.getfield();
 		Node usenode = graph.getStaticHeapNode(field);
 		if (usenode != null)
 			usenodes.add(usenode);
 		defnode = graph.addNewStackNode(stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 
-		graph.unsolvedStatic = graph.parseinfo;
+		graph.unsolvedStatic = graph.dynamictrace;
 		graph.staticStmt = stmt;
 		graph.staticuse = usenodes;
 		graph.staticpred = prednodes;

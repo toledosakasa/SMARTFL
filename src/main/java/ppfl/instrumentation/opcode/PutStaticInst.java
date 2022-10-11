@@ -28,7 +28,7 @@ public class PutStaticInst extends OpcodeInst {
 	@Override
 	public void buildinit(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		String field = graph.parseinfo.getvalue("field");
+		String field = graph.dynamictrace.trace.getfield();
 		defnode = graph.addNewStaticHeapNode(field, stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
@@ -37,7 +37,7 @@ public class PutStaticInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		usenodes.add(graph.getRuntimeStack().pop());
-		String field = graph.parseinfo.getvalue("field");
+		String field = graph.dynamictrace.trace.getfield();
 		defnode = graph.addNewStaticHeapNode(field, stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}

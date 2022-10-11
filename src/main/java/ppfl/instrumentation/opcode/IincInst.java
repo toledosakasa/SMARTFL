@@ -25,7 +25,7 @@ public class IincInst extends OpcodeInst {
 		// build the stmtnode(common)
 		super.buildtrace(graph);
 
-		int varindex = info.getintvalue("store");
+		int varindex = dtrace.trace.store;
 		// int incconst = info.getintvalue("CONST");
 		// if (varindex == 31) {
 		// System.out.println("iinc:" + graph.getDomain());

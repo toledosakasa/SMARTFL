@@ -52,9 +52,10 @@ public class AloadInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		if (defnode != null) {
-			Integer addr = graph.parseinfo.getAddressFromStack();
-			if(addr != null)
+			Integer addr = graph.dynamictrace.getAddressFromStack();
+			if(addr != null){
 				defnode.setAddress(addr);
+			}
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}

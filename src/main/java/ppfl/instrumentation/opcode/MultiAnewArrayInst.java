@@ -44,7 +44,7 @@ public class MultiAnewArrayInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		if (defnode != null) {
-			Integer addr = graph.parseinfo.getAddressFromStack();
+			Integer addr = graph.dynamictrace.getAddressFromStack();
 			if (addr != null)
 				defnode.setAddress(addr);
 		}

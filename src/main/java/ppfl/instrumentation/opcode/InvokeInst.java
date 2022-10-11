@@ -58,9 +58,9 @@ public class InvokeInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		String traceclass = info.getvalue("callclass");
-		String tracemethod = info.getvalue("callname");
-		String signature = info.getvalue("calltype");
+		String traceclass = dtrace.trace.getcallclass();
+		String tracemethod = dtrace.trace.getcallname();
+		String signature = dtrace.trace.getcalltype();
 		TraceDomain callDomain = new TraceDomain(traceclass, tracemethod, signature);
 		Boolean istraced = true;
 
@@ -75,7 +75,7 @@ public class InvokeInst extends OpcodeInst {
 			}
 		}
 
-		String desc = info.getvalue("calltype");
+		String desc = dtrace.trace.getcalltype();
 		int argcnt = OpcodeInst.getArgNumByDesc(desc);
 
 		// add An extra argument: caller:object->callee:this
@@ -100,7 +100,7 @@ public class InvokeInst extends OpcodeInst {
 
 		// mark untraced invokes
 		if (!istraced) {
-			graph.untracedInvoke = graph.parseinfo;
+			graph.untracedInvoke = graph.dynamictrace;
 			graph.untracedStmt = stmt;
 			graph.untraceduse = usenodes;
 			graph.untracedpred = prednodes;
@@ -109,10 +109,12 @@ public class InvokeInst extends OpcodeInst {
 				if (!objectAddress.isHeapObject()) {
 					// System.out.println("not a object:" + objectAddress.getStmtName());
 				}
+				
 				graph.untracedObj = objectAddress;
 			}
 		} else {
-			graph.tracedInvoke = graph.parseinfo;
+			graph.tracedInvoke = graph.dynamictrace;
+			// System.exit(0);
 			graph.tracedStmt = stmt;
 			graph.traceduse = usenodes;
 			graph.tracedpred = prednodes;

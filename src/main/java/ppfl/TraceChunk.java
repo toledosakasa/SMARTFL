@@ -6,8 +6,11 @@ import java.util.Set;
 import java.util.Collections;
 
 import ppfl.instrumentation.TraceDomain;
+import ppfl.instrumentation.Trace;
+import ppfl.instrumentation.InvokeTrace;
+import ppfl.instrumentation.FieldTrace;
 import ppfl.instrumentation.DynamicTrace;
-
+import java.io.FileWriter;
 public class TraceChunk {
 
   private class MatchedPoint {
@@ -26,6 +29,7 @@ public class TraceChunk {
   String fullname;
   boolean pruned = false;
   public List<ParseInfo> parsedTraces = new ArrayList<>();
+  public List<DynamicTrace> parsedDTraces = new ArrayList<>();
 
   public TraceChunk(String fullname) {
     traces = new ArrayList<>();
@@ -45,17 +49,49 @@ public class TraceChunk {
   }
 
   public void pruneInit(Set<TraceDomain> TracedDomain) {
-    for (int i = 0; i < traces.size(); i++) {
-      ParseInfo parsed = null;
+    int trace_size=traces.size();
+    System.out.println(trace_size);
+    for (int i = 0; i < trace_size; i++) {
+      Trace trace=null;
+      DynamicTrace Dtrace=null;
       try {
-        parsed = new ParseInfo(traces.get(i));
+        String str_trace = traces.get(i);
+        String[] split = str_trace.split(",");
+        trace = new Trace(split);
+        String _calltype = null, _callclass = null, _callname = null;
+        String _field = null;
+        for (String instinfo : split) {
+          String[] splitinstinfo = instinfo.split("=");
+          String infotype = splitinstinfo[0];
+          String infovalue = splitinstinfo[1];
+          if (infotype.equals("calltype")) {
+            _calltype = infovalue;
+          }
+          if (infotype.equals("callclass")) {
+            _callclass = infovalue;
+          }
+          if (infotype.equals("callname")) {
+            _callname = infovalue;
+          }
+          if (infotype.equals("field")) {
+            _field = infovalue;
+          }
+        }
+        if (_calltype != null) {
+          trace = new InvokeTrace(trace, _calltype, _callclass, _callname);
+        }
+        if (_field != null) {
+          trace = new FieldTrace(trace, _field);
+        }
+        Dtrace = new DynamicTrace(trace);
       } catch (Exception e) {
         System.out.println(this.fullname + " " + i);
         System.out.println(traces.get(i));
         throw (e);
       }
-      if (parsed.form == 179)// putstatic
-        parsedTraces.add(parsed);
+      if (trace.opcode == 179)// putstatic
+        parsedDTraces.add(Dtrace);
+      assert(Dtrace.toString().contentEquals("\n"+traces.get(i)));
     }
     this.traces.clear();
   }
@@ -101,14 +137,7 @@ public class TraceChunk {
   }
 
   public void parseOneTrace(DynamicTrace dtrace) {
-    ParseInfo parsed = null;
-    try {
-      parsed = new ParseInfo(dtrace);
-    } catch (Exception e) {
-      System.out.println(this.fullname);
-      throw (e);
-    }
-    parsedTraces.add(parsed);
+    parsedDTraces.add(dtrace);
   }
 
   private MatchedPoint matchLastReturnOrCatch(int pos, ParseInfo toMatch, Set<String> tracedClass) {

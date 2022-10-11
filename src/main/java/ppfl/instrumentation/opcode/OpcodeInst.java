@@ -19,6 +19,8 @@ import ppfl.ByteCodeGraph;
 import ppfl.MyWriter;
 import ppfl.Node;
 import ppfl.ParseInfo;
+import ppfl.instrumentation.DynamicTrace;
+import ppfl.instrumentation.Trace;
 import ppfl.StmtNode;
 import ppfl.WriterUtils;
 import ppfl.instrumentation.CallBackIndex;
@@ -34,6 +36,7 @@ public class OpcodeInst {
 	// buildtrace
 	protected StmtNode stmt;
 	protected ParseInfo info;
+	protected DynamicTrace dtrace;
 	protected List<Node> prednodes;
 	protected List<Node> usenodes;
 	protected Node defnode;
@@ -73,7 +76,7 @@ public class OpcodeInst {
 	}
 
 	public static String getCurrDomainType(ByteCodeGraph graph) {
-		return graph.parseinfo.domain.signature;
+		return graph.dynamictrace.getDomain().signature;
 	}
 
 	public static boolean isLongReturnMethodByDesc(String desc) {
@@ -389,23 +392,15 @@ public class OpcodeInst {
 	}
 
 	public void buildstmt(ByteCodeGraph graph) {
-		this.info = graph.parseinfo;
-		TraceDomain tDomain = info.domain;
-		int linenumber = info.linenumber;
-		int byteindex = info.byteindex;
+		this.dtrace = graph.dynamictrace;
+		TraceDomain tDomain = dtrace.getDomain();
+		int linenumber = dtrace.trace.lineno;
+		int byteindex = dtrace.trace.index;
 
+		// TODO: use index insteadof String name as id
 		String stmtname = tDomain.toString() + "#" + linenumber;
-		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + byteindex;
-		// if (!graph.hasNode(stmtname)) {
-		//// stmt = new StmtNode(stmtname);
-		//// graph.addNode(stmtname, stmt);
-		// stmt = graph.addNewStmt(stmtname);
-		// } else {
-		// stmt = (StmtNode) graph.getNode(stmtname);
-		// assert (stmt.isStmt());
-		// }
-		this.stmt = graph.getStmt(stmtname, this.info.form);
+		this.stmt = graph.getStmt(stmtname, this.dtrace.trace.opcode);
 
 		// count how many times this statment has been executed
 		if (graph.stmtcountmap.containsKey(stmtname)) {
@@ -467,31 +462,27 @@ public class OpcodeInst {
 				prednodes.add(thepred);
 		}
 
-		if (this.doLoad && info.getintvalue("load") != null) {
-			int loadvar = info.getintvalue("load");
+		if (this.doLoad && dtrace.trace.load != null) {
+			int loadvar = dtrace.trace.load;
 			Node node = graph.getLoadNodeAsUse(loadvar);
 			if (node != null)
 				usenodes.add(node);
 		}
-		if (this.doPop && info.getintvalue("popnum") != null) {
-			int instpopnum = info.getintvalue("popnum");
+		if (this.doPop && dtrace.trace.popnum != null) {
+			int instpopnum = dtrace.trace.popnum;
 			for (int i = 0; i < instpopnum; i++) {
 				usenodes.add(graph.getRuntimeStack().pop());
 			}
 		}
 		// defs
 		// stack
-		if (this.doPush && info.getintvalue("pushnum") != null) {
-			int instpushnum = info.getintvalue("pushnum");
-			// push must not be more than 1
+		if (this.doPush && dtrace.trace.pushnum != null) {
+			int instpushnum = dtrace.trace.pushnum;
 			assert (instpushnum <= 1);
 			defnode = graph.addNewStackNode(stmt);
 		}
-		if (this.doStore && info.getintvalue("store") != null) {
-			int storevar = info.getintvalue("store");
-			// if (storevar == 31) {
-			// System.out.println(graph.getDomain());
-			// }
+		if (this.doStore && dtrace.trace.store != null) {
+			int storevar = dtrace.trace.store;
 			defnode = graph.addNewVarNode(storevar, stmt);
 		}
 

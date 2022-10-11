@@ -70,7 +70,7 @@ public class AreturnInst extends OpcodeInst {
 		// def in caller frame
 		Node defnode = graph.addNewStackNode(stmt);
 		if (defnode != null) {
-			Integer addr = graph.parseinfo.getAddressFromStack();
+			Integer addr = graph.dynamictrace.getAddressFromStack();
 			if (addr != null)
 				defnode.setAddress(addr);
 		}
