@@ -891,7 +891,10 @@ def match(proj: str, id: str):
     for line in oraclefile.readlines():
         sp = line.split('||')
         for oracle in sp:
-            oracle_lines.add(oracle.strip())
+            oracle = oracle.strip()
+            lineno = oracle.split(':')[1]
+            classname = ".".join(oracle.split(':')[0].split('.')[0:-1])
+            oracle_lines.add(classname + ':' + lineno)
 
     triggerpath = f'./triggertest/{proj}/{id}'
     try:
@@ -923,12 +926,31 @@ def match(proj: str, id: str):
                 spinfo = instinfo.split('=')
                 if spinfo[0] == 'lineinfo':
                     sporacle = spinfo[1].split('#')
-                    compare_oracle = sporacle[0] + \
-                        '.'+sporacle[1]+':'+sporacle[3]
+                    compare_oracle = sporacle[0] + ':'+sporacle[3]
                     if compare_oracle in oracle_lines:
                         print(
                             f'{proj}{id} log has oracle,              in {testlog}')
                         return 1
+
+
+    initpath = f'{checkoutbase}/{proj}/{id}/trace/logs/mytrace/'
+    for root, dirs, files in os.walk(initpath):
+            for name in files:
+                if(re.match(r".*init\.log",name)):
+                    try:
+                        initfile = utf8open(join(root, name))
+                    except IOError:
+                        continue
+                    for line in initfile.readlines():
+                        sp = line.split(',')
+                        for instinfo in sp:
+                            spinfo = instinfo.split('=')
+                            if spinfo[0] == 'lineinfo':
+                                sporacle = spinfo[1].split('#')
+                                compare_oracle = sporacle[0] +':'+sporacle[3]
+                                if compare_oracle in oracle_lines:
+                                    print(f'{proj}{id} log has oracle,              in {name}')
+                                    return 1
     print(f'{proj}{id} has no oracle in trigger log')
     return 0
 
