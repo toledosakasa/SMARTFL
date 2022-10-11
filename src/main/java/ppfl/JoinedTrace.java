@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.io.ObjectInputStream;
 
 import ppfl.instrumentation.TracePool;
@@ -19,6 +20,7 @@ import ppfl.instrumentation.TraceDomain;
 import ppfl.instrumentation.DynamicTrace;
 import ppfl.instrumentation.TraceSequence;
 import ppfl.instrumentation.Interpreter;
+import ppfl.instrumentation.Trace;
 import ppfl.instrumentation.TraceTransformer;
 
 public class JoinedTrace {
@@ -123,12 +125,13 @@ public class JoinedTrace {
     File[] fs = folder.listFiles();
     if (TraceTransformer.useNewTrace) {
 
-      String poolname = path.replaceAll("logs/run/(.*)", "classcache/TracePool.ser");
+      String poolname = path.replaceAll("logs/run/(.*)", "logs/mytrace/TracePool.ser");
       TracePool tracepool = null;
       if(TraceTransformer.useIndexTrace){
         try{
             FileInputStream fileIn = new FileInputStream(poolname);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
+            BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+            ObjectInputStream in = new ObjectInputStream(bufferedIn);
             tracepool = (TracePool) in.readObject();
             in.close();
             fileIn.close();
@@ -179,7 +182,8 @@ public class JoinedTrace {
     try {
       // System.out.printf("yyyy "+f.getAbsolutePath()+"\n");
       FileInputStream fileIn = new FileInputStream(f.getAbsolutePath());
-      ObjectInputStream in = new ObjectInputStream(fileIn);
+      BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+      ObjectInputStream in = new ObjectInputStream(bufferedIn);
       traceseq = (TraceSequence) in.readObject();
       traceseq.setTracePool(tracepool);
       // System.out.printf("yyyy "+traceseq.get(0).trace.classname +"\n");
@@ -207,7 +211,7 @@ public class JoinedTrace {
         continue;
       }
 
-      if (!dtrace.trace.ismethodlog) {
+      if (dtrace.trace.type == Trace.LogType.Inst) {
         thischunk.parseOneTrace(dtrace);
       }
       // if (dtrace.isret)

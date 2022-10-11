@@ -239,7 +239,7 @@ public class ParseInfo {
 		}
 
 		if(dtrace.trace.getdefault() != null){
-			tracemap.put("default", dtrace.trace.getdefault());
+			tracemap.put("default", dtrace.trace.getdefault().toString());
 			tracemap.put("switch", dtrace.trace.getswitch());
 		}
 

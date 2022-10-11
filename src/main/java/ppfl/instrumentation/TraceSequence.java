@@ -27,6 +27,11 @@ public class TraceSequence implements Serializable {
         this.tracepool = tracepool;
     }
 
+    public DynamicTrace getRaw(int index){
+        DynamicTrace ret = tracelist.get(index);
+        return ret;
+    }
+
     public DynamicTrace get(int index){
         DynamicTrace ret = tracelist.get(index);
         if(!TraceTransformer.useIndexTrace)
@@ -47,6 +52,10 @@ public class TraceSequence implements Serializable {
 
     public int size(){
         return tracelist.size();
+    }
+
+    public void remove(int index){
+        tracelist.remove(index);
     }
 
 }

@@ -8,11 +8,9 @@ import java.util.ArrayList;;
 public class TracePool implements Serializable{
     private List<Trace> pool;
     private int index;
-    private boolean init;
     TracePool(){
         pool = new ArrayList<>();
         index = 0;
-        init = false;
     }
 
     public void add(Trace trace){
@@ -27,15 +25,6 @@ public class TracePool implements Serializable{
     
     public int indexAt(){
         return index;
-    }
-
-
-    public boolean hsinit(){
-        return init;
-    }
-
-    public void init(){
-        init = true;
     }
 
     public int size(){

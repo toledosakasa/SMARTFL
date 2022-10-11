@@ -8,8 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.io.ObjectInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -21,6 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.lang.System;
+
+import javafx.util.Callback;
 
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
@@ -47,6 +52,7 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 import ppfl.instrumentation.opcode.PutFieldInst;
 import ppfl.instrumentation.opcode.PutStaticInst;
 import ppfl.instrumentation.opcode.TableSwitchInst;
+import ppfl.instrumentation.InstrumentationAgent.CacheCond;
 
 // import java.lang.management.ManagementFactory;
 
@@ -54,7 +60,9 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	// TODO: now the ser log is based on TracePool cache, try to find a better way
 	public boolean useCachedClass = true; // has to be true, otherwise writeWhatIsTraced is wrong
-	public boolean foundCache = false;
+	// public boolean foundCache = false;
+	// public boolean foundSA = false;
+	public CacheCond cacheCond = CacheCond.GotAll;
 	public static boolean useNewTrace = true;
 	public static boolean useIndexTrace = true;
 
@@ -76,6 +84,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static BufferedWriter whatIsTracedWriter = null;
 	// Map of transformed clazz, key: classname, value: classloader
 	private Map<String,ClassLoader> transformedclazz;
+	private StaticAnalyzer staticAnalyzer = null;
 
 	private boolean useD4jTest = false;
 	private Set<String> d4jMethodNames = new HashSet<>();
@@ -89,8 +98,9 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static List<String> stackwriter;
 
 	/** filename for logging */
-	public TraceTransformer(Map<String,ClassLoader> transformedclazz, String logfilename){
+	public TraceTransformer(Map<String,ClassLoader> transformedclazz, String logfilename, CacheCond cacheCond){
 		this.transformedclazz = transformedclazz;
+		this.cacheCond = cacheCond;
 		File debugdir = new File("trace/debug/");
 		debugdir.mkdirs();
 		WriterUtils.setPath("trace/debug/");
@@ -99,7 +109,8 @@ public class TraceTransformer implements ClassFileTransformer {
 		File logdir = new File("trace/logs/run/");
 		logdir.mkdirs();
 		Interpreter.init();
-		setWhatIsTracedWriterFile();
+		if(this.cacheCond == CacheCond.GenPool)
+			setWhatIsTracedWriterFile();
 		FileWriter file = null;
 		try {
 			file = new FileWriter("trace/logs/run/" + logfilename, true);
@@ -109,12 +120,94 @@ public class TraceTransformer implements ClassFileTransformer {
 
 		CallBackIndex.tracewriter = new TraceSequence(logfilename);
 		CallBackIndex.tracepool = new TracePool();
+		CallBackIndex.loopset = new ArrayList<>();
+
+		// long startTime = System.currentTimeMillis();
+		if(this.cacheCond == CacheCond.GotAll || this.cacheCond == CacheCond.GenClass)
+			this.initCache();
+		// else if (this.cacheCond == CacheCond.GenClass){
+		// 	this.initPool();
+		// 	this.staticAnalysis();
+		// 	this.writeStaticAnalyzer();
+		// }
+		// else{
+		// 	// this.FillTracePool();
+		// 	// this.writeTracePool();
+		// 	// this.staticAnalysis();
+		// 	// this.writeStaticAnalyzer();
+		// }
+		// long endTime = System.currentTimeMillis();
+		// double time = (endTime - startTime) / 1000.0;
+		// debugLogger.write(String.format("[Agent] SA init time %f\n", time));
 
 		traceWriter = file;
 		CallBackIndex.setWriter(traceWriter);
 
 		stackwriter = new ArrayList<>();
 		CallBackIndex.stackwriter = stackwriter;
+	}
+
+	private void initCache(){
+		// String SAfolder = "trace/logs/mytrace/";
+		// File SAcache = new File(SAfolder, "StaticAnalyzer.ser");
+		// if (SAcache.exists()) {
+		// 	try {
+		// 		FileInputStream fileIn = new FileInputStream(SAcache);
+		// 		ObjectInputStream in = new ObjectInputStream(fileIn);
+		// 		CallBackIndex.staticAnalyzer = (StaticAnalyzer) in.readObject();
+		// 		in.close();
+		// 		fileIn.close();
+		// 		foundSA = true;
+		// 		debugLogger.write(String.format("[Agent] found SA\n"));
+		// 	} catch (IOException e) {
+		// 		e.printStackTrace();
+		// 	} catch (ClassNotFoundException c) {
+		// 		c.printStackTrace();
+		// 	}
+		// }
+		// else{
+		// 	CallBackIndex.staticAnalyzer = new StaticAnalyzer();
+		// }
+
+		String SAfolder = "trace/logs/mytrace/";
+		File loopset = new File(SAfolder, "loopset.log");
+		try (BufferedReader reader = new BufferedReader(new FileReader(loopset))){
+			String t = null;
+			while ((t = reader.readLine()) != null) {
+				int start = Integer.valueOf(t.split(",")[0]);
+				int end = Integer.valueOf(t.split(",")[1]);
+				CallBackIndex.loopset.add(new BackEdge(start, end));
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		CallBackIndex.initCompressInfos();
+		// foundSA = true;
+
+		// if use index Trace, we don't need tracepool
+		if(!TraceTransformer.useIndexTrace){
+			try {
+				String poolfolder = "trace/logs/mytrace/";
+				File poolcache = new File(poolfolder, "TracePool" + ".ser");
+				FileInputStream fileIn = new FileInputStream(poolcache);
+				BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+				ObjectInputStream in = new ObjectInputStream(bufferedIn);
+				CallBackIndex.tracepool = (TracePool) in.readObject();
+				// debugLogger.writeln("Pool loaded:" + classname);
+				// for(int i=0;i<tracepool.indexAt();i++)
+				// 	debugLogger.writeln(tracepool.get(i).toString());
+				in.close();
+				fileIn.close();
+			} catch (IOException e) {
+				// debugLogger.writeln("IOException:" + classname);
+				// debugLogger.writeln(e.toString());
+				e.printStackTrace();
+			} catch (ClassNotFoundException c) {
+				// debugLogger.writeln("ClassNotFoundException:" + classname);
+				// debugLogger.writeln(c.toString());
+				c.printStackTrace();
+			}
+		}
 	}
 
 	private static void setStaticInitFile(String clazzname) {
@@ -226,6 +319,9 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	private void writeWhatIsTraced(String str) {
+		// should be done in GenPool
+		if(this.cacheCond != CacheCond.GenPool)
+			return;
 		if (this.simpleLog)
 			return;
 		try {
@@ -237,10 +333,12 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	public void writeTracePool(){
+		long startTime = System.currentTimeMillis();
 		try {
-			String classcachefolder = "trace/classcache/";
-			FileOutputStream outStream = new FileOutputStream(classcachefolder + "TracePool" + ".ser");
-			ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
+			String poolfolder = "trace/logs/mytrace/";
+			FileOutputStream outStream = new FileOutputStream(poolfolder + "TracePool" + ".ser");
+			BufferedOutputStream bufferStream = new BufferedOutputStream(outStream);
+			ObjectOutputStream fileObjectOut = new ObjectOutputStream(bufferStream);
 			fileObjectOut.writeObject(CallBackIndex.tracepool);
 			// debugLogger.writeln("Write Tracepool");
 			fileObjectOut.close();
@@ -248,6 +346,46 @@ public class TraceTransformer implements ClassFileTransformer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		long endTime = System.currentTimeMillis();
+		double time = (endTime - startTime) / 1000.0;
+		debugLogger.write(String.format("[Agent] Pool write done\n"));
+		debugLogger.write(String.format("[Agent] Pool write time %f\n", time));
+	}
+
+	public void writeStaticAnalyzer(){
+		// long startTime = System.currentTimeMillis();
+		try {
+			FileWriter SALogger = new FileWriter("trace/logs/mytrace/" + "loopset.log", true);
+			for(BackEdge loopedge: CallBackIndex.loopset){
+				SALogger.write(String.format("%d,%d\n", loopedge.start, loopedge.end));
+			}
+			SALogger.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// long endTime = System.currentTimeMillis();
+		// double time = (endTime - startTime) / 1000.0;
+		// debugLogger.write(String.format("[Agent] Loop write\n"));
+		// debugLogger.write(String.format("[Agent] Loop write time %f\n", time));
+
+	}
+
+	public void staticAnalysis(){
+		// long startTime = System.currentTimeMillis();
+		staticAnalyzer = new StaticAnalyzer();
+		staticAnalyzer.setTracePool(CallBackIndex.tracepool);
+		staticAnalyzer.setLoopSet(CallBackIndex.loopset);
+		staticAnalyzer.parse(debugLogger);
+		staticAnalyzer.get_pre_idom();
+		staticAnalyzer.find_loop();
+		CallBackIndex.initCompressInfos();
+		// this.staticAnalyzer.get_post_idom();
+		// staticAnalyzer.clear();
+		// CallBackIndex.staticAnalyzer.setTracePool(null);
+		// long endTime = System.currentTimeMillis();
+		// double time = (endTime - startTime) / 1000.0;
+		// debugLogger.write(String.format("[Agent] SA done\n"));
+		// debugLogger.write(String.format("[Agent] SA time %f\n", time));
 	}
 
 	protected byte[] transformBody(String classname) {
@@ -261,42 +399,44 @@ public class TraceTransformer implements ClassFileTransformer {
 			if (!file.exists()) {
 				file.mkdirs();
 			}
-			File poolcache = new File(classcachefolder, "TracePool" + ".ser");
-			File classcache = new File(classcachefolder, classname + ".log");
+			// File poolcache = new File(classcachefolder, "TracePool" + ".ser");
+			// File classcache = new File(classcachefolder, classname + ".log");
 			// debugLogger.writeln("PoolCache " + poolcache.exists());
 			// debugLogger.writeln("ClassCache " + classcache.exists());
-			if (!this.simpleLog && poolcache.exists() && classcache.exists()) {
-				// debugLogger.writeln("Cache loaded:" + this.targetClassName);
+			if (!this.simpleLog && this.cacheCond == CacheCond.GotAll) {
+				// debugLogger.writeln("Cache loaded:" + classname);
 				try {
-					if(!CallBackIndex.tracepool.hsinit()){
-						FileInputStream fileIn = new FileInputStream(poolcache);
-						ObjectInputStream in = new ObjectInputStream(fileIn);
-						CallBackIndex.tracepool = (TracePool) in.readObject();
-						// debugLogger.writeln("Pool loaded:" + classname);
-						// for(int i=0;i<tracepool.indexAt();i++)
-						// 	debugLogger.writeln(tracepool.get(i).toString());
-						CallBackIndex.tracepool.init();
-						in.close();
-						fileIn.close();
-					}
-					foundCache = true;
-					// debugLogger.writeln("Cache loaded:" + classname);
+					// // if use index Trace, we don't need tracepool
+					// if(!TraceTransformer.useIndexTrace && !CallBackIndex.tracepool.hsinit()){
+					// 	long startTime = System.currentTimeMillis();
+					// 	FileInputStream fileIn = new FileInputStream(poolcache);
+					// 	ObjectInputStream in = new ObjectInputStream(fileIn);
+					// 	CallBackIndex.tracepool = (TracePool) in.readObject();
+					// 	// debugLogger.writeln("Pool loaded:" + classname);
+					// 	// for(int i=0;i<tracepool.indexAt();i++)
+					// 	// 	debugLogger.writeln(tracepool.get(i).toString());
+					// 	CallBackIndex.tracepool.init();
+					// 	in.close();
+					// 	fileIn.close();
+					// 	long endTime = System.currentTimeMillis();
+					// 	double time = (endTime - startTime) / 1000.0;
+					// 	debugLogger.write(String.format("[Agent] Pool read done\n"));
+					// 	debugLogger.write(String.format("[Agent] Pool read time %f\n", time));
+					// }
+					// foundCache = true; // now just for one class, but is same for all classes
+					// // debugLogger.writeln("Cache loaded:" + classname);
+					File classcache = new File(classcachefolder, classname + ".log");
 					return java.nio.file.Files.readAllBytes(classcache.toPath());
 				} catch (IOException e) {
 					// debugLogger.writeln("IOException:" + classname);
 					// debugLogger.writeln(e.toString());
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} catch (ClassNotFoundException c) {
-					// debugLogger.writeln("ClassNotFoundException:" + classname);
-					// debugLogger.writeln(c.toString());
-					c.printStackTrace();
 				}
 			}
 		}
 
 		if (!this.simpleLog) {
-			this.setLogger(classname);
 			setSourceFile(classname);
 			setStaticInitFile(classname);
 		}
@@ -315,6 +455,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			if (!this.simpleLog) {
 				MethodInfo staticInit = cc.getClassFile().getStaticInitializer();
 				if (staticInit != null) {
+					// TODO, 似乎对static final 且右侧是常数的话，就不会出现在这里,例如 Math 104
 					getStaticInitializerInfo(staticInit, cc, constp);
 				}
 			}
@@ -362,7 +503,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			System.out.println(e);
 			// debugLogger.error("[Bug]bytecode error", e);
 		}
-		if (!this.simpleLog && useCachedClass) {
+		if (!this.simpleLog && useCachedClass && (cacheCond == CacheCond.GenClass)) {
 			try {
 				String classcachefolder = "trace/classcache/";
 				java.nio.file.Files.write(Paths.get(classcachefolder, classname + ".log"), byteCode);
@@ -375,6 +516,8 @@ public class TraceTransformer implements ClassFileTransformer {
 	}
 
 	private void getStaticInitializerInfo(MethodInfo m, CtClass cc, ConstPool constp) throws BadBytecode {
+		// if(this.cacheCond != CacheCond.GenPool)
+		// 	return;
 		MethodInfo mi = m;
 		CodeAttribute ca = mi.getCodeAttribute();
 
@@ -403,6 +546,7 @@ public class TraceTransformer implements ClassFileTransformer {
 		try {
 			staticInitWriter.write(sb.toString());
 			staticInitWriter.flush();
+			debugLogger.write(String.format("[Agent] init done. m = %s\n", mi.getName()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -432,6 +576,9 @@ public class TraceTransformer implements ClassFileTransformer {
 
 		if (!this.simpleLog)
 			instrumentByteCode(cc, mi, ca, constp, cbi);
+		// add the outpoint of this method into tracepool (for static analysis)
+		Trace outpoint = new Trace(cc.getName(), m.getName(), m.getDescriptor());
+		CallBackIndex.tracepool.add(outpoint);
 		// log method name at the beginning of this method.
 		if (!this.simpleLog) {
 			CodeIterator ci = ca.iterator();
@@ -492,8 +639,9 @@ public class TraceTransformer implements ClassFileTransformer {
 
 			int opcode = tempci.byteAt(index);
 			Integer load = null, store = null, popnum = null, pushnum = null;
-			// Integer _default = null;
-			// String _switch = null;
+			Integer branchbyte = null;
+			Integer _default = null;
+			String _switch = null;
 			String[] split = getinst.split(",");
 			// now "branchbyte" and "switch" is not used in running trace
 			// still need to handle "field"
@@ -513,12 +661,15 @@ public class TraceTransformer implements ClassFileTransformer {
 				if (infotype.equals("pushnum")) {
 					pushnum = Integer.valueOf(infovalue);
 				}
-				// if (infotype.equals("default")) {
-				// 	_default = Integer.valueOf(infovalue);
-				// }
-				// if (infotype.equals("switch")) {
-				// 	_switch = infovalue;
-				// }
+				if (infotype.equals("branchbyte")) {
+					branchbyte = Integer.valueOf(infovalue);
+				}
+				if (infotype.equals("default")) {
+					_default = Integer.valueOf(infovalue);
+				}
+				if (infotype.equals("switch")) {
+					_switch = infovalue;
+				}
 			}
 
 			String calltype = null, callclass = null, callname = null;
@@ -565,12 +716,17 @@ public class TraceTransformer implements ClassFileTransformer {
 				instruction = new FieldTrace(instruction, field);
 			}
 
-			// if (_default != null) {
-			// 	instruction = new SwitchTrace(instruction, _default, _switch);
-			// }
+			if (_default != null) {
+				instruction = new SwitchTrace(instruction, _default, _switch);
+			}
+
+			if(branchbyte != null){
+				instruction = new BranchTrace(instruction, branchbyte);
+			}
 
 			int poolindex = CallBackIndex.tracepool.indexAt();
 			CallBackIndex.tracepool.add(instruction);
+			// TODO: 之后在GenPool时，把这个一起输出。第二次GenClass时，就直接用了
 			tracemap.put(i, poolindex);
 
 			// ExceptionTable eTable =
@@ -613,6 +769,12 @@ public class TraceTransformer implements ClassFileTransformer {
 			}
 
 			int poolindex = tracemap.get(i);
+			//FIXME: to false
+			boolean needCompress = false;
+			for(BackEdge loopedge: CallBackIndex.loopset){
+				if(loopedge.end == poolindex)
+					needCompress = true;
+			}
 
 			if (oi != null) {
 				if (!mi.isStaticInitializer()){
@@ -620,7 +782,12 @@ public class TraceTransformer implements ClassFileTransformer {
 					{
 						// debugLogger.write(TracePool.get(poolindex).toString());
 						// debugLogger.write("		insert, " + "poolindex = " + poolindex);
-						oi.insertBefore(ci, constp, poolindex, cbi);
+						if(needCompress){
+							oi.insertBeforeCompress(ci, constp, poolindex, cbi);
+							// debugLogger.writeln("need Compress at index" + poolindex);
+						}
+						else
+							oi.insertBefore(ci, constp, poolindex, cbi);
 					}
 					else
 						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);
@@ -684,11 +851,19 @@ public class TraceTransformer implements ClassFileTransformer {
 							// 	traceWriter.write(trace.toString());
 							// }
 
+							long startTime = System.currentTimeMillis();
+							//TODO: 加buffer Output
 							FileOutputStream outStream = new FileOutputStream("trace/logs/run/" + CallBackIndex.tracewriter.getName()+".ser");
-							ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
+							BufferedOutputStream bufferStream = new BufferedOutputStream(outStream);
+							ObjectOutputStream fileObjectOut = new ObjectOutputStream(bufferStream);
 							fileObjectOut.writeObject(CallBackIndex.tracewriter);
 							fileObjectOut.close();
 							outStream.close();
+							long endTime = System.currentTimeMillis();
+							double time = (endTime - startTime) / 1000.0;
+							traceWriter.write(String.format("[Agent] write trace done\n"));
+							traceWriter.write(String.format("[Agent] write trace time %f\n", time));
+							traceWriter.flush();
 						}
 
 					} catch (IOException e) {
@@ -698,6 +873,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			});
 		}
 		try {
+			long startTime = System.currentTimeMillis();
 			byte[] byteCode = classfileBuffer;
 			// TODO modify here to transform all classes.
 			if(className == null || !transformedclazz.containsKey(className))
@@ -707,7 +883,10 @@ public class TraceTransformer implements ClassFileTransformer {
 			transformedclazz.remove(className);
 			
 			byte[] ret = transformBody(className);
-			// debugLogger.write(String.format("\n%s\n", className));
+			debugLogger.write(String.format("[Agent] class = %s\n", className));
+			long endTime = System.currentTimeMillis();
+			double time = (endTime - startTime) / 1000.0;
+			debugLogger.write(String.format("[Agent] Transform time %f\n", time));
 			// for(byte b: ret)
 			// debugLogger.write(String.format("%x ", b));
 			return ret;
@@ -720,10 +899,6 @@ public class TraceTransformer implements ClassFileTransformer {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	private void setLogger(String clazzname) {
-		// MDC.put("sourcefile", clazzname);
 	}
 
 	private String getInstMap(CodeIterator ci, int index, ConstPool constp) {
