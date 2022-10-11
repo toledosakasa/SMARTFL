@@ -206,10 +206,10 @@ public class JoinedTrace {
       DynamicTrace dtrace = traceseq.get(i);
 
       // TODO: 检测何时会发生，若没有fail test，直接丢弃这种测试
-      if(dtrace==null){
-        // System.err.println(String.format("dynamicTrace %d/%d is null in TraceThunk %s",i,size,thischunk.fullname));
-        continue;
-      }
+      // if(dtrace==null){
+      //   // System.err.println(String.format("dynamicTrace %d/%d is null in TraceThunk %s",i,size,thischunk.fullname));
+      //   continue;
+      // }
 
       if (dtrace.trace.type == Trace.LogType.Inst) {
         thischunk.parseOneTrace(dtrace);

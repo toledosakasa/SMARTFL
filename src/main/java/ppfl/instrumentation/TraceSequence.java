@@ -41,7 +41,7 @@ public class TraceSequence implements Serializable {
         } catch (Exception e) {
             if(ret == null)
                 System.out.println("null");
-            System.out.println("index = " + index);
+            System.out.println("name = "+ name+"\nindex = " + index);
         }
         return ret;
     }
