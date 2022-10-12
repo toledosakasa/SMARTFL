@@ -895,6 +895,9 @@ def match(proj: str, id: str):
             lineno = oracle.split(':')[1]
             classname = ".".join(oracle.split(':')[0].split('.')[0:-1])
             oracle_lines.add(classname + ':' + lineno)
+    if len(oracle_lines) == 0:
+        print(f'{proj}{id} has no oracle')
+        return -1
 
     triggerpath = f'./triggertest/{proj}/{id}'
     try:
@@ -972,7 +975,7 @@ def matchproj(proj: str):
             no_oracle += 1
         elif result == -2:
             no_trigger += 1
-        else:
+        elif result == -3:
             no_trigger_log += 1
 
     print(f'in_log = {in_log}, not_in_log = {not_in_log}, no_oracle = {no_oracle}, no trigger = {no_trigger}, no_trigger_log = {no_trigger_log}')
