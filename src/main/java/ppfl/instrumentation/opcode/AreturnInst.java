@@ -11,7 +11,7 @@ import ppfl.instrumentation.CallBackIndex;
 public class AreturnInst extends OpcodeInst {
 
 	public AreturnInst(int form) {
-		super(form, 0, -1);
+		super(form, 0, 1);
 		this.doBuild = false;
 		this.doPop = false;
 		this.doPush = false;
