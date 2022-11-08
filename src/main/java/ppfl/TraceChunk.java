@@ -50,7 +50,6 @@ public class TraceChunk {
 
   public void pruneInit(Set<TraceDomain> TracedDomain) {
     int trace_size=traces.size();
-    System.out.println(trace_size);
     for (int i = 0; i < trace_size; i++) {
       Trace trace=null;
       DynamicTrace Dtrace=null;
