@@ -578,12 +578,14 @@ public class TraceTransformer implements ClassFileTransformer {
 			instrumentByteCode(cc, mi, ca, constp, cbi);
 		// add the outpoint of this method into tracepool (for static analysis)
 		Trace outpoint = new Trace(cc.getName(), m.getName(), m.getDescriptor());
+		outpoint.setTypeOutPoint();
 		CallBackIndex.tracepool.add(outpoint);
 		// log method name at the beginning of this method.
 		if (!this.simpleLog) {
 			CodeIterator ci = ca.iterator();
 			if(useNewTrace){
-				Trace longname = new Trace(cc.getName(), m.getName());
+				Trace longname = new Trace(cc.getName(), m.getName(), m.getDescriptor());
+				longname.setTypeMethodLog();
 				int poolindex = CallBackIndex.tracepool.indexAt();
 				CallBackIndex.tracepool.add(longname);
 

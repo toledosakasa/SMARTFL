@@ -29,16 +29,17 @@ public class Trace implements Serializable {
         this.type = LogType.Inst;
     }
 
-    public Trace(String classname, String methodname){
-        this.classname = classname;
-        this.methodname = methodname;
-        this.type = LogType.MethodLog;
-    }
-
     public Trace(String classname, String methodname, String signature){
         this.classname = classname;
         this.methodname = methodname;
         this.signature = signature;
+    }
+
+    public void setTypeMethodLog (){
+        this.type = LogType.MethodLog;
+    }
+
+    public void setTypeOutPoint (){
         this.type = LogType.OutPoint;
     }
 
