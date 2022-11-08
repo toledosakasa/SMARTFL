@@ -306,10 +306,7 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
                     index_s = line.find(' ', index) + 1
                     index_e = line.find(' ', index_s)
                     classname = line[index_s:index_e]
-                    if classname.find('$') == -1:
-                        relevant_set.add(classname)
-                    else:
-                        relevant_set.add(classname.split('$')[0])
+                    relevant_set.add(classname)
         classes_relevant = ';'.join(relevant_set)
         metadata['classes.relevant'] = classes_relevant
 
@@ -367,6 +364,7 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     for testclass_rel in reltest_dict:
         for testmethod_rel in reltest_dict[testclass_rel]:
             app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log,project={proj},cache=GotAll\""
+            app = app.replace('$', '@') # deal with missing $ in d4j scripts
             app += '>/dev/null 2>&1'
             ret.append(app)
     return ret

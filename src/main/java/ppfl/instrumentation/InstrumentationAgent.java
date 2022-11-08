@@ -50,6 +50,7 @@ public class InstrumentationAgent {
 	}
 
 	private static synchronized void main(String agentArgs, Instrumentation inst) {
+		agentArgs = agentArgs.replace('@', '$'); // deal with missing $ in d4j scripts
 		WriterUtils.setPath("trace/debug/");
 		debugLogger = WriterUtils.getWriter("Agent.log", true);
 		if (agentArgs == null || agentArgs.equals(""))
