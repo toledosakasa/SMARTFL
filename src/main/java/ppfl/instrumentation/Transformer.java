@@ -38,9 +38,10 @@ public class Transformer implements ClassFileTransformer {
         Interpreter.init();
         FileWriter file = null;
         try {
-            file = new FileWriter("trace/logs/run/" + logfilename, true);
+            file = new FileWriter("trace/logs/run/" + logfilename, false);
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
 
         traceWriter = file;
@@ -72,7 +73,8 @@ public class Transformer implements ClassFileTransformer {
                     traceWriter.flush();
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    String sStackTrace = WriterUtils.handleException(e);
+                    debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
                 }
             }
         });
@@ -105,8 +107,8 @@ public class Transformer implements ClassFileTransformer {
             debugLogger.write(String.format("[Agent] Transform time %f\n", time));
             return ret;
         } catch (Exception e) {
-            // debugLogger.error("[Bug]Exception", e);
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
             return null;
         }
     }

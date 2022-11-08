@@ -29,6 +29,8 @@ import ppfl.instrumentation.opcode.OpcodeInst;
 import ppfl.instrumentation.opcode.PutFieldInst;
 import ppfl.instrumentation.opcode.PutStaticInst;
 
+import ppfl.WriterUtils;
+
 public class GenPoolTransformer extends Transformer {
 
     private BufferedWriter sourceWriter = null;
@@ -68,7 +70,8 @@ public class GenPoolTransformer extends Transformer {
             fileObjectOut.close();
             outStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         long endTime = System.currentTimeMillis();
         double time = (endTime - startTime) / 1000.0;
@@ -97,13 +100,14 @@ public class GenPoolTransformer extends Transformer {
     private void writeStaticAnalyzer() {
         // long startTime = System.currentTimeMillis();
         try {
-            FileWriter SALogger = new FileWriter("trace/logs/mytrace/" + "loopset.log", true);
+            FileWriter SALogger = new FileWriter("trace/logs/mytrace/" + "loopset.log");
             for (BackEdge loopedge : CallBackIndex.loopset) {
                 SALogger.write(String.format("%d,%d\n", loopedge.start, loopedge.end));
             }
             SALogger.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         // long endTime = System.currentTimeMillis();
         // double time = (endTime - startTime) / 1000.0;
@@ -114,14 +118,15 @@ public class GenPoolTransformer extends Transformer {
 
     private void writeTraceMap() {
         try {
-            FileWriter file = new FileWriter("trace/logs/mytrace/" + "tracemap.log", true);
+            FileWriter file = new FileWriter("trace/logs/mytrace/" + "tracemap.log");
             BufferedWriter traceMapLogger = new BufferedWriter(file, BUFFERSIZE);
             for (Integer index : traceMap) {
                 traceMapLogger.write(String.format("%d,", index));
             }
             traceMapLogger.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
     }
 
@@ -129,9 +134,10 @@ public class GenPoolTransformer extends Transformer {
         FileWriter file = null;
         String filename = "trace/logs/mytrace/traced.source.log";
         try {
-            file = new FileWriter(filename, true);
+            file = new FileWriter(filename);
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         whatIsTracedWriter = new BufferedWriter(file, BUFFERSIZE);
     }
@@ -141,7 +147,8 @@ public class GenPoolTransformer extends Transformer {
             whatIsTracedWriter.write(str);
             whatIsTracedWriter.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
     }
 
@@ -151,7 +158,8 @@ public class GenPoolTransformer extends Transformer {
         try {
             file = new FileWriter(filename);
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         sourceWriter = new BufferedWriter(file, BUFFERSIZE);
     }
@@ -162,7 +170,8 @@ public class GenPoolTransformer extends Transformer {
         try {
             file = new FileWriter(filename);
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         staticInitWriter = new BufferedWriter(file, BUFFERSIZE);
     }
@@ -198,7 +207,8 @@ public class GenPoolTransformer extends Transformer {
             staticInitWriter.write(sb.toString());
             staticInitWriter.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
 
     }
@@ -243,7 +253,8 @@ public class GenPoolTransformer extends Transformer {
             cc.detach();
 
         } catch (Exception e) {
-            System.out.println(e);
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] notfound of badbytecode, %s\n", sStackTrace));
         }
         return byteCode;
     }
@@ -277,7 +288,8 @@ public class GenPoolTransformer extends Transformer {
         try {
             sourceWriter.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
     }
 
@@ -388,7 +400,8 @@ public class GenPoolTransformer extends Transformer {
             try {
                 sourceWriter.write(getinst + linenumberinfo);
             } catch (IOException e) {
-                e.printStackTrace();
+                String sStackTrace = WriterUtils.handleException(e);
+                debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
             }
 
         }

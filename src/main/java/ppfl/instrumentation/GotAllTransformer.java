@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import ppfl.WriterUtils;
+
 public class GotAllTransformer extends Transformer {
 
     public GotAllTransformer(Map<String, ClassLoader> transformedclazz, String logfilename) {
@@ -28,7 +30,8 @@ public class GotAllTransformer extends Transformer {
                 CallBackIndex.loopset.add(new BackEdge(start, end));
             }
         } catch (Exception e) {
-
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         CallBackIndex.initCompressInfos();
     }
@@ -41,7 +44,8 @@ public class GotAllTransformer extends Transformer {
             File classcache = new File(classcachefolder, classname + ".log");
             return java.nio.file.Files.readAllBytes(classcache.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         return byteCode;
     }

@@ -22,6 +22,8 @@ import javassist.bytecode.MethodInfo;
 import ppfl.instrumentation.opcode.InvokeInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
 
+import ppfl.WriterUtils;
+
 public class GenClassTransformer extends Transformer {
 
     private int traceMapIndex;
@@ -54,7 +56,8 @@ public class GenClassTransformer extends Transformer {
                 CallBackIndex.loopset.add(new BackEdge(start, end));
             }
         } catch (Exception e) {
-
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         CallBackIndex.initCompressInfos();
         // init traceMap
@@ -66,7 +69,8 @@ public class GenClassTransformer extends Transformer {
                 traceMap.add(Integer.valueOf(index));
             }
         } catch (Exception e) {
-
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
 
     }
@@ -94,8 +98,8 @@ public class GenClassTransformer extends Transformer {
             byteCode = cc.toBytecode();
             cc.detach();
         } catch (Exception e) {
-            System.out.println(e);
-            // debugLogger.error("[Bug]bytecode error", e);
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] notfound of badbytecode, %s\n", sStackTrace));
         }
         // write the classfile cache
         String classcachefolder = "trace/classcache/";
@@ -106,7 +110,8 @@ public class GenClassTransformer extends Transformer {
         try {
             java.nio.file.Files.write(Paths.get(classcachefolder, classname + ".log"), byteCode);
         } catch (IOException e) {
-            e.printStackTrace();
+            String sStackTrace = WriterUtils.handleException(e);
+            debugLogger.write(String.format("[Bug] write class error, %s\n", sStackTrace));
         }
         return byteCode;
     }
