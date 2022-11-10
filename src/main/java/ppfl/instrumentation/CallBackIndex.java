@@ -48,11 +48,11 @@ public class CallBackIndex {
 	public int tsindex_object;
 
 	// threshold
-	static int loglimit = 1200000;
-	static int logcount = 0;
+	public static int loglimit = 1200000;
+	public static int logcount = 0;
 
 	// logger
-	private static Writer writer = null;
+	public static Writer writer = null;
 
 	public static List<String> stackwriter = null;
 
@@ -411,6 +411,12 @@ public class CallBackIndex {
 		// 	System.exit(0);
 		// }
 		if (tracewriter.size() > loglimit) {
+			try {
+				writer.write(String.format("Oversize Exit\n"));
+				writer.flush();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			System.exit(0);
 		}
 		DynamicTrace inst;
@@ -459,6 +465,12 @@ public class CallBackIndex {
 	public static void logCompress(int poolindex) {
 		logcount++;
 		if (tracewriter.size() > loglimit) {
+			try {
+				writer.write(String.format("Oversize Exit\n"));
+				writer.flush();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			System.exit(0);
 		}
 		DynamicTrace inst;
@@ -528,6 +540,12 @@ public class CallBackIndex {
 		// 	System.exit(0);
 		// }
 		if (tracewriter.size() > loglimit) {
+			try {
+				writer.write(String.format("Oversize Exit\n"));
+				writer.flush();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			System.exit(0);
 		}
 		DynamicTrace inst;

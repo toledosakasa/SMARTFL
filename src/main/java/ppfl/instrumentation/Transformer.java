@@ -10,7 +10,8 @@ import java.io.ObjectOutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.lang.System;
 
 import ppfl.MyWriter;
@@ -22,12 +23,26 @@ public class Transformer implements ClassFileTransformer {
 
     protected static MyWriter debugLogger = null;
     protected static Writer traceWriter = null;
+    protected static final int maxMethodSize = 10000;
     // Map of transformed clazz, key: classname, value: classloader
-    protected Map<String, ClassLoader> transformedclazz;
+    protected Set<String> transformedclazz;
+    protected Set<TraceDomain> foldSet;
 
     /** filename for logging */
-    public Transformer(Map<String, ClassLoader> transformedclazz, String logfilename) {
-        this.transformedclazz = transformedclazz;
+    public Transformer(Set<String> transformedclazz, String logfilename, Set<TraceDomain> foldSet) {
+        this.transformedclazz = new HashSet<>();
+        for(String classname : transformedclazz){
+            // replace . with /
+            this.transformedclazz.add(classname.replace(".", "/"));
+        }
+        
+        this.foldSet = new HashSet<>();
+        if(foldSet != null){
+            for(TraceDomain foldMethod : foldSet){
+                this.foldSet.add(foldMethod);
+            }
+        }
+
         File debugdir = new File("trace/debug/");
         debugdir.mkdirs();
         WriterUtils.setPath("trace/debug/");
@@ -94,14 +109,11 @@ public class Transformer implements ClassFileTransformer {
             long startTime = System.currentTimeMillis();
             byte[] byteCode = classfileBuffer;
             // TODO modify here to transform all classes.
-            if (className == null || !transformedclazz.containsKey(className))
-                return byteCode;
-            if (loader == null || !loader.equals(transformedclazz.get(className)))
+            if (className == null || !transformedclazz.contains(className))
                 return byteCode;
             transformedclazz.remove(className);
-
-            byte[] ret = transformBody(className);
             debugLogger.write(String.format("[Agent] class = %s\n", className));
+            byte[] ret = transformBody(className);
             long endTime = System.currentTimeMillis();
             double time = (endTime - startTime) / 1000.0;
             debugLogger.write(String.format("[Agent] Transform time %f\n", time));

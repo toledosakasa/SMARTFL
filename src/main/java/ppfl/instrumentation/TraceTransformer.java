@@ -83,7 +83,7 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static Writer traceWriter = null;
 	private static BufferedWriter whatIsTracedWriter = null;
 	// Map of transformed clazz, key: classname, value: classloader
-	private Map<String,ClassLoader> transformedclazz;
+	private Set<String> transformedclazz;
 	private StaticAnalyzer staticAnalyzer = null;
 
 	private boolean useD4jTest = false;
@@ -98,8 +98,12 @@ public class TraceTransformer implements ClassFileTransformer {
 	private static List<String> stackwriter;
 
 	/** filename for logging */
-	public TraceTransformer(Map<String,ClassLoader> transformedclazz, String logfilename, CacheCond cacheCond){
-		this.transformedclazz = transformedclazz;
+	public TraceTransformer(Set<String> transformedclazz, String logfilename, CacheCond cacheCond){
+		this.transformedclazz = new HashSet<>();
+		for(String classname : transformedclazz){
+            // replace . with /
+            this.transformedclazz.add(classname.replace(".", "/"));
+        }
 		this.cacheCond = cacheCond;
 		File debugdir = new File("trace/debug/");
 		debugdir.mkdirs();
@@ -878,9 +882,7 @@ public class TraceTransformer implements ClassFileTransformer {
 			long startTime = System.currentTimeMillis();
 			byte[] byteCode = classfileBuffer;
 			// TODO modify here to transform all classes.
-			if(className == null || !transformedclazz.containsKey(className))
-				return byteCode;
-			if(loader == null || !loader.equals(transformedclazz.get(className)))
+			if(className == null || !transformedclazz.contains(className))
 				return byteCode;
 			transformedclazz.remove(className);
 			

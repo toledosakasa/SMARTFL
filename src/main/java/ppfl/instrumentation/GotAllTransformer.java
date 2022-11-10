@@ -5,14 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Set;
 
 import ppfl.WriterUtils;
 
 public class GotAllTransformer extends Transformer {
 
-    public GotAllTransformer(Map<String, ClassLoader> transformedclazz, String logfilename) {
-        super(transformedclazz, logfilename);
+    public GotAllTransformer(Set<String> transformedclazz, String logfilename, Set<TraceDomain> foldSet) {
+        super(transformedclazz, logfilename, foldSet);
         CallBackIndex.tracewriter = new TraceSequence(logfilename);
         CallBackIndex.loopset = new ArrayList<>();
         this.initCache();

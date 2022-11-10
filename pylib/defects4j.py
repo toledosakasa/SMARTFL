@@ -356,18 +356,28 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     # print(reltest_dict)
     # input()
 
-    ret = []
-    # for testclass_rel in reltest_dict:
-    #     app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses}\""
-    #     app += ' > /dev/null'
-    #     ret.append(app)
+    ret_fail = []
+    logTrace = False
+    trigger_tests = metadata['tests.trigger'].strip().split(';')
+    # trigger_tests at first
+    for trigger_test in trigger_tests:
+        filename = trigger_test.replace('::', '.')
+        app = f"defects4j test -t {trigger_test} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={filename}.log,project={proj},cache=GotAll\""
+        app = app.replace('$', '@') # deal with missing $ in d4j scripts
+        if not logTrace:
+            app += '>/dev/null 2>&1'
+        ret_fail.append(app)
+    ret_pass = []
     for testclass_rel in reltest_dict:
         for testmethod_rel in reltest_dict[testclass_rel]:
+            if(f'{testclass_rel}::{testmethod_rel}' in trigger_tests):
+                continue
             app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log,project={proj},cache=GotAll\""
             app = app.replace('$', '@') # deal with missing $ in d4j scripts
-            app += '>/dev/null 2>&1'
-            ret.append(app)
-    return ret
+            if not logTrace:
+                app += '>/dev/null 2>&1'
+            ret_pass.append(app)
+    return ret_fail,ret_pass
 
 
 def changeCacheInCmd(cmd: str, arg):
@@ -404,15 +414,36 @@ def clearcache(proj: str, id: str):
     os.system('rm '+cachepath)
 
 
+def checkoversize(checkoutdir, cmdline):
+    logfile = ""
+    for spt in cmdline.split(','):
+        if spt.startswith('logfile='):
+            logfile = spt.split('=')[1]
+            break
+    logpath = f'{checkoutdir}/trace/logs/run/{logfile}'
+    while True:
+        line = utf8open(logpath).readlines()[0].strip()
+        if line == 'Oversize Exit':
+            extractcmd = f'mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.Extract" "-Dexec.args={checkoutdir}/trace/logs/run/{logfile}.ser"'
+            os.system(extractcmd)
+            os.system(changeCacheInCmd(cmdline, f',cache=GenPool,fold=True'))
+            os.system(changeCacheInCmd(cmdline, f',cache=GenClass,fold=True'))
+            # os.system(extractcmd)
+        else:
+            break
+
 # @func_set_timeout(1200)
 def rund4j(proj: str, id: str, debug=True):
     cleanupcheckout(proj,id)
-    banlist = ['','Lang2','Time21']
+    banlist = ['Lang2','Time21']
+    # banlist.append('Lang43')
+    # banlist.append('Math13')
     if((proj+id).strip() in banlist):
         return
     time_start = time.time()
     checkout(proj, id)
-    cmdlines = getd4jcmdline(proj, id, debug)
+    cmdlines_fail, cmdlines_pass= getd4jcmdline(proj, id, debug)
+    cmdlines = cmdlines_fail + cmdlines_pass
     checkoutdir = f'{checkoutbase}/{proj}/{id}'
     # cleanup previous log
     previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
@@ -423,11 +454,8 @@ def rund4j(proj: str, id: str, debug=True):
     cmdlines = [cdcmd + cmdline for cmdline in cmdlines]
     os.system(changeCacheInCmd(cmdlines[0], ',cache=GenPool'))
     os.system(changeCacheInCmd(cmdlines[0], ',cache=GenClass'))
-    # with Pool(processes=1) as pool:
-    #     pool.map(os.system, cmdlines[0:1])
-    #     pool.close()
-    #     pool.join()
-    # os.system(cmdlines[0])
+    checkoversize(checkoutdir, cmdlines[0])
+
     processesnum = 16
     if proj == 'Time':
         processesnum = 1
@@ -555,7 +583,8 @@ def rund4jtest(proj: str, id: str, test: str):
         return
     time_start = time.time()
     checkout(proj, id)
-    cmdlines = getd4jcmdline(proj, id, debug)
+    cmdlines_fail, cmdlines_pass= getd4jcmdline(proj, id, debug)
+    cmdlines = cmdlines_fail + cmdlines_pass
     cmdline = ''
     for line in cmdlines:
         if TestName in line:
@@ -570,6 +599,36 @@ def rund4jtest(proj: str, id: str, test: str):
         os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
     os.system(changeCacheInCmd(cmdline, ',cache=GenPool'))
     os.system(changeCacheInCmd(cmdline, ',cache=GenClass'))
+    checkoversize(checkoutdir, cmdline)
+    time_end = time.time()
+    if debug:
+        print('d4j tracing complete after', time_end-time_start, 'sec')
+
+def runfailtest(proj: str, id: str):
+    # TestCalss = test.split('#')[0]
+    # TestMethod = test.split('#')[1]
+    # TestName = TestCalss + "::" + TestMethod
+    os.system('mvn package -DskipTests')
+    debug = True
+    cleanupcheckout(proj,id)
+    banlist = ['','Lang2','Time21']
+    if((proj+id).strip() in banlist):
+        return
+    time_start = time.time()
+    checkout(proj, id)
+    cmdlines_fail, cmdlines_pass= getd4jcmdline(proj, id, debug)
+    cmdlines = cmdlines_fail + cmdlines_pass
+    cmdline = cmdlines[0]
+    checkoutdir = f'{checkoutbase}/{proj}/{id}'
+    cmdline = f'cd {checkoutdir} && {cmdline}'
+    # cleanup previous log
+    previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
+    if os.path.exists(previouslog):
+        # print('removing previous trace logs.')
+        os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
+    os.system(changeCacheInCmd(cmdline, ',cache=GenPool'))
+    os.system(changeCacheInCmd(cmdline, ',cache=GenClass'))
+    checkoversize(checkoutdir, cmdline)
     time_end = time.time()
     if debug:
         print('d4j tracing complete after', time_end-time_start, 'sec')

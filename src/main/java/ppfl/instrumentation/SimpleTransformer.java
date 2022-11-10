@@ -10,7 +10,6 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.lang.System;
 
@@ -32,12 +31,16 @@ public class SimpleTransformer implements ClassFileTransformer {
 	private static Writer traceWriter = null;
 	private Set<String> d4jMethodNames = new HashSet<>();
 	// Map of transformed clazz, key: classname, value: classloader
-	private Map<String, ClassLoader> transformedclazz;
+	private Set<String> transformedclazz;
 	private boolean first_addShutdownHook = true;
 
 	/** filename for logging */
-	public SimpleTransformer(Map<String, ClassLoader> transformedclazz, String logfilename) {
-		this.transformedclazz = transformedclazz;
+	public SimpleTransformer(Set<String> transformedclazz, String logfilename) {
+		this.transformedclazz = new HashSet<>();
+		for(String classname : transformedclazz){
+            // replace . with /
+            this.transformedclazz.add(classname.replace(".", "/"));
+        }
 		File debugdir = new File("trace/debug/");
 		debugdir.mkdirs();
 		WriterUtils.setPath("trace/debug/");
@@ -100,9 +103,7 @@ public class SimpleTransformer implements ClassFileTransformer {
 				if (instrumentJunit && cc.getName().startsWith("junit") && !m.getName().startsWith("assert")) {
 					continue;
 				}
-				if (!m.isStaticInitializer()) {
-					transformBehavior(m, cc, constp, cbi);
-				}
+				transformBehavior(m, cc, constp, cbi);
 			}
 
 			byteCode = cc.toBytecode();
@@ -157,9 +158,7 @@ public class SimpleTransformer implements ClassFileTransformer {
 			long startTime = System.currentTimeMillis();
 			byte[] byteCode = classfileBuffer;
 			// TODO modify here to transform all classes.
-			if (className == null || !transformedclazz.containsKey(className))
-				return byteCode;
-			if (loader == null || !loader.equals(transformedclazz.get(className)))
+			if (className == null || !transformedclazz.contains(className))
 				return byteCode;
 			transformedclazz.remove(className);
 

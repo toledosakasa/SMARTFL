@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
 
 
 import ppfl.MyWriter;
@@ -25,6 +23,7 @@ public class InstrumentationAgent {
 	private static String logFile = null;
 	private static String[] className = null;
 	private static List<String> classNames = null;
+	private static Set<TraceDomain> foldSet = null;
 	private static String d4jdatafile = null;
 	private static boolean simpleLog = false;
 	private static String project = null;
@@ -82,6 +81,26 @@ public class InstrumentationAgent {
 			if (s.startsWith("project=")) {
 				project = s.split("=")[1];
 			}
+			if(s.startsWith("fold=")){
+				if(s.split("=")[1].equals("True")){
+					foldSet = new HashSet<>();
+					String foldpath = "trace/logs/mytrace/fold.log";
+					try (BufferedReader reader = new BufferedReader(new FileReader(foldpath))) {
+						String t = null;
+						while ((t = reader.readLine()) != null) {
+							if(t.startsWith("[count]"))
+								continue;
+							String[] tmps = t.split(":");
+							TraceDomain	foldDomain = new TraceDomain(tmps[0], tmps[1], tmps[2]);
+							foldSet.add(foldDomain);
+						}
+					} catch (Exception e) {
+						String sStackTrace = WriterUtils.handleException(e);
+						debugLogger.write(String.format("[Bug] IO Exception, %s\n", sStackTrace));
+						debugLogger.flush();
+					}
+				}
+			}
 			if (s.startsWith("cache=")) {
 				String cacheArg = s.split("=")[1];
 				if(cacheArg.equals("GenPool"))
@@ -92,6 +111,8 @@ public class InstrumentationAgent {
 					cacheCond = CacheCond.GotAll;
 			}
 		}
+		debugLogger.write(String.format("[Agent] Start Agent %s\n", logFile));
+		debugLogger.flush();
 		if (logFile == null && className == null && classNames == null && d4jdatafile == null)
 			return;
 		transformClass(inst);
@@ -114,8 +135,6 @@ public class InstrumentationAgent {
 			transformAll(instrumentation);
 			return;
 		}
-		Class<?> targetCls = null;
-		ClassLoader targetClassLoader = null;
 		if (d4jdatafile != null) {
 			String relevantClasses = null;
 			String allTestClasses = null;
@@ -153,33 +172,7 @@ public class InstrumentationAgent {
 			return;
 		}
 		for (String classname : className) {
-			// see if we can get the class using forName
-			try {
-				// debugLogger.info("className:{}", classname);
-				targetCls = Class.forName(classname);
-				targetClassLoader = targetCls.getClassLoader();
-				transform(targetCls, targetClassLoader, instrumentation);
-				if (!instrumentNested) {
-					// retransform child classes.
-					Class<?> children[] = targetCls.getDeclaredClasses();
-					if (children != null && children.length > 0) {
-						for (Class<?> chdclazz : children)
-							transform(chdclazz, targetClassLoader, instrumentation);
-					}
-				}
-				continue;
-			} catch (Exception ex) {
-				// debugLogger.error("Class [{}] not found with Class.forName", classname);
-			}
-			// otherwise iterate all loaded classes and find what we want
-			for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
-				if (clazz.getName().equals(classname)) {
-					targetCls = clazz;
-					targetClassLoader = targetCls.getClassLoader();
-					transform(targetCls, targetClassLoader, instrumentation);
-				}
-			}
-			throw new RuntimeException("Failed to find class [" + classname + "]");
+			transform(classname, instrumentation);
 		}
 
 		String logfilename = "all.log";
@@ -193,37 +186,41 @@ public class InstrumentationAgent {
 				dt.setD4jDataFile(d4jdatafile);
 			}
 			instrumentation.addTransformer(dt, true);
-			for (Class<?> clazz : clazzset) {
-				try {
-					instrumentation.retransformClasses(clazz);
-				} catch (Exception ex) {
-					throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
-				}
-			}
+			// for(String classname : transformedclazz){
+			// 	debugLogger.write(String.format("[Profile] Transform %s\n", classname));
+			// 	try {
+			// 		Class.forName(classname, false, InstrumentationAgent.class.getClassLoader());
+			// 	} catch (Exception ex) {
+			// 		debugLogger.write(String.format("[ProfileBug] Class %s not found with Class.forName\n", classname));
+			// 	}
+			// }
 			return;
 		}
 		boolean usenewTransformer = true;
 		if(usenewTransformer){
 			Transformer dt;
 			if(cacheCond == CacheCond.GenPool)
-				dt = new GenPoolTransformer(transformedclazz, logfilename);
+				dt = new GenPoolTransformer(transformedclazz, logfilename, foldSet);
 			else if (cacheCond == CacheCond.GenClass)
-				dt = new GenClassTransformer(transformedclazz, logfilename);
+				dt = new GenClassTransformer(transformedclazz, logfilename, foldSet);
 			else
-				dt = new GotAllTransformer(transformedclazz, logfilename);
+				dt = new GotAllTransformer(transformedclazz, logfilename, foldSet);
 
 			instrumentation.addTransformer(dt, true);
 			long startTime = System.currentTimeMillis();
-			for (Class<?> clazz : clazzset) {
+			for(String classname : transformedclazz){
+				// targetCls = Class.forName(classname);
+				debugLogger.write(String.format("[Agent] Transform %s\n", classname));
 				try {
-					instrumentation.retransformClasses(clazz);
+					Class.forName(classname, false, InstrumentationAgent.class.getClassLoader());
 				} catch (Exception ex) {
-					throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
+					debugLogger.write(String.format("[Bug] Class %s not found with Class.forName\n", classname));
 				}
 			}
 			long endTime = System.currentTimeMillis();
 			double time = (endTime - startTime) / 1000.0;
-			debugLogger.write(String.format("[Agent] Transform time %f\n", time));
+			debugLogger.write(String.format("[Agent] Transform time %f, %s\n", time, logfilename));
+			debugLogger.flush();
 			// the first test has no cache now, need to write
 			if(cacheCond == CacheCond.GenPool){
 				dt.output();
@@ -250,16 +247,16 @@ public class InstrumentationAgent {
 			// }
 			instrumentation.addTransformer(dt, true);
 			long startTime = System.currentTimeMillis();
-			for (Class<?> clazz : clazzset) {
-				try {
-					instrumentation.retransformClasses(clazz);
-				} catch (Exception ex) {
-					throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
-				}
-			}
+			// for (Class<?> clazz : clazzset) {
+			// 	try {
+			// 		instrumentation.retransformClasses(clazz);
+			// 	} catch (Exception ex) {
+			// 		throw new RuntimeException("Transform failed for class: [" + clazz.getName() + "]", ex);
+			// 	}
+			// }
 			long endTime = System.currentTimeMillis();
 			double time = (endTime - startTime) / 1000.0;
-			debugLogger.write(String.format("[Agent] Transform time %f\n", time));
+			debugLogger.write(String.format("[Agent] Transform time %f, %s\n", time, logfilename));
 			// the first test has no cache now, need to write
 			if(dt.cacheCond == CacheCond.GenPool){
 				dt.writeTracePool();
@@ -285,37 +282,36 @@ public class InstrumentationAgent {
 		// inst.addTransformer(dt, true);
 	}
 
-	// static Set<String> transformedclazz = new HashSet<>();
-	static Map<String, ClassLoader> transformedclazz = new HashMap<>();
-	static Set<Class<?>> clazzset = new HashSet<>();
+	static Set<String> transformedclazz = new HashSet<>();
 
-	private static void transform(Class<?> clazz, ClassLoader classLoader, Instrumentation instrumentation) {
-		String classname = clazz.getName().replace(".", "/"); // replace . with /
-		if (transformedclazz.containsKey(classname))
+	private static void transform(String classname, Instrumentation instrumentation) {
+		// classname = classname.replace(".", "/"); // replace . with /
+		if (transformedclazz.contains(classname))
 			return;
-		transformedclazz.put(classname, classLoader);
-		clazzset.add(clazz);
+		// transformedclazz.put(classname, classLoader);
+		transformedclazz.add(classname);
+		// clazzset.add(clazz);
 		// if (transformedclazz.contains(clazz.getName())) {
 		// return;
 		// }
 		// transformedclazz.add(clazz.getName());
 
-		if (instrumentNested) {
-			// retransform nested classes.
-			Class<?> children[] = clazz.getDeclaredClasses();
-			if (children != null && children.length > 0) {
-				for (Class<?> chdclazz : children)
-					transform(chdclazz, classLoader, instrumentation);
-			}
-		}
+		// if (instrumentNested) {
+		// 	// retransform nested classes.
+		// 	Class<?> children[] = clazz.getDeclaredClasses();
+		// 	if (children != null && children.length > 0) {
+		// 		for (Class<?> chdclazz : children)
+		// 			transform(chdclazz, classLoader, instrumentation);
+		// 	}
+		// }
 
-		boolean retransformSuper = false;// evaluation switch
-		// retransform super class.
-		if (retransformSuper) {
-			Class<?> superCl = clazz.getSuperclass();
-			if (superCl != null)
-				transform(superCl, classLoader, instrumentation);
-		}
+		// boolean retransformSuper = false;// evaluation switch
+		// // retransform super class.
+		// if (retransformSuper) {
+		// 	Class<?> superCl = clazz.getSuperclass();
+		// 	if (superCl != null)
+		// 		transform(superCl, classLoader, instrumentation);
+		// }
 	}
 
 }

@@ -190,6 +190,11 @@ if __name__ == '__main__':
             d4j.rund4jtest(args[2], args[3], args[4])
         else:
             print(f"python3 s.py rund4jtest proj id TestClass#testmethod")
+    if args[1] == 'runfailtest':
+        if (len(args) == 4):
+            d4j.runfailtest(args[2], args[3])
+        else:
+            print(f"python3 s.py runfailtest proj id")
 
     if args[1] == 'parsed4j':
         if(len(args) == 4):

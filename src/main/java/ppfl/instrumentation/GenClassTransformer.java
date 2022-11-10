@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.lang.System;
+import java.util.Set;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -35,8 +34,8 @@ public class GenClassTransformer extends Transformer {
         return poolindex;
     }
 
-    public GenClassTransformer(Map<String, ClassLoader> transformedclazz, String logfilename) {
-        super(transformedclazz, logfilename);
+    public GenClassTransformer(Set<String> transformedclazz, String logfilename, Set<TraceDomain> foldSet) {
+        super(transformedclazz, logfilename, foldSet);
         traceMapIndex = 0;
         traceMap = new ArrayList<>();
         CallBackIndex.tracewriter = new TraceSequence(logfilename);
@@ -87,12 +86,20 @@ public class GenClassTransformer extends Transformer {
 
             boolean instrumentJunit = true;// evaluation switch
             for (MethodInfo m : cc.getClassFile().getMethods()) {
+                // handle fold method
+                String methodname = m.getName();
+                String signature = m.getDescriptor();
+                TraceDomain thisDomain = new TraceDomain(classname, methodname, signature);
+                if(foldSet.contains(thisDomain))
+                    continue;
+                // handle big method, it seems insertgap will be slow
+                CodeAttribute ca = m.getCodeAttribute();
+                if(ca != null && ca.length() > maxMethodSize)
+                    continue;
                 if (instrumentJunit && cc.getName().startsWith("junit") && !m.getName().startsWith("assert")) {
                     continue;
                 }
-                if (!m.isStaticInitializer()) {
-                    transformBehavior(m, cc, constp, cbi);
-                }
+                transformBehavior(m, cc, constp, cbi);
             }
 
             byteCode = cc.toBytecode();
@@ -160,12 +167,10 @@ public class GenClassTransformer extends Transformer {
                     needCompress = true;
             }
             if (oi != null) {
-                if (!mi.isStaticInitializer()) {
-                    if (needCompress) {
-                        oi.insertBeforeCompress(ci, constp, poolindex, cbi);
-                    } else
-                        oi.insertBefore(ci, constp, poolindex, cbi);
-                }
+                if (needCompress) {
+                    oi.insertBeforeCompress(ci, constp, poolindex, cbi);
+                } else
+                    oi.insertBefore(ci, constp, poolindex, cbi);
             }
             // move to the next inst. everything below this will be inserted after the inst.
             index = ci.next();
@@ -176,13 +181,9 @@ public class GenClassTransformer extends Transformer {
                 // in the case that static-initializer may be called.
                 // FIXME: what about the loaded obj of getstatic and new
                 if (oi instanceof InvokeInst || oi.form == 178 || oi.form == 187) {// getstatic and new
-                    if (!mi.isStaticInitializer()) {
-                        oi.insertReturn(ci, constp, poolindex, cbi);
-                    }
+                    oi.insertReturn(ci, constp, poolindex, cbi);
                 } else {
-                    if (!mi.isStaticInitializer()) {
-                        oi.insertAfter(ci, index, constp, cbi);
-                    }
+                    oi.insertAfter(ci, index, constp, cbi);
                 }
             }
         }

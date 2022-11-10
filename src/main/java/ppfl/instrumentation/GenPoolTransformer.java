@@ -9,7 +9,7 @@ import java.io.BufferedOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.lang.System;
 
 import javassist.ClassPool;
@@ -40,8 +40,8 @@ public class GenPoolTransformer extends Transformer {
     private List<Integer> traceMap;
     private StaticAnalyzer staticAnalyzer = null;
 
-    public GenPoolTransformer(Map<String, ClassLoader> transformedclazz, String logfilename) {
-        super(transformedclazz, logfilename);
+    public GenPoolTransformer(Set<String> transformedclazz, String logfilename, Set<TraceDomain> foldSet) {
+        super(transformedclazz, logfilename, foldSet);
         File logdir = new File("trace/logs/mytrace/");
         logdir.mkdirs();
         setWhatIsTracedWriterFile();
@@ -236,13 +236,21 @@ public class GenPoolTransformer extends Transformer {
 
             boolean instrumentJunit = true;// evaluation switch
             for (MethodInfo m : cc.getClassFile().getMethods()) {
+                // handle fold method
+                String methodname = m.getName();
+                String signature = m.getDescriptor();
+                TraceDomain thisDomain = new TraceDomain(classname, methodname, signature);
+                if(foldSet.contains(thisDomain))
+                    continue;
+                // handle big method, it seems insertgap will be slow
+                CodeAttribute ca = m.getCodeAttribute();
+                if(ca != null && ca.length() > maxMethodSize)
+                    continue;
                 if (instrumentJunit && cc.getName().startsWith("junit") && !m.getName().startsWith("assert")) {
                     continue;
                 }
-                if (!m.isStaticInitializer()) {
-                    writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
-                    transformBehavior(m, cc, constp, cbi);
-                }
+                writeWhatIsTraced(m.getName() + "#" + m.getDescriptor() + ",");
+                transformBehavior(m, cc, constp, cbi);
             }
             // dump class inheritance
             String superClassName = cc.getClassFile().getSuperclass();
@@ -387,7 +395,6 @@ public class GenPoolTransformer extends Transformer {
 
             int poolindex = CallBackIndex.tracepool.indexAt();
             CallBackIndex.tracepool.add(instruction);
-            // TODO: 之后在GenPool时，把这个一起输出。第二次GenClass时，就直接用了
             traceMap.add(poolindex);
 
             String linenumberinfo = ",lineinfo=" + classname + "#" + methodname + "#" + signature + "#" + ln + "#"
