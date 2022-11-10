@@ -106,7 +106,7 @@ public class DynamicTrace implements Serializable {
 
     public Integer getAddressFromStack() {
         if (stackType != null) {
-            if (stackType.contentEquals("Obj")) {
+            if (stackType.contentEquals("Obj") || stackType.equals("Str")) {
                 int objValue = (int) stackValue;
                 return new Integer(objValue);
             }

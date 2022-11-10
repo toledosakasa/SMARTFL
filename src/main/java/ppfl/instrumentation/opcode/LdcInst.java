@@ -60,7 +60,7 @@ public class LdcInst extends OpcodeInst {
 		callbackindex = cbi.getLdcCallBack(v);
 
 		// FIXME: now disable other type 
-		if(callbackindex == cbi.traceindex_object){
+		if(callbackindex == cbi.traceindex_object || callbackindex == cbi.traceindex_string){
 			int instpos = ci.insertExGap(4);// the gap must be long enough for the following instrumentation
 			ci.writeByte(89, instpos);// dup
 			ci.writeByte(184, instpos + 1);// invokestatic

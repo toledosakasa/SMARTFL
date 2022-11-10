@@ -161,6 +161,7 @@ public class CallBackIndex {
 		// traceindex_float = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(F)F");
 		// traceindex_string = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/String;)Ljava/lang/String;");
 		// traceindex_object = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/Object;)Ljava/lang/Object;");
+		traceindex_string = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/String;)V");
 		traceindex_object = constp.addMethodrefInfo(classindex, TRACE_CALLBACK_NAME, "(Ljava/lang/Object;)V");
 
 		logstringindex = constp.addMethodrefInfo(classindex, "logString", "(Ljava/lang/String;)V");
@@ -358,17 +359,12 @@ public class CallBackIndex {
 		return i;
 	}
 
-	public static String traceTopStack1(String i) {
-		// try {
-		// 	writer.write(",stack=Str:");
-		// 	// FIXME this is currently buggy if the string include \n.
-		// 	// writer.write(i);
-		// 	// writer.flush();
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// }
-		// TraceTransformer.traceLogger.info(",pushtype=String,pushvalue=\"{}\"", i);
-		return i;
+	public static void traceTopStack1(String i) {
+		// call system hashcode (jvm address)
+		String stackType = "Str";
+		int value = java.lang.System.identityHashCode(i);
+		tracewriter.top().addDynamicInfo(stackType, value);
+		return;
 	}
 
 
