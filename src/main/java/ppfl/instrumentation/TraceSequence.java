@@ -2,12 +2,15 @@ package ppfl.instrumentation;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.ArrayList;
 
 public class TraceSequence implements Serializable {
     private String name;
     private List<DynamicTrace> tracelist;
     private TracePool tracepool;
+    public boolean pass;
 
     TraceSequence(String name){
         this.name = name;
@@ -21,6 +24,10 @@ public class TraceSequence implements Serializable {
 
     public String getName(){
         return name;
+    }
+
+    public void setName(String name){
+        this.name = name;
     }
 
     public void setTracePool(TracePool tracepool){
@@ -37,11 +44,14 @@ public class TraceSequence implements Serializable {
         if(!TraceTransformer.useIndexTrace)
             return ret;
         try {
+            if(ret.isStackTrace())
+                return ret;
             ret.trace = tracepool.get(ret.traceindex);
         } catch (Exception e) {
             if(ret == null)
                 System.out.println("null");
             System.out.println("name = "+ name+"\nindex = " + index);
+            // throw(e);
         }
         return ret;
     }
@@ -58,4 +68,16 @@ public class TraceSequence implements Serializable {
         tracelist.remove(index);
     }
 
+    public void prune(Set<String> observeSet){
+        ListIterator<DynamicTrace> iter = tracelist.listIterator(tracelist.size());
+        while(iter.hasPrevious()){
+            DynamicTrace dtrace = iter.previous();
+            Trace trace = tracepool.get(dtrace.traceindex);
+            String location = trace.classname + ":" + trace.lineno;
+            if(!observeSet.contains(location))
+                iter.remove();
+            else
+                break;
+        }
+    }
 }

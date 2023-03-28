@@ -100,6 +100,7 @@ public class SimpleTransformer implements ClassFileTransformer {
 
 			boolean instrumentJunit = true;// evaluation switch
 			for (MethodInfo m : cc.getClassFile().getMethods()) {
+				debugLogger.write("[Debug] handle %s :: %s\n", cc.getName(), m.getName());
 				if (instrumentJunit && cc.getName().startsWith("junit") && !m.getName().startsWith("assert")) {
 					continue;
 				}
@@ -132,6 +133,8 @@ public class SimpleTransformer implements ClassFileTransformer {
 		CodeIterator ci = ca.iterator();
 		String longname = String.format("%s::%s", cc.getName(), m.getName());
 		ProfileUtils.logMethodName(ci, longname, constp);
+
+		debugLogger.write("[Debug] transform %s :: %s\n", cc.getName(), m.getName());
 
 		// not sure if this is necessary.
 		ca.computeMaxStack();

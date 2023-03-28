@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -38,6 +39,29 @@ public class GetFieldInst extends OpcodeInst {
 		defnode = graph.addNewStackNode(stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		Node objectAddress = graph.popStackNode();
+		usenodes.add(objectAddress);
+		String field = dtrace.trace.getfield();
+		Node use = graph.getHeap(objectAddress, field);
+		// in some pass tests, there can be uninstrumented methods and no first def of the use
+		if(use != null)
+			usenodes.add(use);
+		else{
+			Node obj = graph.getObj(objectAddress);
+			if(obj != null)
+				usenodes.add(obj);
+		}
+		int size = dtrace.trace.getfieldsize();
+		defnode = graph.addStackNode(stmt, size);
+		Integer addr = dtrace.getAddressFromStack();
+		if(addr != null)
+			defnode.setAddress(addr);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 	@Override

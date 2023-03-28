@@ -6,6 +6,7 @@ import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
 
 //168, no insert after
+// now we don't handle the control flow from jsr and ret.
 public class JsrInst extends OpcodeInst {
 
 	public JsrInst(int _form) {

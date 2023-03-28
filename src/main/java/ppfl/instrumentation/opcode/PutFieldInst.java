@@ -5,7 +5,11 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
+import ppfl.ProbGraph;
 import ppfl.instrumentation.CallBackIndex;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //181
 public class PutFieldInst extends OpcodeInst {
@@ -34,6 +38,27 @@ public class PutFieldInst extends OpcodeInst {
 		usenodes.add(objectAddress);
 		String field = graph.dynamictrace.trace.getfield();
 		defnode = graph.addNewHeapNode(objectAddress, field, stmt);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		usenodes.add(graph.popStackNode());
+		Node objectAddress = graph.popStackNode();
+		usenodes.add(objectAddress);
+
+		Node self = graph.getObj(objectAddress);
+		List<Node> usenodes2 = new ArrayList<>();
+		usenodes2.addAll(usenodes);
+		if(self != null)
+			usenodes2.add(self);
+		defnode = graph.addObj(objectAddress, stmt);
+		graph.buildFactor(defnode, prednodes, usenodes2, null, stmt);
+
+		String field = dtrace.trace.getfield();
+		int size = dtrace.trace.getfieldsize();
+		defnode = graph.addHeap(objectAddress, field, stmt, size);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 

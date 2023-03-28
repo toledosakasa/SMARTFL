@@ -73,6 +73,8 @@ public class Extract {
         int count = 0;
         for(int i=0;i<size;i++){
             DynamicTrace trace = traceseq.get(i);
+            if(trace.isStackTrace())
+                continue;
             // if(trace.isret || trace.trace.type != Trace.LogType.Inst)
             //     continue;
             TraceDomain domain = trace.getDomain();

@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -47,7 +48,7 @@ public class AreturnInst extends OpcodeInst {
 	}
 
 	@Override
-	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi, boolean isEx)
 			throws BadBytecode {
 		int instpos = ci.insertGap(10);
 		int instindex = constp.addIntegerInfo(poolindex);
@@ -76,6 +77,25 @@ public class AreturnInst extends OpcodeInst {
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		graph.killPredStack("OUT_" + stmt.getClassMethod());
+	}
+
+	@Override
+	public void build(ProbGraph graph){		
+		super.build(graph);
+		// uses
+		usenodes.add(graph.popStackNode());
+		// switch stack frame
+		graph.popFrame();
+		// may be some invalid frame from junit
+		if(graph.topFrame() == null)
+			return;
+		// def in caller frame
+		Node defnode = graph.addStackNode(stmt,1);
+		Integer addr = dtrace.getAddressFromStack();
+		assert(addr != null);
+		defnode.setAddress(addr);
+ 
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 }

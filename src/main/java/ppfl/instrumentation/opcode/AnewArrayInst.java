@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.ProbGraph;
 
 //189
 public class AnewArrayInst extends OpcodeInst {
@@ -31,5 +32,13 @@ public class AnewArrayInst extends OpcodeInst {
 		ci.writeByte(89, instpos);// dup
 		ci.writeByte(184, instpos + 1);// invokestatic
 		ci.write16bit(cbi.traceindex_object, instpos + 2);
+	}
+
+	@Override
+	public void build(ProbGraph graph){
+		super.build(graph);
+		Integer addr = dtrace.getAddressFromStack();
+		assert(addr != null);
+		defnode.setAddress(addr);
 	}
 }

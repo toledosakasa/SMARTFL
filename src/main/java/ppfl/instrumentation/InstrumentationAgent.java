@@ -141,9 +141,11 @@ public class InstrumentationAgent {
 			String relevantTests = null;
 			// String configpath = String.format("d4j_resources/metadata_cached/%s%d.log",
 			// project, id);
+			debugLogger.writeln( "In agent, d4jdatafile = " + d4jdatafile);
 			try (BufferedReader reader = new BufferedReader(new FileReader(d4jdatafile));) {
 				String tmp;
 				while ((tmp = reader.readLine()) != null) {
+					debugLogger.writeln( "In agent, tmp = " + tmp);
 					String[] splt = tmp.split("=");
 					if (splt[0].equals("classes.relevant")) {
 						relevantClasses = splt[1];
@@ -158,6 +160,7 @@ public class InstrumentationAgent {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			debugLogger.writeln( "In agent, relevantClasses = " + relevantClasses);
 			ArrayList<String> classNameList = new ArrayList<>();
 			addNameToList(classNameList, relevantClasses);
 			if (simpleLog) {
@@ -167,6 +170,9 @@ public class InstrumentationAgent {
 			}
 
 			className = classNameList.toArray(new String[classNameList.size()]);
+			for(String name: className){
+				debugLogger.writeln( "In agent, calssname = " + name);
+			}
 		}
 		if (className == null) {
 			return;

@@ -1,5 +1,6 @@
 import os
 from pylib.countmap import CountMap
+from pylib.observe import genExceptionObserve, genAssertObserve
 import time
 from func_timeout import func_set_timeout
 import func_timeout
@@ -12,9 +13,9 @@ from os.path import join, getsize
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 project_bug_nums = {"Lang": 65, "Math": 106,
-                    "Time": 27, "Closure": 176, "Chart": 26}
+                    "Time": 27, "Closure": 176, "Chart": 26, "Cli": 40, "Codec": 18, "Csv" : 16, "Gson" : 18, "JacksonXml" : 6}
 # Lang changes name from org.apache.commons.lang3 to org.apache.commons.lang after 40
-classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript'}
+classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml'}
 
 use_simple_filter = False
 
@@ -103,6 +104,7 @@ def getmetainfo(proj: str, id: str, debug=True) -> Dict[str, str]:
     cachefile = utf8open_w(cachepath)
     for (k, v) in ret.items():
         cachefile.write(f'{k}={v}\n')
+    cachefile.close()
     # cleanup
     if debug:
         print('Removing temporary file')
@@ -131,6 +133,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     # currelevant = False
     trigger_tests_set, trigger_tests_map = parse_trigger_tests(trigger_tests)
     testmethods_set = parse_test_methods(testmethods)
+    # TODO: In, Codec 1, fail test 是从测试类的父类中继承而来，因此log中的类+方法名是父类的，和metadata中子类明+方法名不一致
     fail_coverage = get_fail_coverage(
         profile, trigger_tests_set, testmethods_set)
     curclass = ''
@@ -326,6 +329,7 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
         for (k, v) in tmpfile:
             cachefile.write(f'{k}={v}\n')
         cachefile.write(f'corrected=true\n')
+        cachefile.close()
 
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
@@ -364,8 +368,9 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
         filename = trigger_test.replace('::', '.')
         app = f"defects4j test -t {trigger_test} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={filename}.log,project={proj},cache=GotAll\""
         app = app.replace('$', '@') # deal with missing $ in d4j scripts
-        if not logTrace:
-            app += '>/dev/null 2>&1'
+        app += f' > trace/logs/observe/{filename}-obs.log 2>&1'
+        # if not logTrace:
+        #     app += '>/dev/null 2>&1'
         ret_fail.append(app)
     ret_pass = []
     for testclass_rel in reltest_dict:
@@ -391,6 +396,9 @@ def checkout(proj: str, id: str):
         print("in checkout")
         os.system(
             f'defects4j checkout -p {proj} -v {id}b -w {checkoutbase}/{proj}/{id} >/dev/null 2>&1')
+    obspath = f'{checkoutpath}/trace/logs/observe'
+    if not(os.path.exists(obspath)):
+        os.makedirs(obspath)
 
 
 def deletecheckout(proj: str, id: str):
@@ -402,7 +410,7 @@ def deletecheckout(proj: str, id: str):
 def cleanupcheckout(proj: str, id: str):
     checkoutpath = f'{checkoutbase}/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
-        os.system(f'rm -rf {checkoutpath}/trace/logs/profile/')
+        # os.system(f'rm -rf {checkoutpath}/trace/logs/profile/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/run/')
         os.system(f'rm -rf {checkoutpath}/trace/classcache/')
@@ -435,7 +443,7 @@ def checkoversize(checkoutdir, cmdline):
 # @func_set_timeout(1200)
 def rund4j(proj: str, id: str, debug=True):
     cleanupcheckout(proj,id)
-    banlist = ['Lang2','Time21']
+    banlist = ['Lang2','Time21', 'Cli6']
     # banlist.append('Lang43')
     # banlist.append('Math13')
     if((proj+id).strip() in banlist):
@@ -468,6 +476,8 @@ def rund4j(proj: str, id: str, debug=True):
     #     print('testing', testclassname)
     #     # input()
     #     os.system(cdcmd + cmdline)
+    genExceptionObserve(proj, id)
+    genAssertObserve(proj, id)
     time_end = time.time()
     if debug:
         print('d4j tracing complete after', time_end-time_start, 'sec')
@@ -519,7 +529,7 @@ def parseproj(proj: str, debug=True):
     if(not debug):
         for cmdline in cmdlines:
             cmdline = cmdline + '>/dev/null 2>&1'
-    with Pool(processes=16) as pool:
+    with Pool(processes=1) as pool:
         pool.map(os.system, cmdlines)
         pool.close()
         pool.join()
@@ -535,7 +545,7 @@ def fl(proj: str, id: str, debug=True):
     if((proj+id).strip() in banlist):
         return
     #cleanupcheckout(proj, id)
-    clearcache(proj, id)
+    # clearcache(proj, id)
     rund4j(proj, id, debug)
     parse(proj, id, debug)
 
@@ -772,7 +782,8 @@ def eval_method(proj: str, id: str):
             oracle_lines.add(oracle.strip().split(':')[0])
     try:
         resultfile = utf8open(
-            f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            # f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            f'logs/result/result-{proj}-{id}.log')
     except IOError:
         print(f'{proj}{id} has failed.')
         return -2
@@ -817,11 +828,12 @@ def eval(proj: str, id: str):
             oracle_lines.add(oracle)
     try:
         resultfile = utf8open(
-            f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            # f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            f'logs/result/result-{proj}-{id}.log')
     except IOError:
         print(f'{proj}{id} has failed.')
         return -2
-    i = 0
+    i = 1
     ret = -3
     prob = 0
     lines = set()
@@ -834,6 +846,7 @@ def eval(proj: str, id: str):
         if(sp.__len__() < 3):
             print(line)
         classname = sp[0]
+        classname = classname.split('$')[0]
         methodname = sp[1]
         if methodname == '<clinit>':
             methodname = '<init>'
@@ -842,14 +855,14 @@ def eval(proj: str, id: str):
         fullname = f'{classname}:{linenumber}'
         if fullname in lines:
             continue
-        if classname.lower().startswith('test') or classname.lower().endswith('test'):
-            continue
         lines.add(fullname)
-        i += 1
         if fullname in oracle_lines:
             ret = i
             prob = float(line.split("=")[1])
             break
+        if classname.lower().startswith('test') or classname.lower().endswith('test'):
+            continue
+        i += 1
     print(f'{proj}{id} result ranking: {ret}')
     # print(f'{proj}{id} result ranking: {ret}, prob = {prob}')
     return ret
@@ -986,6 +999,8 @@ def match(proj: str, id: str):
                 spinfo = instinfo.split('=')
                 if spinfo[0] == 'lineinfo':
                     sporacle = spinfo[1].split('#')
+                    # if(sporacle[0].find('$') != -1):
+                    #     sporacle[0] = sporacle[0].split('$')[0]
                     compare_oracle = sporacle[0] + ':'+sporacle[3]
                     if compare_oracle in oracle_lines:
                         print(

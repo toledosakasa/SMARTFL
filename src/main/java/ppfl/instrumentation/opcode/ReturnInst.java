@@ -3,6 +3,7 @@ package ppfl.instrumentation.opcode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 
 //177, type void?
 public class ReturnInst extends OpcodeInst {
@@ -29,4 +30,11 @@ public class ReturnInst extends OpcodeInst {
 		graph.popStackFrame();
 		graph.killPredStack("OUT_" + stmt.getClassMethod());
 	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		graph.popFrame();
+	}
+
 }

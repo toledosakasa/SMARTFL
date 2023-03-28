@@ -6,6 +6,7 @@ public class Trace implements Serializable {
     public int opcode, lineno, index, nextinst;
     public Integer load, store, popnum, pushnum;
     public String classname, methodname, signature;
+    public boolean isStatic;
 
     public enum LogType{
         Inst, MethodLog, OutPoint
@@ -33,6 +34,7 @@ public class Trace implements Serializable {
         this.classname = classname;
         this.methodname = methodname;
         this.signature = signature;
+        this.isStatic = false;
     }
 
     public void setTypeMethodLog (){
@@ -41,6 +43,24 @@ public class Trace implements Serializable {
 
     public void setTypeOutPoint (){
         this.type = LogType.OutPoint;
+    }
+
+    public void setStatic (){
+        this.isStatic = true;
+    }
+
+    public boolean isStatic(){
+        return this.isStatic;
+    }
+
+
+
+    public boolean isInst(){
+        return this.type == LogType.Inst;
+    }
+
+    public boolean isMethodLog(){
+        return this.type == LogType.MethodLog;
     }
 
     public Trace(String []split) {
@@ -86,6 +106,8 @@ public class Trace implements Serializable {
     public String toString(){
         if(type == LogType.MethodLog){
             String ret = "###" + classname + "::" + methodname;
+            if(isStatic)
+                ret += ", static";
             return ret;
         }
 
@@ -114,8 +136,9 @@ public class Trace implements Serializable {
         }
 
         String field = this.getfield();
+        int size = this.getfieldsize();
         if(field != null){
-            ret += ",field=" + field;
+            ret += ",field=" + field + ",size=" + size;
         }
 
         Integer branchbyte = this.getbranchbyte();
@@ -132,6 +155,10 @@ public class Trace implements Serializable {
         
         ret += ",lineinfo=" + classname + "#" + methodname + "#" + signature + "#" + lineno + "#" + index + ",nextinst=" + nextinst;
         return ret;
+    }
+
+    public String getlineinfo(){
+        return classname + ":" + methodname + ":" + signature + "#" + lineno + "#" + index;
     }
 
     public String getdomain(){
@@ -152,6 +179,10 @@ public class Trace implements Serializable {
 
     public String getfield(){
         return null;
+    }
+
+    public int getfieldsize(){
+        return 0;
     }
 
     public Integer getdefault(){

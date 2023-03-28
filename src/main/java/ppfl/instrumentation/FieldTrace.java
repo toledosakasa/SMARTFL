@@ -2,17 +2,20 @@ package ppfl.instrumentation;
 
 public class FieldTrace extends Trace{
     public String FieldrefClassName, FieldrefName;
+    public boolean is2byte;
 
-    public FieldTrace(Trace trace, String field) {
+    public FieldTrace(Trace trace, String field, Boolean is2byte) {
         super(trace.opcode, trace.lineno, trace.index, trace.nextinst, trace.load, trace.store, trace.popnum,
                 trace.pushnum, trace.classname, trace.methodname, trace.signature);
         if(field.contains("#")){
             this.FieldrefClassName = field.split("#")[0];
             this.FieldrefName = field.split("#")[1];
+            this.is2byte = is2byte;
         }
         else{
-            this.FieldrefClassName =null;
+            this.FieldrefClassName = null;
             this.FieldrefName = field;
+            this.is2byte = is2byte;
         }
     }
 
@@ -37,5 +40,12 @@ public class FieldTrace extends Trace{
         if(FieldrefClassName != null)
             field = FieldrefClassName + "#" + field;
         return field;
+    }
+
+    @Override
+    public int getfieldsize(){
+        if(is2byte)
+            return 2;
+        return 1;
     }
 }

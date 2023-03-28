@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.ProbGraph;
 
 //50
 public class AaloadInst extends XaloadInst {
@@ -31,6 +32,14 @@ public class AaloadInst extends XaloadInst {
 		ci.writeByte(89, instpos);// dup
 		ci.writeByte(184, instpos + 1);// invokestatic
 		ci.write16bit(cbi.traceindex_object, instpos + 2);
+	}
+
+	@Override
+	public void build(ProbGraph graph){
+		super.build(graph);
+		Integer addr = dtrace.getAddressFromStack();
+		assert(addr != null);
+		defnode.setAddress(addr);
 	}
 
 }

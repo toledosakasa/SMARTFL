@@ -376,10 +376,10 @@ public class TraceTransformer implements ClassFileTransformer {
 
 	public void staticAnalysis(){
 		// long startTime = System.currentTimeMillis();
-		staticAnalyzer = new StaticAnalyzer();
+		staticAnalyzer = new StaticAnalyzer(debugLogger);
 		staticAnalyzer.setTracePool(CallBackIndex.tracepool);
 		staticAnalyzer.setLoopSet(CallBackIndex.loopset);
-		staticAnalyzer.parse(debugLogger);
+		staticAnalyzer.parse();
 		staticAnalyzer.get_pre_idom();
 		staticAnalyzer.find_loop();
 		CallBackIndex.initCompressInfos();
@@ -718,9 +718,9 @@ public class TraceTransformer implements ClassFileTransformer {
 				instruction = new InvokeTrace(instruction, calltype, callclass, callname);
 			}
 
-			if (field != null) {
-				instruction = new FieldTrace(instruction, field);
-			}
+			// if (field != null) {
+			// 	instruction = new FieldTrace(instruction, field);
+			// }
 
 			if (_default != null) {
 				instruction = new SwitchTrace(instruction, _default, _switch);
@@ -786,14 +786,14 @@ public class TraceTransformer implements ClassFileTransformer {
 				if (!mi.isStaticInitializer()){
 					if(useNewTrace)
 					{
-						// debugLogger.write(TracePool.get(poolindex).toString());
-						// debugLogger.write("		insert, " + "poolindex = " + poolindex);
-						if(needCompress){
-							oi.insertBeforeCompress(ci, constp, poolindex, cbi);
-							// debugLogger.writeln("need Compress at index" + poolindex);
-						}
-						else
-							oi.insertBefore(ci, constp, poolindex, cbi);
+						// // debugLogger.write(TracePool.get(poolindex).toString());
+						// // debugLogger.write("		insert, " + "poolindex = " + poolindex);
+						// if(needCompress){
+						// 	oi.insertBeforeCompress(ci, constp, poolindex, cbi);
+						// 	// debugLogger.writeln("need Compress at index" + poolindex);
+						// }
+						// else
+						// 	oi.insertBefore(ci, constp, poolindex, cbi);
 					}
 					else
 						oi.insertByteCodeBefore(ci, index, constp, instinfo, cbi);

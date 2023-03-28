@@ -19,6 +19,7 @@ import ppfl.ByteCodeGraph;
 import ppfl.MyWriter;
 import ppfl.Node;
 import ppfl.ParseInfo;
+import ppfl.ProbGraph;
 import ppfl.instrumentation.DynamicTrace;
 import ppfl.instrumentation.Trace;
 import ppfl.StmtNode;
@@ -127,7 +128,7 @@ public class OpcodeInst {
 		} else {
 			x0 = desc.substring(beginIndex + 1, endIndex);
 		}
-		Pattern pattern = Pattern.compile("\\[*L[^;]+;|\\[[ZBCSIFDJ]|[ZBCSIFDJ]");
+		Pattern pattern = Pattern.compile("\\[*L[^;]+;|\\[*[ZBCSIFDJ]|[ZBCSIFDJ]");
 		Matcher matcher = pattern.matcher(x0);
 
 		ArrayList<String> listMatches = new ArrayList<>();
@@ -346,24 +347,43 @@ public class OpcodeInst {
 		}
 	}
 
-	//FIXME: there's no need to override this, except Areturn ? 
-	// For other return insts, seems not to trace the return value now. 
-	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+	public void insertStack(CodeIterator ci, CallBackIndex cbi)
 		throws BadBytecode {
 
-		int instpos = ci.insertGap(6);
+		int instpos = ci.insertGap(3);
+		ci.writeByte(184, instpos);// invokestatic
+		ci.write16bit(cbi.stackindex, instpos + 1);
+
+		// ci.writeByte(0, instpos);// invokestatic
+		// ci.write16bit(0, instpos + 1);
+		
+	}
+
+	//FIXME: there's no need to override this, except Areturn ? 
+	// For other return insts, seems not to trace the return value now. 
+	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi, boolean isEx)
+		throws BadBytecode {
+
+		int instpos;
+		if(isEx)
+			instpos = ci.insertExGap(6);
+		else
+			instpos = ci.insertGap(6);
 		int instindex = constp.addIntegerInfo(poolindex);
 		ci.writeByte(19, instpos);// ldc_w
 		ci.write16bit(instindex, instpos + 1);
 		ci.writeByte(184, instpos + 3);// invokestatic
 		ci.write16bit(cbi.logtraceindex, instpos + 4);
-		
 	}
 
-	public void insertBeforeCompress(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+	public void insertBeforeCompress(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi, boolean isEx)
 	throws BadBytecode {
 
-	int instpos = ci.insertGap(6);
+	int instpos;
+	if(isEx)
+		instpos = ci.insertExGap(6);
+	else
+		instpos = ci.insertGap(6);
 	int instindex = constp.addIntegerInfo(poolindex);
 	ci.writeByte(19, instpos);// ldc_w
 	ci.write16bit(instindex, instpos + 1);
@@ -414,16 +434,16 @@ public class OpcodeInst {
 		stmtname = stmtname + "#" + byteindex;
 		this.stmt = graph.getStmt(stmtname, this.dtrace.trace.opcode);
 
-		// count how many times this statment has been executed
-		if (graph.stmtcountmap.containsKey(stmtname)) {
-			graph.stmtcountmap.put(stmtname, graph.stmtcountmap.get(stmtname) + 1);
-		} else {
-			graph.stmtcountmap.put(stmtname, 1);
-		}
+		// // count how many times this statment has been executed
+		// if (graph.stmtcountmap.containsKey(stmtname)) {
+		// 	graph.stmtcountmap.put(stmtname, graph.stmtcountmap.get(stmtname) + 1);
+		// } else {
+		// 	graph.stmtcountmap.put(stmtname, 1);
+		// }
 
-		if (graph.max_loop > 0 && graph.stmtcountmap.get(stmtname) > graph.max_loop) {
-			return;
-		}
+		// if (graph.max_loop > 0 && graph.stmtcountmap.get(stmtname) > graph.max_loop) {
+		// 	return;
+		// }
 
 		// auto-assigned observation: test function always true
 		if (graph.auto_oracle) {
@@ -504,4 +524,69 @@ public class OpcodeInst {
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
 	}
+
+
+	
+	public void buildStmt(ProbGraph graph) {
+		this.dtrace = graph.dynamicTrace;
+		this.stmt = graph.getStmt(dtrace.traceindex);
+		if(stmt == null)
+			this.stmt = graph.addStmt(dtrace.traceindex, dtrace.trace.opcode);
+
+		// auto-assigned observation: test function always true
+
+		String stmtName = dtrace.trace.classname + "::" + dtrace.trace.methodname;
+
+		if (stmtName.equals(graph.testname)|| graph.d4jTestClasses.contains(dtrace.trace.classname)
+				|| stmtName.startsWith("junit")) {
+			stmt.observe(true);
+		}
+	}
+
+	// override needed.
+	public void build(ProbGraph graph){
+		// build the stmtnode(common)
+		buildStmt(graph);
+		this.prednodes = new ArrayList<>();
+		this.usenodes = new ArrayList<>();
+		this.defnode = null;
+
+		if (this.doPred) {
+			Node thepred = graph.getPred();
+			if (thepred != null)
+				prednodes.add(thepred);
+		}
+
+		if (this.doLoad && dtrace.trace.load != null) {
+			int loadvar = dtrace.trace.load;
+			Node node = graph.getVarNode(loadvar);
+			// 有时会有一些的非调用得到的函数出现在trace中，会导致没有对应的参数node
+			if (node != null)
+				usenodes.add(node);
+		}
+		if (this.doPop && dtrace.trace.popnum != null) {
+			int instpopnum = dtrace.trace.popnum;
+			for (int i = 0; i < instpopnum; i++) {
+				usenodes.add(graph.popStackNode());
+			}
+		}
+		// defs
+		// stack
+		if (this.doPush && dtrace.trace.pushnum != null) {
+			int instpushnum = dtrace.trace.pushnum;
+			assert (instpushnum <= 1);
+			defnode = graph.addStackNode(this.stmt, 1);
+		}
+		if (this.doStore && dtrace.trace.store != null) {
+			int storevar = dtrace.trace.store;
+			defnode = graph.addVarNode(storevar, stmt, 1);
+		}
+
+		// build factor.
+		if (this.doBuild && defnode != null) {
+			// TODO should consider ops.
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		}
+	}
+
 }

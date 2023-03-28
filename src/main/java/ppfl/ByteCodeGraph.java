@@ -3,6 +3,9 @@ package ppfl;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +33,12 @@ import ppfl.instrumentation.RuntimeFrame;
 import ppfl.instrumentation.TraceDomain;
 import ppfl.instrumentation.DynamicTrace;
 import ppfl.instrumentation.opcode.OpcodeInst;
+
+
+import ppfl.instrumentation.TracePool;
+import ppfl.instrumentation.TraceSequence;
+import ppfl.instrumentation.Trace;
+import ppfl.instrumentation.TraceTransformer;
 
 public class ByteCodeGraph {
 
@@ -66,13 +75,13 @@ public class ByteCodeGraph {
 		this.traceAllClasses = value;
 	}
 
-	public void addTracedDomain(TraceDomain domain) {
-		tracedDomain.add(domain);
-	}
+	// public void addTracedDomain(TraceDomain domain) {
+	// 	tracedDomain.add(domain);
+	// }
 
-	public void addTracedDomain(Collection<TraceDomain> domain) {
-		tracedDomain.addAll(domain);
-	}
+	// public void addTracedDomain(Collection<TraceDomain> domain) {
+	// 	tracedDomain.addAll(domain);
+	// }
 
 	public boolean isUntracedInvoke(ParseInfo p) {
 		return p.isInvoke() && (!isTraced(p.getCallDomain()));
@@ -106,8 +115,11 @@ public class ByteCodeGraph {
 	}
 
 	public boolean useD4jTest = false;
+	// all test methods in metadata, each string - TestClass::testMethod
 	public Set<String> d4jMethodNames = new HashSet<>();
+	// all test classes in metadata, each string - TestClass
 	public Set<String> d4jTestClasses = new HashSet<>();
+	// all trigger classes in metadata, each string - TestClass::testMethod
 	public Set<String> d4jTriggerTestNames = new HashSet<>();
 
 	private boolean isD4jTestMethod(String className, String methodName) {
@@ -123,6 +135,8 @@ public class ByteCodeGraph {
 		return !d4jTriggerTestNames.contains(fullname);
 	}
 
+	public TracePool tracePool;
+
 	public List<FactorNode> factornodes;
 	public List<Node> nodes;
 	public List<StmtNode> stmts;
@@ -130,7 +144,7 @@ public class ByteCodeGraph {
 	public Map<String, Node> stmtmap;
 	public Map<String, Integer> varcountmap;
 	public Map<String, Integer> stackcountmap;
-	public Map<String, Integer> stmtcountmap;
+	// public Map<String, Integer> stmtcountmap;
 	public Map<String, Integer> heapcountmap;
 	public Map<String, Integer> objectcountmap;
 	public Map<String, Integer> staticheapcountmap;
@@ -192,7 +206,7 @@ public class ByteCodeGraph {
 
 	// if max_loop is set to negative, then no limit is set(unlimited loop
 	// unfolding)
-	public int max_loop;
+	// public int max_loop;
 
 	public String testname = null;
 
@@ -231,14 +245,14 @@ public class ByteCodeGraph {
 		this.stackframe.clear();
 	}
 
-	public RuntimeFrame getPrevFrame() {
-		if (stackframe.size() < 2)
-			return null;
-		RuntimeFrame top = stackframe.removeFirst();
-		RuntimeFrame ret = stackframe.peekFirst();
-		stackframe.addFirst(top);
-		return ret;
-	}
+	// public RuntimeFrame getPrevFrame() {
+	// 	if (stackframe.size() < 2)
+	// 		return null;
+	// 	RuntimeFrame top = stackframe.removeFirst();
+	// 	RuntimeFrame ret = stackframe.peekFirst();
+	// 	stackframe.addFirst(top);
+	// 	return ret;
+	// }
 
 	public SafeRunTimeStack getRuntimeStack() {
 		return getFrame().runtimestack;
@@ -345,7 +359,7 @@ public class ByteCodeGraph {
 		stmtmap = new HashMap<>();
 		varcountmap = new HashMap<>();
 		stackcountmap = new HashMap<>();
-		stmtcountmap = new HashMap<>();
+		// stmtcountmap = new HashMap<>();
 		heapcountmap = new HashMap<>();
 		objectcountmap = new HashMap<>();
 		staticheapcountmap = new HashMap<>();
@@ -360,7 +374,7 @@ public class ByteCodeGraph {
 		post_idom = new TreeMap<>();
 		branch_stores = new TreeMap<>();
 		store_num = new HashMap<>();
-		max_loop = -1;
+		// max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
 		stackframe = new ArrayDeque<>();
@@ -418,9 +432,9 @@ public class ByteCodeGraph {
 	// }
 	// }
 
-	public void setMaxLoop(int i) {
-		this.max_loop = i;
-	}
+	// public void setMaxLoop(int i) {
+	// 	this.max_loop = i;
+	// }
 
 	public void setAutoOracle(boolean b) {
 		this.auto_oracle = b;
@@ -432,13 +446,14 @@ public class ByteCodeGraph {
 		this.stackcountmap = new HashMap<>();
 		this.stackframe = new ArrayDeque<>();
 		this.predicates.clear();
-		stmtcountmap = new HashMap<>();
+		// stmtcountmap = new HashMap<>();
 		heapcountmap = new HashMap<>();
 		objectcountmap = new HashMap<>();
 		staticheapcountmap = new HashMap<>();
 		objectFieldMap = new HashMap<>();
 	}
 
+	// set superClassMap and tracedDomain from traced.source.log
 	public void parseWhatIsTracedLog(String logfilename) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(logfilename))) {
 			String t;
@@ -471,6 +486,28 @@ public class ByteCodeGraph {
 		}
 	}
 
+	public void setPool(String path){
+		try{
+			FileInputStream fileIn = new FileInputStream(path);
+			BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+			ObjectInputStream in = new ObjectInputStream(bufferedIn);
+			this.tracePool = (TracePool) in.readObject();
+			in.close();
+			fileIn.close();
+		}
+		catch(IOException i)
+		{
+			i.printStackTrace();
+			return;
+		}catch(ClassNotFoundException c)
+		{
+			System.out.println("TracePool class not found");
+			c.printStackTrace();
+			return;
+		}
+	}
+
+	// now Deprecated, only used in GraphTest
 	public void parseD4jSource(String project, int id, String classname) {
 		String checkoutbase = GraphBuilder.getCheckoutBase();
 		String fullname = String.format("%s/%s/%s/trace/logs/mytrace/%s.source.log", checkoutbase, project, id, classname);
@@ -963,7 +1000,7 @@ public class ByteCodeGraph {
 	}
 
 	public void parseFolder(String folder, String sourcefolder, boolean usesimple) {
-		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
+		JoinedTrace jTrace = new JoinedTrace(tracePool, d4jMethodNames, d4jTriggerTestNames, tracedDomain);
 		try {
 			jTrace.parseFolder(folder);
 			jTrace.parseSourceFolder(sourcefolder);
@@ -984,16 +1021,17 @@ public class ByteCodeGraph {
 		parseJoinedTracePruned(jTrace, usesimple);
 	}
 
-	public void pruneAndParse(String tracefilename) {
-		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
-		try {
-			jTrace.parseFile(tracefilename);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("parse failed.");
-		}
-		parseJoinedTracePruned(jTrace, false);
-	}
+	// deprecated
+	// public void pruneAndParse(String tracefilename) {
+	// 	JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
+	// 	try {
+	// 		jTrace.parseFile(tracefilename);
+	// 	} catch (Exception e) {
+	// 		e.printStackTrace();
+	// 		System.err.println("parse failed.");
+	// 	}
+	// 	parseJoinedTracePruned(jTrace, false);
+	// }
 
 	private void parseSimpleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
 		this.parseinfo = pInfo;
@@ -1076,12 +1114,15 @@ public class ByteCodeGraph {
 		String instname = this.dynamictrace.getLineinfo();
 
 		// solve traced invoke
+		// 在invoke之后的第一个trace去处理这个invoke，之后就cleanTraced了
 		if (this.solveTracedInvoke && this.tracedInvoke != null) {
 			if (matchTracedInvoke(dTrace)) {
+				// 处理直接 @RET返回的情况？
 				if (dTrace.isret) {
 					buildTracedInvoke();
 					return;
 				}
+				// 处理正常的call
 				this.resolveTracedArgs(dTrace);
 				this.cleanTraced();
 			} else {
@@ -1116,6 +1157,8 @@ public class ByteCodeGraph {
 					buildUntracedInvokeException();
 				}
 			} else {
+				// 可能会有问题
+				// TODO: 考虑 在插桩代码 引入 Thread.getthread.getstack() 获得调用栈信息。然后通过引入一个变量来决定是否开启这部分的代码，即在call一个untraced方法之后。若返回，则关闭
 				// check if the control flow had already been thrown upward
 				if (dTrace.isCatch() && this.isInCallStack_Trace(dTrace)) {
 					if (debugswitch) {
@@ -1263,6 +1306,7 @@ public class ByteCodeGraph {
 		}
 		for (Node n : this.untraceduse) {
 			if (n.isHeapObject()) {
+				// 把untraced方法中的所有 由aload加载得到的堆obj中的所有访问过的field，给重新定义一次
 				buildFactorForAllField(n, this.untracedpred, this.untraceduse, null, this.untracedStmt);
 			}
 		}
@@ -1302,13 +1346,13 @@ public class ByteCodeGraph {
 		// }
 		System.out.println("parsing trace,length=" + tracelength + ":");
 		System.out.println("\t" + tChunk.fullname);
-		{ // 这里不会运行
-			boolean limitSingleTrace = false;
-			if (limitSingleTrace && tracelength > 100000 && tChunk.testpass) {
-				System.out.println("Trace is too long, skipping");
-				return;
-			}
-		}
+		// { // 这里不会运行
+		// 	boolean limitSingleTrace = false;
+		// 	if (limitSingleTrace && tracelength > 100000 && tChunk.testpass) {
+		// 		System.out.println("Trace is too long, skipping");
+		// 		return;
+		// 	}
+		// }
 		boolean debugswitch = false;
 		boolean testpass = tChunk.testpass;
 		this.testname = tChunk.getTestName();
@@ -1650,6 +1694,7 @@ public class ByteCodeGraph {
 			}
 		}
 
+		// TODO: add class 判断
 		if (auto_oracle && !stmt.getMethod().contentEquals(this.testname) && !stmt.isUnexe()) {
 			int ln = stmt.getLineNumber();
 			if (this.lastDefinedLine != ln) {
@@ -1816,6 +1861,7 @@ public class ByteCodeGraph {
 
 	private String getFormalVarName(int varindex) {
 		String name = String.valueOf(varindex);
+		// {domain name}#{domain entercnt}:{varindex} 
 		return this.getDomain() + name;
 	}
 
@@ -1856,12 +1902,13 @@ public class ByteCodeGraph {
 		return String.format("%x.%s", objectAddress.getAddress(), field);
 	}
 
-	// 没用
-	private String getFormalVarNameWithIndex(int varindex, TraceDomain domain) {
-		return getVarName(getFormalVarName(varindex, domain), this.varcountmap);
-	}
+	// deprecated
+	// private String getFormalVarNameWithIndex(int varindex, TraceDomain domain) {
+	// 	return getVarName(getFormalVarName(varindex, domain), this.varcountmap);
+	// }
 
 	private String getFormalVarNameWithIndex(int varindex) {
+		// {varname}#{the i-th def of that var}
 		return getVarName(getFormalVarName(varindex), this.varcountmap);
 	}
 
@@ -1960,13 +2007,14 @@ public class ByteCodeGraph {
 		return defnode;
 	}
 
-	public Node addNewVarNode(int varindex, StmtNode stmt, TraceDomain domain) {
-		this.incVarIndex(varindex, domain);
-		String nodename = this.getFormalVarNameWithIndex(varindex, domain);
-		Node defnode = new Node(nodename, this.testname, stmt);
-		this.addNode(nodename, defnode);
-		return defnode;
-	}
+	// deprecated
+	// public Node addNewVarNode(int varindex, StmtNode stmt, TraceDomain domain) {
+	// 	this.incVarIndex(varindex, domain);
+	// 	String nodename = this.getFormalVarNameWithIndex(varindex, domain);
+	// 	Node defnode = new Node(nodename, this.testname, stmt);
+	// 	this.addNode(nodename, defnode);
+	// 	return defnode;
+	// }
 
 	public Node addNewPredNode(StmtNode stmt) {
 		this.incPredIndex(stmt);
@@ -2027,6 +2075,7 @@ public class ByteCodeGraph {
 		return this.getNode(this.getFormalVarNameWithIndex(loadvar));
 	}
 
+	// 是不是对stack的node，其实不会通过getNode的途径去访问，而是直接通过stack的pop去得到?
 	private Node getNode(String name) {
 		if (nodemap.containsKey(getNodeName(name)))
 			return nodemap.get(getNodeName(name));
@@ -2402,6 +2451,7 @@ public class ByteCodeGraph {
 		return fileData.toString();
 	}
 
+	// now Deprecated, only used in GraphTest
 	public void initD4jProject(String project, int id) {
 		this.useD4jTest = true;
 		String triggerTests = null;
@@ -2470,6 +2520,7 @@ public class ByteCodeGraph {
 		// this.parseD4jTrace(tracefilename);
 	}
 
+	// now Deprecated
 	public void initFromConfigFile(String baseDir, String configpath) {
 		String sourcepath = null;
 		String tracepath = null;

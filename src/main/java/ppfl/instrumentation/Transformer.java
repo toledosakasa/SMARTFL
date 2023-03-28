@@ -23,7 +23,7 @@ public class Transformer implements ClassFileTransformer {
 
     protected static MyWriter debugLogger = null;
     protected static Writer traceWriter = null;
-    protected static final int maxMethodSize = 10000;
+    protected static final int maxMethodSize = 16384;
     // Map of transformed clazz, key: classname, value: classloader
     protected Set<String> transformedclazz;
     protected Set<TraceDomain> foldSet;

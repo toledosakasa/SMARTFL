@@ -5,7 +5,10 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
+import ppfl.ProbGraph;
+import ppfl.InvokeItem;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.instrumentation.Trace;
 import ppfl.instrumentation.TraceDomain;
 
 //Utils for all invoke insts.
@@ -47,7 +50,7 @@ public class InvokeInst extends OpcodeInst {
 	@Override
 	public void insertReturn(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
 		throws BadBytecode {
-		int instpos = ci.insertExGap(8);
+		int instpos = ci.insertExGap(6);
 		int instindex = constp.addIntegerInfo(poolindex);
 		ci.writeByte(19, instpos);// ldc_w
 		ci.write16bit(instindex, instpos + 1);
@@ -90,6 +93,7 @@ public class InvokeInst extends OpcodeInst {
 			System.err.println(String.format("%d stacks is not enough for %d args", graph.getRuntimeStack().size(), argcnt));
 		}
 		for (int i = 0; i < argcnt; i++) {
+			// node size?
 			Node node = graph.getRuntimeStack().pop();
 			usenodes.add(node);
 			// System.out.println(node.getStmtName());
@@ -155,6 +159,38 @@ public class InvokeInst extends OpcodeInst {
 		// Node defnode = graph.addNewVarNode(paravarindex, stmt, callDomain);
 		// graph.buildFactor(defnode, prednodes, adduse, null, stmt);
 		// paravarindex += curArgument.getSize();
+		// }
+	}
+
+	@Override
+	public void build(ProbGraph graph){
+		super.build(graph);
+		TraceDomain callDomain = this.dtrace.getCallDomain();
+		boolean isTraced = graph.isTraced(callDomain);
+		String signature = this.dtrace.trace.getcalltype();
+		int argcnt = OpcodeInst.getArgNumByDesc(signature);
+		argcnt += this.argadd;
+
+		// if argadd avail.
+		Node objectAddress = null;
+		for (int i = 0; i < argcnt; i++) {
+			Node node = graph.popStackNode();
+			usenodes.add(node);
+			// System.out.println(node.getStmtName());
+			if (i == argcnt - 1 && this.argadd == 1) {
+				objectAddress = node;
+			}
+		}
+
+		InvokeItem thisInvoke = new InvokeItem(stmt, usenodes, prednodes, this.dtrace, argcnt, objectAddress);
+		
+		graph.setInvoke(thisInvoke);
+		// if(isTraced)
+		// 	graph.setTraced(thisInvoke);
+		// else{
+		// 	graph.setUntraced(thisInvoke);
+		// 	// graph.pushUntraced(thisInvoke);
+		// 	// graph.pushFrame(callDomain);
 		// }
 	}
 }

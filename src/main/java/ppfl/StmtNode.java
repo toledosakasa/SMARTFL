@@ -7,6 +7,7 @@ public class StmtNode extends Node {
 	private boolean isUnexe = false;
 	private Map<Integer, StmtNode> unexeStmtMap = new HashMap<>();
 	int form;// unexe stmt:-1
+	private Integer index;
 
 	public void setUnexe() {
 		this.isUnexe = true;
@@ -32,6 +33,17 @@ public class StmtNode extends Node {
 		super(sname);
 		this.form = form;
 		this.isStmt = true;
+	}
+
+	public StmtNode(Integer index, int form, String name) {
+		super(name);
+		this.index = index;
+		this.form = form;
+		this.isStmt = true;
+	}
+
+	public Integer getIndex(){
+		return index;
 	}
 
 	@Override

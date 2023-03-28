@@ -3,6 +3,7 @@ package ppfl.instrumentation.opcode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 
 //175
@@ -35,6 +36,21 @@ public class DreturnInst extends OpcodeInst {
 		defnode.setSize(2);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		graph.killPredStack("OUT_" + stmt.getClassMethod());
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		// uses
+		usenodes.add(graph.popStackNode());
+		// switch stack frame
+		graph.popFrame();
+		// may be some invalid frame from junit
+		if(graph.topFrame() == null)
+			return;
+		// def in caller frame
+		Node defnode = graph.addStackNode(stmt,2);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 }

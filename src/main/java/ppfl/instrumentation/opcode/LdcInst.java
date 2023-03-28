@@ -5,6 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.ProbGraph;
 
 //18,19,20
 public class LdcInst extends OpcodeInst {
@@ -74,5 +75,16 @@ public class LdcInst extends OpcodeInst {
 		if (this.form == 20)// ldc2_w
 			defnode.setSize(2);
 	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		if (this.form == 20)// ldc2_w
+			defnode.setSize(2);
+		Integer addr = dtrace.getAddressFromStack();
+		if(addr != null)
+			defnode.setAddress(addr);
+	}
+
 
 }

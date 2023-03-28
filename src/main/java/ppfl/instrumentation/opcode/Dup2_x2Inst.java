@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -104,6 +105,84 @@ public class Dup2_x2Inst extends OpcodeInst {
 			graph.getRuntimeStack().push(ThirdTop);
 			graph.getRuntimeStack().push(nextTop);
 			graph.getRuntimeStack().push(top);
+		}
+
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		// build the stmtnode(common)
+		super.build(graph);
+
+		Node top = graph.topFrame().peekStack();
+		if(top.getSize() == 2){
+			usenodes.add(top);
+			Node nextTop = graph.popStackNode();
+			if(nextTop.getSize() == 2){
+				defnode = graph.addStackNode(stmt,2);
+				if (top.isHeapObject()) {
+					defnode.setAddress(top.getAddress());
+				}
+				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+				graph.pushStackNode(nextTop);
+				graph.pushStackNode(top);
+			}
+			else{
+				Node thirdTop = graph.popStackNode();
+				assert (thirdTop.getSize() == 1);
+				defnode = graph.addStackNode(stmt,2);
+				if (top.isHeapObject()) {
+					defnode.setAddress(top.getAddress());
+				}
+				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+				graph.pushStackNode(thirdTop);
+				graph.pushStackNode(nextTop);
+				graph.pushStackNode(top);
+			}
+		}
+		else{
+			Node nextTop = graph.popStackNode();
+			assert (nextTop.getSize() == 1);
+			Node thirdTop = graph.popStackNode();
+			if(thirdTop.getSize() == 2){
+				usenodes.add(nextTop);
+				defnode = graph.addStackNode(stmt,1);
+				if (nextTop.isHeapObject()) {
+					defnode.setAddress(nextTop.getAddress());
+				}
+				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+				usenodes.clear();
+				usenodes.add(top);
+				defnode = graph.addStackNode(stmt,1);
+				if (top.isHeapObject()) {
+					defnode.setAddress(top.getAddress());
+				}
+				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+				graph.pushStackNode(thirdTop);
+				graph.pushStackNode(nextTop);
+				graph.pushStackNode(top);
+			}
+			else{
+				Node fourthTop = graph.popStackNode();
+				assert (fourthTop.getSize() == 1);
+				usenodes.add(nextTop);
+				defnode = graph.addStackNode(stmt,1);
+				if (nextTop.isHeapObject()) {
+					defnode.setAddress(nextTop.getAddress());
+				}
+				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+				usenodes.clear();
+				usenodes.add(top);
+				defnode = graph.addStackNode(stmt,1);
+				if (top.isHeapObject()) {
+					defnode.setAddress(top.getAddress());
+				}
+				graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+				graph.pushStackNode(fourthTop);
+				graph.pushStackNode(thirdTop);
+				graph.pushStackNode(nextTop);
+				graph.pushStackNode(top);
+			}
 		}
 
 	}

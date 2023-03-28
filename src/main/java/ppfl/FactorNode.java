@@ -12,9 +12,16 @@ import java.io.*;
 
 public class FactorNode {
 
-	protected static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
+	//protected static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
 	protected static MyWriter printLogger = WriterUtils.getWriter("GraphLogger");
 
+	public static MyWriter debugLogger;
+
+	public static boolean nontrivial = false;
+	
+	public static int count = 0;
+	public int id;
+	
 	private List<Node> preds;
 	private Node def;
 	private Node stmt;
@@ -135,7 +142,18 @@ public class FactorNode {
 		// if (use_ap)
 		// 	ap_gettensor(allnodes, nnodes - 1);
 		// else
+		count += 1;
+		this.id = count;
+
+		if(nontrivial){
 			gettensor(allnodes, nnodes - 1);
+			// if(id == 201){
+			// 	debugLogger.write("id = %d, nnodes = %d\n", id, nnodes);
+			// 	for(Double d  : tensor)
+			// 		debugLogger.write("%f, ", d);
+			// 	debugLogger.write("\n");
+			// }
+		}
 	}
 
 	public List<Node> getpunodes() {
@@ -151,12 +169,23 @@ public class FactorNode {
 
 	private void gettensor(List<Node> allnodes, int cur) {
 		if (cur < 0) {
-			tensor.add(getProb());
+			double prob = getProb();
+			// if(id == 201)
+			// 	debugLogger.write("getprob = %f\n", prob);
+			tensor.add(prob);
 			return;
 		}
 		allnodes.get(cur).setTemp(false);
+		// if(id == 201 && cur == 5)
+		// 	debugLogger.write("set u3 = %b\n", allnodes.get(cur).getCurrentValue());
+		// if(id == 201 && cur == 6)
+		// 	debugLogger.write("set u4 = %b\n", allnodes.get(cur).getCurrentValue());
 		gettensor(allnodes, cur - 1);
 		allnodes.get(cur).setTemp(true);
+		// if(id == 201 && cur == 5)
+		// 	debugLogger.write("set u3 = %b\n", allnodes.get(cur).getCurrentValue());
+		// if(id == 201 && cur == 6)
+		// 	debugLogger.write("set u4 = %b\n", allnodes.get(cur).getCurrentValue());
 		gettensor(allnodes, cur - 1);
 	}
 
@@ -171,6 +200,56 @@ public class FactorNode {
 	// 	ap_gettensor(allnodes, cur - 1);
 	// }
 
+	public void sendMessage(){
+		List<Edge> puedges = new ArrayList<>();
+		puedges.addAll(pedges);
+		puedges.addAll(uedges);
+
+		double put = 1;
+		for (Edge n : puedges) 
+			put = put * n.get_ntof();
+
+		double dv = dedge.get_ntof();
+		double sv = sedge.get_ntof();
+
+		// if(id == 16){
+		// 	double u1 = uedges.get(0).get_ntof();
+		// 	double p1 = pedges.get(0).get_ntof();
+		// 	debugLogger.write("sv = %.20f, dv = %.20f, u1 = %.20f, p1 = %.20f\n", dv, sv, u1, p1);
+		// }
+
+		double sv1 = HIGH * dv * put + MEDIUM_HIGH * (1 - dv) * (1 - put) + LOW * (1 - dv) * put + MEDIUM_LOW * dv * (1 - put);
+		//double sv1 = 1.98 * dv * put + 0.99 - 0.98 *dv - 0.99 * put;
+		double sv0 = MEDIUM_HIGH * (1 - dv) + MEDIUM_LOW * dv;
+		sedge.set_fton(sv1 / (sv1 + sv0));
+
+		// if(id == 16){
+		// 	debugLogger.write("sv1 = %.20f, sv0 = %.20f,\n", sv1, sv0);
+		// }
+
+		double dv1 = HIGH * sv * put + MEDIUM_LOW * (1 - sv * put);
+		double dv0 = MEDIUM_HIGH * (1 - sv * put) + LOW * sv * put;
+		// if(id == 201){
+		// 	debugLogger.write("dv1 = %.10f, dv0 = %.10f,\n", dv1, dv0);
+		// }
+		dedge.set_fton(dv1 / (dv1 + dv0));
+
+		for (Edge n : puedges) {
+			double spu = sv * put / n.get_ntof();
+			if(Double.isNaN(spu)){
+				spu = sv;
+				for (Edge e : puedges)
+					if(e != n) 
+						spu = spu * e.get_ntof();
+			}
+			double nv1 = HIGH * spu * dv + MEDIUM_LOW * (1 - spu) * dv + LOW * spu * (1-dv) + MEDIUM_HIGH * (1- spu) * (1-dv); 
+			double nv0 = MEDIUM_HIGH * (1 - dv) + MEDIUM_LOW * dv;
+			//debugLogger.write("put = %f, n = %f,  nv1 = %f, nv0 = %f\n",put, n.get_ntof(), nv1, nv0);
+			n.set_fton(nv1 / (nv1 + nv0));
+		}
+
+	}
+
 	public void send_message() {
 		if (!use_ap) {
 			// used to save all the messages from the nodes
@@ -178,6 +257,11 @@ public class FactorNode {
 			for (int i = 0; i < nnodes; i++) {
 				tmpvlist.add(alledges.get(i).get_ntof());
 			}
+			// if(id == 201){
+			// 	for(Double prob :tmpvlist)
+			// 		debugLogger.write(prob + " ,");
+			// 	debugLogger.write("\n");
+			// }
 			// System.out.println("tmplist = "+tmpvlist);
 			for (int j = 0; j < nnodes; j++) {
 				double v0 = 0;
@@ -186,6 +270,8 @@ public class FactorNode {
 				int vnum = (1 << nnodes);
 				// transform a tensor of nnodes-dimension into a one-dimension vector(two
 				// values)
+				// if(id == 201)
+				// 	debugLogger.write("start\n");
 				for (int k = 0; k < vnum; k += 2 * step) {
 					for (int o = 0; o < step; o++) {
 						int index0 = k + o;
@@ -232,6 +318,8 @@ public class FactorNode {
 
 						v0 += tmp0;
 						v1 += tmp1;
+						// if(id == 201)
+						// 	debugLogger.write("tmp0 = %.10f, tmp1 = %.10f, v0 = %.10f, v1 = %.10f  \n", tmp0, tmp1, v0, v1);
 					}
 				}
 				// if(v1 + v0 == 0.0){
@@ -381,6 +469,16 @@ public class FactorNode {
 				}
 			}
 		boolean pu = predv && usev;
+
+		// if(id == 201){
+		// 	boolean u1 = uses.get(0).getCurrentValue();
+		// 	boolean u2 = uses.get(1).getCurrentValue();
+		// 	boolean u3 = uses.get(2).getCurrentValue();
+		// 	boolean u4 = uses.get(3).getCurrentValue();
+		// 	boolean p1 = preds.get(0).getCurrentValue();
+		// 	debugLogger.write("%b, %b, %b, %b, %b, %b, %b\n", stmtv, defv, p1, u1, u2, u3, u4);
+		// }
+
 		if (stmtv) {// if the statement is written correctly.
 			if (defv && pu)
 				return HIGH;

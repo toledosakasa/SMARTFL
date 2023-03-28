@@ -25,8 +25,9 @@ public class StaticAnalyzer implements Serializable {
 	public Map<Integer, Integer> store_num;
 	public Map<Integer, Set<Integer>> branch_stores;
 	public List<BackEdge> loopset;
+	public MyWriter debugLogger;
 
-	public StaticAnalyzer() {
+	public StaticAnalyzer(MyWriter debugLogger) {
 		tracepool = null;
 		loopset = null;
 		instset = new HashSet<>();
@@ -39,6 +40,7 @@ public class StaticAnalyzer implements Serializable {
 		post_idom = new HashMap<>();
 		store_num = new HashMap<>();
 		branch_stores = new HashMap<>();
+		debugLogger = debugLogger;
 	}
 
 	public void clear() {
@@ -78,7 +80,7 @@ public class StaticAnalyzer implements Serializable {
 		}
 	}
 
-	public void parse(MyWriter debugLogger) {
+	public void parse() {
 		setup_inverted_pool();
 		Set<String> noNextInsts = new HashSet<String>() {
 			{
@@ -317,32 +319,6 @@ public class StaticAnalyzer implements Serializable {
 		this.inset = tmp_set;
 	}
 
-	// public class BackEdge implements Serializable{
-	// final public Integer start;
-	// final public Integer end;
-	// public BackEdge(Integer start, Integer end) {
-	// this.start = start;
-	// this.end = end;
-	// }
-	// // @Override
-	// // public boolean equals(Object o) {
-	// // if (!(o instanceof BackEdge)) {
-	// // return false;
-	// // }
-	// // if (this == o) {
-	// // return true;
-	// // }
-
-	// // BackEdge other = (BackEdge) o;
-	// // return this.start.equals(other.start) && this.end.equals(other.end);
-	// // }
-
-	// // @Override
-	// // public int hashCode() {
-	// // return this.start.hashCode() ^ this.end.hashCode();
-	// // }
-	// }
-
 	public void find_loop() {
 		for (Map.Entry<Integer, List<Integer>> entry : predataflowmap.entrySet()) {
 			Integer edge_start = entry.getKey();
@@ -363,6 +339,47 @@ public class StaticAnalyzer implements Serializable {
 					BackEdge theloop = new BackEdge(edge_start, edge_end);
 					loopset.add(theloop);
 				}
+			}
+		}
+	}
+
+	// only keep post_idom for branching stmt
+	public void filter_post_idom(){
+		for (Integer inst : instset) {
+			List<Integer> nextlist = predataflowmap.get(inst);
+			if (nextlist.size() <= 1) {
+				post_idom.remove(inst);
+			}
+		}
+	}
+
+	private Set<Integer> visited_for_stores = new HashSet<>();
+	Integer theidom_for_stores;
+	Set<Integer> thestores;
+
+	private void dfs_for_stores(Integer inst) {
+		if (inst.equals(theidom_for_stores))
+			return;
+		visited_for_stores.add(inst);
+		Integer storen = store_num.get(inst);
+		if (storen != null)
+			thestores.add(storen);
+		List<Integer> thenexts = predataflowmap.get(inst);
+		for (Integer next : thenexts) {
+			if (!visited_for_stores.contains(next))
+				dfs_for_stores(next);
+		}
+	}
+
+	public void get_stores() {
+		for (Integer inst : instset) {
+			List<Integer> nextlist = predataflowmap.get(inst);
+			if (nextlist.size() > 1) {
+				theidom_for_stores = post_idom.get(inst);
+				thestores = new HashSet<>();
+				visited_for_stores.clear();
+				dfs_for_stores(inst);
+				branch_stores.put(inst, thestores);
 			}
 		}
 	}

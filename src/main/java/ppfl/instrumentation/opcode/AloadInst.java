@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //25
@@ -13,7 +14,7 @@ public class AloadInst extends OpcodeInst {
 
 	public AloadInst(int _form) {
 		super(_form, 1, 0);
-		this.doBuild = false;
+		// this.doBuild = false;
 	}
 
 	@Override
@@ -58,6 +59,14 @@ public class AloadInst extends OpcodeInst {
 			}
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+	}
+
+	@Override
+	public void build(ProbGraph graph){
+		super.build(graph);
+		Integer addr = dtrace.getAddressFromStack();
+		assert(addr != null);
+		defnode.setAddress(addr);
 	}
 
 }

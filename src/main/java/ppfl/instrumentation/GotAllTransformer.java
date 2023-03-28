@@ -1,5 +1,8 @@
 package ppfl.instrumentation;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -34,6 +37,31 @@ public class GotAllTransformer extends Transformer {
             debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
         CallBackIndex.initCompressInfos();
+
+        String poolname = folder + "TracePool.ser";
+        try{
+            long startTime = System.currentTimeMillis();
+            FileInputStream fileIn = new FileInputStream(poolname);
+            BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+            ObjectInputStream in = new ObjectInputStream(bufferedIn);
+            CallBackIndex.tracepool = (TracePool) in.readObject();
+            in.close();
+            fileIn.close();
+            long endTime = System.currentTimeMillis();
+            double time = (endTime - startTime) / 1000.0;
+            System.out.println("[Agent] Pool read done");
+            System.out.println("[Agent] Pool read time " + time);
+        }
+        catch(IOException i)
+        {
+            i.printStackTrace();
+            return;
+        }catch(ClassNotFoundException c)
+        {
+            System.out.println("TracePool class not found");
+            c.printStackTrace();
+            return;
+        }
     }
 
     protected byte[] transformBody(String classname) {

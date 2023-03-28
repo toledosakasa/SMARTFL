@@ -1,8 +1,13 @@
 package ppfl.instrumentation;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.ArrayDeque;
 
 public class DynamicTrace implements Serializable {
+    public Deque<String> stackTrace = null;
     public int traceindex;
     public Trace trace;
     public String stackType;
@@ -10,6 +15,17 @@ public class DynamicTrace implements Serializable {
     public double fstackValue;
     public boolean isret;
     private TraceDomain domain = null;
+
+    public DynamicTrace(){
+        this.stackTrace = new ArrayDeque<>();
+        this.trace = null;
+        this.stackType = null;
+        this.isret = false;
+    }
+
+    public boolean isStackTrace(){
+        return stackTrace != null;
+    }
 
     public DynamicTrace(Trace trace){
         this.trace = trace;
@@ -38,6 +54,7 @@ public class DynamicTrace implements Serializable {
         this.fstackValue = stackValue;
     }
 
+    // 判断是不是 astore， 以此来作为判断是否发生了catch的标志（zmh观察发现catch block第一句是astore）
     public boolean isCatch() {
         return trace.opcode == 58 || (trace.opcode >= 75 && trace.opcode <= 78);
     }
@@ -129,6 +146,14 @@ public class DynamicTrace implements Serializable {
     }
 
     public String toString(){
+        if(this.isStackTrace()){
+            String ret = "\nException Stack\n";
+            for(String st: this.stackTrace){
+                ret += "    " + st + "\n";
+            }
+            return ret;
+        }
+
         String ret = "\n";
         if(this.isret)
             ret += "###RET@";

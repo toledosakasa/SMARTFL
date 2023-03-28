@@ -1,11 +1,15 @@
 package ppfl.instrumentation;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +21,7 @@ import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.MethodInfo;
+import javassist.bytecode.ExceptionTable;
 
 import ppfl.instrumentation.opcode.InvokeInst;
 import ppfl.instrumentation.opcode.OpcodeInst;
@@ -72,6 +77,31 @@ public class GenClassTransformer extends Transformer {
             debugLogger.write(String.format("[Bug] IOException, %s\n", sStackTrace));
         }
 
+        String poolname = folder + "TracePool.ser";
+        try{
+            long startTime = System.currentTimeMillis();
+            FileInputStream fileIn = new FileInputStream(poolname);
+            BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+            ObjectInputStream in = new ObjectInputStream(bufferedIn);
+            CallBackIndex.tracepool = (TracePool) in.readObject();
+            in.close();
+            fileIn.close();
+            long endTime = System.currentTimeMillis();
+            double time = (endTime - startTime) / 1000.0;
+            System.out.println("[Agent] Pool read done");
+            System.out.println("[Agent] Pool read time " + time);
+        }
+        catch(IOException i)
+        {
+            i.printStackTrace();
+            return;
+        }catch(ClassNotFoundException c)
+        {
+            System.out.println("TracePool class not found");
+            c.printStackTrace();
+            return;
+        }
+
     }
 
     protected byte[] transformBody(String classname) {
@@ -90,12 +120,17 @@ public class GenClassTransformer extends Transformer {
                 String methodname = m.getName();
                 String signature = m.getDescriptor();
                 TraceDomain thisDomain = new TraceDomain(classname, methodname, signature);
-                if(foldSet.contains(thisDomain))
+                if(foldSet.contains(thisDomain)){
+                    debugLogger.writeln("[Agent] fold method %s, class = %s \n", methodname, classname);
                     continue;
+                }
                 // handle big method, it seems insertgap will be slow
                 CodeAttribute ca = m.getCodeAttribute();
-                if(ca != null && ca.length() > maxMethodSize)
+                if(ca != null && ca.length() > maxMethodSize){
+                    debugLogger.writeln("[Agent] ignore method %s, class = %s, size = %d\n", methodname, classname, ca.length());
                     continue;
+                }
+
                 if (instrumentJunit && cc.getName().startsWith("junit") && !m.getName().startsWith("assert")) {
                     continue;
                 }
@@ -138,8 +173,14 @@ public class GenClassTransformer extends Transformer {
 
         // log method name at the beginning of this method.
         CodeIterator ci = ca.iterator();
+
+		// int instpos_ = ci.insertGap(3);
+		// ci.writeByte(184, instpos_);// invokestatic
+		// ci.write16bit(cbi.stackindex, instpos_ + 1);
+
+        // ci = ca.iterator();
         int poolindex = getTraceMap();
-        int instpos = ci.insertGap(6);
+        int instpos = ci.insertExGap(6);
         int instindex = constp.addIntegerInfo(poolindex);
         ci.writeByte(19, instpos);// ldc_w
         ci.write16bit(instindex, instpos + 1);
@@ -153,6 +194,17 @@ public class GenClassTransformer extends Transformer {
 
     private void instrumentByteCode(CtClass cc, MethodInfo mi, CodeAttribute ca, ConstPool constp, CallBackIndex cbi)
             throws BadBytecode {
+
+        ExceptionTable exceptionTB = ca.getExceptionTable();
+        Set<Integer> handlerStart = new HashSet<>();
+        int tbSize = exceptionTB.size();
+        for(int i = 0; i < tbSize; i++){
+            handlerStart.add(exceptionTB.handlerPc(i));
+            //debugLogger.writeln("find hanlder, method = " + mi.getName() + ", index = " + exceptionTB.handlerPc(i));
+        }
+
+        debugLogger.writeln("handle %s::%s", cc.getName(), mi.getName());
+
         // iterate every instruction
         CodeIterator ci = ca.iterator();
         while (ci.hasNext()) {
@@ -166,26 +218,52 @@ public class GenClassTransformer extends Transformer {
                 if (loopedge.end == poolindex)
                     needCompress = true;
             }
-            if (oi != null) {
+            if(handlerStart.contains(CallBackIndex.tracepool.get(poolindex).index)){
+                oi.insertStack(ci, cbi);
+            }
+
+            // getstatic, putstatic, new
+            boolean do_before = !(op == 178 || op == 179 || op == 187);
+            if (oi != null && do_before) {
                 if (needCompress) {
-                    oi.insertBeforeCompress(ci, constp, poolindex, cbi);
+                    oi.insertBeforeCompress(ci, constp, poolindex, cbi, false);
                 } else
-                    oi.insertBefore(ci, constp, poolindex, cbi);
+                    oi.insertBefore(ci, constp, poolindex, cbi, false);
             }
             // move to the next inst. everything below this will be inserted after the inst.
             index = ci.next();
+
+            if(oi != null && !do_before){
+                if (needCompress) {
+                    oi.insertBeforeCompress(ci, constp, poolindex, cbi, true);
+                } else
+                    oi.insertBefore(ci, constp, poolindex, cbi, true);
+            }
+
             // print advanced information(e.g. value pushed)
             if (oi != null) {
-                // if (oi.form > 42)
-                // getstatic should be treated like invocation,
-                // in the case that static-initializer may be called.
-                // FIXME: what about the loaded obj of getstatic and new
-                if (oi instanceof InvokeInst || oi.form == 178 || oi.form == 187) {// getstatic and new
+                if (oi instanceof InvokeInst) {
                     oi.insertReturn(ci, constp, poolindex, cbi);
                 } else {
                     oi.insertAfter(ci, index, constp, cbi);
                 }
             }
+            // if(!ci.hasNext()){
+            //     // // for clinit, add an end trace
+            //     if(mi.getName().equals("<clinit>")){
+            //         ci = ca.iterator();
+            //         poolindex = getTraceMap();
+            //         debugLogger.writeln("instrument clinit, index = " + poolindex);
+            //         int instpos = ci.insertGap(6);
+            //         int instindex = constp.addIntegerInfo(poolindex);
+            //         ci.writeByte(19, instpos);// ldc_w
+            //         ci.write16bit(instindex, instpos + 1);
+            //         ci.writeByte(184, instpos + 3);// invokestatic
+            //         ci.write16bit(cbi.rettraceindex, instpos + 4);
+            //     }
+
+            //     break;
+            // }
         }
     }
 

@@ -20,6 +20,7 @@ public class CallBackIndex {
 	private static final String TRACE_CALLBACK_NAME = "traceTopStack1";
 	private static final int BUFFERSIZE = 1024;
 	// use the logger set by TraceTransformer
+	public int stackindex;
 	public int logtraceindex;
 	public int logcompressindex;
 	public int rettraceindex;
@@ -148,6 +149,7 @@ public class CallBackIndex {
 		CtClass thisKlass = cp.get("ppfl.instrumentation.CallBackIndex");
 		int classindex = constp.addClassInfo(thisKlass);
 
+		stackindex = constp.addMethodrefInfo(classindex, "logStack", "()V");
 		logtraceindex = constp.addMethodrefInfo(classindex, "logTrace", "(I)V");
 		logcompressindex = constp.addMethodrefInfo(classindex, "logCompress", "(I)V");
 		rettraceindex = constp.addMethodrefInfo(classindex, "retTrace", "(I)V");
@@ -390,6 +392,34 @@ public class CallBackIndex {
 		// TraceTransformer.traceLogger.info(s);
 	}
 
+	public static void logStack(){
+		logcount++;
+		if (tracewriter.size() > loglimit) {
+			try {
+				writer.write(String.format("Oversize Exit\n"));
+				writer.flush();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			System.exit(0);
+		}
+
+		DynamicTrace st = new DynamicTrace();
+		StackTraceElement[] stackTraces = new Throwable().getStackTrace();
+		for(StackTraceElement stackTrace : stackTraces){
+			st.stackTrace.push(stackTrace.getClassName() + "#" + stackTrace.getMethodName());
+		}
+		tracewriter.add(st);
+		// try {
+		// 	writer.write(String.format("handler donw\n"));
+		// 	writer.write(st.toString());
+		// 	writer.flush();
+		// } catch (Exception e) {
+		// 	// TODO: handle exception
+		// }
+
+	}
+
 	public static void logTrace(int poolindex) {
 		// try {
 		// 	writer.write(String.format("%d\n", poolindex));
@@ -500,13 +530,51 @@ public class CallBackIndex {
 							} 
 							else {
 								for (int j = 0; j <= compressSize; j++) {
-									int index1 = tracewriter.getRaw(j + compressInfo.compressFirst).traceindex;
-									int index2 = tracewriter.getRaw(j + compressInfo.loopFirst).traceindex;
+									DynamicTrace trace1 = tracewriter.getRaw(j + compressInfo.compressFirst);
+									DynamicTrace trace2 = tracewriter.getRaw(j + compressInfo.loopFirst);
+									if(trace1.isStackTrace() || trace2.isStackTrace()){
+										canPress = false;
+										break;
+									}
+									int index1 = trace1.traceindex;
+									int index2 = trace1.traceindex;
+									// TODO 目前没管dynamictrace后面跟着的地址，在考虑如果地址不一样的话，是不是不适合压缩？
 									if(index1 != index2){
 										canPress = false;
 										break;
 									}
 								}
+
+								int invokecount = 0;
+								int retcount = 0;
+								for(int j = 0; j <= compressSize; j++){
+									DynamicTrace trace = tracewriter.getRaw(j + compressInfo.compressFirst);
+									if(trace.isret)
+										retcount++;
+									else{
+										int opcode = tracepool.get(trace.traceindex).opcode;
+										if(opcode <= 186 && opcode >= 182)
+											invokecount++;
+									}
+									// try {
+									// 	trace.trace = tracepool.get(trace.traceindex);
+									// 	writer.write(String.format(trace.toString()));
+									// 	writer.flush();
+									// } catch (Exception e) {
+									// 	// TODO: handle exception
+									// }
+
+								}
+								if(invokecount != retcount){
+									canPress = false;
+								}
+								// try {
+								// 	writer.write(String.format("\ninvokec = %d, retc = %d \n", invokecount, retcount));
+								// 	writer.flush();
+								// } catch (Exception e) {
+								// 	// TODO: handle exception
+								// }
+
 							}
 							if(canPress){
 								for(int i = compressInfo.loopLast; i >= compressInfo.loopFirst; i--)

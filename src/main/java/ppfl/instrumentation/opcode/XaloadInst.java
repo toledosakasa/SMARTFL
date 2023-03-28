@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -47,6 +48,26 @@ public class XaloadInst extends OpcodeInst {
 		if (usenode != null)
 			usenodes.add(usenode);
 		defnode = graph.addNewStackNode(stmt);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		Node indexNode = graph.popStackNode();
+		usenodes.add(indexNode);
+		Node arrayAddress = graph.popStackNode();
+		usenodes.add(arrayAddress);
+		String field = "0";
+		Node usenode = graph.getHeap(arrayAddress, field);
+		if (usenode != null) // for some string from ldc, there is no first def of use
+			usenodes.add(usenode);
+		else{
+			Node obj = graph.getObj(arrayAddress);
+			if(obj != null)
+				usenodes.add(obj);
+		}
+		defnode = graph.addStackNode(stmt, 1);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 

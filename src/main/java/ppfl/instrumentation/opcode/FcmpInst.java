@@ -6,6 +6,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //149,150
@@ -41,6 +42,14 @@ public class FcmpInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
+		List<String> ops = new ArrayList<>();
+		ops.add("<"); // treat as <
+		graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
 		List<String> ops = new ArrayList<>();
 		ops.add("<"); // treat as <
 		graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);

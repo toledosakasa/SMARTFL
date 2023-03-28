@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //49
@@ -36,6 +37,12 @@ public class DaloadInst extends XaloadInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
+		defnode.setSize(2);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
 		defnode.setSize(2);
 	}
 

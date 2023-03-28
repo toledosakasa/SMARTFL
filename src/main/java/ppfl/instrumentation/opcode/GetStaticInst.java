@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -40,16 +41,16 @@ public class GetStaticInst extends OpcodeInst {
 		ci.write16bit(cbi.logstringindex, instpos + 4);
 	}
 
-	@Override
-	public void insertReturn(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
-		throws BadBytecode {
-		int instpos = ci.insertExGap(8);
-		int instindex = constp.addIntegerInfo(poolindex);
-		ci.writeByte(19, instpos);// ldc_w
-		ci.write16bit(instindex, instpos + 1);
-		ci.writeByte(184, instpos + 3);// invokestatic
-		ci.write16bit(cbi.rettraceindex, instpos + 4);
-	}
+	// @Override
+	// public void insertReturn(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+	// 	throws BadBytecode {
+	// 	int instpos = ci.insertExGap(8);
+	// 	int instindex = constp.addIntegerInfo(poolindex);
+	// 	ci.writeByte(19, instpos);// ldc_w
+	// 	ci.write16bit(instindex, instpos + 1);
+	// 	ci.writeByte(184, instpos + 3);// invokestatic
+	// 	ci.write16bit(cbi.rettraceindex, instpos + 4);
+	// }
 
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
@@ -65,6 +66,22 @@ public class GetStaticInst extends OpcodeInst {
 		graph.staticStmt = stmt;
 		graph.staticuse = usenodes;
 		graph.staticpred = prednodes;
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		String name = dtrace.trace.getfield();
+		Node use = graph.getStatic(name);
+		// in some pass tests, there can be uninstrumented clinit and no first def of the use
+		if(use != null)
+			usenodes.add(use);
+		int size = dtrace.trace.getfieldsize();
+		defnode = graph.addStackNode(stmt, size);
+		Integer addr = dtrace.getAddressFromStack();
+		if(addr != null)
+			defnode.setAddress(addr);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 	@Override

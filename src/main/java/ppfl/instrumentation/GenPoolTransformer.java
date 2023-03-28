@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import java.lang.System;
 
 import javassist.ClassPool;
@@ -81,13 +82,16 @@ public class GenPoolTransformer extends Transformer {
 
     private void staticAnalysis() {
         // long startTime = System.currentTimeMillis();
-        staticAnalyzer = new StaticAnalyzer();
+        staticAnalyzer = new StaticAnalyzer(debugLogger);
         staticAnalyzer.setTracePool(CallBackIndex.tracepool);
         staticAnalyzer.setLoopSet(CallBackIndex.loopset);
-        staticAnalyzer.parse(debugLogger);
+        staticAnalyzer.parse();
         staticAnalyzer.get_pre_idom();
         staticAnalyzer.find_loop();
         CallBackIndex.initCompressInfos();
+        staticAnalyzer.get_post_idom();
+        staticAnalyzer.filter_post_idom();
+        staticAnalyzer.get_stores();
         // this.staticAnalyzer.get_post_idom();
         // staticAnalyzer.clear();
         // CallBackIndex.staticAnalyzer.setTracePool(null);
@@ -103,6 +107,19 @@ public class GenPoolTransformer extends Transformer {
             FileWriter SALogger = new FileWriter("trace/logs/mytrace/" + "loopset.log");
             for (BackEdge loopedge : CallBackIndex.loopset) {
                 SALogger.write(String.format("%d,%d\n", loopedge.start, loopedge.end));
+            }
+            SALogger.close();
+            SALogger = new FileWriter("trace/logs/mytrace/" + "post_idom.log");
+            for (Map.Entry<Integer,Integer> entry: staticAnalyzer.post_idom.entrySet()) {
+                SALogger.write(String.format("%d,%d\n", entry.getKey(), entry.getValue()));
+            }
+            SALogger.close();
+            SALogger = new FileWriter("trace/logs/mytrace/" + "branch_stores.log");
+            for (Map.Entry<Integer,Set<Integer>> entry: staticAnalyzer.branch_stores.entrySet()) {
+                String stores = "";
+                for(Integer i : entry.getValue())
+                    stores += stores.equals("")? i : "#" + i;
+                SALogger.write(String.format("%d,%s\n", entry.getKey(), stores));
             }
             SALogger.close();
         } catch (IOException e) {
@@ -280,6 +297,17 @@ public class GenPoolTransformer extends Transformer {
         // ConstPool constp = mi.getConstPool();
         // CallBackIndex cbi = new CallBackIndex(constp, traceWriter);
         instrumentByteCode(cc, mi, ca, constp, cbi);
+
+        // // for clinit, add an end trace
+        // if(m.getName().equals("<clinit>")){
+        //     Trace longname = new Trace(cc.getName(), m.getName(), m.getDescriptor());
+        //     longname.setTypeMethodLog();
+        //     int poolindex = CallBackIndex.tracepool.indexAt();
+        //     CallBackIndex.tracepool.add(longname);
+        //     traceMap.add(poolindex);
+        //     debugLogger.writeln("find clinit" + longname.toString() + ", index = " + poolindex);
+        // }
+
         // add the outpoint of this method into tracepool (for static analysis)
         Trace outpoint = new Trace(cc.getName(), m.getName(), m.getDescriptor());
         outpoint.setTypeOutPoint();
@@ -288,6 +316,10 @@ public class GenPoolTransformer extends Transformer {
         // log method name at the beginning of this method.
         Trace longname = new Trace(cc.getName(), m.getName(), m.getDescriptor());
         longname.setTypeMethodLog();
+        final int ACC_STATIC = 0x008;
+        int isStatic = ACC_STATIC & mi.getAccessFlags();
+        if(isStatic > 0)
+            longname.setStatic();
         int poolindex = CallBackIndex.tracepool.indexAt();
         CallBackIndex.tracepool.add(longname);
         traceMap.add(poolindex);
@@ -355,16 +387,19 @@ public class GenPoolTransformer extends Transformer {
             }
 
             String field = null;
+            String type = null;
             if (Interpreter.map[opcode] instanceof PutFieldInst ||
                     Interpreter.map[opcode] instanceof GetFieldInst) {
                 int num = tempci.u16bitAt(index + 1);
                 field = constp.getFieldrefName(num);
+                type = constp.getFieldrefType(num);
             }
 
             if (Interpreter.map[opcode] instanceof PutStaticInst ||
                     Interpreter.map[opcode] instanceof GetStaticInst) {
                 int num = tempci.u16bitAt(index + 1);
                 field = constp.getFieldrefClassName(num) + "#" + constp.getFieldrefName(num);
+                type = constp.getFieldrefType(num);
             }
 
             String classname = cc.getName();
@@ -382,7 +417,8 @@ public class GenPoolTransformer extends Transformer {
             }
 
             if (field != null) {
-                instruction = new FieldTrace(instruction, field);
+                boolean is2byte = type.equals("D") || type.equals("J");
+                instruction = new FieldTrace(instruction, field, is2byte);
             }
 
             if (_default != null) {

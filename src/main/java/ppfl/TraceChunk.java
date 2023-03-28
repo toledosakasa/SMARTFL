@@ -44,9 +44,9 @@ public class TraceChunk {
     this.traces.add(s);
   }
 
-  public void addSetUp(List<String> s) {
-    this.traces.addAll(s);
-  }
+  // public void addSetUp(List<String> s) {
+  //   this.traces.addAll(s);
+  // }
 
   public void pruneInit(Set<TraceDomain> TracedDomain) {
     int trace_size=traces.size();
@@ -59,6 +59,7 @@ public class TraceChunk {
         trace = new Trace(split);
         String _calltype = null, _callclass = null, _callname = null;
         String _field = null;
+        int _size = 1;
         for (String instinfo : split) {
           String[] splitinstinfo = instinfo.split("=");
           String infotype = splitinstinfo[0];
@@ -75,12 +76,15 @@ public class TraceChunk {
           if (infotype.equals("field")) {
             _field = infovalue;
           }
+          if (infotype.equals("size")) {
+            _size = Integer.valueOf(infovalue);
+          }
         }
         if (_calltype != null) {
           trace = new InvokeTrace(trace, _calltype, _callclass, _callname);
         }
         if (_field != null) {
-          trace = new FieldTrace(trace, _field);
+          trace = new FieldTrace(trace, _field, _size == 2);
         }
         Dtrace = new DynamicTrace(trace);
       } catch (Exception e) {

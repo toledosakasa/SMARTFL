@@ -5,6 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.ProbGraph;
 
 //9-10
 public class LconstInst extends OpcodeInst {
@@ -39,6 +40,12 @@ public class LconstInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
+		defnode.setSize(2);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
 		defnode.setSize(2);
 	}
 

@@ -5,6 +5,7 @@ import java.util.List;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 
 //165-166, type reference is object?
 public class If_acmpInst extends OpcodeInst {
@@ -45,5 +46,22 @@ public class If_acmpInst extends OpcodeInst {
 				ops.add("!=");
 			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 		}
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		int instpopnum = dtrace.trace.popnum;
+		for (int i = 0; i < instpopnum; i++) {
+			usenodes.add(graph.popStackNode());
+		}
+		defnode = graph.pushPred(stmt);
+		List<String> ops = new ArrayList<>();
+		if (this.form == 165)
+			ops.add("==");
+		else
+			ops.add("!=");
+		graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
+
 	}
 }
