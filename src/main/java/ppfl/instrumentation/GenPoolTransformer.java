@@ -261,8 +261,10 @@ public class GenPoolTransformer extends Transformer {
                     continue;
                 // handle big method, it seems insertgap will be slow
                 CodeAttribute ca = m.getCodeAttribute();
-                if(ca != null && ca.length() > maxMethodSize)
+                if(ca != null && ca.length() > maxMethodSize){
+                    debugLogger.writeln("[Debug] " + "size = " + ca.length() + " > maxMethodSize " + classname + "::" + methodname);
                     continue;
+                }
                 if (instrumentJunit && cc.getName().startsWith("junit") && !m.getName().startsWith("assert")) {
                     continue;
                 }
