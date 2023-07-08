@@ -1,0 +1,7 @@
+org.jsoup.nodes.DocumentType.DocumentType:31
+org.jsoup.nodes.DocumentType.outerHtmlHead:58
+org.jsoup.nodes.DocumentType.outerHtmlHead:59
+org.jsoup.parser.HtmlTreeBuilderState.<init>:23
+org.jsoup.parser.TokeniserState.<init>:1195
+org.jsoup.parser.TokeniserState.<init>:1197
+org.jsoup.parser.XmlTreeBuilder.insert:100

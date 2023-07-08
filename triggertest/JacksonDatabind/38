@@ -1,0 +1,1 @@
+com.fasterxml.jackson.databind.interop.DeprecatedTypeHandling1102Test::testExplicitMapType;com.fasterxml.jackson.databind.interop.DeprecatedTypeHandling1102Test::testExplicitCollectionType;com.fasterxml.jackson.databind.interop.DeprecatedTypeHandling1102Test::testPOJOSubType

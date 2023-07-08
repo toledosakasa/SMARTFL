@@ -13,7 +13,7 @@ alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "C
 project_bug_nums = {"Lang": 65, "Math": 106,
                     "Time": 27, "Closure": 176, "Chart": 26}
 # Lang changes name from org.apache.commons.lang3 to org.apache.commons.lang after 40
-classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml'}
+classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml', 'Compress' :'org.apache.commons.compress', "Jsoup": 'org.jsoup', 'JxPath': 'org.apache.commons.jxpath', 'JacksonDatabind': 'com.fasterxml.jackson.databind', 'JacksonCore': 'com.fasterxml.jackson.core'}
 def utf8open(filename):
     return open(filename, encoding='utf-8', errors='ignore')
 

@@ -1,0 +1,1 @@
+com.fasterxml.jackson.databind.objectid.AlwaysAsReferenceFirstTest::testIssue1607

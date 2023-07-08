@@ -1,0 +1,1 @@
+com.google.javascript.jscomp.AmbiguatePropertiesTest::testImplementsAndExtends;com.google.javascript.jscomp.TypeCheckTest::testIssue86

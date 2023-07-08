@@ -1,0 +1,1 @@
+org.apache.commons.compress.archivers.ArchiveStreamFactoryTest::testEncodingInputStream;org.apache.commons.compress.archivers.ArchiveStreamFactoryTest::testEncodingInputStreamAutodetect;org.apache.commons.compress.archivers.ArchiveStreamFactoryTest::testEncodingOutputStream

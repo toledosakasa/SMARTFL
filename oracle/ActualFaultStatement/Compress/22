@@ -1,0 +1,17 @@
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.<init>:67
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.BZip2CompressorInputStream:135
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:199
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:205
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:211
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:212
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:215
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:216
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:222
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:223
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:226
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:227
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.read0:232
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.setupRandPartA:853
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.setupNoRandPartA:871
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.setupRandPartC:913
+org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream.setupNoRandPartC:942

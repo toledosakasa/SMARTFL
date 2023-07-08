@@ -13,9 +13,9 @@ from os.path import join, getsize
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 project_bug_nums = {"Lang": 65, "Math": 106,
-                    "Time": 27, "Closure": 176, "Chart": 26, "Cli": 40, "Codec": 18, "Csv" : 16, "Gson" : 18, "JacksonXml" : 6}
+                    "Time": 27, "Closure": 176, "Chart": 26, "Cli": 40, "Codec": 18, "Csv" : 16, "Gson" : 18, "JacksonXml" : 6, "Compress": 47, "Jsoup" : 93, "JxPath": 22, "Mockito": 38, "JacksonDatabind": 112, "JacksonCore": 26}
 # Lang changes name from org.apache.commons.lang3 to org.apache.commons.lang after 40
-classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml'}
+classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml', 'Compress' :'org.apache.commons.compress', "Jsoup": 'org.jsoup', 'JxPath': 'org.apache.commons.jxpath', 'JacksonDatabind': 'com.fasterxml.jackson.databind', 'JacksonCore': 'com.fasterxml.jackson.core'}
 
 use_simple_filter = False
 
@@ -275,6 +275,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
         # here the command is single-thread? change it to multi-thread 
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile},project={proj}\""
         simplelogcmd += f' > {projectbase}/trace/runtimelog/{proj}{id}.profile.log 2>&1'
+        # print(cdcmd + simplelogcmd)
         os.system(cdcmd + simplelogcmd)
         # joinprofile(checkoutdir + '/trace/logs/profile/')
     else:
@@ -443,7 +444,7 @@ def checkoversize(checkoutdir, cmdline):
 # @func_set_timeout(1200)
 def rund4j(proj: str, id: str, debug=True):
     cleanupcheckout(proj,id)
-    banlist = ['Lang2','Time21', 'Cli6']
+    banlist = ['Lang2','Time21', 'Cli6', 'Closure63', 'Closure93']
     # banlist.append('Lang43')
     # banlist.append('Math13')
     if((proj+id).strip() in banlist):
@@ -465,7 +466,7 @@ def rund4j(proj: str, id: str, debug=True):
     checkoversize(checkoutdir, cmdlines[0])
 
     processesnum = 16
-    if proj == 'Time':
+    if proj == 'Time' or proj == 'Closure':
         processesnum = 1
     with Pool(processes=processesnum) as pool:
         pool.map(os.system, cmdlines[1:])
@@ -1008,24 +1009,24 @@ def match(proj: str, id: str):
                         return 1
 
 
-    initpath = f'{checkoutbase}/{proj}/{id}/trace/logs/mytrace/'
-    for root, dirs, files in os.walk(initpath):
-            for name in files:
-                if(re.match(r".*init\.log",name)):
-                    try:
-                        initfile = utf8open(join(root, name))
-                    except IOError:
-                        continue
-                    for line in initfile.readlines():
-                        sp = line.split(',')
-                        for instinfo in sp:
-                            spinfo = instinfo.split('=')
-                            if spinfo[0] == 'lineinfo':
-                                sporacle = spinfo[1].split('#')
-                                compare_oracle = sporacle[0] +':'+sporacle[3]
-                                if compare_oracle in oracle_lines:
-                                    print(f'{proj}{id} log has oracle,              in {name}')
-                                    return 1
+    # initpath = f'{checkoutbase}/{proj}/{id}/trace/logs/mytrace/'
+    # for root, dirs, files in os.walk(initpath):
+    #         for name in files:
+    #             if(re.match(r".*init\.log",name)):
+    #                 try:
+    #                     initfile = utf8open(join(root, name))
+    #                 except IOError:
+    #                     continue
+    #                 for line in initfile.readlines():
+    #                     sp = line.split(',')
+    #                     for instinfo in sp:
+    #                         spinfo = instinfo.split('=')
+    #                         if spinfo[0] == 'lineinfo':
+    #                             sporacle = spinfo[1].split('#')
+    #                             compare_oracle = sporacle[0] +':'+sporacle[3]
+    #                             if compare_oracle in oracle_lines:
+    #                                 print(f'{proj}{id} log has oracle,              in {name}')
+    #                                 return 1
     print(f'{proj}{id} has no oracle in trigger log')
     return 0
 

@@ -1,0 +1,2 @@
+org.apache.commons.codec.binary.Base64.setInitialBuffer:419||org.apache.commons.codec.binary.Base64.setInitialBuffer:420||org.apache.commons.codec.binary.Base64.setInitialBuffer:421||org.apache.commons.codec.binary.Base64.setInitialBuffer:422||org.apache.commons.codec.binary.Base64.setInitialBuffer:423
+org.apache.commons.codec.binary.Base64InputStream.read:169||org.apache.commons.codec.binary.Base64InputStream.read:170

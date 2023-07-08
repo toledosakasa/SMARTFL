@@ -1,0 +1,1 @@
+com.fasterxml.jackson.databind.creators.InnerClassCreatorTest::testIssue1501

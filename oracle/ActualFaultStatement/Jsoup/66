@@ -1,0 +1,6 @@
+org.jsoup.nodes.Element.ensureChildNodes:89
+org.jsoup.nodes.Element.doClone:1402
+org.jsoup.nodes.Element$NodeList.<init>:1408
+org.jsoup.nodes.Element$NodeList.NodeList:1409
+org.jsoup.nodes.Element$NodeList.NodeList:1410
+org.jsoup.nodes.Element$NodeList.onContentsChanged:1411

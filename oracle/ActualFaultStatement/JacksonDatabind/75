@@ -1,0 +1,6 @@
+com.fasterxml.jackson.databind.ser.std.EnumSerializer.construct:86
+com.fasterxml.jackson.databind.ser.std.EnumSerializer.createContextual:103
+com.fasterxml.jackson.databind.ser.std.EnumSerializer.createContextual:104
+com.fasterxml.jackson.databind.ser.std.EnumSerializer._isShapeWrittenUsingIndex:217
+com.fasterxml.jackson.databind.ser.std.EnumSerializer._isShapeWrittenUsingIndex:221
+com.fasterxml.jackson.databind.ser.std.EnumSerializer._isShapeWrittenUsingIndex:225

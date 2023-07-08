@@ -1,0 +1,3 @@
+org.mockito.internal.creation.MockSettingsImpl.serializable:22
+org.mockito.internal.creation.MockSettingsImpl.isSerializable:74
+org.mockito.internal.util.MockUtil.createMock:45

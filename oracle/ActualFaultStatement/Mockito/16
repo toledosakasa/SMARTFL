@@ -1,0 +1,4 @@
+org.mockito.Mockito.mock:827
+org.mockito.Mockito.spy:899
+org.mockito.internal.MockitoCore.mock:32
+org.mockito.internal.MockitoCore.mock:33||org.mockito.internal.MockitoCore.mock:35

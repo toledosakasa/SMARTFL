@@ -1,0 +1,17 @@
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:580
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:586
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:595
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:598
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:603
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:618
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:621
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildContainerSerializer:624
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildCollectionSerializer:636
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildCollectionSerializer:654
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildMapSerializer:737
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildMapSerializer:755
+com.fasterxml.jackson.databind.ser.BasicSerializerFactory.buildArraySerializer:831
+com.fasterxml.jackson.databind.ser.BeanSerializerFactory._createSerializer2:174
+com.fasterxml.jackson.databind.ser.BeanSerializerFactory._createSerializer2:175
+com.fasterxml.jackson.databind.ser.BeanSerializerFactory._createSerializer2:176
+com.fasterxml.jackson.databind.ser.BeanSerializerFactory._createSerializer2:214

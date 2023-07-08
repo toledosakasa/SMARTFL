@@ -1,0 +1,10 @@
+org.jsoup.parser.HtmlTreeBuilder.insertEmpty:227
+org.jsoup.parser.HtmlTreeBuilder.insertEmpty:230
+org.jsoup.parser.HtmlTreeBuilder.insertEmpty:231
+org.jsoup.parser.Tokeniser.read:44
+org.jsoup.parser.Tokeniser.read:45
+org.jsoup.parser.Tokeniser.read:46
+org.jsoup.parser.Tokeniser.emit:76
+org.jsoup.parser.Tokeniser.emit:77
+org.jsoup.parser.Tokeniser.acknowledgeSelfClosingFlag:124
+org.jsoup.parser.Tokeniser.acknowledgeSelfClosingFlag:125

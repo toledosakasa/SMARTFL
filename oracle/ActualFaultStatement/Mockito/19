@@ -1,0 +1,5 @@
+org.mockito.internal.configuration.injection.PropertyAndSetterInjection.injectMockCandidatesOnFields:114
+org.mockito.internal.configuration.injection.filter.FinalMockCandidateFilter.filterCandidate:23
+org.mockito.internal.configuration.injection.filter.MockCandidateFilter.filterCandidate:15
+org.mockito.internal.configuration.injection.filter.NameBasedCandidateFilter.filterCandidate:23||org.mockito.internal.configuration.injection.filter.NameBasedCandidateFilter.filterCandidate:31||org.mockito.internal.configuration.injection.filter.NameBasedCandidateFilter.filterCandidate:43
+org.mockito.internal.configuration.injection.filter.TypeBasedCandidateFilter.filterCandidate:20||org.mockito.internal.configuration.injection.filter.TypeBasedCandidateFilter.filterCandidate:28
