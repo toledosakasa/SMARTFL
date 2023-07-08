@@ -4,12 +4,15 @@ package ppfl;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.ArrayDeque;
+import java.util.Set;
+import java.util.HashSet;
 
+import ppfl.RuntimeFrame.FrameState;
 import ppfl.instrumentation.DynamicTrace;
 import ppfl.instrumentation.TraceDomain;
 
 public class StackFrame {
-    private Deque<RuntimeFrame> stackframe;
+    public Deque<RuntimeFrame> stackframe;
 
     public StackFrame(){
         this.stackframe = new ArrayDeque<>();
@@ -30,8 +33,8 @@ public class StackFrame {
 
     // should be called while invoking.
 	// e.g. invokestatic
-	public void push(TraceDomain domain, boolean valid) {
-		RuntimeFrame topush = new RuntimeFrame(domain, valid);
+	public void push(TraceDomain domain, FrameState state) {
+		RuntimeFrame topush = new RuntimeFrame(domain, state);
 		this.stackframe.push(topush);
 	}
 
@@ -42,7 +45,7 @@ public class StackFrame {
 	public void print(MyWriter debugLogger){
 		debugLogger.write("\n stackframe:");
 		for(RuntimeFrame f : stackframe){
-			debugLogger.write("\n	" + f.getName());
+			debugLogger.write("\n	" + f.getName() + ", state = " + f.getState());
 			// f.printMap(debugLogger);
 			// if(f.getInvoke() != null)
 			// 	debugLogger.write(",	invoke = " + f.getInvoke().invokeTrace.toString());
@@ -50,7 +53,16 @@ public class StackFrame {
 		debugLogger.write("\n");
 	}
 
-	public void handleException(Deque<String> stack){
+	private int countSize(){
+		int ret = 0;
+		for(RuntimeFrame f : stackframe){
+			if(f.getState() != FrameState.Untraced)
+				ret += 1;
+		}
+		return ret;
+	}
+
+	public void handleException(Deque<String> stack, MyWriter debugLogger){
 		// System.out.println("\nstack:");
 		// for(String s : stack)
 		// 	System.out.println(s);
@@ -70,10 +82,35 @@ public class StackFrame {
 		assert(stack.peekLast().equals("ppfl.instrumentation.CallBackIndex#logStack"));
 		stack.removeLast();
 
-		if(stackframe.size() < stack.size()) // exception message in untraced method trails
-			return;
+		Set<String> frameSet = new HashSet<>();
+		for(RuntimeFrame frame : stackframe){
+			TraceDomain domain = frame.getDomain();
+			if(frame.getState() == FrameState.Untraced)
+				continue;
+			String frameName = domain.traceclass + "#" + domain.tracemethod;
+			frameSet.add(frameName);
+		}
 
-		while(stackframe.size() > stack.size()){
+		// debugLogger.write("\n frame set = " + frameSet);
+
+		Set<String> removeSet = new HashSet<>();
+		for(String stackframe : stack){
+			if(!frameSet.contains(stackframe))
+				removeSet.add(stackframe);
+		}
+
+		// debugLogger.write("\n remove set = " + removeSet);
+		
+		stack.removeAll(removeSet);
+
+		// debugLogger.write("\n stack = " + stack);
+
+		if(stackframe.size() < stack.size()){ // exception message in untraced method trails
+			this.top().clearStack();
+			return;
+		}
+
+		while(countSize() > stack.size()){
 			this.stackframe.pop();
 		}
 

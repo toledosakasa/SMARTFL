@@ -12,6 +12,12 @@ public class InvokeItem{
     public Node callerObj = null;
     public boolean canBeParsed;
 
+    public enum InvokeState{
+        Start, Traced, Untraced
+    }
+
+    public InvokeState state;
+
     public InvokeItem(StmtNode stmt, List<Node> use, List<Node> pred, 
         DynamicTrace invokeTrace, int argcnt, Node callerObj){
         this.stmt = stmt;
@@ -21,6 +27,7 @@ public class InvokeItem{
         this.argcnt = argcnt;
         this.callerObj = callerObj;
         this.canBeParsed = true;
+        this.state = InvokeState.Start;
     }
 
 }

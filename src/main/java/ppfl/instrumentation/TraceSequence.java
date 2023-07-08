@@ -72,6 +72,12 @@ public class TraceSequence implements Serializable {
         ListIterator<DynamicTrace> iter = tracelist.listIterator(tracelist.size());
         while(iter.hasPrevious()){
             DynamicTrace dtrace = iter.previous();
+            // if(observeSet.size()>1)
+            //     System.out.println(dtrace.toString());
+            if(dtrace == null || dtrace.isStackTrace()){
+                iter.remove();
+                continue;
+            }
             Trace trace = tracepool.get(dtrace.traceindex);
             String location = trace.classname + ":" + trace.lineno;
             if(!observeSet.contains(location))

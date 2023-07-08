@@ -45,7 +45,8 @@ import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.InvokeTrace;
 import ppfl.instrumentation.Trace;
 import ppfl.instrumentation.TraceTransformer;
-
+import ppfl.InvokeItem.InvokeState;
+import ppfl.RuntimeFrame.FrameState;
 import ppfl.defects4j.GraphBuilder;
 import ppfl.instrumentation.opcode.OpcodeInst;
 
@@ -59,7 +60,7 @@ public class ProbGraph {
     private MyWriter resultLogger;
     private MyWriter debugLogger;
 
-    public boolean debug_logger_switch = true;
+    public boolean debug_logger_switch = false;
 
     public void setGraphLogger(String proj, int id) {
         String path = "logs/graph/";
@@ -300,6 +301,7 @@ public class ProbGraph {
                 String exceptionObs = exceptionObsMap.get(traceSeq.getName());
                 if(exceptionObs != null){
                     observeSet.add(exceptionObs);
+                    //怎么处理 invoke然后trace中没有ret就出异常的情况呢？这样可能最后的observe位置后还有有用的回调函数trace，比如equal
                     traceSeq.prune(observeSet);
                 }   
                 // traceSeq.prune(observeClass, observeLineno);
@@ -328,14 +330,22 @@ public class ProbGraph {
 
     }
 
+    // private boolean isValid;
+    // public boolean frameValid(){
+    //     return topFrame().isValid();
+    // }
+
     private boolean isValid;
-    public boolean frameValid(){
-        return topFrame().isValid();
+
+    public FrameState frameState(){
+        if(topFrame() == null)
+            return null;
+        return topFrame().getState();
     }
 
-    public void pushFrame(TraceDomain domain, boolean valid){
-        //debugLogger.write("\npush frame %s, valid = %b", domain.toString(), valid);
-        this.stackframe.push(domain, valid);
+    public void pushFrame(TraceDomain domain, FrameState state){
+        // debugLogger.write("\npush frame %s", domain.toString());
+        this.stackframe.push(domain, state);
         // this.stackframe.print(debugLogger);
     }
 
@@ -387,7 +397,8 @@ public class ProbGraph {
 
     public Node popStackNode(){
         Node ret = topFrame().popStack();
-        // debugLogger.write("\n   pop stack node" + ret.getNodeName());
+        // if(ret != null)
+        //     debugLogger.write("\n   pop stack node" + ret.getNodeName());
         return ret;
     }
 
@@ -625,8 +636,10 @@ public class ProbGraph {
     }
 
 	private boolean matchTracedInvoke(InvokeItem invoke, DynamicTrace dTrace) {
-        if(!invoke.canBeParsed)
+        if(invoke.state != InvokeState.Start)
             return false;
+        // if(!invoke.canBeParsed)
+        //     return false;
 		TraceDomain td = invoke.invokeTrace.getCallDomain();
         // 对一些重载方法，可能会是父子类的关系，所以此处先不比较类
 		return td.signature.equals(dTrace.trace.signature) && td.tracemethod.equals(dTrace.trace.methodname);
@@ -634,7 +647,7 @@ public class ProbGraph {
 
     private void resolveTracedArgs(InvokeItem invoke, DynamicTrace dTrace) {
 		// switch stack frame
-        pushFrame(dTrace.getDomain(), true);
+        pushFrame(dTrace.getDomain(), FrameState.Normal);
 		int argcnt = invoke.argcnt;
 		// static arguments starts with 0
 		int paravarindex = 0;
@@ -651,29 +664,30 @@ public class ProbGraph {
 		}
 	}
 
-    // private void resolveUnTracedArgs(DynamicTrace dTrace) {
-	// 	// switch stack frame
-    //     pushFrame(dTrace.getDomain());
-	// 	// int argcnt = this.untracedargcnt;
+    private void buildUntracedStack(InvokeItem invoke){
+        TraceDomain td = invoke.invokeTrace.getCallDomain();
+        pushFrame(td, FrameState.Untraced);
+        topFrame().setUntraced(invoke);
+    }
 
+    private void resolveUnTracedArgs(InvokeItem invoke, DynamicTrace dTrace) {
+        pushFrame(dTrace.getDomain(), FrameState.Normal);
 
-    //     List<String> parameters = OpcodeInst.splitMethodDesc(dTrace.trace.signature);
-    //     // unstatic arguments starts with 1
-    //     if(!dTrace.trace.isStatic())
-    //         parameters.add(0, "Lself;");
-	// 	int paravarindex = 0;
+        List<String> parameters = OpcodeInst.splitMethodDesc(dTrace.trace.signature);
+        // unstatic arguments starts with 1
+        if(!dTrace.trace.isStatic())
+            parameters.add(0, "Lself;");
+		int paravarindex = 0;
 
-    //     InvokeItem currentInvoke = invoke.peek();
-
-	// 	for (String parameter: parameters) {
-    //         int stacksize = 1;
-    //         if(parameter.equals("D") || parameter.equals("J"))
-    //             stacksize = 2;
-    //         Node defnode = addVarNode(paravarindex, currentInvoke.stmt, stacksize);
-	// 		buildFactor(defnode, currentInvoke.pred, currentInvoke.use, null, currentInvoke.stmt);
-	// 		paravarindex += stacksize;
-	// 	}
-	// }
+		for (String parameter: parameters) {
+            int stacksize = 1;
+            if(parameter.equals("D") || parameter.equals("J"))
+                stacksize = 2;
+            Node defnode = addVarNode(paravarindex, invoke.stmt, stacksize);
+			buildFactor(defnode, invoke.pred, invoke.use, null, invoke.stmt);
+			paravarindex += stacksize;
+		}
+	}
 
 
     private void buildAliveInvoke(){
@@ -876,8 +890,14 @@ public class ProbGraph {
         for(int index=0;index<tracelength;index++){
             DynamicTrace dTrace = traceSeq.get(index);
 
+            // if(topFrame()!=null)
+            //     topFrame().printStack(debugLogger);
+            
             if(debug_logger_switch)
                 debugLogger.write(dTrace.toString());
+            
+            // if(topFrame()!=null)
+            //     debugLogger.write("\nframe = " + topFrame().getName());
 
             // if(!dTrace.trace.isInst()) //log like ###Class::MethodName
             //     continue;
@@ -895,11 +915,12 @@ public class ProbGraph {
             //     continue;
 
             else if(dTrace.trace.isMethodLog()){
-                parseInvoke(dTrace);
+                parseInvoke(dTrace, testpass);
             }
 
             else if(getInvoke() != null){
-                getInvoke().canBeParsed = false;
+                // debugLogger.write("\nstill in invoke" + getInvoke().invokeTrace.toString());
+                // getInvoke().canBeParsed = false;
                 continue;
             }
 
@@ -919,8 +940,7 @@ public class ProbGraph {
             //     topFrame().printStack(debugLogger);
 
             // for (RuntimeFrame f : stackframe.stackframe){
-            //     if(f.getDomain().tracemethod.equals("getPublicMethod"))
-            //         f.printStack(debugLogger);
+            //     f.printStack(debugLogger);
             // }
 
             // printHeap();
@@ -931,6 +951,21 @@ public class ProbGraph {
         }
 
         // if crash occurs, and there is still unresolved invoke, lastDefinedVar should be modified with last call
+        
+        if(frameState() == FrameState.Untraced){
+            InvokeItem untraced = topFrame().getUntraced();
+            List<Node> usestack = new ArrayList<>();
+            Node stackNode = popStackNode();
+            while(stackNode != null){
+                usestack.add(stackNode);
+                stackNode = popStackNode();
+            }
+            popFrame();
+            InvokeItem invoke = getInvoke();
+            assert(invoke.state == InvokeState.Untraced);
+            invoke.use.addAll(usestack);
+        }
+        
         if(getInvoke() != null){
             buildAliveInvoke();
         }
@@ -964,14 +999,14 @@ public class ProbGraph {
         return linec;
 	}
 
-    private void parseInvoke(DynamicTrace dTrace){
+    private void parseInvoke(DynamicTrace dTrace, boolean testpass){
         // this.dynamicTrace = dTrace;
 
         // 有一个隐患是如果调用未追踪方法，然后未追踪方法里有catch，又触发了clinit，又把clinit
         // 中的exception给catch了，会导致clinit没有return而出问题.
         // 不过一般正常情况下clinit里的exception也不会被外层的东西给抓到？ 所以应该影响不大？可以把由未追踪方法的clinit 给加进来
         if(dTrace.trace.methodname.equals("<clinit>")){
-            pushFrame(dTrace.getDomain(), true);
+            pushFrame(dTrace.getDomain(), FrameState.Normal);
             return;
         }
 
@@ -981,12 +1016,24 @@ public class ProbGraph {
                 cleanInvoke();
                 resolveTracedArgs(invoke, dTrace);
             }
+            else{
+                invoke.state = InvokeState.Untraced;
+                if(!testpass){ // don't ignore the traces for failtest
+                    buildUntracedStack(invoke);
+                    resolveUnTracedArgs(topFrame().getUntraced(), dTrace);
+                }
+            }
             return;
         }
-        // some other frame 
         else{
-            pushFrame(dTrace.getDomain(), false);
-            return;
+            if(frameState() == FrameState.Untraced){
+                resolveUnTracedArgs(topFrame().getUntraced(), dTrace);
+            }
+            // some other frame 
+            else{
+                pushFrame(dTrace.getDomain(), FrameState.Invalid);
+                return;
+            }
         }
 
         // if(dTrace.trace.methodname.equals("<clinit>")){
@@ -1009,7 +1056,6 @@ public class ProbGraph {
     }
 
     private void parseRet(DynamicTrace dTrace){
-
         InvokeItem invoke = getInvoke();
         if(invoke != null){
             //debugLogger.write("\ninvoke index = %d, dtrace index = %d", invoke.invokeTrace.traceindex, dTrace.traceindex);
@@ -1017,6 +1063,24 @@ public class ProbGraph {
                 buildInvoke();
         }
 
+        if(frameState() == FrameState.Untraced){
+            InvokeItem untraced = topFrame().getUntraced();
+            if(untraced.invokeTrace.traceindex == dTrace.traceindex){
+
+                List<Node> usestack = new ArrayList<>();
+                Node stackNode = popStackNode();
+                while(stackNode != null){
+                    usestack.add(stackNode);
+                    stackNode = popStackNode();
+                }
+                popFrame();
+                invoke = getInvoke();
+                assert(invoke.invokeTrace.traceindex == dTrace.traceindex);
+                assert(invoke.state == InvokeState.Untraced);
+                invoke.use.addAll(usestack);
+                buildInvoke();
+            }
+        }
         //不需要，clinit会以 return指令结尾，在那里popframe即可
         // if(dTrace.trace.methodname.equals("<clinit>")){
         //     if(topFrame().getDomain().equals(dTrace.getDomain())){
@@ -1075,7 +1139,8 @@ public class ProbGraph {
     }
 
     private void parseException(DynamicTrace dTrace){
-        this.stackframe.handleException(dTrace.stackTrace);
+        this.stackframe.handleException(dTrace.stackTrace, debugLogger);
+        // this.stackframe.print(debugLogger);
         StmtNode triggerStmtNode = lastFactor.stmt;
         Node exceptionNode = addStackNode(triggerStmtNode, 1);
         buildFactor(exceptionNode, lastFactor.pred, lastFactor.use, null, triggerStmtNode);
@@ -1094,7 +1159,7 @@ public class ProbGraph {
         if(stores != null)
             pushStore(stores);
 
-        this.isValid = frameValid();   
+        this.isValid = !(frameState() == FrameState.Invalid);  
 		Interpreter.map[this.dynamicTrace.trace.opcode].build(this);
     }
 

@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.Set;
 import java.util.ArrayDeque;
 
+import ppfl.InvokeItem.InvokeState;
 import ppfl.instrumentation.TraceDomain;
 
 public class RuntimeFrame {
@@ -18,9 +19,14 @@ public class RuntimeFrame {
 	private Deque<Set<Integer>> storeStack;
 	private TraceDomain domain;
 	private InvokeItem invoke;
-	private boolean valid;
+	private InvokeItem untracedInvoke; // only used for Untraced Frame
+	// private boolean valid;
+	public enum FrameState{
+        Normal, Untraced, Invalid
+    }
+	private FrameState state;
 
-	public RuntimeFrame(TraceDomain domain, boolean valid) {
+	public RuntimeFrame(TraceDomain domain, FrameState state) {
 		runtimeStack = new ArrayDeque<>();
 		stackCount = 0;
 		varMap = new HashMap<>();
@@ -28,12 +34,13 @@ public class RuntimeFrame {
 		predCount = 0;
 		storeStack = new ArrayDeque<>();
 		this.domain = domain;
-		this.valid = valid;
+		this.state = state;
 		invoke = null;
+		untracedInvoke = null;
 	}
 
-	public boolean isValid(){
-		return valid;
+	public FrameState getState(){
+		return state;
 	}
 
 	public void pushStack(Node stacknode){
@@ -60,7 +67,7 @@ public class RuntimeFrame {
 	}
 
 	public void printStack(MyWriter debugLogger){
-		debugLogger.write("\n	stack node = ");
+		debugLogger.write("\n Stackname = " + getName() + ", stack node = ");
 		for(Node node: runtimeStack)
 			debugLogger.write(node.getNodeName()+ ",");
 	}
@@ -70,6 +77,7 @@ public class RuntimeFrame {
 		predStack.clear();
 		storeStack.clear();
 		// invoke may lead to NullPointerException or for some untraced invoke, not return
+		// System.out.println("clean invoke, " + this.getName() + ", invoke = " + this.invoke.invokeTrace.toString());
 		cleanInvoke();
 	}
 
@@ -137,6 +145,16 @@ public class RuntimeFrame {
 
 	public TraceDomain getDomain(){
 		return this.domain;
+	}
+
+	public void setUntraced(InvokeItem invoke){
+		assert(this.state == FrameState.Untraced);
+        this.untracedInvoke = invoke;
+    }
+
+	public InvokeItem getUntraced(){
+		assert(this.state == FrameState.Untraced);
+		return this.untracedInvoke;
 	}
 
 	// private RuntimeFrame(TraceDomain domain) {
