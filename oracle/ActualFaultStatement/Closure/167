@@ -1,0 +1,10 @@
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.caseEquality:299
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.caseAndOrNotShortCircuiting:346
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.maybeRestrictName:394
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.maybeRestrictTwoNames:405
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.maybeRestrictTwoNames:409
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.maybeRestrictTwoNames:411
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.caseNameOrGetProp:430
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.caseNameOrGetProp:432
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.caseNameOrGetProp:433
+com.google.javascript.jscomp.type.SemanticReverseAbstractInterpreter.caseNameOrGetProp:434

@@ -13,9 +13,9 @@ from os.path import join, getsize
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 project_bug_nums = {"Lang": 65, "Math": 106,
-                    "Time": 27, "Closure": 176, "Chart": 26, "Cli": 40, "Codec": 18, "Csv" : 16, "Gson" : 18, "JacksonXml" : 6, "Compress": 47, "Jsoup" : 93, "JxPath": 22, "Mockito": 38, "JacksonDatabind": 112, "JacksonCore": 26}
+                    "Time": 27, "Closure": 176, "Chart": 26, "Cli": 40, "Codec": 18, "Csv" : 16, "Gson" : 18, "JacksonXml" : 6, "Compress": 47, "Jsoup" : 93, "JxPath": 22, "Mockito": 38, "JacksonDatabind": 112, "JacksonCore": 26, "Collections": 28}
 # Lang changes name from org.apache.commons.lang3 to org.apache.commons.lang after 40
-classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml', 'Compress' :'org.apache.commons.compress', "Jsoup": 'org.jsoup', 'JxPath': 'org.apache.commons.jxpath', 'JacksonDatabind': 'com.fasterxml.jackson.databind', 'JacksonCore': 'com.fasterxml.jackson.core'}
+classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml', 'Compress' :'org.apache.commons.compress', "Jsoup": 'org.jsoup', 'JxPath': 'org.apache.commons.jxpath', 'JacksonDatabind': 'com.fasterxml.jackson.databind', 'JacksonCore': 'com.fasterxml.jackson.core', 'Collections': 'org.apache.commons.collections4'}
 
 use_simple_filter = False
 
@@ -230,6 +230,23 @@ def joinprofile(profiledir):
                 for line in logfile.readlines():
                     profile.write(line)
 
+def getd4jtest_triggerclass(metadata: Dict[str, str]):
+    trigger_tests = metadata['tests.trigger'].strip().split(';')
+    trigger_classes = set()
+    for test in trigger_tests:
+        testclass = test.split('::')[0]
+        trigger_classes.add(testclass)
+    testmethods = metadata['methods.test.all'].split(';')
+    ret = set()
+    for test in testmethods:
+        testclass = test.split('::')[0]
+        if testclass in trigger_classes:
+            methods = test.split('::')[1].split(',')
+            for method in methods:
+                ret.add((testclass, method))
+    return ret
+
+    
 
 def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
     jarpath = os.path.abspath(
@@ -292,7 +309,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
 
 def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     metadata = getmetainfo(proj, id, debug)
-    if not 'corrected' in metadata:
+    if not 'corrected' in metadata and proj != 'Closure':
         # correct the metainfo about classes_relevant. some loaded src classes not in metainfo.
         # now loaded test classes also added
         relevant_set = set()
@@ -337,6 +354,8 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     classes_relevant = metadata['classes.relevant'].strip()
 
     relevant_testmethods = getd4jtestprofile(metadata, proj, id, debug)
+
+    # relevant_testmethods = getd4jtest_triggerclass(metadata)
 
     reltest_dict = {}  # {classname : [methodnames]}
     for (cname, mname) in relevant_testmethods:
@@ -445,6 +464,8 @@ def checkoversize(checkoutdir, cmdline):
 def rund4j(proj: str, id: str, debug=True):
     cleanupcheckout(proj,id)
     banlist = ['Lang2','Time21', 'Cli6', 'Closure63', 'Closure93']
+    if(proj == 'Collections' and int(id) <= 24):
+        return
     # banlist.append('Lang43')
     # banlist.append('Math13')
     if((proj+id).strip() in banlist):
@@ -508,8 +529,7 @@ def parseproj(proj: str, debug=True):
     # cmdlines = [f'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
     #     1, project_bug_nums[proj]+1)]
     cmdlines = []
-    banlist = []
-    banlist = ['Lang2', 'Time25']
+    banlist = ['Lang2', 'Time25', 'Cli6', 'Closure63', 'Closure93']
     #banlist = ['Lang2', 'Lang8' ,'Time21','Math7','Math10','Math13','Math14','Math15','Math16','Math17','Math39','Math44','Math54','Math59','Math64','Math65','Math68','Math71','Math74','Math78','Math100','Time25', 'Chart15']
     if proj == 'MathandTime':
         proj = 'Math'

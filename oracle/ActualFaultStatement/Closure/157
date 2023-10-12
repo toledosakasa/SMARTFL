@@ -1,0 +1,9 @@
+com.google.javascript.jscomp.CodeGenerator.add:343
+com.google.javascript.jscomp.CodeGenerator.add:350
+com.google.javascript.jscomp.CodeGenerator.add:656
+com.google.javascript.jscomp.CodeGenerator.add:663
+com.google.javascript.jscomp.CodeGenerator.add:666
+com.google.javascript.jscomp.RenamePrototypes$ProcessProperties.visit:336
+com.google.javascript.jscomp.RenamePrototypes$ProcessProperties.processPrototypeParent:377
+com.google.javascript.jscomp.parsing.IRFactory$TransformDispatcher.transformAsString:349
+com.google.javascript.jscomp.parsing.IRFactory$TransformDispatcher.transformAsString:351

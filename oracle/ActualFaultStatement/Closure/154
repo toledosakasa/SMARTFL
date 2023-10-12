@@ -1,0 +1,7 @@
+com.google.javascript.jscomp.TypeCheck.<init>:185
+com.google.javascript.jscomp.TypeCheck.<init>:222
+com.google.javascript.jscomp.TypeCheck.checkDeclaredPropertyInheritance:1049
+com.google.javascript.jscomp.TypeCheck.checkDeclaredPropertyInheritance:1050
+com.google.javascript.jscomp.TypeCheck.checkDeclaredPropertyInheritance:1052
+com.google.javascript.jscomp.TypeCheck.checkDeclaredPropertyInheritance:1053
+com.google.javascript.jscomp.TypeValidator.<init>:111

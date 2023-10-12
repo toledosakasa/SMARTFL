@@ -1,0 +1,6 @@
+com.google.javascript.jscomp.JsAst.parse:95
+com.google.javascript.jscomp.NodeUtil.newQualifiedNameNodeDeclaration:2368
+com.google.javascript.jscomp.ScopedAliases$Traversal.findAliases:356
+com.google.javascript.jscomp.ScopedAliases$Traversal.findAliases:357
+com.google.javascript.jscomp.ScopedAliases$Traversal.findAliases:365
+com.google.javascript.jscomp.ScopedAliases$Traversal.findAliases:366
