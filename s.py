@@ -253,4 +253,10 @@ if __name__ == '__main__':
             d4j.decoder(False, args[2])
         else:
             d4j.decoder(False)
+    if args[1] == 'runall':
+        d4j.runall()
+    if args[1] == 'parseall':
+        d4j.parseall()
+    if args[1] == 'evalall':
+        d4j.evalall()
     

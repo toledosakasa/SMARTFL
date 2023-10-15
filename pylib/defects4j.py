@@ -748,7 +748,7 @@ def zevalproj(proj: str):
         f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
 
 
-def evalproj(proj: str):
+def evalproj(proj: str, output = True):
     no_oracle = 0
     no_result = 0
     not_listed = 0
@@ -758,7 +758,7 @@ def evalproj(proj: str):
         top.append(0)
     allbugs = project_bug_nums[proj]
     for i in range(1, allbugs+1):
-        result = eval(proj, str(i))
+        result = eval(proj, str(i), output)
         if(result > 0 and result <= 10):
             for j in range(result, 11):
                 top[j] += 1
@@ -766,8 +766,10 @@ def evalproj(proj: str):
             no_result += 1
         if result == -2:
             crashed += 1
-    print(
-        f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
+    if(output):
+        print(
+            f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
+    return (top[1], top[3], top[5], top[10], no_result+crashed)
 
 def pevalproj(proj: str):
     no_oracle = 0
@@ -833,11 +835,12 @@ def eval_method(proj: str, id: str):
     return ret
 
 
-def eval(proj: str, id: str):
+def eval(proj: str, id: str, output = True):
     try:
         oraclefile = utf8open(f'oracle/ActualFaultStatement/{proj}/{id}')
     except IOError:
-        print(f'{proj}{id} has no oracle')
+        if(output):
+            print(f'{proj}{id} has no oracle')
         return -1
     oracle_lines = set()
     for line in oraclefile.readlines():
@@ -852,7 +855,8 @@ def eval(proj: str, id: str):
             # f'trace/logs/mytrace/InfResult-{proj}{id}.log')
             f'logs/result/result-{proj}-{id}.log')
     except IOError:
-        print(f'{proj}{id} has failed.')
+        if(output):
+            print(f'{proj}{id} has failed.')
         return -2
     i = 1
     ret = -3
@@ -884,7 +888,8 @@ def eval(proj: str, id: str):
         if classname.lower().startswith('test') or classname.lower().endswith('test'):
             continue
         i += 1
-    print(f'{proj}{id} result ranking: {ret}')
+    if(output):
+        print(f'{proj}{id} result ranking: {ret}')
     # print(f'{proj}{id} result ranking: {ret}, prob = {prob}')
     return ret
 
@@ -1142,3 +1147,33 @@ def decoder(incheckout = False, trace = None):
     else:
         cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder"'
     os.system(cmdline)
+
+
+
+def runall():
+    for proj in alld4jprojs:
+        cmdline = f'python3 s.py rund4j {proj}'
+        os.system(cmdline)
+
+
+def parseall():
+    for proj in alld4jprojs:
+        cmdline = f'python3 s.py parsed4j {proj}'
+        os.system(cmdline)
+
+def evalall():
+    top1 = 0
+    top3 = 0
+    top5 = 0
+    top10 = 0
+    fail = 0
+    lst = ["Lang", "Math", "Chart", "Time", "Closure"]
+    for proj in lst:
+        result = evalproj(proj, False)
+        top1 += result[0]
+        top3 += result[1]
+        top5 += result[2]
+        top10 += result[3]
+        fail += result[4]
+        print(f'after {proj}, top1={top1},top3={top3},top5={top5},top10={top10},failed={fail}')
+    print(f'all: top1={top1},top3={top3},top5={top5},top10={top10},failed={fail}')
