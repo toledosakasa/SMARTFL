@@ -1,0 +1,1 @@
+com.fasterxml.jackson.databind.seq.ReadRecoveryTest::testSimpleRootRecovery;com.fasterxml.jackson.databind.seq.ReadRecoveryTest::testRootBeans;com.fasterxml.jackson.databind.seq.ReadRecoveryTest::testSimpleArrayRecovery

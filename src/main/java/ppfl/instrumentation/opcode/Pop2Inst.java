@@ -4,6 +4,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
+import ppfl.ProbGraph;
 
 //88
 public class Pop2Inst extends OpcodeInst {
@@ -32,4 +33,14 @@ public class Pop2Inst extends OpcodeInst {
 		}
 
 	}
+
+	@Override
+	public void build(ProbGraph graph){
+		Node pop1 = graph.popStackNode();
+		if(pop1.getSize() == 1){
+			Node pop2 = graph.popStackNode();
+			assert(pop2.getSize() == 1);
+		}
+	}
+
 }

@@ -1,0 +1,4 @@
+com.google.javascript.jscomp.InlineVariables$InliningBehavior.doInlinesForScope:220
+com.google.javascript.jscomp.InlineVariables$InliningBehavior.inlineNonConstants:229
+com.google.javascript.jscomp.InlineVariables$InliningBehavior.inlineNonConstants:275
+com.google.javascript.jscomp.ReferenceCollectingCallback.visit:123

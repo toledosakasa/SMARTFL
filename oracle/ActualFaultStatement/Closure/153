@@ -1,0 +1,15 @@
+com.google.javascript.jscomp.Normalize$DuplicateDeclarationHandler.onRedeclaration:637
+com.google.javascript.jscomp.Normalize$DuplicateDeclarationHandler.onRedeclaration:667
+com.google.javascript.jscomp.Normalize$DuplicateDeclarationHandler.onRedeclaration:681
+com.google.javascript.jscomp.SyntacticScopeCreator.scanRoot:95
+com.google.javascript.jscomp.SyntacticScopeCreator.scanRoot:103
+com.google.javascript.jscomp.SyntacticScopeCreator.scanVars:125
+com.google.javascript.jscomp.SyntacticScopeCreator.scanVars:126
+com.google.javascript.jscomp.SyntacticScopeCreator.scanVars:127
+com.google.javascript.jscomp.SyntacticScopeCreator.scanVars:142
+com.google.javascript.jscomp.SyntacticScopeCreator.scanVars:154
+com.google.javascript.jscomp.SyntacticScopeCreator$RedeclarationHandler.onRedeclaration:179
+com.google.javascript.jscomp.SyntacticScopeCreator$DefaultRedeclarationHandler.onRedeclaration:188
+com.google.javascript.jscomp.SyntacticScopeCreator.declareVar:235
+com.google.javascript.jscomp.SyntacticScopeCreator.declareVar:241
+com.google.javascript.jscomp.SyntacticScopeCreator.declareVar:244

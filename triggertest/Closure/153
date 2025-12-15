@@ -1,0 +1,1 @@
+com.google.javascript.jscomp.NormalizeTest::testDuplicateVarInExterns;com.google.javascript.jscomp.NormalizeTest::testMakeLocalNamesUnique

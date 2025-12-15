@@ -1,0 +1,1 @@
+org.apache.commons.codec.language.CaverphoneTest::testLocaleIndependence;org.apache.commons.codec.language.DoubleMetaphoneTest::testLocaleIndependence;org.apache.commons.codec.language.MetaphoneTest::testLocaleIndependence;org.apache.commons.codec.language.RefinedSoundexTest::testLocaleIndependence;org.apache.commons.codec.language.SoundexTest::testLocaleIndependence

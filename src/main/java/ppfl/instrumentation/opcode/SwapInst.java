@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -37,6 +38,14 @@ public class SwapInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertAfter(CodeIterator ci, int index,  ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+		// int instpos = ci.insertExGap(3);// the gap must be long enough for the
+		// following instrumentation
+		// ci.writeByte(184, instpos);// invokestatic
+		// ci.write16bit(cbi.tsindex_int, instpos + 1);
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)
 		super.buildtrace(graph);
@@ -46,6 +55,16 @@ public class SwapInst extends OpcodeInst {
 		assert (NextTop.getSize() == 1);
 		graph.getRuntimeStack().push(top);
 		graph.getRuntimeStack().push(NextTop);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		Node top1 = graph.popStackNode();
+		Node top2 = graph.popStackNode();
+		assert(top1.getSize() == 1 && top2.getSize() == 1);
+		graph.pushStackNode(top1);
+		graph.pushStackNode(top2);
 	}
 
 }

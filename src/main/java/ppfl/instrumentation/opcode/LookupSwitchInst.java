@@ -5,6 +5,7 @@ import java.util.List;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 
 //171
 public class LookupSwitchInst extends OpcodeInst {
@@ -42,8 +43,8 @@ public class LookupSwitchInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		if (info.getintvalue("popnum") != null) {
-			int instpopnum = info.getintvalue("popnum");
+		if (dtrace.trace.popnum != null) {
+			int instpopnum = dtrace.trace.popnum;
 			for (int i = 0; i < instpopnum; i++) {
 				usenodes.add(graph.getRuntimeStack().pop());
 			}
@@ -55,6 +56,17 @@ public class LookupSwitchInst extends OpcodeInst {
 			List<String> ops = new ArrayList<>();
 			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 		}
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		int instpopnum = dtrace.trace.popnum;
+		for (int i = 0; i < instpopnum; i++) {
+			usenodes.add(graph.popStackNode());
+		}
+		defnode = graph.pushPred(stmt);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 }

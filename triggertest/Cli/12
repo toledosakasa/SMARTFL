@@ -1,0 +1,1 @@
+org.apache.commons.cli.GnuParserTest::testShortWithEqual;org.apache.commons.cli.GnuParserTest::testLongWithEqualSingleDash;org.apache.commons.cli.GnuParserTest::testLongWithEqual

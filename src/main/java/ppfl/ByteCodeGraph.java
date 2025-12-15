@@ -3,6 +3,9 @@ package ppfl;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +31,14 @@ import ppfl.defects4j.GraphBuilder;
 import ppfl.instrumentation.Interpreter;
 import ppfl.instrumentation.RuntimeFrame;
 import ppfl.instrumentation.TraceDomain;
+import ppfl.instrumentation.DynamicTrace;
 import ppfl.instrumentation.opcode.OpcodeInst;
+
+
+import ppfl.instrumentation.TracePool;
+import ppfl.instrumentation.TraceSequence;
+import ppfl.instrumentation.Trace;
+import ppfl.instrumentation.TraceTransformer;
 
 public class ByteCodeGraph {
 
@@ -65,13 +75,13 @@ public class ByteCodeGraph {
 		this.traceAllClasses = value;
 	}
 
-	public void addTracedDomain(TraceDomain domain) {
-		tracedDomain.add(domain);
-	}
+	// public void addTracedDomain(TraceDomain domain) {
+	// 	tracedDomain.add(domain);
+	// }
 
-	public void addTracedDomain(Collection<TraceDomain> domain) {
-		tracedDomain.addAll(domain);
-	}
+	// public void addTracedDomain(Collection<TraceDomain> domain) {
+	// 	tracedDomain.addAll(domain);
+	// }
 
 	public boolean isUntracedInvoke(ParseInfo p) {
 		return p.isInvoke() && (!isTraced(p.getCallDomain()));
@@ -105,8 +115,11 @@ public class ByteCodeGraph {
 	}
 
 	public boolean useD4jTest = false;
+	// all test methods in metadata, each string - TestClass::testMethod
 	public Set<String> d4jMethodNames = new HashSet<>();
+	// all test classes in metadata, each string - TestClass
 	public Set<String> d4jTestClasses = new HashSet<>();
+	// all trigger classes in metadata, each string - TestClass::testMethod
 	public Set<String> d4jTriggerTestNames = new HashSet<>();
 
 	private boolean isD4jTestMethod(String className, String methodName) {
@@ -122,6 +135,8 @@ public class ByteCodeGraph {
 		return !d4jTriggerTestNames.contains(fullname);
 	}
 
+	public TracePool tracePool;
+
 	public List<FactorNode> factornodes;
 	public List<Node> nodes;
 	public List<StmtNode> stmts;
@@ -129,7 +144,7 @@ public class ByteCodeGraph {
 	public Map<String, Node> stmtmap;
 	public Map<String, Integer> varcountmap;
 	public Map<String, Integer> stackcountmap;
-	public Map<String, Integer> stmtcountmap;
+	// public Map<String, Integer> stmtcountmap;
 	public Map<String, Integer> heapcountmap;
 	public Map<String, Integer> objectcountmap;
 	public Map<String, Integer> staticheapcountmap;
@@ -155,28 +170,28 @@ public class ByteCodeGraph {
 	public StmtNode tracedStmt;
 	public List<Node> traceduse;
 	public List<Node> tracedpred;
-	public ParseInfo tracedInvoke = null;
+	public DynamicTrace tracedInvoke = null;
 	public int tracedargcnt = 0;
 	public Node tracedObj = null;
 
 	public StmtNode untracedStmt;
 	public List<Node> untraceduse;
 	public List<Node> untracedpred;
-	public ParseInfo untracedInvoke = null;
+	public DynamicTrace untracedInvoke = null;
 	public int untracedargcnt = 0;
 	public Node untracedObj = null;
 
 	public StmtNode throwStmt;
 	public List<Node> throwuse;
 	public List<Node> throwpred;
-	public ParseInfo unsolvedThrow = null;
+	public DynamicTrace unsolvedThrow = null;
 	public boolean crashedByThrow = false;
 
 	private boolean solveStatic = true;
 	public StmtNode staticStmt;
 	public List<Node> staticuse;
 	public List<Node> staticpred;
-	public ParseInfo unsolvedStatic = null;
+	public DynamicTrace unsolvedStatic = null;
 
 	public boolean gotoNoBranch = true;
 
@@ -191,7 +206,7 @@ public class ByteCodeGraph {
 
 	// if max_loop is set to negative, then no limit is set(unlimited loop
 	// unfolding)
-	public int max_loop;
+	// public int max_loop;
 
 	public String testname = null;
 
@@ -221,7 +236,7 @@ public class ByteCodeGraph {
 
 	public RuntimeFrame getFrame() {
 		if (stackframe.isEmpty()) {
-			stackframe.push(RuntimeFrame.getFrame(parseinfo.domain));
+			stackframe.push(RuntimeFrame.getFrame(dynamictrace.getDomain()));
 		}
 		return stackframe.peek();
 	}
@@ -230,21 +245,21 @@ public class ByteCodeGraph {
 		this.stackframe.clear();
 	}
 
-	public RuntimeFrame getPrevFrame() {
-		if (stackframe.size() < 2)
-			return null;
-		RuntimeFrame top = stackframe.removeFirst();
-		RuntimeFrame ret = stackframe.peekFirst();
-		stackframe.addFirst(top);
-		return ret;
-	}
+	// public RuntimeFrame getPrevFrame() {
+	// 	if (stackframe.size() < 2)
+	// 		return null;
+	// 	RuntimeFrame top = stackframe.removeFirst();
+	// 	RuntimeFrame ret = stackframe.peekFirst();
+	// 	stackframe.addFirst(top);
+	// 	return ret;
+	// }
 
 	public SafeRunTimeStack getRuntimeStack() {
 		return getFrame().runtimestack;
 	}
 
-	public boolean isInCallStack(ParseInfo p) {
-		TraceDomain tDomain = p.domain;
+	public boolean isInCallStack_Trace(DynamicTrace d) {
+		TraceDomain tDomain = d.getDomain();
 		for (RuntimeFrame rFrame : stackframe) {
 			if (rFrame.domain.equals(tDomain)) {
 				return true;
@@ -254,11 +269,12 @@ public class ByteCodeGraph {
 	}
 
 	public void setStackForNode(Node n) {
-		n.setStackValue(this.parseinfo.getStackValue());
+		n.setStackValue(this.dynamictrace.getStackValue());
 	}
 
 	// local vars used by parsing
 	public ParseInfo parseinfo = new ParseInfo();
+	public DynamicTrace dynamictrace = null;
 
 	// auto-oracle: when set to TRUE, parsetrace() will auto-assign prob for:
 	// input of test function as 1.0(always true)
@@ -312,7 +328,7 @@ public class ByteCodeGraph {
 					// if (!this.store_stack.isEmpty())
 					stores = this.store_stack.pop();
 					// System.out.println("kill "+stores);
-					boolean unexecuted_complement = true; //evaluation switch
+					boolean unexecuted_complement = true; // evaluation switch
 					if (unexecuted_complement) {
 						if (stores != null) {
 							// StmtNode curStmt = curPred.stmt;
@@ -343,7 +359,7 @@ public class ByteCodeGraph {
 		stmtmap = new HashMap<>();
 		varcountmap = new HashMap<>();
 		stackcountmap = new HashMap<>();
-		stmtcountmap = new HashMap<>();
+		// stmtcountmap = new HashMap<>();
 		heapcountmap = new HashMap<>();
 		objectcountmap = new HashMap<>();
 		staticheapcountmap = new HashMap<>();
@@ -358,7 +374,7 @@ public class ByteCodeGraph {
 		post_idom = new TreeMap<>();
 		branch_stores = new TreeMap<>();
 		store_num = new HashMap<>();
-		max_loop = -1;
+		// max_loop = -1;
 		random = new Random();
 		auto_oracle = true;
 		stackframe = new ArrayDeque<>();
@@ -416,9 +432,9 @@ public class ByteCodeGraph {
 	// }
 	// }
 
-	public void setMaxLoop(int i) {
-		this.max_loop = i;
-	}
+	// public void setMaxLoop(int i) {
+	// 	this.max_loop = i;
+	// }
 
 	public void setAutoOracle(boolean b) {
 		this.auto_oracle = b;
@@ -430,13 +446,14 @@ public class ByteCodeGraph {
 		this.stackcountmap = new HashMap<>();
 		this.stackframe = new ArrayDeque<>();
 		this.predicates.clear();
-		stmtcountmap = new HashMap<>();
+		// stmtcountmap = new HashMap<>();
 		heapcountmap = new HashMap<>();
 		objectcountmap = new HashMap<>();
 		staticheapcountmap = new HashMap<>();
 		objectFieldMap = new HashMap<>();
 	}
 
+	// set superClassMap and tracedDomain from traced.source.log
 	public void parseWhatIsTracedLog(String logfilename) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(logfilename))) {
 			String t;
@@ -469,6 +486,28 @@ public class ByteCodeGraph {
 		}
 	}
 
+	public void setPool(String path){
+		try{
+			FileInputStream fileIn = new FileInputStream(path);
+			BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+			ObjectInputStream in = new ObjectInputStream(bufferedIn);
+			this.tracePool = (TracePool) in.readObject();
+			in.close();
+			fileIn.close();
+		}
+		catch(IOException i)
+		{
+			i.printStackTrace();
+			return;
+		}catch(ClassNotFoundException c)
+		{
+			System.out.println("TracePool class not found");
+			c.printStackTrace();
+			return;
+		}
+	}
+
+	// now Deprecated, only used in GraphTest
 	public void parseD4jSource(String project, int id, String classname) {
 		String checkoutbase = GraphBuilder.getCheckoutBase();
 		String fullname = String.format("%s/%s/%s/trace/logs/mytrace/%s.source.log", checkoutbase, project, id, classname);
@@ -489,6 +528,7 @@ public class ByteCodeGraph {
 		try (BufferedReader reader = new BufferedReader(new FileReader(sourcefilename))) {
 			String t;
 			Set<String> nonextinsts = new HashSet<>();
+			// gotoNoBranch=true
 			if (gotoNoBranch) {
 				nonextinsts.add("goto_w");
 				nonextinsts.add("goto");
@@ -604,6 +644,12 @@ public class ByteCodeGraph {
 	private Map<String, Integer> postorder = new HashMap<>();
 	private int cnt;
 
+	/*
+	 * lalala:
+	 * 对postdataflowmap中记录的图（树）以inst为根进行后序遍历。
+	 * 得到postoder和reverse_postorder
+	 * 
+	 */
 	private void dfssearch(String inst) {
 		// visited.add(inst);
 		// List<String> thesuccs = postdataflowmap.get(inst);
@@ -653,6 +699,12 @@ public class ByteCodeGraph {
 		return finger1;
 	}
 
+	/*
+	 * lalala:
+	 * 目标：得到post_idom，记录每个节点的父亲节点（？
+	 * 先依次以outset中的点为根得到postorder
+	 * 
+	 */
 	// Keith D. Cooper algorithm
 	public void get_idom() {
 		cnt = 1;
@@ -724,6 +776,14 @@ public class ByteCodeGraph {
 		// }
 	}
 
+	/*
+	 * lalala:
+	 * 目标：对predataflowmap分析得到pre_idom
+	 * 交换predataflowmap和postdataflowmap，
+	 * 交换outset和inset
+	 * 调用get_idom得到的post_idom就是想要的pre_idom
+	 * 然后再换回来
+	 */
 	public void get_pre_idom() {
 		// for (String tmp :
 		// predataflowmap.get("org.apache.commons.lang3.ValidateTest#testNoNullElementsArray1#()V#558#60"))
@@ -757,6 +817,7 @@ public class ByteCodeGraph {
 	}
 
 	public void find_loop() {
+		// entrySet是 键-值 对 (key-value) 的集合，Set里面的类型是Map.Entry
 		for (Map.Entry<String, List<String>> entry : predataflowmap.entrySet()) {
 			String edge_start = entry.getKey();
 			for (String edge_end : entry.getValue()) {
@@ -939,7 +1000,7 @@ public class ByteCodeGraph {
 	}
 
 	public void parseFolder(String folder, String sourcefolder, boolean usesimple) {
-		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
+		JoinedTrace jTrace = new JoinedTrace(tracePool, d4jMethodNames, d4jTriggerTestNames, tracedDomain);
 		try {
 			jTrace.parseFolder(folder);
 			jTrace.parseSourceFolder(sourcefolder);
@@ -951,25 +1012,26 @@ public class ByteCodeGraph {
 		for (TraceChunk tChunk : jTrace.traceList) {
 			if (debug_compress) {
 				reduceLogger.writeln("\n" + "start " + tChunk.fullname + "\n");
-				tChunk.loop_compress(loopset, reduceLogger);
+				// tChunk.loop_compress(loopset, reduceLogger);
 			} else {
-				tChunk.loop_compress(loopset, null);
+				// tChunk.loop_compress(loopset, null);
 			}
 		}
 
 		parseJoinedTracePruned(jTrace, usesimple);
 	}
 
-	public void pruneAndParse(String tracefilename) {
-		JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
-		try {
-			jTrace.parseFile(tracefilename);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("parse failed.");
-		}
-		parseJoinedTracePruned(jTrace, false);
-	}
+	// deprecated
+	// public void pruneAndParse(String tracefilename) {
+	// 	JoinedTrace jTrace = new JoinedTrace(d4jMethodNames, d4jTriggerTestNames, tracedDomain);
+	// 	try {
+	// 		jTrace.parseFile(tracefilename);
+	// 	} catch (Exception e) {
+	// 		e.printStackTrace();
+	// 		System.err.println("parse failed.");
+	// 	}
+	// 	parseJoinedTracePruned(jTrace, false);
+	// }
 
 	private void parseSimpleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
 		this.parseinfo = pInfo;
@@ -981,35 +1043,35 @@ public class ByteCodeGraph {
 		Interpreter.map[255].buildtrace_simple(this);
 	}
 
-	private void parseInitTrace(ParseInfo pInfo, boolean debugswitch) {
+	private void parseInitTrace(DynamicTrace dtrace, boolean debugswitch) {
 		// FIXME
-		this.parseinfo = pInfo;
+		this.dynamictrace = dtrace;
 		this.getFrame();
-		Interpreter.map[this.parseinfo.form].buildinit(this);
-		// Interpreter.map[this.parseinfo.form].buildtrace(this);
+		Interpreter.map[this.dynamictrace.trace.opcode].buildinit(this);
+
 	}
 
-	private boolean matchTracedInvoke(ParseInfo oth) {
-		if (oth.isReturnMsg) {
-			return this.tracedInvoke.matchDomain(oth) && this.tracedInvoke.linenumber == oth.linenumber
-					&& this.tracedInvoke.byteindex == oth.byteindex;
+	private boolean matchTracedInvoke(DynamicTrace dTrace) {
+		if (dTrace.isret) {
+			return this.tracedInvoke.matchDomain(dTrace) && this.tracedInvoke.trace.lineno == dTrace.getLinenumber()
+					&& this.tracedInvoke.trace.index == dTrace.getByteindex();
 		} else {
 			TraceDomain td = this.tracedInvoke.getCallDomain();
 			if (!compareCallClass) {
-				return td.signature.equals(oth.domain.signature) && td.tracemethod.equals(oth.domain.tracemethod);
+				return td.signature.equals(dTrace.trace.signature) && td.tracemethod.equals(dTrace.trace.methodname);
 			}
 
 			td = resolveMethod(td);
 			if (td == null)
 				return false;
 			// FIXME consider polymorphism
-			return td.signature.equals(oth.domain.signature) && td.tracemethod.equals(oth.domain.tracemethod);
+			return td.signature.equals(dTrace.trace.signature) && td.tracemethod.equals(dTrace.trace.methodname);
 		}
 	}
 
-	private void resolveUntracedArgs(ParseInfo pInfo) {
+	private void resolveUntracedArgs(DynamicTrace dTrace) {
 		// switch stack frame
-		pushStackFrame(pInfo.domain);
+		pushStackFrame(dTrace.getDomain());
 		int argcnt = this.untracedargcnt;
 		// static arguments starts with 0
 		int paravarindex = 0;
@@ -1027,9 +1089,9 @@ public class ByteCodeGraph {
 		}
 	}
 
-	private void resolveTracedArgs(ParseInfo pInfo) {
+	private void resolveTracedArgs(DynamicTrace dTrace) {
 		// switch stack frame
-		pushStackFrame(pInfo.domain);
+		pushStackFrame(dTrace.getDomain());
 		int argcnt = this.tracedargcnt;
 		// static arguments starts with 0
 		int paravarindex = 0;
@@ -1047,47 +1109,34 @@ public class ByteCodeGraph {
 		}
 	}
 
-	private void parseSingleTrace(ParseInfo pInfo, boolean debugswitch, int linec) {
-		// if (debugswitch) {
-		// try {
-		// System.in.read();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
-		this.parseinfo = pInfo;
-		String instname = this.parseinfo.getvalue("lineinfo");
+	private void parseSingleTrace(DynamicTrace dTrace, boolean debugswitch, int linec) {
+		this.dynamictrace = dTrace;
+		String instname = this.dynamictrace.getLineinfo();
 
 		// solve traced invoke
+		// 在invoke之后的第一个trace去处理这个invoke，之后就cleanTraced了
 		if (this.solveTracedInvoke && this.tracedInvoke != null) {
-			if (matchTracedInvoke(pInfo)) {
-				if (pInfo.isReturnMsg) {
-					// actually untraced due to instrumentation bug.
-					// pop stackframe that is pushed for nothing.
-					// System.out.println("frame poped at " + linec);
-					// pInfo.debugprint();
-					// this.popStackFrame();
+			if (matchTracedInvoke(dTrace)) {
+				// 处理直接 @RET返回的情况？
+				if (dTrace.isret) {
 					buildTracedInvoke();
 					return;
 				}
-				this.resolveTracedArgs(pInfo);
+				// 处理正常的call
+				this.resolveTracedArgs(dTrace);
 				this.cleanTraced();
 			} else {
-				// System.out.println("skipped" + linec);
-				// System.out.println(this.tracedInvoke.getCallDomain());
-				// skip
 				return;
 			}
 		}
 
-		//
 		if (this.untracedInvoke != null) {
-			if (!compareCallClass && !pInfo.isReturnMsg) {// compare only signature and method name
+			if (!compareCallClass && !dTrace.isret) {// compare only signature and method name
 				TraceDomain td = this.untracedInvoke.getCallDomain();
 				// if fit
-				if (td.signature.equals(pInfo.domain.signature) && td.tracemethod.equals(pInfo.domain.tracemethod)) {
-					this.resolveUntracedArgs(pInfo);
+				if (td.signature.equals(dTrace.getDomain().signature)
+						&& td.tracemethod.equals(dTrace.getDomain().tracemethod)) {
+					this.resolveUntracedArgs(dTrace);
 					this.cleanUntraced();
 				}
 			}
@@ -1095,9 +1144,8 @@ public class ByteCodeGraph {
 
 		// solve current untraced invoke
 		if (this.untracedInvoke != null) {
-			if (untracedInvoke.matchReturn(pInfo, true)) {
-				if (pInfo.isReturnMsg) {
-					// normally returned
+			if (untracedInvoke.matchReturn(dTrace, true)) {
+				if (dTrace.isret) {
 					if (debugswitch)
 						System.out.println("normally returned");
 					buildUntracedInvoke();
@@ -1109,18 +1157,20 @@ public class ByteCodeGraph {
 					buildUntracedInvokeException();
 				}
 			} else {
+				// 可能会有问题
+				// TODO: 考虑 在插桩代码 引入 Thread.getthread.getstack() 获得调用栈信息。然后通过引入一个变量来决定是否开启这部分的代码，即在call一个untraced方法之后。若返回，则关闭
 				// check if the control flow had already been thrown upward
-				if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
+				if (dTrace.isCatch() && this.isInCallStack_Trace(dTrace)) {
 					if (debugswitch) {
 						System.out.println("thrown");
-						pInfo.debugprint();
+						dTrace.debugprint();
 					}
-					maintainStackframeUpward(pInfo);
+					maintainStackframeUpward(dTrace);
 					buildUntracedInvokeException();
 				} else {
 					if (debugswitch) {
 						System.out.println("skipped:");
-						pInfo.debugprint();
+						dTrace.debugprint();
 					}
 					// is inside untraced call. should skip
 					return;
@@ -1130,10 +1180,10 @@ public class ByteCodeGraph {
 
 		// solve current throw.
 		if (this.unsolvedThrow != null) {
-			if (pInfo.isCatch() && this.isInCallStack(pInfo)) {
-				maintainStackframeUpward(pInfo);
+			if (dTrace.isCatch() && this.isInCallStack_Trace(dTrace)) {
+				maintainStackframeUpward(dTrace);
 				buildThrowException();
-			} else {
+			} else { // 不会执行
 				boolean strictThrow = false; // evaluation switch
 				if (strictThrow) {
 					this.crashedByThrow = true;
@@ -1147,7 +1197,7 @@ public class ByteCodeGraph {
 		}
 
 		if (solveStatic && this.unsolvedStatic != null) {
-			if (unsolvedStatic.matchStaticReturn(pInfo)) {
+			if (unsolvedStatic.matchStaticReturn(dTrace)) {
 				this.cleanStatic();
 				return;
 			} else {
@@ -1157,45 +1207,29 @@ public class ByteCodeGraph {
 		}
 		// untraced invoke has been resolved.
 		// skip @ret message.
-		if (this.parseinfo.isReturnMsg) {
+		if (this.dynamictrace.isret) {
 			return;
 		}
 
 		boolean skipFaultyFrame = false;// evaluation switch
 		// Begin with the initial testmethod.
 		this.getFrame();
-		if (skipFaultyFrame && !this.getFrame().domain.equals(this.parseinfo.domain)) {
+		if (skipFaultyFrame && !this.getFrame().domain.equals(this.dynamictrace.getDomain())) {
 			return;
 		}
-		// if (!this.getFrame().domain.equals(this.parseinfo.domain)) {
-		// try {
-		// System.out.println(linec);
-		// System.in.read();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// pInfo.debugprint();
-		// debugStack(this.stackframe);
-		// }
-		// Debug use
-		// System.out.println(instname);
 
+		// TODO: use index, not string as id
 		killPredStack(instname);
 		if (predataflowmap.get(instname).size() > 1) {
-			// System.out.println("add set" + branch_stores.get(instname));
 			Set<Integer> stores = branch_stores.get(instname);
-			// if (stores != null)
 			store_stack.push(stores);
 		}
-		Interpreter.map[this.parseinfo.form].buildtrace(this);
 
-		// if (pInfo.linenumber == 94 && pInfo.byteindex == 0) {
-		// debugswitch = true;
-		// }
-		// debug runtime stacks
+		Interpreter.map[this.dynamictrace.trace.opcode].buildtrace(this);
+
+		// debugswitch=false
 		if (debugswitch) {
-			pInfo.debugprint();
+			dTrace.debugprint();
 			debugStack(this.stackframe);
 		}
 	}
@@ -1237,8 +1271,8 @@ public class ByteCodeGraph {
 		this.cleanThrow();
 	}
 
-	private void maintainStackframeUpward(ParseInfo pInfo) {
-		TraceDomain curDomain = pInfo.domain;
+	private void maintainStackframeUpward(DynamicTrace dTrace) {
+		TraceDomain curDomain = dTrace.getDomain();
 		TraceDomain frameDomain = this.getFrame().domain;
 		while (!curDomain.equals(frameDomain)) {
 			this.stackframe.pop();
@@ -1253,7 +1287,7 @@ public class ByteCodeGraph {
 	}
 
 	private void buildUntracedInvoke() {
-		String desc = this.untracedInvoke.getvalue("calltype");
+		String desc = this.untracedInvoke.trace.getcalltype();
 		List<Node> toadd = new ArrayList<>();
 		for (Node n : this.untraceduse) {
 			if (n.isHeapObject()) {
@@ -1272,6 +1306,7 @@ public class ByteCodeGraph {
 		}
 		for (Node n : this.untraceduse) {
 			if (n.isHeapObject()) {
+				// 把untraced方法中的所有 由aload加载得到的堆obj中的所有访问过的field，给重新定义一次
 				buildFactorForAllField(n, this.untracedpred, this.untraceduse, null, this.untracedStmt);
 			}
 		}
@@ -1284,7 +1319,7 @@ public class ByteCodeGraph {
 	}
 
 	private void buildTracedInvoke() {
-		String desc = this.tracedInvoke.getvalue("calltype");
+		String desc = this.tracedInvoke.trace.getcalltype();
 		if (!OpcodeInst.isVoidMethodByDesc(desc)) {
 			Node defnode = this.addNewStackNode(this.tracedStmt);
 			buildFactor(defnode, this.tracedpred, this.traceduse, null, this.tracedStmt);
@@ -1297,19 +1332,27 @@ public class ByteCodeGraph {
 		this.cleanTraced();
 	}
 
+	/*
+	 * douya:
+	 * 调用了parseInitTrace，第一个参数是parseinfo，但是也许不用改
+	 * lalala:
+	 * 调用parseSingleTrace
+	 */
 	private void parseChunk(TraceChunk tChunk, TraceChunk inits) {
 		this.cleanupOnChunkSwitch();
-		int tracelength = tChunk.parsedTraces.size();
+		int tracelength = tChunk.parsedDTraces.size();
 		// if (!tChunk.fullname.endsWith("testKeepInitIfBest")) {
 		// return;
 		// }
 		System.out.println("parsing trace,length=" + tracelength + ":");
 		System.out.println("\t" + tChunk.fullname);
-		boolean limitSingleTrace = false;
-		if (limitSingleTrace && tracelength > 100000 && tChunk.testpass) {
-			System.out.println("Trace is too long, skipping");
-			return;
-		}
+		// { // 这里不会运行
+		// 	boolean limitSingleTrace = false;
+		// 	if (limitSingleTrace && tracelength > 100000 && tChunk.testpass) {
+		// 		System.out.println("Trace is too long, skipping");
+		// 		return;
+		// 	}
+		// }
 		boolean debugswitch = false;
 		boolean testpass = tChunk.testpass;
 		this.testname = tChunk.getTestName();
@@ -1317,13 +1360,13 @@ public class ByteCodeGraph {
 		boolean useStaticInit = true;
 		// prepare static inits
 		if (useStaticInit) {
-			for (ParseInfo pInfo : inits.parsedTraces) {
+			for (DynamicTrace dTrace : inits.parsedDTraces) {
 				try {
-					parseInitTrace(pInfo, debugswitch);
+					parseInitTrace(dTrace, debugswitch);
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("parse trace crashed at init");
-					pInfo.debugprint();
+					dTrace.debugprint();
 					throw (e);
 				}
 			}
@@ -1332,18 +1375,15 @@ public class ByteCodeGraph {
 		this.emptyFrame();
 
 		int linec = 0;
-		for (ParseInfo pInfo : tChunk.parsedTraces) {
+		for (DynamicTrace dTrace : tChunk.parsedDTraces) {
 			try {
-				// if (pInfo.linenumber == 94 && pInfo.byteindex == 0) {
-				// debugswitch = true;
-				// }
 				linec++;
-				parseSingleTrace(pInfo, debugswitch, linec);
+				parseSingleTrace(dTrace, debugswitch, linec);
 				if (this.crashedByThrow) {
 					crashedByThrow = false;
 					if (unsolvedThrow != null) {
 						System.out.println("end in throw crash at" + tChunk.fullname);
-						unsolvedThrow.debugprint();
+						unsolvedThrow.toString();
 						Node exceptDef = addNewExceptionNode(throwStmt);
 						buildFactor(exceptDef, throwpred, throwuse, null, throwStmt);
 					}
@@ -1353,9 +1393,6 @@ public class ByteCodeGraph {
 				e.printStackTrace();
 				System.out.println("parse trace crashed at line " + linec);
 				System.out.println("Test name is: " + tChunk.fullname);
-				pInfo.debugprint();
-				// System.out.println(this.getDomain());
-				// System.exit(0);
 				throw (e);
 			}
 		}
@@ -1363,7 +1400,7 @@ public class ByteCodeGraph {
 		boolean buildCrashForPassTest = false;// evaluation switch
 		if (untracedInvoke != null && (buildCrashForPassTest || !testpass)) {
 			System.out.println("end in untraced crash at" + tChunk.fullname);
-			untracedInvoke.debugprint();
+			System.out.println(untracedInvoke.toString());
 			Node exceptDef = addNewExceptionNode(untracedStmt);
 			buildFactor(exceptDef, untracedpred, untraceduse, null, untracedStmt);
 			boolean observeAssertCrash = true;//// evaluation switch
@@ -1379,7 +1416,7 @@ public class ByteCodeGraph {
 
 		if (tracedInvoke != null && (buildCrashForPassTest || !testpass)) {
 			System.out.println("end in traced crash at" + tChunk.fullname);
-			tracedInvoke.debugprint();
+			System.out.println(tracedInvoke.toString());
 			Node exceptDef = addNewExceptionNode(tracedStmt);
 			buildFactor(exceptDef, tracedpred, traceduse, null, tracedStmt);
 		}
@@ -1394,10 +1431,25 @@ public class ByteCodeGraph {
 		}
 	}
 
+	/*
+	 * douya:
+	 * usesimple=false
+	 * 调用parseChunk
+	 * 参数1：jTrace.traceList的每一个tChunk
+	 * 参数2：jTrace.staticInits
+	 * 一个fullname为<init>的TraceChunk
+	 * add：.init.log中每一行
+	 * 调用过pruneInit来将string变成praseinfo
+	 * 也就是说staticInits里面praseinfo相关操作不能变成trace操作？
+	 */
 	public void parseJoinedTracePruned(JoinedTrace jTrace, boolean usesimple) {
 		this.predstack.clear();
 		this.initmaps();
 		jTrace.sortChunk();
+		/*
+		 * lalala:
+		 * 这个函数是把chunk以testpass为第一键值，size为第二键值排序
+		 */
 		int totalSize = 0;
 		int thres = 1000000;// threshold : 1M lines for all traces
 		for (TraceChunk tChunk : jTrace.traceList) {
@@ -1406,7 +1458,7 @@ public class ByteCodeGraph {
 					parseSimpleChunk(tChunk);
 				else {
 					parseChunk(tChunk, jTrace.staticInits);
-					totalSize += tChunk.parsedTraces.size();
+					totalSize += tChunk.parsedDTraces.size();
 				}
 			} catch (Exception e) {
 				System.err.println("parse " + tChunk.fullname + " failed");
@@ -1421,6 +1473,7 @@ public class ByteCodeGraph {
 		}
 	}
 
+	// 没用
 	public void parseJoinedTrace(String tracefilename) {
 		this.predstack.clear();
 		this.initmaps();
@@ -1449,6 +1502,7 @@ public class ByteCodeGraph {
 		}
 	}
 
+	// 没用
 	public String parseTraceFromReader(BufferedReader reader, String testname, boolean testpass) throws IOException {
 		this.predstack.clear();
 		if (testname != null)
@@ -1515,6 +1569,7 @@ public class ByteCodeGraph {
 		return null;
 	}
 
+	// 没用
 	public void parsetrace(String tracefilename, String testname, boolean testpass) {
 		this.predstack.clear();
 		this.testname = testname;
@@ -1629,7 +1684,7 @@ public class ByteCodeGraph {
 
 		// FIXME this may conceal bugs in various insts.
 		// temporary solution.
-		if (compromise) {
+		if (compromise) { // false
 			Iterator<Node> iter = usenodes.iterator();
 			while (iter.hasNext()) {
 				Node tmp = iter.next();
@@ -1639,6 +1694,7 @@ public class ByteCodeGraph {
 			}
 		}
 
+		// TODO: add class 判断
 		if (auto_oracle && !stmt.getMethod().contentEquals(this.testname) && !stmt.isUnexe()) {
 			int ln = stmt.getLineNumber();
 			if (this.lastDefinedLine != ln) {
@@ -1682,45 +1738,7 @@ public class ByteCodeGraph {
 		if (!shouldview)
 			return ret;
 		String factorname = "Factor" + factornodes.size();
-		// viewgraph.addEdge(factorname + stmt.getPrintName(), factorname,
-		// stmt.getPrintName());
-		// org.graphstream.graph.Node outfactor = viewgraph.getNode(factorname);
-		// outfactor.setAttribute("ui.class", "factor");
-		// org.graphstream.graph.Node outstmt = viewgraph.getNode(stmt.getPrintName());
-		// outstmt.setAttribute("ui.class", "stmt");
-		// org.graphstream.graph.Edge outedge = viewgraph.getEdge(factorname +
-		// stmt.getPrintName());
-		// outedge.setAttribute("ui.class", "stmt");
-		// outedge.setAttribute("layout.weight", 3);
 
-		// viewgraph.addEdge(factorname + defnode.getPrintName(), factorname,
-		// defnode.getPrintName());
-		// org.graphstream.graph.Node outdef =
-		// viewgraph.getNode(defnode.getPrintName());
-
-		// debugLogger.info("hhhhhhhhhhhui"+outdef.getId());
-		// outdef.setAttribute("ui.class", "thenode");
-		// outedge = viewgraph.getEdge(factorname + defnode.getPrintName());
-		// outedge.setAttribute("ui.class", "def");
-		// outedge.setAttribute("layout.weight", 2);
-		// for (Node node : prednodes) {
-		// viewgraph.addEdge(factorname + node.getPrintName(), factorname,
-		// node.getPrintName());
-		// org.graphstream.graph.Node outpred = viewgraph.getNode(node.getPrintName());
-		// outpred.setAttribute("ui.class", "thenode");
-		// outedge = viewgraph.getEdge(factorname + node.getPrintName());
-		// outedge.setAttribute("ui.class", "pred");
-		// outedge.setAttribute("layout.weight", 3);
-		// }
-		// for (Node node : usenodes) {
-		// viewgraph.addEdge(factorname + node.getPrintName(), factorname,
-		// node.getPrintName());
-		// org.graphstream.graph.Node outuse = viewgraph.getNode(node.getPrintName());
-		// outuse.setAttribute("ui.class", "thenode");
-		// outedge = viewgraph.getEdge(factorname + node.getPrintName());
-		// outedge.setAttribute("ui.class", "use");
-		// outedge.setAttribute("layout.weight", 3);
-		// }
 		return ret;
 	}
 
@@ -1767,6 +1785,7 @@ public class ByteCodeGraph {
 		}
 	}
 
+	// 没用
 	private void incVarIndex(int varindex, TraceDomain domain) {
 		assert (this.getFrame().domain.equals(domain));
 		// assert (traceclass.equals(this.getFrame().traceclass));
@@ -1821,6 +1840,7 @@ public class ByteCodeGraph {
 		return getVarName(this.getFormalStackName(), this.stackcountmap);
 	}
 
+	// 没用
 	private String getFormalVarName(int varindex, TraceDomain domain) {
 		assert (this.getFrame().domain.equals(domain));
 		// assert (traceclass.equals(this.getFrame().traceclass));
@@ -1841,6 +1861,7 @@ public class ByteCodeGraph {
 
 	private String getFormalVarName(int varindex) {
 		String name = String.valueOf(varindex);
+		// {domain name}#{domain entercnt}:{varindex} 
 		return this.getDomain() + name;
 	}
 
@@ -1881,11 +1902,13 @@ public class ByteCodeGraph {
 		return String.format("%x.%s", objectAddress.getAddress(), field);
 	}
 
-	private String getFormalVarNameWithIndex(int varindex, TraceDomain domain) {
-		return getVarName(getFormalVarName(varindex, domain), this.varcountmap);
-	}
+	// deprecated
+	// private String getFormalVarNameWithIndex(int varindex, TraceDomain domain) {
+	// 	return getVarName(getFormalVarName(varindex, domain), this.varcountmap);
+	// }
 
 	private String getFormalVarNameWithIndex(int varindex) {
+		// {varname}#{the i-th def of that var}
 		return getVarName(getFormalVarName(varindex), this.varcountmap);
 	}
 
@@ -1984,13 +2007,14 @@ public class ByteCodeGraph {
 		return defnode;
 	}
 
-	public Node addNewVarNode(int varindex, StmtNode stmt, TraceDomain domain) {
-		this.incVarIndex(varindex, domain);
-		String nodename = this.getFormalVarNameWithIndex(varindex, domain);
-		Node defnode = new Node(nodename, this.testname, stmt);
-		this.addNode(nodename, defnode);
-		return defnode;
-	}
+	// deprecated
+	// public Node addNewVarNode(int varindex, StmtNode stmt, TraceDomain domain) {
+	// 	this.incVarIndex(varindex, domain);
+	// 	String nodename = this.getFormalVarNameWithIndex(varindex, domain);
+	// 	Node defnode = new Node(nodename, this.testname, stmt);
+	// 	this.addNode(nodename, defnode);
+	// 	return defnode;
+	// }
 
 	public Node addNewPredNode(StmtNode stmt) {
 		this.incPredIndex(stmt);
@@ -2051,6 +2075,7 @@ public class ByteCodeGraph {
 		return this.getNode(this.getFormalVarNameWithIndex(loadvar));
 	}
 
+	// 是不是对stack的node，其实不会通过getNode的途径去访问，而是直接通过stack的pop去得到?
 	private Node getNode(String name) {
 		if (nodemap.containsKey(getNodeName(name)))
 			return nodemap.get(getNodeName(name));
@@ -2426,6 +2451,7 @@ public class ByteCodeGraph {
 		return fileData.toString();
 	}
 
+	// now Deprecated, only used in GraphTest
 	public void initD4jProject(String project, int id) {
 		this.useD4jTest = true;
 		String triggerTests = null;
@@ -2494,6 +2520,7 @@ public class ByteCodeGraph {
 		// this.parseD4jTrace(tracefilename);
 	}
 
+	// now Deprecated
 	public void initFromConfigFile(String baseDir, String configpath) {
 		String sourcepath = null;
 		String tracepath = null;

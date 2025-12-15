@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -11,7 +12,7 @@ import ppfl.instrumentation.CallBackIndex;
 public class AreturnInst extends OpcodeInst {
 
 	public AreturnInst(int form) {
-		super(form, 0, -1);
+		super(form, 0, 1);
 		this.doBuild = false;
 		this.doPop = false;
 		this.doPush = false;
@@ -47,6 +48,20 @@ public class AreturnInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi, boolean isEx)
+			throws BadBytecode {
+		int instpos = ci.insertGap(10);
+		int instindex = constp.addIntegerInfo(poolindex);
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.logtraceindex, instpos + 4);
+		ci.writeByte(89, instpos + 6);// dup
+		ci.writeByte(184, instpos + 7);// invokestatic
+		ci.write16bit(cbi.traceindex_object, instpos + 8);
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		// uses
@@ -56,12 +71,31 @@ public class AreturnInst extends OpcodeInst {
 		// def in caller frame
 		Node defnode = graph.addNewStackNode(stmt);
 		if (defnode != null) {
-			Integer addr = graph.parseinfo.getAddressFromStack();
+			Integer addr = graph.dynamictrace.getAddressFromStack();
 			if (addr != null)
 				defnode.setAddress(addr);
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		graph.killPredStack("OUT_" + stmt.getClassMethod());
+	}
+
+	@Override
+	public void build(ProbGraph graph){		
+		super.build(graph);
+		// uses
+		usenodes.add(graph.popStackNode());
+		// switch stack frame
+		graph.popFrame();
+		// may be some invalid frame from junit
+		if(graph.topFrame() == null)
+			return;
+		// def in caller frame
+		Node defnode = graph.addStackNode(stmt,1);
+		Integer addr = dtrace.getAddressFromStack();
+		assert(addr != null);
+		defnode.setAddress(addr);
+ 
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 }

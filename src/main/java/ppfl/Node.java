@@ -10,7 +10,7 @@ public class Node {
 
 	// private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 	// protected static Logger printLogger = debugLogger;
-	private static MyWriter debugLogger = WriterUtils.getWriter("Debugger");
+	public static MyWriter debugLogger;
 	protected static MyWriter printLogger = debugLogger;
 
 	protected boolean obs;// obs = 1 means observed as a given value, which excludes this node from
@@ -22,6 +22,7 @@ public class Node {
 	private boolean use_ap = false;
 	// private Apfloat ap_p;
 	protected String name;
+	protected int defcnt; 
 	private double impT;
 	private double impF;// importance for True and False in importance sampling.
 	private String testname;
@@ -66,6 +67,29 @@ public class Node {
 		this.stmt = stmt;
 		reduced = true;
 		stacksize = 1;
+		this.defcnt = 0;
+	}
+
+	public Node(String name, String testname, StmtNode stmt, int defcnt){
+		this.testname = testname;
+		this.obs = false;
+		this.p = 0.5;
+		this.name = name;
+		isStmt = false;
+		tempvalue = true;// TODO init by statistics
+		edges = new ArrayList<>();
+		this.stmt = stmt;
+		reduced = true;
+		stacksize = 1;
+		this.defcnt = defcnt;
+	}
+
+	public String getNodeName(){
+		return this.testname + "#" + this.name + ":" + this.defcnt + "@" + this.stmt.getName();
+	}
+
+	public Integer getStmtIndex(){
+		return this.stmt.getIndex();
 	}
 
 	@Override
@@ -119,11 +143,12 @@ public class Node {
 	}
 
 	public int getAddress() {
-		if (!isHeapObject)
-			return 0;
-		if (address == null) {
-			return 0;
-		}
+		assert(isHeapObject);
+		// if (!isHeapObject)
+		// 	return 0;
+		// if (address == null) {
+		// 	return 0;
+		// }
 		return address;
 	}
 
@@ -146,7 +171,8 @@ public class Node {
 	}
 
 	public String getPrintName() {
-		return this.testname + "#" + this.name + "@" + this.stmt.getName();
+		return getNodeName();
+		// return this.testname + "#" + this.name + "@" + this.stmt.getName();
 	}
 
 	public void observe(boolean obsvalue) {
@@ -181,10 +207,12 @@ public class Node {
 	}
 
 	public void setTemp(boolean t) {
+		//tempvalue = t;
 		tempvalue = obs ? obsvalue : t;
 	}
 
 	public boolean getCurrentValue() {
+		//return tempvalue;
 		return obs ? obsvalue : tempvalue;
 	}
 
@@ -255,6 +283,8 @@ public class Node {
 		if (delta < 0)
 			delta = -delta;
 		this.p = result;
+		// if(isStmt)
+		// 	debugLogger.write("%s, prob = %.20f\n", getPrintName(), result);
 
 		for (Edge n : edges) {
 			double b = (1 - n.get_fton());

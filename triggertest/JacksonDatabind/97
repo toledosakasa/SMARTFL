@@ -1,0 +1,1 @@
+com.fasterxml.jackson.databind.node.POJONodeTest::testPOJONodeCustomSer

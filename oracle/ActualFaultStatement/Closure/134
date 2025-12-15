@@ -1,0 +1,6 @@
+com.google.javascript.jscomp.AmbiguateProperties.process:210
+com.google.javascript.jscomp.AmbiguateProperties.isIndependentOf:356
+com.google.javascript.jscomp.AmbiguateProperties.addNode:366
+com.google.javascript.jscomp.AmbiguateProperties$Property.<init>:553||com.google.javascript.jscomp.AmbiguateProperties$Property.<init>:557
+com.google.javascript.jscomp.AmbiguateProperties$Property.addNonUnionType:594||com.google.javascript.jscomp.AmbiguateProperties$Property.addNonUnionType:595||com.google.javascript.jscomp.AmbiguateProperties$Property.addNonUnionType:596||com.google.javascript.jscomp.AmbiguateProperties$Property.addNonUnionType:597||com.google.javascript.jscomp.AmbiguateProperties$Property.addNonUnionType:599
+com.google.javascript.jscomp.TypedScopeCreator.findOverriddenFunction:558||com.google.javascript.jscomp.TypedScopeCreator.findOverriddenFunction:564

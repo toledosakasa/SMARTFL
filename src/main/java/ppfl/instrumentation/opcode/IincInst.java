@@ -4,6 +4,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
+import ppfl.ProbGraph;
 
 //132
 public class IincInst extends OpcodeInst {
@@ -25,7 +26,7 @@ public class IincInst extends OpcodeInst {
 		// build the stmtnode(common)
 		super.buildtrace(graph);
 
-		int varindex = info.getintvalue("store");
+		int varindex = dtrace.trace.store;
 		// int incconst = info.getintvalue("CONST");
 		// if (varindex == 31) {
 		// System.out.println("iinc:" + graph.getDomain());
@@ -39,6 +40,16 @@ public class IincInst extends OpcodeInst {
 		if (defnode != null) {
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		int varindex = dtrace.trace.store;
+		Node use = graph.getVarNode(varindex);
+		usenodes.add(use);
+		defnode = graph.addVarNode(varindex, stmt, use.getSize());
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 
 	@Override

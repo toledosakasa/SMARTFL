@@ -1,0 +1,4 @@
+com.fasterxml.jackson.databind.ser.AnyGetterWriter.AnyGetterWriter:29
+com.fasterxml.jackson.databind.ser.AnyGetterWriter.AnyGetterWriter:33
+com.fasterxml.jackson.databind.ser.AnyGetterWriter.resolve:82
+com.fasterxml.jackson.databind.ser.BeanSerializerFactory.constructBeanSerializer:395

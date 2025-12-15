@@ -5,6 +5,7 @@ import java.util.List;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 
 //159-164
 public class If_icmpInst extends OpcodeInst {
@@ -28,8 +29,8 @@ public class If_icmpInst extends OpcodeInst {
 	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		if (info.getintvalue("popnum") != null) {
-			int instpopnum = info.getintvalue("popnum");
+		if (dtrace.trace.popnum != null) {
+			int instpopnum = dtrace.trace.popnum;
 			for (int i = 0; i < instpopnum; i++) {
 				usenodes.add(graph.getRuntimeStack().pop());
 			}
@@ -53,6 +54,30 @@ public class If_icmpInst extends OpcodeInst {
 				ops.add("<=");
 			graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 		}
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		int instpopnum = dtrace.trace.popnum;
+		for (int i = 0; i < instpopnum; i++) {
+			usenodes.add(graph.popStackNode());
+		}
+		defnode = graph.pushPred(stmt);
+		List<String> ops = new ArrayList<>();
+		if(this.form == 159)
+			ops.add("==");
+		else if (this.form == 160)
+			ops.add("!=");
+		else if (this.form == 161)
+			ops.add("<");
+		else if (this.form == 162)
+			ops.add(">=");
+		else if (this.form == 163)
+			ops.add(">");
+		else
+			ops.add("<=");
+		graph.buildFactor(defnode, prednodes, usenodes, ops, stmt);
 	}
 
 }

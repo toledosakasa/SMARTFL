@@ -1,0 +1,1 @@
+com.fasterxml.jackson.databind.convert.TestMapConversions::testMapToProperties;com.fasterxml.jackson.databind.deser.TestMapDeserialization::testReadProperties;com.fasterxml.jackson.databind.type.TestTypeFactory::testProperties

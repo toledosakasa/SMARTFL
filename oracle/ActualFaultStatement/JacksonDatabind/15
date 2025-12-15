@@ -1,0 +1,11 @@
+com.fasterxml.jackson.databind.ser.BeanSerializerFactory.createSerializer:163
+com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.findConvertingSerializer:370
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.createContextual:121
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.createContextual:126
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.createContextual:127
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.serialize:161
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.serializeWithType:172
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.isEmpty:180
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.isEmpty:187
+com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer.acceptJsonFormatVisitor:224
+com.fasterxml.jackson.databind.ser.std.StdSerializer.findConvertingContentSerializer:262

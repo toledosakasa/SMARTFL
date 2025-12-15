@@ -6,6 +6,7 @@ import java.util.List;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 
 //167
 public class GotoInst extends OpcodeInst {

@@ -1,0 +1,7 @@
+com.google.javascript.jscomp.AbstractCommandLineRunner.doRun:518
+com.google.javascript.jscomp.AbstractCommandLineRunner.doRun:519
+com.google.javascript.jscomp.AbstractCommandLineRunner.doRun:520
+com.google.javascript.jscomp.AbstractCommandLineRunner.doRun:521
+com.google.javascript.jscomp.CommandLineRunner.createOptions:471
+com.google.javascript.jscomp.Compiler.toSource:1362
+com.google.javascript.jscomp.CompilerOptions.<init>:588

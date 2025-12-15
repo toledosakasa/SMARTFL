@@ -184,6 +184,17 @@ if __name__ == '__main__':
             d4j.traceproj(args[2], args[3])
         if(len(args) == 3):
             d4j.traceproj(args[2],'all')
+    
+    if args[1] == 'rund4jtest':
+        if (len(args) == 5):
+            d4j.rund4jtest(args[2], args[3], args[4])
+        else:
+            print(f"python3 s.py rund4jtest proj id TestClass#testmethod")
+    if args[1] == 'runfailtest':
+        if (len(args) == 4):
+            d4j.runfailtest(args[2], args[3])
+        else:
+            print(f"python3 s.py runfailtest proj id")
 
     if args[1] == 'parsed4j':
         if(len(args) == 4):
@@ -235,3 +246,17 @@ if __name__ == '__main__':
             train(args[2],args[3])
     if args[1] == 'resetp':
         resetp()
+    if args[1] == 'decoder':
+        if(len(args) == 4):
+            d4j.decoder(True, args[2])
+        elif(len(args) == 3):
+            d4j.decoder(False, args[2])
+        else:
+            d4j.decoder(False)
+    if args[1] == 'runall':
+        d4j.runall()
+    if args[1] == 'parseall':
+        d4j.parseall()
+    if args[1] == 'evalall':
+        d4j.evalall()
+    

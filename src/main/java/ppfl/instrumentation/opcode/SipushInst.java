@@ -26,4 +26,12 @@ public class SipushInst extends OpcodeInst {
 		ci.write16bit(cbi.tsindex_short, instpos + 1);
 	}
 
+	@Override
+	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi)
+			throws BadBytecode {
+		// int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
+		// ci.writeByte(184, instpos);// invokestatic
+		// ci.write16bit(cbi.traceindex_short, instpos + 1);
+	}
+
 }

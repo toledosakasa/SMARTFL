@@ -1,5 +1,6 @@
 import os
 from pylib.countmap import CountMap
+from pylib.observe import genExceptionObserve, genAssertObserve
 import time
 from func_timeout import func_set_timeout
 import func_timeout
@@ -12,7 +13,10 @@ from os.path import join, getsize
 alld4jprojs = ["Chart", "Cli", "Closure", "Codec", "Collections", "Compress", "Csv", "Gson",
                "JacksonCore", "JacksonDatabind", "JacksonXml", "Jsoup", "JxPath", "Lang", "Math", "Mockito", "Time"]
 project_bug_nums = {"Lang": 65, "Math": 106,
-                    "Time": 27, "Closure": 176, "Chart": 26}
+                    "Time": 27, "Closure": 176, "Chart": 26, "Cli": 40, "Codec": 18, "Csv" : 16, "Gson" : 18, "JacksonXml" : 6, "Compress": 47, "Jsoup" : 93, "JxPath": 22, "Mockito": 38, "JacksonDatabind": 112, "JacksonCore": 26, "Collections": 28}
+# Lang changes name from org.apache.commons.lang3 to org.apache.commons.lang after 40
+classprefix = {'Lang': 'org.apache.commons.lang', 'Math': 'org.apache.commons.math', 'Chart': 'org.jfree', 'Time': 'org.joda.time', 'Closure': 'com.google.javascript', 'Mockito': 'org.mockito', 'Cli' : 'org.apache.commons.cli', 'Codec': 'org.apache.commons.codec', 'Csv' : 'org.apache.commons.csv', 'Gson' : 'com.google.gson', 'JacksonXml' : 'com.fasterxml.jackson.dataformat.xml', 'Compress' :'org.apache.commons.compress', "Jsoup": 'org.jsoup', 'JxPath': 'org.apache.commons.jxpath', 'JacksonDatabind': 'com.fasterxml.jackson.databind', 'JacksonCore': 'com.fasterxml.jackson.core', 'Collections': 'org.apache.commons.collections4'}
+
 use_simple_filter = False
 
 
@@ -100,6 +104,7 @@ def getmetainfo(proj: str, id: str, debug=True) -> Dict[str, str]:
     cachefile = utf8open_w(cachepath)
     for (k, v) in ret.items():
         cachefile.write(f'{k}={v}\n')
+    cachefile.close()
     # cleanup
     if debug:
         print('Removing temporary file')
@@ -128,6 +133,7 @@ def resolve_profile(profile: List[str], classes_relevant: List[str], trigger_tes
     # currelevant = False
     trigger_tests_set, trigger_tests_map = parse_trigger_tests(trigger_tests)
     testmethods_set = parse_test_methods(testmethods)
+    # TODO: In, Codec 1, fail test 是从测试类的父类中继承而来，因此log中的类+方法名是父类的，和metadata中子类明+方法名不一致
     fail_coverage = get_fail_coverage(
         profile, trigger_tests_set, testmethods_set)
     curclass = ''
@@ -214,6 +220,33 @@ def parse_trigger_tests(trigger_tests):
             trigger_tests_map[classname] = [methodname]
     return trigger_tests_set, trigger_tests_map
 
+def joinprofile(profiledir):
+    profile = utf8open_a(profiledir + 'profile')
+    errortest = set()
+    for root, dirs, files in os.walk(profiledir):
+        for name in files:
+            if(re.match(r".*\.log",name)):
+                logfile = utf8open(join(root, name))
+                for line in logfile.readlines():
+                    profile.write(line)
+
+def getd4jtest_triggerclass(metadata: Dict[str, str]):
+    trigger_tests = metadata['tests.trigger'].strip().split(';')
+    trigger_classes = set()
+    for test in trigger_tests:
+        testclass = test.split('::')[0]
+        trigger_classes.add(testclass)
+    testmethods = metadata['methods.test.all'].split(';')
+    ret = set()
+    for test in testmethods:
+        testclass = test.split('::')[0]
+        if testclass in trigger_classes:
+            methods = test.split('::')[1].split(',')
+            for method in methods:
+                ret.add((testclass, method))
+    return ret
+
+    
 
 def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
     jarpath = os.path.abspath(
@@ -235,7 +268,7 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
         tmpstr = utf8open(profile_result).read()
         return json.loads(tmpstr)
 
-    profile = checkoutdir + '/trace/logs/mytrace/profile.log'
+    profile = checkoutdir + '/trace/logs/profile/profile.log'
     if debug:
         print('not found')
         print('checking profile...', end='')
@@ -243,9 +276,25 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
         if debug:
             print('not found. generating...')
         cdcmd = f'cd {checkoutdir} && '
+        # cmdlines = []
+        # testmethods_set = parse_test_methods(testmethods)
+        # for (testclass, testmethod) in testmethods_set:
+        #         cmdline = f"defects4j test -t {testclass}::{testmethod} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile},logfile={testclass}.{testmethod}.log,project={proj}\"" 
+        #         cmdline += f"> /dev/null 2>&1"
+        #         cmdlines.append(cdcmd +cmdline)
+        # processesnum = 16
+        # with Pool(processes=processesnum) as pool:
+        #     pool.map(os.system, cmdlines)
+        #     pool.close()
+        #     pool.join()
+
+
+        # here the command is single-thread? change it to multi-thread 
         simplelogcmd = f"defects4j test -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=simplelog=true,d4jdatafile={d4jdatafile},project={proj}\""
         simplelogcmd += f' > {projectbase}/trace/runtimelog/{proj}{id}.profile.log 2>&1'
+        # print(cdcmd + simplelogcmd)
         os.system(cdcmd + simplelogcmd)
+        # joinprofile(checkoutdir + '/trace/logs/profile/')
     else:
         if debug:
             print('found')
@@ -260,11 +309,53 @@ def getd4jtestprofile(metadata: Dict[str, str], proj: str, id: str, debug=True):
 
 def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     metadata = getmetainfo(proj, id, debug)
+    if not 'corrected' in metadata and proj != 'Closure':
+        # correct the metainfo about classes_relevant. some loaded src classes not in metainfo.
+        # now loaded test classes also added
+        relevant_set = set()
+        checkoutdir = f'{checkoutbase}/{proj}/{id}'
+        cdcmd = f'cd {checkoutdir} && '
+        trigger_tests = metadata['tests.trigger'].strip().split(';')
+        for trigger_test in trigger_tests:
+            loadedcmd = f'defects4j test -t {trigger_test} -a "-Djvmargs=-noverify -Djvmargs=-verbose:class" >> loaded.log'
+            os.system(cdcmd + loadedcmd)
+            pattern = '[Loaded '+classprefix[proj]
+            lines = utf8open(f'{checkoutdir}/loaded.log').readlines()
+            for line in lines:
+                index = line.find(pattern)
+                if index >= 0:
+                    index_s = line.find(' ', index) + 1
+                    index_e = line.find(' ', index_s)
+                    classname = line[index_s:index_e]
+                    relevant_set.add(classname)
+        classes_relevant = ';'.join(relevant_set)
+        metadata['classes.relevant'] = classes_relevant
+
+        cachepath = os.path.abspath(
+            f'./d4j_resources/metadata_cached/{proj}/{id}.log')
+
+        # change the content of cachefile
+        tmpfile = []
+        lines = utf8open(cachepath).readlines()
+        for line in lines:
+            line = line.strip()
+            splits = line.split('=')
+            if splits[0] == 'classes.relevant':
+                splits[1] = classes_relevant
+            tmpfile.append((splits[0],splits[1]))
+        cachefile = utf8open_w(cachepath)
+        for (k, v) in tmpfile:
+            cachefile.write(f'{k}={v}\n')
+        cachefile.write(f'corrected=true\n')
+        cachefile.close()
+
     jarpath = os.path.abspath(
         "./target/ppfl-0.0.1-SNAPSHOT-jar-with-dependencies.jar")
     classes_relevant = metadata['classes.relevant'].strip()
 
     relevant_testmethods = getd4jtestprofile(metadata, proj, id, debug)
+
+    # relevant_testmethods = getd4jtest_triggerclass(metadata)
 
     reltest_dict = {}  # {classname : [methodnames]}
     for (cname, mname) in relevant_testmethods:
@@ -289,18 +380,33 @@ def getd4jcmdline(proj: str, id: str, debug=True) -> List[str]:
     # print(reltest_dict)
     # input()
 
-    ret = []
-    # for testclass_rel in reltest_dict:
-    #     app = f"defects4j test -t {testclass_rel}::{','.join(reltest_dict[testclass_rel])} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses}\""
-    #     app += ' > /dev/null'
-    #     ret.append(app)
+    ret_fail = []
+    logTrace = False
+    trigger_tests = metadata['tests.trigger'].strip().split(';')
+    # trigger_tests at first
+    for trigger_test in trigger_tests:
+        filename = trigger_test.replace('::', '.')
+        app = f"defects4j test -t {trigger_test} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={filename}.log,project={proj},cache=GotAll\""
+        app = app.replace('$', '@') # deal with missing $ in d4j scripts
+        app += f' > trace/logs/observe/{filename}-obs.log 2>&1'
+        # if not logTrace:
+        #     app += '>/dev/null 2>&1'
+        ret_fail.append(app)
+    ret_pass = []
     for testclass_rel in reltest_dict:
         for testmethod_rel in reltest_dict[testclass_rel]:
-            app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log,project={proj}\""
-            app += '>/dev/null 2>&1'
-            ret.append(app)
-    return ret
+            if(f'{testclass_rel}::{testmethod_rel}' in trigger_tests):
+                continue
+            app = f"defects4j test -t {testclass_rel}::{testmethod_rel} -a \"-Djvmargs=-noverify -Djvmargs=-javaagent:{jarpath}=instrumentingclass={instclasses},logfile={testclass_rel}.{testmethod_rel}.log,project={proj},cache=GotAll\""
+            app = app.replace('$', '@') # deal with missing $ in d4j scripts
+            if not logTrace:
+                app += '>/dev/null 2>&1'
+            ret_pass.append(app)
+    return ret_fail,ret_pass
 
+
+def changeCacheInCmd(cmd: str, arg):
+    return cmd.replace(',cache=GotAll', arg)
 
 def checkout(proj: str, id: str):
     checkoutpath = f'{checkoutbase}/{proj}/{id}'
@@ -310,6 +416,9 @@ def checkout(proj: str, id: str):
         print("in checkout")
         os.system(
             f'defects4j checkout -p {proj} -v {id}b -w {checkoutbase}/{proj}/{id} >/dev/null 2>&1')
+    obspath = f'{checkoutpath}/trace/logs/observe'
+    if not(os.path.exists(obspath)):
+        os.makedirs(obspath)
 
 
 def deletecheckout(proj: str, id: str):
@@ -321,9 +430,11 @@ def deletecheckout(proj: str, id: str):
 def cleanupcheckout(proj: str, id: str):
     checkoutpath = f'{checkoutbase}/{proj}/{id}'
     if (os.path.exists(checkoutpath)):
+        # os.system(f'rm -rf {checkoutpath}/trace/logs/profile/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/mytrace/')
         os.system(f'rm -rf {checkoutpath}/trace/logs/run/')
         os.system(f'rm -rf {checkoutpath}/trace/classcache/')
+        os.system(f'rm -rf {checkoutpath}/trace/debug/')
 
 
 def clearcache(proj: str, id: str):
@@ -331,15 +442,38 @@ def clearcache(proj: str, id: str):
     os.system('rm '+cachepath)
 
 
-@func_set_timeout(1200)
+def checkoversize(checkoutdir, cmdline):
+    logfile = ""
+    for spt in cmdline.split(','):
+        if spt.startswith('logfile='):
+            logfile = spt.split('=')[1]
+            break
+    logpath = f'{checkoutdir}/trace/logs/run/{logfile}'
+    while True:
+        line = utf8open(logpath).readlines()[0].strip()
+        if line == 'Oversize Exit':
+            extractcmd = f'mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.Extract" "-Dexec.args={checkoutdir}/trace/logs/run/{logfile}.ser"'
+            os.system(extractcmd)
+            os.system(changeCacheInCmd(cmdline, f',cache=GenPool,fold=True'))
+            os.system(changeCacheInCmd(cmdline, f',cache=GenClass,fold=True'))
+            # os.system(extractcmd)
+        else:
+            break
+
+# @func_set_timeout(1200)
 def rund4j(proj: str, id: str, debug=True):
     cleanupcheckout(proj,id)
-    banlist = ['','Lang2','Time21']
+    banlist = ['Lang2','Time21', 'Cli6', 'Closure63', 'Closure93']
+    if(proj == 'Collections' and int(id) <= 24):
+        return
+    # banlist.append('Lang43')
+    # banlist.append('Math13')
     if((proj+id).strip() in banlist):
         return
     time_start = time.time()
     checkout(proj, id)
-    cmdlines = getd4jcmdline(proj, id, debug)
+    cmdlines_fail, cmdlines_pass= getd4jcmdline(proj, id, debug)
+    cmdlines = cmdlines_fail + cmdlines_pass
     checkoutdir = f'{checkoutbase}/{proj}/{id}'
     # cleanup previous log
     previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
@@ -348,13 +482,12 @@ def rund4j(proj: str, id: str, debug=True):
         os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
     cdcmd = f'cd {checkoutdir} && '
     cmdlines = [cdcmd + cmdline for cmdline in cmdlines]
-    with Pool(processes=1) as pool:
-        pool.map(os.system, cmdlines[0:1])
-        pool.close()
-        pool.join()
-    # os.system(cmdlines[0])
+    os.system(changeCacheInCmd(cmdlines[0], ',cache=GenPool'))
+    os.system(changeCacheInCmd(cmdlines[0], ',cache=GenClass'))
+    checkoversize(checkoutdir, cmdlines[0])
+
     processesnum = 16
-    if proj == 'Time':
+    if proj == 'Time' or proj == 'Closure':
         processesnum = 1
     with Pool(processes=processesnum) as pool:
         pool.map(os.system, cmdlines[1:])
@@ -365,6 +498,8 @@ def rund4j(proj: str, id: str, debug=True):
     #     print('testing', testclassname)
     #     # input()
     #     os.system(cdcmd + cmdline)
+    genExceptionObserve(proj, id)
+    genAssertObserve(proj, id)
     time_end = time.time()
     if debug:
         print('d4j tracing complete after', time_end-time_start, 'sec')
@@ -380,8 +515,8 @@ def rerun(proj: str, id: str):
 def parse(proj: str, id: str, debug=True):
     path = f"{checkoutbase}/{proj}/{id}/trace/logs/run"
     size = getdirsize(path)/(1024*1024)
-    if(size>3000):
-        return
+    # if(size>3000):
+    #     return
     cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"'
     if(not debug):
         cmdline += '>/dev/null 2>&1'
@@ -394,8 +529,8 @@ def parseproj(proj: str, debug=True):
     # cmdlines = [f'mvn exec:java "-Dexec.mainClass=ppfl.defects4j.GraphBuilder" "-Dexec.args={proj} {id}"' for id in range(
     #     1, project_bug_nums[proj]+1)]
     cmdlines = []
-    banlist = []
-    banlist = ['Lang2', 'Lang8' ,'Time21','Math7','Math10','Math13','Math14','Math15','Math16','Math17','Math39','Math44','Math54','Math59','Math64','Math65','Math68','Math71','Math74','Math78','Math100','Time25', 'Chart15']
+    banlist = ['Lang2', 'Time25', 'Cli6', 'Closure63', 'Closure93']
+    #banlist = ['Lang2', 'Lang8' ,'Time21','Math7','Math10','Math13','Math14','Math15','Math16','Math17','Math39','Math44','Math54','Math59','Math64','Math65','Math68','Math71','Math74','Math78','Math100','Time25', 'Chart15']
     if proj == 'MathandTime':
         proj = 'Math'
         for id in range(1, project_bug_nums[proj]+1):
@@ -415,7 +550,7 @@ def parseproj(proj: str, debug=True):
     if(not debug):
         for cmdline in cmdlines:
             cmdline = cmdline + '>/dev/null 2>&1'
-    with Pool(processes=16) as pool:
+    with Pool(processes=1) as pool:
         pool.map(os.system, cmdlines)
         pool.close()
         pool.join()
@@ -431,7 +566,7 @@ def fl(proj: str, id: str, debug=True):
     if((proj+id).strip() in banlist):
         return
     #cleanupcheckout(proj, id)
-    clearcache(proj, id)
+    # clearcache(proj, id)
     rund4j(proj, id, debug)
     parse(proj, id, debug)
 
@@ -466,6 +601,68 @@ def traceproj(proj:str,id: str, doBuild = True):
         print(f'total time: {totaltime/60}min')
     else:
         rund4j(proj,id)
+
+def rund4jtest(proj: str, id: str, test: str):
+    TestCalss = test.split('#')[0]
+    TestMethod = test.split('#')[1]
+    TestName = TestCalss + "::" + TestMethod
+    os.system('mvn package -DskipTests')
+    debug = True
+    cleanupcheckout(proj,id)
+    banlist = ['','Lang2','Time21']
+    if((proj+id).strip() in banlist):
+        return
+    time_start = time.time()
+    checkout(proj, id)
+    cmdlines_fail, cmdlines_pass= getd4jcmdline(proj, id, debug)
+    cmdlines = cmdlines_fail + cmdlines_pass
+    cmdline = ''
+    for line in cmdlines:
+        if TestName in line:
+            cmdline = line
+            break
+    checkoutdir = f'{checkoutbase}/{proj}/{id}'
+    cmdline = f'cd {checkoutdir} && {cmdline}'
+    # cleanup previous log
+    previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
+    if os.path.exists(previouslog):
+        # print('removing previous trace logs.')
+        os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
+    os.system(changeCacheInCmd(cmdline, ',cache=GenPool'))
+    os.system(changeCacheInCmd(cmdline, ',cache=GenClass'))
+    checkoversize(checkoutdir, cmdline)
+    time_end = time.time()
+    if debug:
+        print('d4j tracing complete after', time_end-time_start, 'sec')
+
+def runfailtest(proj: str, id: str):
+    # TestCalss = test.split('#')[0]
+    # TestMethod = test.split('#')[1]
+    # TestName = TestCalss + "::" + TestMethod
+    os.system('mvn package -DskipTests')
+    debug = True
+    cleanupcheckout(proj,id)
+    banlist = ['','Lang2','Time21']
+    if((proj+id).strip() in banlist):
+        return
+    time_start = time.time()
+    checkout(proj, id)
+    cmdlines_fail, cmdlines_pass= getd4jcmdline(proj, id, debug)
+    cmdlines = cmdlines_fail + cmdlines_pass
+    cmdline = cmdlines[0]
+    checkoutdir = f'{checkoutbase}/{proj}/{id}'
+    cmdline = f'cd {checkoutdir} && {cmdline}'
+    # cleanup previous log
+    previouslog = f'{checkoutdir}/trace/logs/mytrace/all.log'
+    if os.path.exists(previouslog):
+        # print('removing previous trace logs.')
+        os.system(f'rm {checkoutdir}/trace/logs/mytrace/all.log')
+    os.system(changeCacheInCmd(cmdline, ',cache=GenPool'))
+    os.system(changeCacheInCmd(cmdline, ',cache=GenClass'))
+    checkoversize(checkoutdir, cmdline)
+    time_end = time.time()
+    if debug:
+        print('d4j tracing complete after', time_end-time_start, 'sec')
 
 def testproj(proj: str):
     time_start = time.time()
@@ -551,7 +748,7 @@ def zevalproj(proj: str):
         f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
 
 
-def evalproj(proj: str):
+def evalproj(proj: str, output = True):
     no_oracle = 0
     no_result = 0
     not_listed = 0
@@ -561,7 +758,7 @@ def evalproj(proj: str):
         top.append(0)
     allbugs = project_bug_nums[proj]
     for i in range(1, allbugs+1):
-        result = eval(proj, str(i))
+        result = eval(proj, str(i), output)
         if(result > 0 and result <= 10):
             for j in range(result, 11):
                 top[j] += 1
@@ -569,8 +766,10 @@ def evalproj(proj: str):
             no_result += 1
         if result == -2:
             crashed += 1
-    print(
-        f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
+    if(output):
+        print(
+            f'top1={top[1]},top3={top[3]},top5={top[5]},top10={top[10]},failed={no_result+crashed}')
+    return (top[1], top[3], top[5], top[10], no_result+crashed)
 
 def pevalproj(proj: str):
     no_oracle = 0
@@ -606,7 +805,8 @@ def eval_method(proj: str, id: str):
             oracle_lines.add(oracle.strip().split(':')[0])
     try:
         resultfile = utf8open(
-            f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            # f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            f'logs/result/result-{proj}-{id}.log')
     except IOError:
         print(f'{proj}{id} has failed.')
         return -2
@@ -635,11 +835,12 @@ def eval_method(proj: str, id: str):
     return ret
 
 
-def eval(proj: str, id: str):
+def eval(proj: str, id: str, output = True):
     try:
         oraclefile = utf8open(f'oracle/ActualFaultStatement/{proj}/{id}')
     except IOError:
-        print(f'{proj}{id} has no oracle')
+        if(output):
+            print(f'{proj}{id} has no oracle')
         return -1
     oracle_lines = set()
     for line in oraclefile.readlines():
@@ -651,11 +852,13 @@ def eval(proj: str, id: str):
             oracle_lines.add(oracle)
     try:
         resultfile = utf8open(
-            f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            # f'trace/logs/mytrace/InfResult-{proj}{id}.log')
+            f'logs/result/result-{proj}-{id}.log')
     except IOError:
-        print(f'{proj}{id} has failed.')
+        if(output):
+            print(f'{proj}{id} has failed.')
         return -2
-    i = 0
+    i = 1
     ret = -3
     prob = 0
     lines = set()
@@ -668,6 +871,7 @@ def eval(proj: str, id: str):
         if(sp.__len__() < 3):
             print(line)
         classname = sp[0]
+        classname = classname.split('$')[0]
         methodname = sp[1]
         if methodname == '<clinit>':
             methodname = '<init>'
@@ -676,15 +880,16 @@ def eval(proj: str, id: str):
         fullname = f'{classname}:{linenumber}'
         if fullname in lines:
             continue
-        if classname.lower().startswith('test') or classname.lower().endswith('test'):
-            continue
         lines.add(fullname)
-        i += 1
         if fullname in oracle_lines:
             ret = i
             prob = float(line.split("=")[1])
             break
-    print(f'{proj}{id} result ranking: {ret}')
+        if classname.lower().startswith('test') or classname.lower().endswith('test'):
+            continue
+        i += 1
+    if(output):
+        print(f'{proj}{id} result ranking: {ret}')
     # print(f'{proj}{id} result ranking: {ret}, prob = {prob}')
     return ret
 
@@ -771,6 +976,7 @@ def gentrigger(proj: str):
 
 
 def match(proj: str, id: str):
+    newTrace = True
     oraclepath = f'./oracle/ActualFaultStatement/{proj}/{id}'
     try:
         oraclefile = utf8open(oraclepath)
@@ -781,7 +987,13 @@ def match(proj: str, id: str):
     for line in oraclefile.readlines():
         sp = line.split('||')
         for oracle in sp:
-            oracle_lines.add(oracle.strip())
+            oracle = oracle.strip()
+            lineno = oracle.split(':')[1]
+            classname = ".".join(oracle.split(':')[0].split('.')[0:-1])
+            oracle_lines.add(classname + ':' + lineno)
+    if len(oracle_lines) == 0:
+        print(f'{proj}{id} has no oracle')
+        return -1
 
     triggerpath = f'./triggertest/{proj}/{id}'
     try:
@@ -791,24 +1003,55 @@ def match(proj: str, id: str):
         return -2
     for testlog in triggertests:
         testlog = testlog.replace('::', '.')
-        logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
-        try:
-            logfile = utf8open(logpath)
-        except IOError:
-            print(f'{proj}{id} misses log of triggertest    {testlog}')
-            return -3
+        if newTrace:
+            logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log.ser'
+            if not os.path.exists(logpath):
+                print(f'{proj}{id} misses log of triggertest   {testlog}')
+                return -3
+            os.system(f"python3 s.py decoder {logpath} True >/dev/null 2>&1")
+            traecpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
+            logfile = utf8open(traecpath)
+            
+        else:
+            logpath = f'{checkoutbase}/{proj}/{id}/trace/logs/run/{testlog}.log'
+            try:
+                logfile = utf8open(logpath)
+            except IOError:
+                print(f'{proj}{id} misses log of triggertest    {testlog}')
+                return -3
         for line in logfile.readlines():
             sp = line.split(',')
             for instinfo in sp:
                 spinfo = instinfo.split('=')
                 if spinfo[0] == 'lineinfo':
                     sporacle = spinfo[1].split('#')
-                    compare_oracle = sporacle[0] + \
-                        '.'+sporacle[1]+':'+sporacle[3]
+                    # if(sporacle[0].find('$') != -1):
+                    #     sporacle[0] = sporacle[0].split('$')[0]
+                    compare_oracle = sporacle[0] + ':'+sporacle[3]
                     if compare_oracle in oracle_lines:
                         print(
                             f'{proj}{id} log has oracle,              in {testlog}')
                         return 1
+
+
+    # initpath = f'{checkoutbase}/{proj}/{id}/trace/logs/mytrace/'
+    # for root, dirs, files in os.walk(initpath):
+    #         for name in files:
+    #             if(re.match(r".*init\.log",name)):
+    #                 try:
+    #                     initfile = utf8open(join(root, name))
+    #                 except IOError:
+    #                     continue
+    #                 for line in initfile.readlines():
+    #                     sp = line.split(',')
+    #                     for instinfo in sp:
+    #                         spinfo = instinfo.split('=')
+    #                         if spinfo[0] == 'lineinfo':
+    #                             sporacle = spinfo[1].split('#')
+    #                             compare_oracle = sporacle[0] +':'+sporacle[3]
+    #                             if compare_oracle in oracle_lines:
+    #                                 print(f'{proj}{id} log has oracle,              in {name}')
+    #                                 return 1
     print(f'{proj}{id} has no oracle in trigger log')
     return 0
 
@@ -830,7 +1073,7 @@ def matchproj(proj: str):
             no_oracle += 1
         elif result == -2:
             no_trigger += 1
-        else:
+        elif result == -3:
             no_trigger_log += 1
 
     print(f'in_log = {in_log}, not_in_log = {not_in_log}, no_oracle = {no_oracle}, no trigger = {no_trigger}, no_trigger_log = {no_trigger_log}')
@@ -894,4 +1137,43 @@ def extractproj(proj: str):
     allbugs = project_bug_nums[proj]
     for i in range(1, allbugs+1):
         result = extract(proj, str(i))
-    
+
+def decoder(incheckout = False, trace = None):
+    if trace: 
+        if incheckout:
+            cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder" "-Dexec.args={trace} incheckout"'
+        else:
+            cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder" "-Dexec.args={trace}"'
+    else:
+        cmdline = f'mvn compile -q && mvn exec:java "-Dexec.mainClass=ppfl.instrumentation.TraceDecoder"'
+    os.system(cmdline)
+
+
+
+def runall():
+    for proj in alld4jprojs:
+        cmdline = f'python3 s.py rund4j {proj}'
+        os.system(cmdline)
+
+
+def parseall():
+    for proj in alld4jprojs:
+        cmdline = f'python3 s.py parsed4j {proj}'
+        os.system(cmdline)
+
+def evalall():
+    top1 = 0
+    top3 = 0
+    top5 = 0
+    top10 = 0
+    fail = 0
+    lst = ["Lang", "Math", "Chart", "Time", "Closure"]
+    for proj in lst:
+        result = evalproj(proj, False)
+        top1 += result[0]
+        top3 += result[1]
+        top5 += result[2]
+        top10 += result[3]
+        fail += result[4]
+        print(f'after {proj}, top1={top1},top3={top3},top5={top5},top10={top10},failed={fail}')
+    print(f'all: top1={top1},top3={top3},top5={top5},top10={top10},failed={fail}')

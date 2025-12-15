@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -38,6 +39,11 @@ public class DupInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertAfter(CodeIterator ci, int index,ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		// build the stmtnode(common)
 		super.buildtrace(graph);
@@ -50,6 +56,21 @@ public class DupInst extends OpcodeInst {
 			defnode.setAddress(top.getAddress());
 		}
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		// build the stmtnode(common)
+		super.build(graph);
+		Node top = graph.popStackNode();
+		assert (top.getSize() == 1);
+		usenodes.add(top);
+		defnode = graph.addStackNode(stmt,1);
+		if (top.isHeapObject()) {
+			defnode.setAddress(top.getAddress());
+		}
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		graph.pushStackNode(top);
 	}
 
 }

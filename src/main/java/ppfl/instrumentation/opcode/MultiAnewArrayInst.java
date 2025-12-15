@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //197
@@ -12,8 +13,12 @@ public class MultiAnewArrayInst extends OpcodeInst {
 	public int dimension = 0;
 
 	public MultiAnewArrayInst(int _form) {
-		super(_form, -1, 1);
+		super(_form, 1, -1);
 		this.doBuild = false;
+		this.doPop = false;
+		this.doPush = false;
+		this.doLoad = false;
+		this.doStore = false;
 	}
 
 	@Override
@@ -23,6 +28,14 @@ public class MultiAnewArrayInst extends OpcodeInst {
 		ci.write16bit(cbi.tsindex_object, instpos + 1);
 	}
 
+	@Override
+	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+		int instpos = ci.insertExGap(4);// the gap must be long enough for the following instrumentation
+		ci.writeByte(89, instpos);// dup
+		ci.writeByte(184, instpos + 1);// invokestatic
+		ci.write16bit(cbi.traceindex_object, instpos + 2);
+	}
+	
 	@Override
 	public String getinst(CodeIterator ci, int index, ConstPool constp) {
 		StringBuilder ret = new StringBuilder("\n");
@@ -36,10 +49,23 @@ public class MultiAnewArrayInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		if (defnode != null) {
-			Integer addr = graph.parseinfo.getAddressFromStack();
+			Integer addr = graph.dynamictrace.getAddressFromStack();
 			if (addr != null)
 				defnode.setAddress(addr);
 		}
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+	}
+
+	@Override public void build(ProbGraph graph){
+		super.build(graph);
+		int instpopnum = dtrace.trace.popnum;
+		for (int i = 0; i < instpopnum; i++) {
+			usenodes.add(graph.popStackNode());
+		}
+		defnode = graph.addStackNode(stmt, 1);
+		Integer addr = dtrace.getAddressFromStack();
+		assert(addr != null);
+		defnode.setAddress(addr);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 

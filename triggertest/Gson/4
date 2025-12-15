@@ -1,0 +1,1 @@
+com.google.gson.stream.JsonReaderTest::testTopLevelValueTypeWithSkipValue;com.google.gson.stream.JsonReaderTest::testTopLevelValueTypes;com.google.gson.stream.JsonWriterTest::testTopLevelValueTypes

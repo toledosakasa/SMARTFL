@@ -1,0 +1,1 @@
+com.fasterxml.jackson.databind.jsontype.TestSubtypes::testIssue1125WithDefault

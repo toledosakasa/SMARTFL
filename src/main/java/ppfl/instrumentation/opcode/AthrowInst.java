@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 
 //191
 //FIXME The frame should be poped when not being catched.
@@ -25,9 +26,14 @@ public class AthrowInst extends OpcodeInst {
 		super.buildtrace(graph);
 		// graph.throwuse = new ArrayList<>();
 		// graph.throwuse.add(defnode);
-		graph.unsolvedThrow = graph.parseinfo;
+		graph.unsolvedThrow = graph.dynamictrace;
 		graph.throwStmt = stmt;
 		graph.throwuse = usenodes;
 		graph.throwpred = prednodes;
 	}
+
+	// @Override
+	// public void build(ProbGraph graph) {
+	// 	super.build(graph);
+	// }
 }

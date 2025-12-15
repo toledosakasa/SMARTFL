@@ -5,6 +5,7 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.ProbGraph;
 
 //22
 public class LloadInst extends OpcodeInst {
@@ -37,10 +38,23 @@ public class LloadInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+		// int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
+		// ci.writeByte(184, instpos);// invokestatic
+		// ci.write16bit(cbi.traceindex_long, instpos + 1);
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		defnode.setSize(2);
 
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		defnode.setSize(2);
 	}
 
 }

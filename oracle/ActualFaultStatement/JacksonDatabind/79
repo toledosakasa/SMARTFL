@@ -1,0 +1,6 @@
+com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector.findObjectReferenceInfo:579
+com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector.findObjectReferenceInfo:580
+com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector.findObjectReferenceInfo:582
+com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.createContextual:432
+com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.createContextual:433
+com.fasterxml.jackson.databind.ser.std.BeanSerializerBase.createContextual:434

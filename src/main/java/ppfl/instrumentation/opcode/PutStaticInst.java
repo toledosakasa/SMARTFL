@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.instrumentation.CallBackIndex;
 
 //179
@@ -28,7 +29,7 @@ public class PutStaticInst extends OpcodeInst {
 	@Override
 	public void buildinit(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		String field = graph.parseinfo.getvalue("field");
+		String field = graph.dynamictrace.trace.getfield();
 		defnode = graph.addNewStaticHeapNode(field, stmt);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
@@ -37,8 +38,18 @@ public class PutStaticInst extends OpcodeInst {
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
 		usenodes.add(graph.getRuntimeStack().pop());
-		String field = graph.parseinfo.getvalue("field");
+		String field = graph.dynamictrace.trace.getfield();
 		defnode = graph.addNewStaticHeapNode(field, stmt);
+		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		usenodes.add(graph.popStackNode());
+		String name = dtrace.trace.getfield();
+		int size = dtrace.trace.getfieldsize();
+		defnode = graph.addStatic(name, stmt, size);
 		graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 	}
 

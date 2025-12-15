@@ -1,0 +1,7 @@
+com.google.javascript.rhino.jstype.JSTypeRegistry.canPropertyBeDefined:699
+com.google.javascript.rhino.jstype.RecordType.<init>:83
+com.google.javascript.rhino.jstype.RecordType.<init>:87
+com.google.javascript.rhino.jstype.RecordType.<init>:93
+com.google.javascript.rhino.jstype.RecordType.<init>:94
+com.google.javascript.rhino.jstype.RecordType.getGreatestSubtypeHelper:156
+com.google.javascript.rhino.jstype.RecordTypeBuilder.build:92

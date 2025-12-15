@@ -1,0 +1,1 @@
+com.google.javascript.jscomp.InlineGettersTest::testIssue2508576_1;com.google.javascript.jscomp.InlineGettersTest::testIssue2508576_3;com.google.javascript.jscomp.MethodCheckTest::testSeparateMethods;com.google.javascript.jscomp.RenameVarsTest::testDollarSignSuperExport2

@@ -19,6 +19,9 @@ import ppfl.ByteCodeGraph;
 import ppfl.MyWriter;
 import ppfl.Node;
 import ppfl.ParseInfo;
+import ppfl.ProbGraph;
+import ppfl.instrumentation.DynamicTrace;
+import ppfl.instrumentation.Trace;
 import ppfl.StmtNode;
 import ppfl.WriterUtils;
 import ppfl.instrumentation.CallBackIndex;
@@ -29,11 +32,12 @@ public class OpcodeInst {
 	// private static Logger debugLogger = LoggerFactory.getLogger("Debugger");
 
 	public int form;
-	String opcode;
+	public String opcode;
 
 	// buildtrace
 	protected StmtNode stmt;
 	protected ParseInfo info;
+	protected DynamicTrace dtrace;
 	protected List<Node> prednodes;
 	protected List<Node> usenodes;
 	protected Node defnode;
@@ -73,7 +77,7 @@ public class OpcodeInst {
 	}
 
 	public static String getCurrDomainType(ByteCodeGraph graph) {
-		return graph.parseinfo.domain.signature;
+		return graph.dynamictrace.getDomain().signature;
 	}
 
 	public static boolean isLongReturnMethodByDesc(String desc) {
@@ -124,7 +128,7 @@ public class OpcodeInst {
 		} else {
 			x0 = desc.substring(beginIndex + 1, endIndex);
 		}
-		Pattern pattern = Pattern.compile("\\[*L[^;]+;|\\[[ZBCSIFDJ]|[ZBCSIFDJ]");
+		Pattern pattern = Pattern.compile("\\[*L[^;]+;|\\[*[ZBCSIFDJ]|[ZBCSIFDJ]");
 		Matcher matcher = pattern.matcher(x0);
 
 		ArrayList<String> listMatches = new ArrayList<>();
@@ -151,28 +155,55 @@ public class OpcodeInst {
 		if (desc.length() < 1) {
 			return 0;
 		}
-		switch (desc.charAt(0)) {
-			case 'L':
-			case '[':
-				return cbi.tsindex_object;
-			case 'B':
-				return cbi.tsindex_byte;
-			case 'C':
-				return cbi.tsindex_char;
-			case 'D':
-				return cbi.tsindex_double;
-			case 'F':
-				return cbi.tsindex_float;
-			case 'I':
-				return cbi.tsindex_int;
-			case 'J':
-				return cbi.tsindex_long;
-			case 'S':
-				return cbi.tsindex_short;
-			case 'Z':
-				return cbi.tsindex_boolean;
-			default:
-				return 0;
+		if(ppfl.instrumentation.TraceTransformer.useNewTrace){
+			switch (desc.charAt(0)) {
+				case 'L':
+				case '[':
+					return cbi.traceindex_object;
+				case 'B':
+					return cbi.traceindex_byte;
+				case 'C':
+					return cbi.traceindex_char;
+				case 'D':
+					return cbi.traceindex_double;
+				case 'F':
+					return cbi.traceindex_float;
+				case 'I':
+					return cbi.traceindex_int;
+				case 'J':
+					return cbi.traceindex_long;
+				case 'S':
+					return cbi.traceindex_short;
+				case 'Z':
+					return cbi.traceindex_boolean;
+				default:
+					return 0;
+			}
+		}
+		else{
+			switch (desc.charAt(0)) {
+				case 'L':
+				case '[':
+					return cbi.tsindex_object;
+				case 'B':
+					return cbi.tsindex_byte;
+				case 'C':
+					return cbi.tsindex_char;
+				case 'D':
+					return cbi.tsindex_double;
+				case 'F':
+					return cbi.tsindex_float;
+				case 'I':
+					return cbi.tsindex_int;
+				case 'J':
+					return cbi.tsindex_long;
+				case 'S':
+					return cbi.tsindex_short;
+				case 'Z':
+					return cbi.tsindex_boolean;
+				default:
+					return 0;
+			}
 		}
 	}
 
@@ -316,8 +347,59 @@ public class OpcodeInst {
 		}
 	}
 
+	public void insertStack(CodeIterator ci, CallBackIndex cbi)
+		throws BadBytecode {
+
+		int instpos = ci.insertGap(3);
+		ci.writeByte(184, instpos);// invokestatic
+		ci.write16bit(cbi.stackindex, instpos + 1);
+
+		// ci.writeByte(0, instpos);// invokestatic
+		// ci.write16bit(0, instpos + 1);
+		
+	}
+
+	//FIXME: there's no need to override this, except Areturn ? 
+	// For other return insts, seems not to trace the return value now. 
+	public void insertBefore(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi, boolean isEx)
+		throws BadBytecode {
+
+		int instpos;
+		if(isEx)
+			instpos = ci.insertExGap(6);
+		else
+			instpos = ci.insertGap(6);
+		int instindex = constp.addIntegerInfo(poolindex);
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.logtraceindex, instpos + 4);
+	}
+
+	public void insertBeforeCompress(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi, boolean isEx)
+	throws BadBytecode {
+
+	int instpos;
+	if(isEx)
+		instpos = ci.insertExGap(6);
+	else
+		instpos = ci.insertGap(6);
+	int instindex = constp.addIntegerInfo(poolindex);
+	ci.writeByte(19, instpos);// ldc_w
+	ci.write16bit(instindex, instpos + 1);
+	ci.writeByte(184, instpos + 3);// invokestatic
+	ci.write16bit(cbi.logcompressindex, instpos + 4);
+	
+}
+
 	// only for invoke insts.
 	public void insertReturnSite(CodeIterator ci, int previndex, ConstPool constp, String instinfo, CallBackIndex cbi)
+			throws BadBytecode {
+		// doing nothing
+	}
+
+		// only for invoke insts.
+	public void insertReturn(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
 			throws BadBytecode {
 		// doing nothing
 	}
@@ -336,35 +418,32 @@ public class OpcodeInst {
 		// }
 	}
 
+	// extended class should override this method.
+	public void insertAfter(CodeIterator ci, int index, ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+
+	}
+
 	public void buildstmt(ByteCodeGraph graph) {
-		this.info = graph.parseinfo;
-		TraceDomain tDomain = info.domain;
-		int linenumber = info.linenumber;
-		int byteindex = info.byteindex;
+		this.dtrace = graph.dynamictrace;
+		TraceDomain tDomain = dtrace.getDomain();
+		int linenumber = dtrace.trace.lineno;
+		int byteindex = dtrace.trace.index;
 
+		// TODO: use index insteadof String name as id
 		String stmtname = tDomain.toString() + "#" + linenumber;
-		// System.out.println("At line " + stmtname);
 		stmtname = stmtname + "#" + byteindex;
-		// if (!graph.hasNode(stmtname)) {
-		//// stmt = new StmtNode(stmtname);
-		//// graph.addNode(stmtname, stmt);
-		// stmt = graph.addNewStmt(stmtname);
+		this.stmt = graph.getStmt(stmtname, this.dtrace.trace.opcode);
+
+		// // count how many times this statment has been executed
+		// if (graph.stmtcountmap.containsKey(stmtname)) {
+		// 	graph.stmtcountmap.put(stmtname, graph.stmtcountmap.get(stmtname) + 1);
 		// } else {
-		// stmt = (StmtNode) graph.getNode(stmtname);
-		// assert (stmt.isStmt());
+		// 	graph.stmtcountmap.put(stmtname, 1);
 		// }
-		this.stmt = graph.getStmt(stmtname, this.info.form);
 
-		// count how many times this statment has been executed
-		if (graph.stmtcountmap.containsKey(stmtname)) {
-			graph.stmtcountmap.put(stmtname, graph.stmtcountmap.get(stmtname) + 1);
-		} else {
-			graph.stmtcountmap.put(stmtname, 1);
-		}
-
-		if (graph.max_loop > 0 && graph.stmtcountmap.get(stmtname) > graph.max_loop) {
-			return;
-		}
+		// if (graph.max_loop > 0 && graph.stmtcountmap.get(stmtname) > graph.max_loop) {
+		// 	return;
+		// }
 
 		// auto-assigned observation: test function always true
 		if (graph.auto_oracle) {
@@ -415,31 +494,27 @@ public class OpcodeInst {
 				prednodes.add(thepred);
 		}
 
-		if (this.doLoad && info.getintvalue("load") != null) {
-			int loadvar = info.getintvalue("load");
+		if (this.doLoad && dtrace.trace.load != null) {
+			int loadvar = dtrace.trace.load;
 			Node node = graph.getLoadNodeAsUse(loadvar);
 			if (node != null)
 				usenodes.add(node);
 		}
-		if (this.doPop && info.getintvalue("popnum") != null) {
-			int instpopnum = info.getintvalue("popnum");
+		if (this.doPop && dtrace.trace.popnum != null) {
+			int instpopnum = dtrace.trace.popnum;
 			for (int i = 0; i < instpopnum; i++) {
 				usenodes.add(graph.getRuntimeStack().pop());
 			}
 		}
 		// defs
 		// stack
-		if (this.doPush && info.getintvalue("pushnum") != null) {
-			int instpushnum = info.getintvalue("pushnum");
-			// push must not be more than 1
+		if (this.doPush && dtrace.trace.pushnum != null) {
+			int instpushnum = dtrace.trace.pushnum;
 			assert (instpushnum <= 1);
 			defnode = graph.addNewStackNode(stmt);
 		}
-		if (this.doStore && info.getintvalue("store") != null) {
-			int storevar = info.getintvalue("store");
-			// if (storevar == 31) {
-			// System.out.println(graph.getDomain());
-			// }
+		if (this.doStore && dtrace.trace.store != null) {
+			int storevar = dtrace.trace.store;
 			defnode = graph.addNewVarNode(storevar, stmt);
 		}
 
@@ -449,4 +524,69 @@ public class OpcodeInst {
 			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
 		}
 	}
+
+
+	
+	public void buildStmt(ProbGraph graph) {
+		this.dtrace = graph.dynamicTrace;
+		this.stmt = graph.getStmt(dtrace.traceindex);
+		if(stmt == null)
+			this.stmt = graph.addStmt(dtrace.traceindex, dtrace.trace.opcode);
+
+		// auto-assigned observation: test function always true
+
+		String stmtName = dtrace.trace.classname + "::" + dtrace.trace.methodname;
+
+		if (stmtName.equals(graph.testname)|| graph.d4jTestClasses.contains(dtrace.trace.classname)
+				|| stmtName.startsWith("junit")) {
+			stmt.observe(true);
+		}
+	}
+
+	// override needed.
+	public void build(ProbGraph graph){
+		// build the stmtnode(common)
+		buildStmt(graph);
+		this.prednodes = new ArrayList<>();
+		this.usenodes = new ArrayList<>();
+		this.defnode = null;
+
+		if (this.doPred) {
+			Node thepred = graph.getPred();
+			if (thepred != null)
+				prednodes.add(thepred);
+		}
+
+		if (this.doLoad && dtrace.trace.load != null) {
+			int loadvar = dtrace.trace.load;
+			Node node = graph.getVarNode(loadvar);
+			// 有时会有一些的非调用得到的函数出现在trace中，会导致没有对应的参数node
+			if (node != null)
+				usenodes.add(node);
+		}
+		if (this.doPop && dtrace.trace.popnum != null) {
+			int instpopnum = dtrace.trace.popnum;
+			for (int i = 0; i < instpopnum; i++) {
+				usenodes.add(graph.popStackNode());
+			}
+		}
+		// defs
+		// stack
+		if (this.doPush && dtrace.trace.pushnum != null) {
+			int instpushnum = dtrace.trace.pushnum;
+			assert (instpushnum <= 1);
+			defnode = graph.addStackNode(this.stmt, 1);
+		}
+		if (this.doStore && dtrace.trace.store != null) {
+			int storevar = dtrace.trace.store;
+			defnode = graph.addVarNode(storevar, stmt, 1);
+		}
+
+		// build factor.
+		if (this.doBuild && defnode != null) {
+			// TODO should consider ops.
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+		}
+	}
+
 }

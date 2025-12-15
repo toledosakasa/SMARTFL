@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.ProbGraph;
 
 //135,138,141
 public class DturntypeInst extends OpcodeInst {
@@ -28,4 +29,17 @@ public class DturntypeInst extends OpcodeInst {
 		ci.write16bit(cbi.tsindex_double, instpos + 1);
 	}
 
+	@Override
+	public void insertAfter(CodeIterator ci, int index,  ConstPool constp, CallBackIndex cbi)
+			throws BadBytecode {
+		// int instpos = ci.insertExGap(3);// the gap must be long enough for the following instrumentation
+		// ci.writeByte(184, instpos);// invokestatic
+		// ci.write16bit(cbi.traceindex_double, instpos + 1);
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		defnode.setSize(2);
+	}
 }

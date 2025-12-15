@@ -1,0 +1,2 @@
+org.apache.commons.codec.language.bm.Lang.<init>:98,102
+org.apache.commons.codec.language.bm.PhoneticEngine.applyFinalRules:338||org.apache.commons.codec.language.bm.PhoneticEngine.applyFinalRules:361||org.apache.commons.codec.language.bm.PhoneticEngine.applyFinalRules:364

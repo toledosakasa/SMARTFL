@@ -11,10 +11,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.ObjectInputStream;
+
+import ppfl.instrumentation.TracePool;
 import ppfl.instrumentation.TraceDomain;
+import ppfl.instrumentation.DynamicTrace;
+import ppfl.instrumentation.TraceSequence;
+import ppfl.instrumentation.Interpreter;
+import ppfl.instrumentation.Trace;
+import ppfl.instrumentation.TraceTransformer;
 
 public class JoinedTrace {
 
+  private TracePool tracePool;
   private Set<String> d4jMethodNames = new HashSet<>();
   private Set<String> d4jTriggerTestNames = new HashSet<>();
   private Set<TraceDomain> tracedDomain = new HashSet<>();
@@ -23,14 +34,14 @@ public class JoinedTrace {
   public List<TraceChunk> traceList = new ArrayList<>();
   public TraceChunk staticInits = new TraceChunk("<init>");
 
-  private List<String> setUpTraces = null;
+  // private List<String> setUpTraces = null;
 
   public void sortChunk() {
     this.traceList.sort(new Comparator<TraceChunk>() {
       @Override
       public int compare(TraceChunk arg0, TraceChunk arg1) {
         if (arg0.testpass == arg1.testpass) {
-          return arg0.parsedTraces.size() - arg1.parsedTraces.size();
+          return arg0.parsedDTraces.size() - arg1.parsedDTraces.size();
         } else {
           return arg0.testpass ? 1 : -1;
         }
@@ -42,42 +53,44 @@ public class JoinedTrace {
     TraceChunk toadd = new TraceChunk(fullname);
     toadd.testpass = getD4jTestState(fullname);
     traceList.add(toadd);
-    if (setUpTraces != null) {
-      toadd.addSetUp(setUpTraces);
-      setUpTraces = null;
-    }
+    // if (setUpTraces != null) {
+    //   toadd.addSetUp(setUpTraces);
+    //   setUpTraces = null;
+    // }
   }
 
-  private void addSingleTrace(String trace) {
-    if (setUpTraces != null) {
-      setUpTraces.add(trace);
-      return;
-    }
-    if (!traceList.isEmpty())
-      traceList.get(traceList.size() - 1).add(trace);
-  }
+  // private void addSingleTrace(String trace) {
+  //   if (setUpTraces != null) {
+  //     setUpTraces.add(trace);
+  //     return;
+  //   }
+  //   if (!traceList.isEmpty())
+  //     traceList.get(traceList.size() - 1).add(trace);
+  // }
 
-  private boolean isD4jTestMethod(String longname) {
-    // String longname = className + "::" + methodName;
-    // System.out.println(longname);
-    return d4jMethodNames.contains(longname);
-  }
+  // private boolean isD4jTestMethod(String longname) {
+  //   // String longname = className + "::" + methodName;
+  //   // System.out.println(longname);
+  //   return d4jMethodNames.contains(longname);
+  // }
 
-  private boolean isSetUp(String longname) {
-    return longname.endsWith("::setUp");
-  }
+  // private boolean isSetUp(String longname) {
+  //   return longname.endsWith("::setUp");
+  // }
 
-  private void addSetUp(String t) {
-    this.setUpTraces = new ArrayList<>();
-    // this.setUpTraces.add(t);
-  }
+  // private void addSetUp(String t) {
+  //   this.setUpTraces = new ArrayList<>();
+  //   // this.setUpTraces.add(t);
+  // }
 
+  // return false for trigger test, true for other tests, Exception if the name is not in d4j tests
   private boolean getD4jTestState(String fullname) {
     assert (d4jMethodNames.contains(fullname));
     return !d4jTriggerTestNames.contains(fullname);
   }
 
-  public JoinedTrace(Set<String> d4jMethodNames, Set<String> d4jTriggerTestNames, Set<TraceDomain> tracedDomain) {
+  public JoinedTrace(TracePool tracePool, Set<String> d4jMethodNames, Set<String> d4jTriggerTestNames, Set<TraceDomain> tracedDomain) {
+    this.tracePool = tracePool;
     this.d4jMethodNames = d4jMethodNames;
     this.d4jTriggerTestNames = d4jTriggerTestNames;
     this.tracedDomain = tracedDomain;
@@ -113,95 +126,165 @@ public class JoinedTrace {
   public void parseFolder(String path) {
     File folder = new File(path);
     File[] fs = folder.listFiles();
-    for (File f : fs) {
-      if (f.getName().equals("all.log"))
-        continue;
-      parseSepFile(f, f.getName());
+    if (TraceTransformer.useNewTrace) {
+      for (File f : fs) {
+        if (f.getName().equals("all.log.ser"))
+          continue;
+        String suffix = ".log.ser";
+        if (f.getName().endsWith(suffix))
+          parseInfo(f, f.getName());
+      }
+    } else {
+      // for (File f : fs) {
+      //   if (f.getName().equals("all.log"))
+      //     continue;
+      //   parseSepFile(f, f.getName());
+      // }
+      // parseToInfo();
+
     }
-    parseToInfo();
   }
 
-  private void parseSepFile(File f, String name) {
-    String suffix = ".log";
-    if (name.endsWith(suffix))
-      name = name.substring(0, name.length() - suffix.length());
+  private void parseInfo(File f, String name) {
+    // System.out.printf("dddd "+name+"\n");
+    String suffix = ".log.ser";
+
+    // if (name.endsWith(suffix))
+    name = name.substring(0, name.length() - suffix.length());
     int index = name.lastIndexOf('.');
     String fullname = name.substring(0, index) + "::" + name.substring(index + 1);
     if (getD4jTestState(fullname) && f.length() > MAX_FILE_LIMIT) {
       return;
     }
-    // Lang-6
-    // if (!fullname.endsWith("testMath221"))
-    // return;
+
+    TraceSequence traceseq = null;
+    try {
+      // System.out.printf("yyyy "+f.getAbsolutePath()+"\n");
+      FileInputStream fileIn = new FileInputStream(f.getAbsolutePath());
+      BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+      ObjectInputStream in = new ObjectInputStream(bufferedIn);
+      traceseq = (TraceSequence) in.readObject();
+      traceseq.setTracePool(tracePool);
+      // System.out.printf("yyyy "+traceseq.get(0).trace.classname +"\n");
+      in.close();
+      fileIn.close();
+    } catch (IOException i) {
+      // i.printStackTrace();
+      System.out.printf("IOException at " + fullname + "\n");
+      return;
+    } catch (ClassNotFoundException c) {
+      System.out.println("TraceSequence class not found at" + fullname + "\n");
+      // c.printStackTrace();
+      return;
+    }
     this.addTraceChunk(fullname);
-    try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
-      String delimiterPrefix = "###";
-      String t = null;
-      while ((t = reader.readLine()) != null) {
-        if (t.isEmpty()) {
-          continue;
-        }
-        if (t.startsWith(delimiterPrefix)) {
-          // System.out.println(t);
-          t = t.substring(delimiterPrefix.length());
-          // if (isSetUp(t)) {
-          // this.addSetUp(t);
-          // }
-          if (isD4jTestMethod(t)) {
-            // this.addTraceChunk(t);
-          }
-          if (t.startsWith("RET@")) {
-            this.addSingleTrace(t);
-          }
-        } else {
-          this.addSingleTrace(t);
-        }
+    TraceChunk thischunk = traceList.get(traceList.size() - 1);
+    int size = traceseq.size();
+    // System.out.println(size);
+    for (int i = 0; i < size; i++) {
+      DynamicTrace dtrace = traceseq.get(i);
+
+      // TODO: 检测何时会发生，若没有fail test，直接丢弃这种测试
+      // if(dtrace==null){
+      //   // System.err.println(String.format("dynamicTrace %d/%d is null in TraceThunk %s",i,size,thischunk.fullname));
+      //   continue;
+      // }
+
+      if (dtrace.trace.type == Trace.LogType.Inst) {
+        thischunk.parseOneTrace(dtrace);
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+      // if (dtrace.isret)
+      // traceList.get(traceList.size() - 1).parseOneTrace(dtrace);
+      // } else {
+      // traceList.get(traceList.size() - 1).parseOneTrace(dtrace);
+      // }
     }
   }
 
-  // this could be memory-unfriendly.
-  // some pruning will be done here.
-  public void parseFile(String tracefilename) {
-    this.traceList = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
-      String t = null;
-      String delimiterPrefix = "###";
-      int i = 0;
-      while ((t = reader.readLine()) != null) {
-        // System.out.println(t.length());
-        ++i;
-        // if (t.endsWith("AggregateTrans")) {
-        // System.out.println(i);
-        // System.out.println(t);
-        // }
-        if (t.isEmpty()) {
-          continue;
-        }
-        if (t.startsWith(delimiterPrefix)) {
-          // System.out.println(t);
-          t = t.substring(delimiterPrefix.length());
-          // String[] splt = t.split("::");
-          if (isSetUp(t)) {
-            this.addSetUp(t);
-          }
-          if (isD4jTestMethod(t)) {
-            this.addTraceChunk(t);
-          }
-          if (t.startsWith("RET@")) {
-            this.addSingleTrace(t);
-          }
-        } else {
-          this.addSingleTrace(t);
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    parseToInfo();
-  }
+  // deprecated
+  // private void parseSepFile(File f, String name) {
+  //   String suffix = ".log";
+  //   if (name.endsWith(suffix))
+  //     name = name.substring(0, name.length() - suffix.length());
+  //   int index = name.lastIndexOf('.');
+  //   String fullname = name.substring(0, index) + "::" + name.substring(index + 1);
+  //   if (getD4jTestState(fullname) && f.length() > MAX_FILE_LIMIT) {
+  //     return;
+  //   }
+  //   // Lang-6
+  //   // if (!fullname.endsWith("testMath221"))
+  //   // return;
+  //   this.addTraceChunk(fullname);
+  //   try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
+  //     String delimiterPrefix = "###";
+  //     String t = null;
+  //     while ((t = reader.readLine()) != null) {
+  //       if (t.isEmpty()) {
+  //         continue;
+  //       }
+  //       if (t.startsWith(delimiterPrefix)) {
+  //         // System.out.println(t);
+  //         t = t.substring(delimiterPrefix.length());
+  //         // if (isSetUp(t)) {
+  //         // this.addSetUp(t);
+  //         // }
+  //         if (isD4jTestMethod(t)) {
+  //           // this.addTraceChunk(t);
+  //         }
+  //         if (t.startsWith("RET@")) {
+  //           this.addSingleTrace(t);
+  //         }
+  //       } else {
+  //         this.addSingleTrace(t);
+  //       }
+  //     }
+  //   } catch (IOException e) {
+  //     e.printStackTrace();
+  //   }
+  // }
+
+
+	// deprecated
+  // // this could be memory-unfriendly.
+  // // some pruning will be done here.
+  // public void parseFile(String tracefilename) {
+  //   this.traceList = new ArrayList<>();
+  //   try (BufferedReader reader = new BufferedReader(new FileReader(tracefilename))) {
+  //     String t = null;
+  //     String delimiterPrefix = "###";
+  //     int i = 0;
+  //     while ((t = reader.readLine()) != null) {
+  //       // System.out.println(t.length());
+  //       ++i;
+  //       // if (t.endsWith("AggregateTrans")) {
+  //       // System.out.println(i);
+  //       // System.out.println(t);
+  //       // }
+  //       if (t.isEmpty()) {
+  //         continue;
+  //       }
+  //       if (t.startsWith(delimiterPrefix)) {
+  //         // System.out.println(t);
+  //         t = t.substring(delimiterPrefix.length());
+  //         // String[] splt = t.split("::");
+  //         if (isSetUp(t)) {
+  //           this.addSetUp(t);
+  //         }
+  //         if (isD4jTestMethod(t)) {
+  //           this.addTraceChunk(t);
+  //         }
+  //         if (t.startsWith("RET@")) {
+  //           this.addSingleTrace(t);
+  //         }
+  //       } else {
+  //         this.addSingleTrace(t);
+  //       }
+  //     }
+  //   } catch (IOException e) {
+  //     e.printStackTrace();
+  //   }
+  //   parseToInfo();
+  // }
 
   private void parseStaticInfo() {
     try {
@@ -211,18 +294,20 @@ public class JoinedTrace {
     }
   }
 
-  private void parseToInfo() {
-    // prune
-    Iterator<TraceChunk> it = this.traceList.iterator();
-    while (it.hasNext()) {
-      TraceChunk chunk = it.next();
-      try {
-        chunk.prune(this.tracedDomain);
-      } catch (Exception e) {
-        System.err.println("prune at " + chunk.fullname + " failed");
-        it.remove();
-        // this.traceList.remove(chunk);
-      }
-    }
-  }
+  // deprecated
+  // private void parseToInfo() {
+  //   // prune
+  //   Iterator<TraceChunk> it = this.traceList.iterator();
+  //   while (it.hasNext()) {
+  //     TraceChunk chunk = it.next();
+  //     try {
+  //       chunk.prune(this.tracedDomain);
+  //     } catch (Exception e) {
+  //       System.err.println("prune at " + chunk.fullname + " failed");
+  //       it.remove();
+  //       // this.traceList.remove(chunk);
+  //     }
+  //   }
+  // }
+
 }

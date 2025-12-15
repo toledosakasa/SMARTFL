@@ -1,0 +1,1 @@
+com.google.javascript.jscomp.PeepholeFoldConstantsTest::testFoldTypeof;com.google.javascript.jscomp.SourceMapTest::testGoldenOutput0;com.google.javascript.jscomp.SourceMapTest::testGoldenOutput1;com.google.javascript.jscomp.SourceMapTest::testGoldenOutput2;com.google.javascript.jscomp.SourceMapTest::testGoldenOutput3;com.google.javascript.jscomp.SourceMapTest::testGoldenOutput4

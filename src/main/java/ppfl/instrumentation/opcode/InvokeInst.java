@@ -5,7 +5,10 @@ import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
 import ppfl.Node;
+import ppfl.ProbGraph;
+import ppfl.InvokeItem;
 import ppfl.instrumentation.CallBackIndex;
+import ppfl.instrumentation.Trace;
 import ppfl.instrumentation.TraceDomain;
 
 //Utils for all invoke insts.
@@ -45,11 +48,22 @@ public class InvokeInst extends OpcodeInst {
 	}
 
 	@Override
+	public void insertReturn(CodeIterator ci, ConstPool constp, int poolindex, CallBackIndex cbi)
+		throws BadBytecode {
+		int instpos = ci.insertExGap(6);
+		int instindex = constp.addIntegerInfo(poolindex);
+		ci.writeByte(19, instpos);// ldc_w
+		ci.write16bit(instindex, instpos + 1);
+		ci.writeByte(184, instpos + 3);// invokestatic
+		ci.write16bit(cbi.rettraceindex, instpos + 4);
+	}
+
+	@Override
 	public void buildtrace(ByteCodeGraph graph) {
 		super.buildtrace(graph);
-		String traceclass = info.getvalue("callclass");
-		String tracemethod = info.getvalue("callname");
-		String signature = info.getvalue("calltype");
+		String traceclass = dtrace.trace.getcallclass();
+		String tracemethod = dtrace.trace.getcallname();
+		String signature = dtrace.trace.getcalltype();
 		TraceDomain callDomain = new TraceDomain(traceclass, tracemethod, signature);
 		Boolean istraced = true;
 
@@ -64,7 +78,7 @@ public class InvokeInst extends OpcodeInst {
 			}
 		}
 
-		String desc = info.getvalue("calltype");
+		String desc = dtrace.trace.getcalltype();
 		int argcnt = OpcodeInst.getArgNumByDesc(desc);
 
 		// add An extra argument: caller:object->callee:this
@@ -79,6 +93,7 @@ public class InvokeInst extends OpcodeInst {
 			System.err.println(String.format("%d stacks is not enough for %d args", graph.getRuntimeStack().size(), argcnt));
 		}
 		for (int i = 0; i < argcnt; i++) {
+			// node size?
 			Node node = graph.getRuntimeStack().pop();
 			usenodes.add(node);
 			// System.out.println(node.getStmtName());
@@ -89,7 +104,7 @@ public class InvokeInst extends OpcodeInst {
 
 		// mark untraced invokes
 		if (!istraced) {
-			graph.untracedInvoke = graph.parseinfo;
+			graph.untracedInvoke = graph.dynamictrace;
 			graph.untracedStmt = stmt;
 			graph.untraceduse = usenodes;
 			graph.untracedpred = prednodes;
@@ -98,10 +113,12 @@ public class InvokeInst extends OpcodeInst {
 				if (!objectAddress.isHeapObject()) {
 					// System.out.println("not a object:" + objectAddress.getStmtName());
 				}
+				
 				graph.untracedObj = objectAddress;
 			}
 		} else {
-			graph.tracedInvoke = graph.parseinfo;
+			graph.tracedInvoke = graph.dynamictrace;
+			// System.exit(0);
 			graph.tracedStmt = stmt;
 			graph.traceduse = usenodes;
 			graph.tracedpred = prednodes;
@@ -142,6 +159,38 @@ public class InvokeInst extends OpcodeInst {
 		// Node defnode = graph.addNewVarNode(paravarindex, stmt, callDomain);
 		// graph.buildFactor(defnode, prednodes, adduse, null, stmt);
 		// paravarindex += curArgument.getSize();
+		// }
+	}
+
+	@Override
+	public void build(ProbGraph graph){
+		super.build(graph);
+		TraceDomain callDomain = this.dtrace.getCallDomain();
+		boolean isTraced = graph.isTraced(callDomain);
+		String signature = this.dtrace.trace.getcalltype();
+		int argcnt = OpcodeInst.getArgNumByDesc(signature);
+		argcnt += this.argadd;
+
+		// if argadd avail.
+		Node objectAddress = null;
+		for (int i = 0; i < argcnt; i++) {
+			Node node = graph.popStackNode();
+			usenodes.add(node);
+			// System.out.println(node.getStmtName());
+			if (i == argcnt - 1 && this.argadd == 1) {
+				objectAddress = node;
+			}
+		}
+
+		InvokeItem thisInvoke = new InvokeItem(stmt, usenodes, prednodes, this.dtrace, argcnt, objectAddress);
+		
+		graph.setInvoke(thisInvoke);
+		// if(isTraced)
+		// 	graph.setTraced(thisInvoke);
+		// else{
+		// 	graph.setUntraced(thisInvoke);
+		// 	// graph.pushUntraced(thisInvoke);
+		// 	// graph.pushFrame(callDomain);
 		// }
 	}
 }

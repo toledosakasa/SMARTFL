@@ -2,6 +2,7 @@ package ppfl.instrumentation.opcode;
 
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
+import ppfl.ProbGraph;
 
 //54-78
 public class Xstore_NInst extends OpcodeInst {
@@ -19,5 +20,11 @@ public class Xstore_NInst extends OpcodeInst {
 		ret.append(",store=" + storeindex);
 		return ret.toString();
 	}
-
+	
+	@Override
+	public void build(ProbGraph graph) {
+		super.build(graph);
+		if((form >= 63 && form <= 66) || (form >= 71 && form <= 74))
+			defnode.setSize(2);
+	}
 }

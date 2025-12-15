@@ -5,6 +5,8 @@ package ppfl;
 // import org.apfloat.ApfloatMath;
 
 public class Edge {
+	public static MyWriter debugLogger;
+
 	private Node node;
 	private FactorNode factor;
 	private double ntof = 0.5;
@@ -42,6 +44,7 @@ public class Edge {
 
 	public void set_fton(double val) {
 		fton = val;
+		//debugLogger.write("v = %.20f, from %s to %s\n", val, factor.id, node.getPrintName());
 	}
 
 	public double get_fton() {

@@ -1,0 +1,1 @@
+org.jsoup.parser.CharacterReaderTest::handleCarriageReturnAsLineFeed;org.jsoup.parser.CharacterReaderTest::consumeToEnd;org.jsoup.parser.ParserTest::handlesNewlinesAndWhitespaceInTag

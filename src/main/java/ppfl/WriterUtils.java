@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -74,4 +76,13 @@ public class WriterUtils {
     }
     return wMap.get(name);
   }
+
+  public static String handleException(Exception e){
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    e.printStackTrace(pw);
+    String sStackTrace = sw.toString(); // stack trace as a string
+    return sStackTrace;
+  }
+
 }

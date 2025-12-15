@@ -1,0 +1,1 @@
+org.jsoup.parser.HtmlParserTest::selfClosingOnNonvoidIsError;org.jsoup.parser.HtmlParserTest::selfClosingVoidIsNotAnError;org.jsoup.parser.HtmlParserTest::tracksErrorsWhenRequested

@@ -1,0 +1,4 @@
+com.fasterxml.jackson.core.base.ParserBase._reportTooLongIntegral:869
+com.fasterxml.jackson.core.base.ParserBase._reportTooLongIntegral:870
+com.fasterxml.jackson.core.base.ParserBase._reportTooLongIntegral:871
+com.fasterxml.jackson.core.base.ParserBase._reportTooLongIntegral.convertNumberToInt:887

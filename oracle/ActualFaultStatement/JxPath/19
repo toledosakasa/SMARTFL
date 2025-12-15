@@ -1,0 +1,2 @@
+org.apache.commons.jxpath.ri.model.dom.DOMNodePointer.getRelativePositionByQName:560||org.apache.commons.jxpath.ri.model.dom.DOMNodePointer.getRelativePositionByQName:561||org.apache.commons.jxpath.ri.model.dom.DOMNodePointer.getRelativePositionByQName:562||org.apache.commons.jxpath.ri.model.dom.DOMNodePointer.getRelativePositionByQName:563
+org.apache.commons.jxpath.ri.model.jdom.JDOMNodePointer.getRelativePositionByQName:696||org.apache.commons.jxpath.ri.model.jdom.JDOMNodePointer.getRelativePositionByQName:697

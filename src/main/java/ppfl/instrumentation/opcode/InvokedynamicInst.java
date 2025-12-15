@@ -6,7 +6,7 @@ import ppfl.ByteCodeGraph;
 public class InvokedynamicInst extends InvokeInst {
 
 	public InvokedynamicInst(int _form) {
-		super(_form, 1);
+		super(_form, 0);
 	}
 
 	@Override

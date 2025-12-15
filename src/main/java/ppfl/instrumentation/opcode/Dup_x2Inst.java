@@ -4,6 +4,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeIterator;
 import javassist.bytecode.ConstPool;
 import ppfl.ByteCodeGraph;
+import ppfl.ProbGraph;
 import ppfl.Node;
 import ppfl.instrumentation.CallBackIndex;
 
@@ -34,6 +35,11 @@ public class Dup_x2Inst extends OpcodeInst {
 		// following instrumentation
 		// ci.writeByte(184, instpos);// invokestatic
 		// ci.write16bit(cbi.tsindex_int, instpos + 1);
+	}
+
+	@Override
+	public void insertAfter(CodeIterator ci, int index,ConstPool constp, CallBackIndex cbi) throws BadBytecode {
+
 	}
 
 	@Override
@@ -71,6 +77,37 @@ public class Dup_x2Inst extends OpcodeInst {
 			graph.getRuntimeStack().push(top);
 		}
 
+	}
+
+	@Override
+	public void build(ProbGraph graph) {
+		// build the stmtnode(common)
+		super.build(graph);
+		Node top = graph.popStackNode();
+		assert (top.getSize() == 1);
+		usenodes.add(top);
+		Node nextTop = graph.popStackNode();
+		if(nextTop.getSize() == 2){
+			defnode = graph.addStackNode(stmt,1);
+			if (top.isHeapObject()) {
+				defnode.setAddress(top.getAddress());
+			}
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			graph.pushStackNode(nextTop);
+			graph.pushStackNode(top);
+		}
+		else{
+			Node thirdTop = graph.popStackNode();
+			assert (thirdTop.getSize() == 1);
+			defnode = graph.addStackNode(stmt,1);
+			if (top.isHeapObject()) {
+				defnode.setAddress(top.getAddress());
+			}
+			graph.buildFactor(defnode, prednodes, usenodes, null, stmt);
+			graph.pushStackNode(thirdTop);
+			graph.pushStackNode(nextTop);
+			graph.pushStackNode(top);
+		}
 	}
 
 }
