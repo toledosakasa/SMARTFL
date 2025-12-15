@@ -1,5 +1,11 @@
 # SmartFL
 
+## Tags
+Artifact for [ICSE 2022 paper](https://dl.acm.org/doi/10.1145/3510003.3510073): paper-icse2022
+
+Artifact for [TSE 2025 paper](https://ieeexplore.ieee.org/document/11016188): paper-tse2025
+
+
 ## Requiring
 defects4j from https://github.com/rjust/defects4j
 
